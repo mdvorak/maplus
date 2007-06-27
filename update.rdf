@@ -2,15 +2,15 @@
 <RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
           xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
-  <RDF:Description RDF:about="urn:mozilla:extension:EXTENSION@ID">
+  <RDF:Description RDF:about="urn:mozilla:extension:TODO_EXTENSION_ID">
     <em:updates>
       <RDF:Seq>
-        <RDF:li RDF:resource="urn:mozilla:extension:EXTENSION@ID"/>
+        <RDF:li RDF:resource="urn:mozilla:extension:TODO_EXTENSION_ID"/>
       </RDF:Seq>
     </em:updates>
   </RDF:Description>
 
-  <RDF:Description RDF:about="urn:mozilla:extension:EXTENSION@ID">
+  <RDF:Description RDF:about="urn:mozilla:extension:TODO_EXTENSION_ID">
     <em:version>1.0</em:version>
     <em:targetApplication>
       <RDF:Description>

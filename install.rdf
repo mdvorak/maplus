@@ -2,10 +2,10 @@
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
-    <em:id>EXTENSION@ID</em:id>
+    <em:id>TODO_EXTENSION_ID</em:id>
     <em:version>1.0</em:version>
     <em:type>2</em:type>
-    <em:name>EXTENSION_NAME</em:name>
+    <em:name>TODO_LONG_EXTENSION_NAME</em:name>
     <em:description>WebExtender extension.</em:description>
     <em:creator></em:creator>
     <em:iconURL></em:iconURL>

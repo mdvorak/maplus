@@ -34,8 +34,9 @@
  * 
  * ***** END LICENSE BLOCK ***** */
  
- const EXTENSION_NAME = "TODO";
- const EXTENSION_ID = "TODO@TODO";
+ // IMPORTANT: Find and replace all TODOs in project otherwise extension won't work properly.
+ const EXTENSION_NAME = "TODO_EXTENSION_NAME";
+ const EXTENSION_ID = "TODO_EXTENSION_ID"; // One of the ID formats is "EXTENSION_NAME@AUTHOR". for details see firefox website.
  
  var WebExtender = {
     _siteMap: new Hash(),
@@ -107,30 +108,30 @@
  
     /** Object implementation **/
     
-    init: function() {
+    _init: function() {
         var appcontent = document.getElementById("appcontent");
-        appcontent.addEventListener("load", this.onPageLoad, true);
+        appcontent.addEventListener("load", function(eventSrc) { this._onPageLoad(eventSrc); }, true);
         
-        window.addEventListener("unload", function() { this.onUnload(); }, false);
+        window.addEventListener("unload", function() { this._onUnload(); }, false);
         
-        this.init = null;
+        this._init = null;
     },
     
-    onUnload: function() {
+    _onUnload: function() {
         for (var i = 0; i < this._unloadHandlers.length; i++) {
             this._unloadHandlers[i]();
         }
     },
     
-    onPageLoad: function(eventSrc) {
+    _onPageLoad: function(eventSrc) {
         var doc = eventSrc.originalTarget;
 
         if (doc && doc.nodeName == "#document" && doc.location.href.search("http://") == 0) {
-            callExtenders(doc);
+            _callExtenders(doc);
         } 
     },
     
-    callExtenders: function(doc) {
+    _callExtenders: function(doc) {
         var extenders = this.getExtenders(doc.location.href, false);
         if (extenders) {
             var page = new Page(doc);
@@ -140,7 +141,10 @@
     }
 };
 
-window.addEventListener("load", function(e) { WebExtender.init(e); }, false);
+// Initialize WebExtender after browser has been loaded.
+window.addEventListener("load", function(e) { WebExtender._init(e); }, false);
+
+
 
 /*** Script class ***/
 

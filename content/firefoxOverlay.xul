@@ -35,7 +35,7 @@
   - 
   - ***** END LICENSE BLOCK ***** -->
 
-<overlay id="maplus-overlay"
+<overlay id="TODO_EXTENSION_NAME-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   
   <!-- WebExtender implementation -->
@@ -43,6 +43,7 @@
   <script src="webExtenderLib.js" />
   <script src="webExtender.js" />
   <script src="xmlConfig.js" />
+  <script src="inPageExtenders.js" />
 
   <!-- Custom Extenders -->
 
