@@ -45,7 +45,7 @@
     getExtenders: function(url, create) {
         if (!callback) throw "url is null.";
     
-        var m = url.match(/^http:\/\/([\w.]+)(\/[\w%.~\/]+)?(?:[?].+)?$/);
+        var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?].+)?$/);
         if (!m) throw "Invalid url format.";
         
         var site = m[1];
@@ -81,7 +81,7 @@
     registerCallback: function(url, callback) {
         if (!callback) throw "callback is null.";
     
-        var extender = Object.extend(new PageExtender(), {
+        var extender = PageExtender.create({
                 process: function(page) {
                     callback(page);
                 }
@@ -136,14 +136,27 @@
         if (extenders) {
             var page = new Page(doc);
             
+            this._initExtendedPage(page);            
             extenders.process(page);
+            this._finalizeExtendedPage(page);
+        }
+    },
+    
+    _initExtendedPage: function(page) {
+        if (InPageExtenders && InPageExtenders.finalizePage) {
+            InPageExtenders.initPage(page);
+        }
+    },
+    
+    _finalizeExtendedPage: function(page) {
+        if (InPageExtenders && InPageExtenders.finalizePage) {
+            InPageExtenders.finalizePage(page);
         }
     }
 };
 
 // Initialize WebExtender after browser has been loaded.
 window.addEventListener("load", function(e) { WebExtender._init(e); }, false);
-
 
 
 /*** Script class ***/

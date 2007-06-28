@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<extenders xmlns="extenders.xsd">
-  
-</extenders>
+<webExtender>
+  <urls>
+    <alias name="maplus">chrome://maplus</alias>
+    <alias name="melior">http://meliorannis.idnes.cz</alias>
+  </urls>
+  <stylesheets>
+    <style url="{melior}/*" src="{maplus}/html/maplus.css" />
+  </stylesheets>
+  <extenders>
+    <script url="{melior}/*" name="menu.js" type="text/javascript" />
+    <script url="{melior}/posta.html" name="posta.js" type="text/javascript" />
+    <script url="{melior}/aliance.html" name="aliance.js" type="text/javascript" />
+  </extenders>
+</webExtender>

@@ -69,6 +69,26 @@ Object.extend(Object, {
     }
 });
 
+Object.extend(String, {
+    format: function(str, args) {
+        if (!str) return null;
+        
+        for (var i = 0; i < arguments.length; i++) {
+            str = str.replace("\{" + i + "\}", arguments[i]);
+        } 
+        return str;
+    },
+    
+    formatByMap: function(str, map) {
+        if (!str) return null;
+        if (!map) return str;
+        
+        map.keys().each(function(k) {
+                str = str.replace("\{" + k + "\}", map[k]);
+            });
+        return str;
+    }
+});
 
 /*** XPath class ***/
 

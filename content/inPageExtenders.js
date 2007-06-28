@@ -35,13 +35,120 @@
  * ***** END LICENSE BLOCK ***** */
  
 var InPageExtenders = {
-    DEFINITION_URL: "extenders/extenders.xml",
-
-    load: function() {
-        var definition = Xml.load(WebExtender.getChromeUrl() + DEFINITION_URL);
+    getExtendersLocation: function() {
+        return WebExtender.getChromeUrl() + "extenders/";
+    },
+    
+    getDefinition: function() {
+        Xml.load(this.getExtendersLocation() + "extenders.xml");
+    },
+    
+    // Called directly by WebExtender
+    initPage: function(page) {
+        Script.execute("var pageExtenders = new PageExtenderCollection();", page.document);
+    },
+    
+    // Called directly by WebExtender
+    finalizePage: function(page) {
+        var transport = page.document.createElelement("WebExtenderTransport");
+        transport.id = "id_WebExtenderTransport";
+        transport.pageObject = page;
+        page.document.appendChild(transport);
+        
+        Script.execute("var _extendPage = " +
+            function() {
+                var eTransport = XPath.evaluateSingle('\\WebExtenderTransport[@id = "id_WebExtenderTransport"]');
+                if (!eTransport.pageObject)
+                    throw "Unable to get page object.";
+                if (eTransport.pageObject.document != document)
+                    throw "Invalid page object.";
+                
+                pageExtenders.process(eTransport.pageObject);
+            } + ";\n" +
+            "_extendPage(); ", page.document);
+    },
+    
+    _init: function() {
+        var definition = this.getDefinition();
+        if (definition) {
+            // Read aliases definitions
+            var aliasesDef = XPath.evaluateList('/webExtender/urls/alias', definition);
+            var aliasesMap = Hash();
+            aliasesDef.each(function(a) { aliasesMap[a.getAttribute("name")] = a.textContent; });
+            
+            // Process stylesheets
+            var stylesheets = XPath.evaluateList('/webExtender/stylesheets/style', definition);
+            stylesheets.each(function(s) {
+                    var url = String.formatByMap(s.getAttribute("url"), aliasesMap);
+                    var src = String.formatByMap(s.getAttribute("src"), aliasesMap);
+                    
+                    if (url && src) {                    
+                        var extender = new StyleExtender(src);
+                        WebExtender.registerExtender(url, extender);
+                    }
+                });
+            
+            // Process scripts
+            var scripts = XPath.evaluateList('/webExtender/extenders/script', definition);
+            scripts.each(function(s) {
+                    var url = String.formatByMap(s.getAttribute("url"), aliasesMap);
+                    var src = InPageExtenders.getExtendersLocation() + s.getAttribute("name");
+                    var type = s.getAttribute("type");
+                    
+                    if (url && s.getAttribute("name")) {                    
+                        var extender = new ScriptExtender(src, type);
+                        WebExtender.registerExtender(url, extender);
+                    }
+                });
+        }
+        
+        this._init = null;
     }
 };
 
+/** Helper classes **/
+var StyleExtender = PageExtender.create({
+    initialize: function(src) {
+        if (!src)
+            throw "src is null.";
+        this._src = src;
+    },
+
+    analyze: function(page) {
+        if (!page.document._head) {
+            page.document._head = XPath.evaluateSingle('/html/head', page.document);
+        }
+        
+        return (page.document._head) ? PageExtenderResult.OK : PageExtenderResult.CANCEL;
+    },
+    
+    process: function(page) {
+        var e = page.document.createElement("link");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("href", this._src);
+        page.document._head.appendChild(e);
+    }
+});
+
+var ScriptExtender = PageExtender.create({
+    DEFAULT_TYPE: "text/javascript",
+
+    initialize: function(src, type) {
+        if (!src)
+            throw "src is null.";
+        this._src = src;
+        this._type = (type ? type : this.DEFAULT_TYPE);
+    },
+
+    process: function(page) {
+        var e = page.document.createElement("script");
+        e.setAttribute("type", this._type);
+        e.setAttribute("src", this._src);
+        page.document.body.appendChild(e);
+    }
+});
+
 // Load defined extenders
-InPageExtenders.load();
+InPageExtenders._init();
 
