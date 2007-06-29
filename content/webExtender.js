@@ -34,51 +34,27 @@
  * 
  * ***** END LICENSE BLOCK ***** */
  
- // IMPORTANT: Find and replace all TODOs in project otherwise extension won't work properly.
- const EXTENSION_NAME = "TODO_EXTENSION_NAME";
- const EXTENSION_ID = "TODO_EXTENSION_ID"; // One of the ID formats is "EXTENSION_NAME@AUTHOR". for details see firefox website.
+// IMPORTANT: Find and replace all TODOs in project otherwise extension won't work properly.
+const EXTENSION_NAME = "TODO_EXTENSION_NAME";
+const EXTENSION_ID = "TODO_EXTENSION_ID"; // One of the ID formats is "EXTENSION_NAME@AUTHOR". for details see firefox website.
  
- var WebExtender = {
-    _siteMap: new Hash(),
-    _unloadHandlers: new Array(),
+var ExtenderCollection = Class.create();
 
-    getExtenders: function(url, create) {
-        if (!callback) throw "url is null.";
-    
-        var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?].+)?$/);
-        if (!m) throw "Invalid url format.";
-        
-        var site = m[1];
-        var path = (m[2] != null) ? m[2] : "DEFAULT";
-    
-        var site = _siteMap[site];
-        if (!site) {
-            if (!create) return null;
-        
-            site = new Hash();
-            _siteMap[site] = site;
-        }
-        
-        var urlExtenders = site[pageName];
-        if (!urlExtenders) {
-            if (!create) return null;
-            
-            urlExtenders = new Array();
-            site[pageName] = urlExtenders;
-        }
-        
-        return urlExtenders;
-    },
+// Core extension class 
+var WebExtender = {
+    _extenders: new ExtenderCollection(),
+    _unloadHandlers: new Array(),
     
     registerExtender: function(url, extender) {
+        if (!url) throw "url is null.";
         if (!extender) throw "extender is null.";
-    
-        var extenders = this.getExtenders(url, true);
-        extenders.push(extender);
+        
+        this._extenders.add(url, extender);
         return extender;
     },
     
     registerCallback: function(url, callback) {
+        if (!url) throw "url is null.";
         if (!callback) throw "callback is null.";
     
         var extender = PageExtender.create({
@@ -132,8 +108,8 @@
     },
     
     _callExtenders: function(doc) {
-        var extenders = this.getExtenders(doc.location.href, false);
-        if (extenders) {
+        var extenders = this._extenders.getList(doc.location.href);
+        if (extenders && extenders.length > 0) {
             var page = new Page(doc);
             
             this._initExtendedPage(page);            
@@ -152,6 +128,75 @@
         if (InPageExtenders && InPageExtenders.finalizePage) {
             InPageExtenders.finalizePage(page);
         }
+    }
+};
+
+ExtenderCollection.prototype = {
+    _siteMap = new Hash(),
+    _cache = new Hash(),
+    
+    _analyzeUrl: function(url) {
+        if (!url) throw "url is null.";
+    
+        var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?].+)?$/);
+        if (!m) throw "Invalid url format.";
+        
+        return {
+            site: m[1],
+            path: (m[2] != null) ? m[2] : "DEFAULT",
+            address: (this.site + this.path)
+        };
+    },
+    
+    add: function(url, e) {
+        if (!e) throw "extender is null.";
+        
+        var analyzedUrl = this._analyzeUrl(url);
+    
+        var site = this._siteMap[analyzedUrl.site];
+        if (!site) {
+            site = new Hash();
+            _siteMap[analyzedUrl.site] = site;
+        }
+        
+        var extenders = site[analyzedUrl.path];
+        if (!extenders) {
+            extenders = new Array();
+            site[analyzedUrl.path] = extenders;
+        }
+        
+        extenders.push(e);
+        this._cache.clear();
+        return e;
+    },
+    
+    getList: function(url) {
+        var analyzedUrl = this._analyzeUrl(url);
+        var extenders = this._cache[analyzedUrl.address];
+        
+        if (!extenders) {  
+            extenders = new Array();
+          
+            var site = this._siteMap[analyzedUrl.site];
+            if (site) {
+                // Find all suitable extenders
+                site.keys().each(function(k) {
+                        if (k == analyzedUrl.path) {
+                            extenders.push(site[k]);
+                        }
+                        else if (k.endsWith("*")) {
+                            var partPath = k.replace(/[*]$/, "");
+                            if (k.startsWith(partPath)) {
+                                extenders.push(site[k]);
+                            }
+                        }
+                    });
+            }
+            
+            this._cache[analyzedUrl.address] = extenders;
+        }
+        
+        return extenders;
     }
 };
 

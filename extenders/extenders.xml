@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <webExtender>
   <urls>
-    <alias name="maplus">chrome://maplus</alias>
-    <alias name="melior">http://meliorannis.idnes.cz</alias>
+    <!-- Example
+    <alias name="chrome">chrome://TODO_EXTENSION_ID</alias>
+    <alias name="foo">http://www.foo.com</alias>
+    -->
   </urls>
   <stylesheets>
-    <style url="{melior}/*" src="{maplus}/html/maplus.css" />
+    <!-- Example
+    <style url="{foo}/*" src="{chrome}/html/foo.css" />
+    -->
   </stylesheets>
   <extenders>
-    <script url="{melior}/*" name="menu.js" type="text/javascript" />
-    <script url="{melior}/posta.html" name="posta.js" type="text/javascript" />
-    <script url="{melior}/aliance.html" name="aliance.js" type="text/javascript" />
+    <!-- Example: Files must be placed in same directory as this definition.
+    <script url="{foo}/*" name="menu.js" type="text/javascript" />
+    <script url="{foo}/mail.html" name="mail.js" type="text/javascript" />
+    -->
   </extenders>
 </webExtender>
