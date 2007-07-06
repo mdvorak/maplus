@@ -2,22 +2,22 @@
 <RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
           xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
-  <RDF:Description RDF:about="urn:mozilla:extension:TODO_EXTENSION_ID">
+  <RDF:Description RDF:about="urn:mozilla:extension:maplus@michal.dvorak">
     <em:updates>
       <RDF:Seq>
-        <RDF:li RDF:resource="urn:mozilla:extension:TODO_EXTENSION_ID"/>
+        <RDF:li RDF:resource="urn:mozilla:extension:maplus@michal.dvorak"/>
       </RDF:Seq>
     </em:updates>
   </RDF:Description>
 
-  <RDF:Description RDF:about="urn:mozilla:extension:TODO_EXTENSION_ID">
-    <em:version>1.0</em:version>
+  <RDF:Description RDF:about="urn:mozilla:extension:maplus@michal.dvorak">
+    <em:version>0.5</em:version>
     <em:targetApplication>
       <RDF:Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>2.0</em:minVersion>
         <em:maxVersion>2.0.0.*</em:maxVersion>
-        <em:updateLink>TODO</em:updateLink>
+        <em:updateLink>http://maplus.zapto.org/maplus.xpi</em:updateLink>
       </RDF:Description>
     </em:targetApplication>
   </RDF:Description>

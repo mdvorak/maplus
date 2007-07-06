@@ -73,28 +73,16 @@ Object.extend(String, {
     format: function(str, args) {
         if (!str) return null;
         
-        for (var i = 0; i < arguments.length; i++) {
+        for (var i = 1; i < arguments.length; i++) {
             str = str.replace("\{" + i + "\}", arguments[i]);
         } 
-        return str;
-    },
-    
-    formatByMap: function(str, map) {
-        if (!str) return null;
-        if (!map) return str;
-        
-        map.keys().each(function(k) {
-                str = str.replace("\{" + k + "\}", map[k]);
-            });
         return str;
     }
 });
 
 /*** XPath class ***/
 
-var XPath = Class.create();
-
-Object.extend(XPath, {
+var XPath = {
     evaluate: function(xpath, context, resultType) {
         if (!xpath) return null;
         if (!context) context = document;
@@ -110,7 +98,7 @@ Object.extend(XPath, {
         
         if (result) {
             for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
-                list.push(i);
+                list.push($X(i));
             }
         }
         
@@ -119,7 +107,7 @@ Object.extend(XPath, {
     
     evaluateSingle: function(xpath, context) {
         var result = this.evaluate(xpath, context, XPathResult.ANY_TYPE);
-        return result ? result.iterateNext() : null;
+        return result ? $X(result.iterateNext()) : null;
     },
     
     evaluateString: function(xpath, context) {
@@ -130,18 +118,61 @@ Object.extend(XPath, {
     evaluateNumber: function(xpath, context) {
         var result = this.evaluate(xpath, context, XPathResult.NUMBER_TYPE);
         return result ? result.numberValue : null;
+    },
+    
+    extend: function(element) {
+        element = $(element);
+    
+        if (element._xpathExtended)
+            return element;
+    
+        for (var property in XPath.Methods) {
+            var value = XPath.Methods[property];
+            if (typeof value == 'function' && !(property in element))
+                element[property] = value;
+            }
+        }
+        
+        element._xpathExtended = true;
+        return element;
     }
-});
+};
+
+XPath.Methods = {
+    evaluateList: function(xpath) {
+        return XPath.evaluateList(xpath, this);
+    },
+    
+    evaluateSingle: function(xpath) {
+        return XPath.evaluateSingle(xpath, this);
+    },
+    
+    evaluateString: function(xpath) {
+        return XPath.evaluateString(xpath, this);
+    },
+    
+    evaluateNumber: function(xpath) {
+        return XPath.evaluateNumber(xpath, this);
+    }
+};
+
+function $X(element) {
+    return XPath.extend(element);
+}
+
+function $XF(xpath, context) {
+    return XPath.evaluateSingle(xpath, context);
+}
 
 /*** Page class ***/
 var Page = Class.create();
 
 Page.prototype = {
     initialize: function(doc) {
-        // Note: when you use other than default document, you can't use prototype methods, like $('abc').
+        // Note: when you use other than default document, you can't use some prototype methods, like $('abc').
         if (doc == null) doc = document;
     
-        this.document = doc;
+        this.document = $(doc);
         this.url = this.document.location.href;
         this.name = this.url.match(/\/([\w.]+?)([?].+?)?$/)[1];
         
@@ -149,53 +180,60 @@ Page.prototype = {
         this.arguments = new Hash();
         
         var args = this.url.match(/\b\w+=.+?(?=&|$)/g);
-        for (var i in args) {
-            var pair = args[i].split("=");
-            this.arguments[pair[0]] = pair[1];
+        if (args) {
+            args.each(function(arg) {
+                var pair = arg.split("=");
+                this.arguments[pair[0]] = pair[1];
+            });
         }
     }
 };
 
 /*** PageExtender class ***/
-var PageExtenderResult = {
-    OK: 0,
-    CANCEL: 1,
-    ABORT: -1
-};
-
 var PageExtender = Class.create();
 
 PageExtender.prototype = {
-    analyze: function(page) {
-        return PageExtenderResult.OK;
+    initialize: function() {
+        this.weak = false;
+    },
+
+    analyze: function(page, context, static) {
+        return true;
     },
     
-    process: function(page) {
+    process: function(page, context, static) {
     }
 };
 
 Object.extend(PageExtender, {
+    // Creates instance of PageExtender with customized implementation. Ideal for single-purpose extenders
     create: function(definition) {
         return Object.extend(new PageExtender(), definition);
+    },
+    
+    createClass: function(definition) {
+        var cls = Class.create();
+        Object.extend(cls, PageExtender.prototype);
+        return Object.extend(cls, definition);
     }
 });
 
 /* PageExtender example
 
 var myPageExtender = PageExtender.create({
-    analyze: function(page) {
-        // Use page for data used in other extenders, and this for local.
+    analyze: function(page, context) {
+        // Use page for data used in other extenders, and context for local.
         page.something = $('something');
-        this.else = $('else');
+        context.else = $('else');
         
-        if (!Page.something || !this.else)
-            return PageExtenderResult.CANCEL;
+        if (!Page.something || !context.else)
+            return false;
         
-        return PageExtenderResult.OK;
+        return true;
     },
     
-    process: function(page) {
-        this.else.hide();
+    process: function(page, context) {
+        context.else.hide();
         page.something.style.width = "10px";
     }
 });
@@ -209,35 +247,94 @@ var myPageExtender = PageExtender.create({
 var PageExtenderCollection = Class.create();
 
 PageExtenderCollection.prototype = {
-    _extenders: new Array(),
-
-    register: function(extender) {
-        if (!extender) return;
-        this._extenders.push(extender);
+    initialize: function() {
+        this._extenders = new Array();
+        this._significant = 0;
+    },
+    
+    size: function() {
+        return this._extenders.length;
+    },
+    
+    significantSize: function() {
+        return this._significant;
     },
 
-    process: function() {
-        var abort = false;
-        var processList = new Array();
+    add: function(extender) {
+        if (!extender) return;
+        this._extenders.push(extender);
         
-        // Analyze 
-        this._extenders.each(function(e) {
-                var r = e.analyze();
+        if (!extender.weak)
+            this._significant++;
+    },
+
+    process: function(page, static) {
+        try {
+            var processList = new Array();
             
-                if (r == PageExtenderResult.OK)
-                    processList.push(e);
-                abort |= (r == PageExtenderResult.ABORT);
-            });
+            // Analyze 
+            this._extenders.each(function(e) {
+                    if (!e) return;
+                    
+                    var context = new Object();
+                    if (e.analyze(page, context, static))
+                        processList.push([e, context]);
+                });
 
-        if (abort)
+            // Process
+            processList.each(function(entry) {
+                    var extender = entry[0];
+                    var context = entry[1];
+                    extender.process(page, context, static);
+                });
+
+            return true;
+        }
+        catch (ex) {
+            // TODO: log error
             return false;
-
-        // Process
-        this.processList.each(function(e) {
-                e.process();
-            });
-
-        return true;
+        }
     }
 };
 
+
+/*** Custom extender classes ***/
+
+var ScriptExtender = PageExtender.createClass({
+    DEFAULT_TYPE: "text/javascript",
+
+    initialize: function(src, type) {
+        if (!src)
+            throw "src is null.";
+        this._src = src;
+        this._type = (type ? type : this.DEFAULT_TYPE);
+    },
+
+    process: function(page, context, static) {
+        var e = page.document.createElement("script");
+        e.setAttribute("type", this._type);
+        e.setAttribute("src", this._src);
+        page.document.body.appendChild(e);
+    }
+});
+
+var StyleExtender = PageExtender.createClass({
+    initialize: function(src) {
+        if (!src)
+            throw "src is null.";
+        this._src = src;
+    },
+
+    analyze: function(page, context, static) {
+        context.head = XPath.evaluateSingle('/html/head', page.document);
+        return (context.head != null);
+    },
+    
+    process: function(page, context, static) {
+        var e = page.document.createElement("link");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("href", this._src);
+        context.head.appendChild(e);
+    }
+});

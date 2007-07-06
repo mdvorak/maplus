@@ -57,7 +57,7 @@ var Xml = Object.extend(Xml || {}, {
         serializer.serializeToStream(dom, foStream, ""); 
         foStream.close();
     }
-};
+});
  
 /*** XmlConfig class ***/
 var XmlConfig = {
@@ -131,6 +131,9 @@ var XmlConfig = {
 var XmlConfigNode = Class.create();
  
 XmlConfigNode.prototype = {
+    initialize: function() {
+    },
+
     addPref: function(name, value) {
         var elem = this.ownerDocument.createElement(name);
         
@@ -224,8 +227,6 @@ XmlConfigNode.prototype = {
 var XmlConfigManager = Class.create();
 
 XmlConfigManager.prototype = {
-    _cache: new Hash(),
-
     initialize: function(directory, rootName, initCallback) {
         if (!directory)
             throw "directory is null.";
@@ -233,6 +234,7 @@ XmlConfigManager.prototype = {
         if (!rootName)
             rootName = XmlConfig.DEFAULT_ROOT_NAME;
             
+        this._cache = new Hash();
         this._directory = directory;
         this._rootName = rootName;
         this._initCallback = initCallback;
@@ -271,6 +273,7 @@ XmlConfigManager.prototype = {
     },
     
     saveAll: function(name) {
-        this._cache.keys().each(saveConfig);
+        var _this = this;
+        this._cache.keys().each(function(e) { _this.saveConfig(e); });
     }
 };

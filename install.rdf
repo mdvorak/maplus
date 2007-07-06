@@ -2,15 +2,15 @@
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
-    <em:id>TODO_EXTENSION_ID</em:id>
-    <em:version>1.0</em:version>
+    <em:id>maplus@michal.dvorak</em:id>
+    <em:version>0.5</em:version>
     <em:type>2</em:type>
-    <em:name>TODO_LONG_EXTENSION_NAME</em:name>
-    <em:description>WebExtender extension.</em:description>
-    <em:creator></em:creator>
-    <em:iconURL></em:iconURL>
-    <em:homepageURL></em:homepageURL>
-    <em:updateURL></em:updateURL>
+    <em:name>Melior Annis Plus</em:name>
+    <em:description>Vylepseni pro hru Melior Annis.</em:description>
+    <em:creator>Michal Dvorak</em:creator>
+    <em:iconURL>chrome://maplus/skin/icon.png</em:iconURL>
+    <em:homepageURL>http://maplus.zapto.org/</em:homepageURL>
+    <em:updateURL>http://maplus.zapto.org/maplus.rdf</em:updateURL>
     
     <em:targetApplication>
       <Description>

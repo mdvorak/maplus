@@ -33,17 +33,110 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
-// IMPORTANT: Find and replace all TODOs in project otherwise extension won't work properly.
-const EXTENSION_NAME = "TODO_EXTENSION_NAME";
-const EXTENSION_ID = "TODO_EXTENSION_ID"; // One of the ID formats is "EXTENSION_NAME@AUTHOR". for details see firefox website.
- 
+
 var ExtenderCollection = Class.create();
+
+ExtenderCollection.prototype = {
+    initialize: function() {
+        this._generic = new Array();
+        this._siteMap = new Hash();
+        this._cache = new Hash();
+    },
+    
+    _analyzeUrl: function(url) {
+        if (!url) throw "url is null.";
+
+        var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?].+)?$/);
+        if (!m) return null;
+        
+        var site = m[1];
+        var path = (m[2] != null) ? m[2] : "DEFAULT";
+        
+        return {
+            site: site,
+            path: path,
+            address: (site + path)
+        };
+    },
+    
+    add: function(url, e) {
+        if (!e) throw "extender is null.";
+        
+        // Clear cache
+        this._cache.remove();
+        
+        // Special case - generic extender
+        if (url == "*") {
+            this._generic.push(e);
+            return e;
+        }
+        
+        var analyzedUrl = this._analyzeUrl(url);
+        if (!analyzedUrl)
+            throw "Invalid url format.";
+    
+        var site = this._siteMap[analyzedUrl.site];
+        if (!site) {
+            site = new Hash();
+            this._siteMap[analyzedUrl.site] = site;
+        }
+        
+        var extenders = site[analyzedUrl.path];
+        if (!extenders) {
+            extenders = new Array();
+            site[analyzedUrl.path] = extenders;
+        }
+        
+        extenders.push(e);
+        return e;
+    },
+    
+    getList: function(url) {
+        var analyzedUrl = this._analyzeUrl(url);
+        if (!analyzedUrl)
+            return null;
+        
+        var extenders = this._cache[analyzedUrl.address];
+        
+        if (!extenders) {  
+            var site = this._siteMap[analyzedUrl.site];
+            if (site) {
+                extenders = new PageExtenderCollection();
+                
+                // Add generic extenders
+                this._generic.each(function(e) { extenders.add(e); });
+            
+                // Find all suitable extenders
+                site.keys().each(function(k) {
+                        var add = false;
+                        
+                        if (k == analyzedUrl.path) {
+                            add = true;
+                        }
+                        else if (k.endsWith("*")) {
+                            var partPath = k.replace(/[*]$/, "");
+                            if (k.startsWith(partPath)) {
+                                add = true;
+                            }
+                        }
+                        
+                        if (add)
+                            site[k].each(function(e) { extenders.add(e); });
+                    });
+                    
+                this._cache[analyzedUrl.address] = extenders;
+            }
+        }
+        
+        return extenders;
+    }
+};
 
 // Core extension class 
 var WebExtender = {
     _extenders: new ExtenderCollection(),
     _unloadHandlers: new Array(),
+    _staticContent: new Object(),
     
     registerExtender: function(url, extender) {
         if (!url) throw "url is null.";
@@ -71,6 +164,10 @@ var WebExtender = {
         this._unloadHandlers.push(callback);
     },
     
+    getStaticContent: function() {
+        return this._staticContent;
+    },
+    
     getDirectory: function() {
         return Components.classes["@mozilla.org/extensions/manager;1"]
                     .getService(Components.interfaces.nsIExtensionManager)
@@ -79,16 +176,22 @@ var WebExtender = {
     },
     
     getChromeUrl: function() {
-        return "chrome://" + EXTENSION_ID + "/";
+        return "chrome://" + EXTENSION_NAME + "/";
+    },
+    
+    getContentUrl: function() {
+        return this.getChromeUrl() + "content/";
     },
  
     /** Object implementation **/
     
     _init: function() {
-        var appcontent = document.getElementById("appcontent");
-        appcontent.addEventListener("load", function(eventSrc) { this._onPageLoad(eventSrc); }, true);
+        var _this = this;
+    
+        var appcontent = document.getElementById("appcontent");        
+        appcontent.addEventListener("load", function(event) { _this._onPageLoad(event); }, true);
         
-        window.addEventListener("unload", function() { this._onUnload(); }, false);
+        window.addEventListener("unload", function() { _this._onUnload(); }, false);
         
         this._init = null;
     },
@@ -99,104 +202,35 @@ var WebExtender = {
         }
     },
     
-    _onPageLoad: function(eventSrc) {
-        var doc = eventSrc.originalTarget;
+    _onPageLoad: function(event) {
+        var doc = event.originalTarget;
 
         if (doc && doc.nodeName == "#document" && doc.location.href.search("http://") == 0) {
-            _callExtenders(doc);
+            this._callExtenders(doc);
         } 
     },
     
     _callExtenders: function(doc) {
         var extenders = this._extenders.getList(doc.location.href);
-        if (extenders && extenders.length > 0) {
+        if (extenders && extenders.significantSize() > 0) {
             var page = new Page(doc);
             
             this._initExtendedPage(page);            
-            extenders.process(page);
+            extenders.process(page, this.getStaticContent());
             this._finalizeExtendedPage(page);
         }
     },
     
-    _initExtendedPage: function(page) {
-        if (InPageExtenders && InPageExtenders.finalizePage) {
-            InPageExtenders.initPage(page);
+    _initExtendedPage: function(page) { 
+        if (ExtenderManager && ExtenderManager.initPage) {
+            ExtenderManager.initPage(page);
         }
     },
     
     _finalizeExtendedPage: function(page) {
-        if (InPageExtenders && InPageExtenders.finalizePage) {
-            InPageExtenders.finalizePage(page);
+        if (ExtenderManager && ExtenderManager.finalizePage) {
+            ExtenderManager.finalizePage(page);
         }
-    }
-};
-
-ExtenderCollection.prototype = {
-    _siteMap = new Hash(),
-    _cache = new Hash(),
-    
-    _analyzeUrl: function(url) {
-        if (!url) throw "url is null.";
-    
-        var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?].+)?$/);
-        if (!m) throw "Invalid url format.";
-        
-        return {
-            site: m[1],
-            path: (m[2] != null) ? m[2] : "DEFAULT",
-            address: (this.site + this.path)
-        };
-    },
-    
-    add: function(url, e) {
-        if (!e) throw "extender is null.";
-        
-        var analyzedUrl = this._analyzeUrl(url);
-    
-        var site = this._siteMap[analyzedUrl.site];
-        if (!site) {
-            site = new Hash();
-            _siteMap[analyzedUrl.site] = site;
-        }
-        
-        var extenders = site[analyzedUrl.path];
-        if (!extenders) {
-            extenders = new Array();
-            site[analyzedUrl.path] = extenders;
-        }
-        
-        extenders.push(e);
-        this._cache.clear();
-        return e;
-    },
-    
-    getList: function(url) {
-        var analyzedUrl = this._analyzeUrl(url);
-        var extenders = this._cache[analyzedUrl.address];
-        
-        if (!extenders) {  
-            extenders = new Array();
-          
-            var site = this._siteMap[analyzedUrl.site];
-            if (site) {
-                // Find all suitable extenders
-                site.keys().each(function(k) {
-                        if (k == analyzedUrl.path) {
-                            extenders.push(site[k]);
-                        }
-                        else if (k.endsWith("*")) {
-                            var partPath = k.replace(/[*]$/, "");
-                            if (k.startsWith(partPath)) {
-                                extenders.push(site[k]);
-                            }
-                        }
-                    });
-            }
-            
-            this._cache[analyzedUrl.address] = extenders;
-        }
-        
-        return extenders;
     }
 };
 
@@ -207,32 +241,38 @@ window.addEventListener("load", function(e) { WebExtender._init(e); }, false);
 /*** Script class ***/
 
 var Script = Object.extend(Script || {}, {
-    executeFile: function(src, type, doc) {
+    executeFile: function(doc, src, type) {
+        if (!doc) throw "doc is null.";
         if (!src) throw "src is null.";
-        
         if (!type) type = "text/javascript";
-        if (!doc) doc = document;
         
         var e = doc.createElement("script");
         e.setAttribute("type", type);
         e.setAttribute("src", src);
         
-        doc.appendChild(e);
+        doc.body.appendChild(e);
     },
 
-    execute: function(code, type, doc) {
+    execute: function(doc, code, type) {
+        if (!doc) throw "doc is null.";
         if (!code) throw "code is null.";
-        
         if (!type) type = "text/javascript";
-        if (!doc) doc = document;
         
         var e = doc.createElement("script");
         e.setAttribute("type", type);
         e.innerHTML = code;
         
-        doc.appendChild(e);
+        doc.body.appendChild(e);
+    },
+    
+    // This will execute function in the dom of doc
+    executeJavascriptFunction: function(doc, func) {
+        if (!doc) throw "doc is null.";
+        if (!func) throw "func is null.";
+        
+        this.execute(doc, "(" + func.toString() + ")();", "text/javascript");
     }
-};
+});
 
 /*** Xml class ***/
 
@@ -263,5 +303,107 @@ var Xml = Object.extend(Xml || {}, {
         foStream.init(file, 0x02 | 0x08 | 0x20, 0664, 0);   // write, create, truncate
         serializer.serializeToStream(dom, foStream, ""); 
         foStream.close();
+    }
+});
+
+
+/*** ExtenderManager class ***/
+
+var ExtenderManager = {    
+    load: function(definitionUrl) {
+        if (!definitionUrl) throw "definitionUrl is null.";
+        
+        var definition = Xml.load(definitionUrl);
+        if (definition) {
+            var extendersLocationUrl = definitionUrl.replace(/\/[^\/]+$/, "/");
+            var _this = this;
+        
+            // Read aliases definitions
+            var aliasesDef = XPath.evaluateList('/webExtender/urls/alias', definition);
+            var aliasesMap = new Hash();
+            aliasesDef.each(function(a) { aliasesMap[a.getAttribute("name")] = a.textContent; });
+            
+            // Process stylesheets
+            var stylesheets = XPath.evaluateList('/webExtender/stylesheets/style', definition);
+            stylesheets.each(function(s) { _this._processStyle(aliasesMap, s); });
+
+            // Process scripts
+            var scripts = XPath.evaluateList('/webExtender/extenders/script', definition);
+            scripts.each(function(s) { _this._processScript(extendersLocationUrl, aliasesMap, s); });
+        }
+        
+        this._init = null;
+    },
+    
+    // Called directly by WebExtender
+    initPage: function(page) {
+        Script.executeFile(page.document, WebExtender.getContentUrl() + "prototype.js");
+        Script.executeFile(page.document, WebExtender.getContentUrl() + "webExtenderLib.js");
+        Script.executeFile(page.document, WebExtender.getContentUrl() + "constants.js");
+    
+        Script.execute(page.document, "var pageExtenders = new PageExtenderCollection();");
+    },
+    
+    // Called directly by WebExtender
+    finalizePage: function(page) {
+        var transport = page.document.createElement("WebExtenderTransport");
+        transport.setAttribute("id", "id_WebExtenderTransport");
+        transport.pageObject = page;
+        transport.staticContent = WebExtender.getStaticContent();
+        page.document.body.appendChild(transport);
+        
+        Script.executeJavascriptFunction(page.document, function() {
+                var eTransport = $XF('\\WebExtenderTransport[@id = "id_WebExtenderTransport"]');
+                if (!eTransport.pageObject)
+                    throw "Unable to get page object.";
+                if (eTransport.pageObject.document != document)
+                    throw "Invalid page object.";
+                if (!eTransport.staticContent)
+                    throw "Unable to get static content.";
+                
+                pageExtenders.process(eTransport.pageObject, eTransport.staticContent);
+            });
+    },
+    
+    _processStyle: function(aliasesMap, s) {
+        var url = new Template(s.getAttribute("url")).evaluate(aliasesMap);
+        var src = new Template(s.getAttribute("src")).evaluate(aliasesMap);
+        var weak = s.getAttribute("weak");
+        
+        if (url && src) {                    
+            var extender = new StyleExtender(src);
+            extender.weak = (weak != null && (weak.toLowerCase() == "true" || parseInt(weak) > 0));
+            WebExtender.registerExtender(url, extender);
+        }
+    },
+    
+    _processScript: function(extendersLocationUrl, aliasesMap, s) {
+        var url = new Template(s.getAttribute("url")).evaluate(aliasesMap);
+        var name = s.getAttribute("name");
+        var weak = s.getAttribute("weak");
+        var scope = s.getAttribute("scope");
+        
+        if (url && name) {
+            var src = extendersLocationUrl + name;
+            
+            switch (scope) {
+                case "extension":
+                    var js = loadText(src);
+                    if (js) {
+                        eval(js);
+                    }
+                    break;
+                
+                case "page":
+                case null:
+                    var extender = new ScriptExtender(src, "text/javascript");
+                    extender.weak = (weak != null && (weak.toLowerCase() == "true" || parseInt(weak) > 0));
+                    WebExtender.registerExtender(url, extender);
+                    break;
+                
+                default:
+                    throw String.format("Invalid scope ({0}).", scope);
+            }
+        }
     }
 };
