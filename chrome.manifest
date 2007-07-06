@@ -1,3 +1,3 @@
-content	maplus	content/ extenders/ html/
-skin	maplus	skin/
+content	maplus	content/
+skin	maplus	classic/1.0	skin/
 overlay	chrome://browser/content/browser.xul	chrome://maplus/content/firefoxOverlay.xul

@@ -35,7 +35,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 const CONFIG_ROOT_NAME = "prefs";
-var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME, function(cfg) { MaPlus.initConfig(cfg); }),
+var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME, function(cfg) { MaPlus.initConfig(cfg); });
 
 var plusConfig = PageExtender.create({
     weak: true,

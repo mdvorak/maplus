@@ -118,23 +118,6 @@ var XPath = {
     evaluateNumber: function(xpath, context) {
         var result = this.evaluate(xpath, context, XPathResult.NUMBER_TYPE);
         return result ? result.numberValue : null;
-    },
-    
-    extend: function(element) {
-        element = $(element);
-    
-        if (element._xpathExtended)
-            return element;
-    
-        for (var property in XPath.Methods) {
-            var value = XPath.Methods[property];
-            if (typeof value == 'function' && !(property in element))
-                element[property] = value;
-            }
-        }
-        
-        element._xpathExtended = true;
-        return element;
     }
 };
 
@@ -155,6 +138,24 @@ XPath.Methods = {
         return XPath.evaluateNumber(xpath, this);
     }
 };
+
+Object.extend(XPath, {
+    extend: function(element) {
+        element = $(element);
+    
+        if (element._xpathExtended)
+            return element;
+    
+        for (var property in XPath.Methods) {
+            var value = XPath.Methods[property];
+            if (typeof value == 'function' && !(property in element)) 
+                element[property] = value;
+        }
+        
+        element._xpathExtended = true;
+        return element;
+    }
+});
 
 function $X(element) {
     return XPath.extend(element);
@@ -213,8 +214,9 @@ Object.extend(PageExtender, {
     
     createClass: function(definition) {
         var cls = Class.create();
-        Object.extend(cls, PageExtender.prototype);
-        return Object.extend(cls, definition);
+        Object.extend(cls.prototype, PageExtender.prototype);
+        Object.extend(cls.prototype, definition);
+        return cls;
     }
 });
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <webExtender>
   <urls>
-    <alias name="chrome">chrome://maplus</alias>
+    <alias name="chrome">chrome://maplus/content</alias>
     <alias name="melior">http://meliorannis.idnes.cz</alias>
   </urls>
   <stylesheets>

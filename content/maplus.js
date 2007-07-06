@@ -63,4 +63,4 @@ var MaPlus = {
 };
 
 // Load extenders
-ExtenderManager.load(WebExtender.getChromeUrl() + "extenders/extenders.xml");
+ExtenderManager.load(WebExtender.getContentUrl() + "extenders/extenders.xml");
