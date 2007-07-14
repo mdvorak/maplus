@@ -35,13 +35,13 @@
  * ***** END LICENSE BLOCK ***** */
 
 const CONFIG_ROOT_NAME = "prefs";
-var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME, function(cfg) { MaPlus.initConfig(cfg); });
+var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME);
 
 var plusConfigAutosave = PageExtender.create({
     SAVE_INTERVAL: 100,
     
     weak: true,
-    _hits = 0,
+    _hits: 0,
     
     analyze: function(page, context) {
         if (++this._hits > this.SAVE_INTERVAL) {
@@ -56,4 +56,4 @@ var plusConfigAutosave = PageExtender.create({
 // Register
 Marshal.registerObject("configManager", configManager);
 WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
-WebExtender.registerUnloadHandler(function() { plusConfig.saveAll(); });
+WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });

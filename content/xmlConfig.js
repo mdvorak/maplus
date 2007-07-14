@@ -243,12 +243,12 @@ XmlConfigManager.prototype = {
     getConfig_PROXY: MARSHAL_BY_REF,
     getConfig: function(name, dontCreate) {
         name = String(name);
-        var config = _cache[name];
+        var config = this._cache[name];
         
         if (!config && !dontCreate) {
-            var path = getConfigPath(name);
+            var path = this.getConfigPath(name);
             config = XmlConfig.load(path, this._rootName, this._initCallback);
-            _cache[name] = config;
+            this._cache[name] = config;
         }
         
         return config;
@@ -257,10 +257,10 @@ XmlConfigManager.prototype = {
     saveConfig_PROXY: MARSHAL_BY_VALUE,
     saveConfig: function(name) {
         name = String(name);
-        var config = _cache[name];
+        var config = this._cache[name];
         
         if (config) {
-            var path = getConfigPath(name);
+            var path = this.getConfigPath(name);
             XmlConfig.save(path, config);
         }
     },

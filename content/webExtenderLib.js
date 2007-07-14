@@ -182,9 +182,11 @@ Page.prototype = {
         
         var args = this.url.match(/\b\w+=.+?(?=&|$)/g);
         if (args) {
+            var _this = this;
+            
             args.each(function(arg) {
                 var pair = arg.split("=");
-                this.arguments[pair[0]] = pair[1];
+                _this.arguments[pair[0]] = pair[1];
             });
         }
     }
@@ -294,6 +296,7 @@ PageExtenderCollection.prototype = {
         }
         catch (ex) {
             // TODO: log error
+            alert(Object.toJSON(ex));
             return false;
         }
     }

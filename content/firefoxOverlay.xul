@@ -45,6 +45,10 @@
   <script src="webExtender.js" />
   <script src="xmlConfig.js" />
 
-  <!-- MaPlus -->
+  <!-- MaPlus backend -->
   <script src="maplus.js" />
+  <script src="config.js" />
+  
+  <!-- Extenders -->
+  <script src="default.js" />
 </overlay>

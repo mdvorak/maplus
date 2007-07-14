@@ -47,22 +47,5 @@ var MaPlus = {
         }
         
         return path;
-    },
-
-    initConfig: function(cfg) {
-        cfg.getEnabled = function() { return this.getBoolean("enabled", true); };
-        cfg.getMaxTahu = function() { return this.getNumber("maxTahu", 30); };
-        cfg.getTemneBarvy = function() { return this.getBoolean("temneBarvy", true); };
-        
-        /*
-        cfg.aliance = cfg.getPrefNode("aliance", true);
-        cfg.nastaveni = cfg.getPrefNode("nastaveni", true);
-      
-        cfg.nastaveni.utok = cfg.nastaveni.getPrefNode("utok", true);
-        cfg.nastaveni.boj = cfg.nastaveni.getPrefNode("boj", true);
-        */
     }
 };
-
-// Load extenders
-ExtenderManager.load(WebExtender.getContentUrl() + "extenders/extenders.xml");

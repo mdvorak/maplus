@@ -304,11 +304,13 @@ var Marshal = {
     PROXY_SUFFIX: "_PROXY",
 
     _objects: new Hash(),
-    _objectId: 0;
+    _objectId: 0,
 
     initPage: function(page) {
-        page.document.addEventListener("MarshalMethodCall", function(event) { this._methodCallHandler(event); return false; }, false, true);
-        page.document.addEventListener("MarshalGetProxyDefinition", function(event) { this._getProxyDefinitionHandler(event); return false; }, false, true);
+        var _this = this;
+        
+        page.document.addEventListener("MarshalMethodCall", function(event) { _this._methodCallHandler(event); }, false);
+        page.document.addEventListener("MarshalGetProxyDefinition", function(event) { _this._getProxyDefinitionHandler(event); }, false);
         
         Script.executeFile(page.document, WebExtender.getContentUrl() + "interopClient.js");
     },
@@ -322,17 +324,17 @@ var Marshal = {
             throw "Invalid operation.";
         
         name = String(name);
-        if (_objects[name])
+        if (this._objects[name])
             throw String.format("Object '{0}' already exists.", name);
         
-        _objects[name] = obj;
+        this._objects[name] = obj;
     },
     
     _methodCallHandler: function(event) {
         var elem = event.originalTarget;
         
         try {
-            var objectName = elem.originalTarget.getAttribute("objectName");
+            var objectName = elem.getAttribute("objectName");
             var methodName = elem.getAttribute("methodName");
             var resultName = elem.getAttribute("resultName");
             var argsStr = elem.getAttribute("arguments");
@@ -344,20 +346,20 @@ var Marshal = {
                 
             var obj = this._objects[objectName];
             if (!obj)
-                throw String.format("Object '{0}' not found.", objectName);
+                throw String.format("Object '{0}' is not registered.", objectName);
             
             var method = obj[methodName];
             if (!method || typeof method != "function")
                 throw String.format("Method '{0}' not found.", methodName);
                 
-            var methodType = this._getMethodType(methodName);
+            var methodType = this._getMethodType(obj, methodName);
             if (methodType == 0)
                 throw String.format("Method '{0}' cannot be marshaled.", methodName);
             
             var args = !argsStr.empty() ? argsStr.evalJSON() : null;
             
             // Call method
-            var retval = func.apply(obj, args);
+            var retval = method.apply(obj, args);
             
             if (retval) {
                 // Process result
@@ -417,9 +419,9 @@ var Marshal = {
         
         for (var f in obj) {
             if (typeof obj[f] == "function") {
-                var type = this._getMethodType(f);
+                var type = this._getMethodType(obj, f);
             
-                methods.push({ 
+                def.methods.push({ 
                     name: f,
                     type: type
                 });
@@ -429,7 +431,7 @@ var Marshal = {
         return def;
     },
 
-    _getMethodType: function(methodName) {
+    _getMethodType: function(obj, methodName) {
         var attr = obj[methodName + this.PROXY_SUFFIX];
         
         switch (attr) {

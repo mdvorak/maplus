@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Melior Annis Plus.
+ * The Original Code is WebExtender.
  *
  * The Initial Developer of the Original Code is
  * Michal Dvorak.
@@ -33,11 +33,6 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
-var bestiar = PageExtender.create({
-    process: function(page, context) {
-        alert("ID: " + page.id);
-    }
-});
 
-pageExtenders.add(bestiar);
+// Load extenders
+ExtenderManager.load(WebExtender.getContentUrl() + "extenders/default.xml");

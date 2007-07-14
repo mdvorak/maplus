@@ -47,12 +47,12 @@ var Marshal = {
         var argsStr = args ? Object.toJSON(args) : null;
         
         var elem = document.createElement("marshal");
-        elem.setAttribute("resultName", resultName);
+        document.body.appendChild(elem);
         elem.setAttribute("objectName", objectName);
         elem.setAttribute("methodName", methodName);
         elem.setAttribute("arguments", argsStr);
         
-        Event.dispatch(elem, "MarshalMethodCall");
+        Event.dispatch(elem, "MarshalMethodCall", true);
         
         if (elem.getAttribute("exception"))
             throw elem.getAttribute("exception").evalJSON();

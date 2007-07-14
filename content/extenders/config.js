@@ -33,71 +33,80 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
-
-var PlusConfigTemplate = {
-    getPrefNode: function() {
-        throw "Not supported.";
-    },
-    getPrefNodeByXPath: function() {
-        throw "Not supported.";
-    },
-
+ 
+var PlusConfig = new Object();
+PlusConfig.prototype = {
     getEnabled: function() { 
-        return this.getBoolean("enabled", true);
+        return this.getBoolean("enabled", true); 
     },
     
-    getMaxTahu: function() { 
+    getMaxTahu: function() {
         return this.getNumber("maxTahu", 30); 
     },
     
-    getTemneBarvy: function() { 
-        return this.getBoolean("temneBarvy", true); 
+    getTemneBarvy: function() {
+        return this.getBoolean("temneBarvy", true);
     },
-
+    
     getAliance: function() {
-        throw "Not implemented.";
+        if (!this._aliance) {
+            this._aliance = this.getPrefNode("aliance", true);
+        }
+        return this._aliance;
     },
     
     getNastaveni: function() {
-        throw "Not implemented.";
+        if (!this._nastaveni) {
+            this._nastaveni = this.getPrefNode("nastaveni", true);
+            Object.extend(this._nastaveni, PlusConfig.Nastaveni.prototype);
+        }
+        return this._nastaveni;
+    },
+};
+ 
+PlusConfig.Nastaveni = new Object();
+PlusConfig.Nastaveni.prototype = {
+    getUtok: function() {
+        if (!this._utok) {
+            this._utok = this.getPrefNode("utok", true);
+        }
+        return this._utok;
+    },
+    
+    getBoj: function() {
+        if (!this._boj) {
+            this._boj= this.getPrefNode("boj", true);
+        }
+        return this._boj;
     }
 };
 
-var PlusConfigNastaveniTemplate = {
-};
-
-
-// TODO jako extender, special metodu na proxy configu
-var PlusConfig = {
-    _configCache: new Hash(),
-    
+Object.extend(PlusConfig, {
     getConfig: function(id) {
         if (!id || isNaN(parseInt(id)))
-            throw "id is invalid.";
-        id = String(id);
+            throw String.format("id '{0}' is invalid.", id);
         
-        var cfg = this._configCache[id];
-        if (!cfg) {
-            var configName = "config." + id;
-            Marshal.registerMethodCall(configName, "configManager", "getConfig", [id]);
-            cfg = Marshal.createObjectProxy(configName);
-            this._configCache[id] = cfg;
-            
-            Object.extend(cfg, PlusConfigTemplate);
-            cfg.addPref = function() { cfg.addPref.apply(cfg, arguments); }; // odstrani navratovou hodnotu
-            
-            Marshal.registerMethodCall(configName + ".aliance", configName, "getPrefNode", ["aliance", true]);
-            var aliance = Marshal.createObjectProxy(configName + ".aliance");
-            cfg.getAliance = function() { return aliance; };
-            
-            var nastaveniName = configName + ".nastaveni";
-            Marshal.registerMethodCall(nastaveniName, configName, "getPrefNode", ["nastaveni", true]);
-            Marshal.registerMethodCall(nastaveniName + ".utok", nastaveniName, "getPrefNode", ["utok", true]);
-            Marshal.registerMethodCall(nastaveniName + ".boj", nastaveniName, "getPrefNode", ["boj", true]);
-            
-            
-        }
+        // Note: cfg should be proxy
+        var cfg = Marshal.callMethod("configManager", "getConfig", [id]);
+        if (!cfg)
+            throw String.format("Unable to find config for id '{0}'.", id);
         
-        return cfg;
+        return Object.extend(cfg, PlusConfig.prototype);
     },
-};
+});
+
+// Extender
+var configExtender = PageExtender.create({
+    weak: true,
+
+    analyze: function(page) {
+        page.config = PlusConfig.getConfig(page.id);
+        
+        if (!page.config)
+            throw String.format("Unable to get config for id '{0}'.", page.id);
+        
+        return true;
+    }
+});
+
+pageExtenders.add(configExtender);
