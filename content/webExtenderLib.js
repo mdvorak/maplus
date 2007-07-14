@@ -74,7 +74,7 @@ Object.extend(String, {
         if (!str) return null;
         
         for (var i = 1; i < arguments.length; i++) {
-            str = str.replace("\{" + i + "\}", arguments[i]);
+            str = str.replace("\{" + String(i - 1) + "\}", arguments[i]);
         } 
         return str;
     }
@@ -93,7 +93,7 @@ var XPath = {
     },
     
     evaluateList: function(xpath, context) {
-        var result = this.evaluate(xpath, context, XPathResult.ANY_TYPE);
+        var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
         var list = new Array();
         
         if (result) {
@@ -106,7 +106,7 @@ var XPath = {
     },
     
     evaluateSingle: function(xpath, context) {
-        var result = this.evaluate(xpath, context, XPathResult.ANY_TYPE);
+        var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
         return result ? $X(result.iterateNext()) : null;
     },
     
@@ -198,11 +198,11 @@ PageExtender.prototype = {
         this.weak = false;
     },
 
-    analyze: function(page, context, static) {
+    analyze: function(page, context) {
         return true;
     },
     
-    process: function(page, context, static) {
+    process: function(page, context) {
     }
 };
 
@@ -270,7 +270,7 @@ PageExtenderCollection.prototype = {
             this._significant++;
     },
 
-    process: function(page, static) {
+    process: function(page) {
         try {
             var processList = new Array();
             
@@ -279,7 +279,7 @@ PageExtenderCollection.prototype = {
                     if (!e) return;
                     
                     var context = new Object();
-                    if (e.analyze(page, context, static))
+                    if (e.analyze(page, context))
                         processList.push([e, context]);
                 });
 
@@ -287,7 +287,7 @@ PageExtenderCollection.prototype = {
             processList.each(function(entry) {
                     var extender = entry[0];
                     var context = entry[1];
-                    extender.process(page, context, static);
+                    extender.process(page, context);
                 });
 
             return true;
@@ -312,7 +312,7 @@ var ScriptExtender = PageExtender.createClass({
         this._type = (type ? type : this.DEFAULT_TYPE);
     },
 
-    process: function(page, context, static) {
+    process: function(page, context) {
         var e = page.document.createElement("script");
         e.setAttribute("type", this._type);
         e.setAttribute("src", this._src);
@@ -327,12 +327,12 @@ var StyleExtender = PageExtender.createClass({
         this._src = src;
     },
 
-    analyze: function(page, context, static) {
+    analyze: function(page, context) {
         context.head = XPath.evaluateSingle('/html/head', page.document);
         return (context.head != null);
     },
     
-    process: function(page, context, static) {
+    process: function(page, context) {
         var e = page.document.createElement("link");
         e.setAttribute("rel", "stylesheet");
         e.setAttribute("type", "text/css");

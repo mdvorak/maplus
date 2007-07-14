@@ -42,12 +42,12 @@ var analyzeLayout = PageExtender.create({
     analyze: function(page, context, static) {
         if (page.name == null || page.name == "" || page.name == "login.html")
             throw "Unsupported page name.";
-        
+
         // Najdi id
         page.id = parseInt(this._findParameter(page, "id"));
         page.code = this._findParameter(page, "code");
         page.ftc = this._findParameter(page, "ftc");
-        
+
         if (!page.id || isNaN(page.id))
             throw "Id nenalezeno.";
         

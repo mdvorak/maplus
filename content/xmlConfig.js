@@ -33,32 +33,7 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
-/*** Xml class ***/
-var Xml = Object.extend(Xml || {}, {
-    loadFile: function(file) {
-        var ios = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
-        var fileHandler = ios.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
-        var url = fileHandler.getURLSpecFromFile(file);
 
-        var req = new XMLHttpRequest();
-        req.open("GET", url, false); 
-        req.send(null);
-        
-        return req.responseXML;
-    },
-
-    saveFile: function(file, dom) {
-        var serializer = new XMLSerializer();
-        var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
-                       .createInstance(Components.interfaces.nsIFileOutputStream);
-                       
-        foStream.init(file, 0x02 | 0x08 | 0x20, 0664, 0);   // write, create, truncate
-        serializer.serializeToStream(dom, foStream, ""); 
-        foStream.close();
-    }
-});
- 
 /*** XmlConfig class ***/
 var XmlConfig = {
     DEFAULT_ROOT_NAME: "config",
@@ -134,6 +109,10 @@ XmlConfigNode.prototype = {
     initialize: function() {
     },
 
+    getAttribute_PROXY: MARSHAL_BY_VALUE,
+    setAttribute_PROXY: MARSHAL_BY_VALUE,
+
+    addPref_PROXY: MARSHAL_BY_REF,
     addPref: function(name, value) {
         var elem = this.ownerDocument.createElement(name);
         
@@ -145,6 +124,7 @@ XmlConfigNode.prototype = {
         return elem;
     },
 
+    getPrefNode_PROXY: MARSHAL_BY_REF,
     getPrefNode: function(name, create) {
         if (!name || !name.match(/^[\w_-.:]+$/))
             throw "Name contains invalid characters.";
@@ -161,11 +141,13 @@ XmlConfigNode.prototype = {
         return elem;
     },
     
+    getPref_PROXY: MARSHAL_BY_VALUE,
     getPref: function(name, defaultValue) {
         var elem = this.getPrefNode(name);
         return elem ? elem.textContent : defaultValue;
     },
     
+    setPref_PROXY: MARSHAL_BY_VALUE,
     setPref: function(name, value) {
         var elem = this.getPrefNode(name);
         if (!elem)
@@ -174,17 +156,20 @@ XmlConfigNode.prototype = {
         return value;
     },
     
+    getBoolean_PROXY: MARSHAL_BY_VALUE,
     getBoolean: function(name, defaultValue) {
         var v = this.getPref(name, defaultValue);
         return Boolean(v) && (v.toLowerCase == null || v.toLowerCase() != "false");
     },
     
+    getNumber_PROXY: MARSHAL_BY_VALUE,
     getNumber: function(name, defaultValue) {
         var v = Number(this.getPref(name, defaultValue));
         if (!isNaN(v)) return v;
         else return defaultValue;
     },
        
+    getPrefNodeByXPath_PROXY: MARSHAL_BY_REF,
     getPrefNodeByXPath: function(xpath) {
         var elem = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ANY_TYPE, null).iterateNext();
         if (elem) {
@@ -193,11 +178,13 @@ XmlConfigNode.prototype = {
         return elem;
     },
     
+    getPrefByName_PROXY: MARSHAL_BY_VALUE,
     getPrefByName: function(tagName, name, defaultValue) {
         var elem = this.getPrefNodeByXPath(tagName + '[@name = "' + name + '"]');
         return elem ? elem.textContent : defaultValue;
     },
     
+    setPrefByName_PROXY: MARSHAL_BY_VALUE,
     setPrefByName: function(tagName, name, value) {
         var elem = this.getPrefNodeByXPath(tagName + '[@name = "' + name + '"]');
         if (value) {
@@ -215,6 +202,7 @@ XmlConfigNode.prototype = {
         return value;
     },
 
+    clearChildNodes_PROXY: MARSHAL_BY_VALUE,
     clearChildNodes: function() {
         while (this.firstChild) {
             this.removeChild(this.firstChild);
@@ -241,6 +229,9 @@ XmlConfigManager.prototype = {
     },
     
     getConfigPath: function(name) {
+        if (!name || name.empty())
+            throw "name is null or empty.";
+    
         var path = Components.classes["@mozilla.org/file/local;1"]
                              .createInstance(Components.interfaces.nsILocalFile);
         
@@ -249,6 +240,7 @@ XmlConfigManager.prototype = {
         return path;
     },
     
+    getConfig_PROXY: MARSHAL_BY_REF,
     getConfig: function(name, dontCreate) {
         name = String(name);
         var config = _cache[name];
@@ -262,6 +254,7 @@ XmlConfigManager.prototype = {
         return config;
     },
     
+    saveConfig_PROXY: MARSHAL_BY_VALUE,
     saveConfig: function(name) {
         name = String(name);
         var config = _cache[name];
@@ -272,6 +265,7 @@ XmlConfigManager.prototype = {
         }
     },
     
+    saveAll_PROXY: MARSHAL_BY_VALUE,
     saveAll: function(name) {
         var _this = this;
         this._cache.keys().each(function(e) { _this.saveConfig(e); });

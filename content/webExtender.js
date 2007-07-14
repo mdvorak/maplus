@@ -136,7 +136,6 @@ ExtenderCollection.prototype = {
 var WebExtender = {
     _extenders: new ExtenderCollection(),
     _unloadHandlers: new Array(),
-    _staticContent: new Object(),
     
     registerExtender: function(url, extender) {
         if (!url) throw "url is null.";
@@ -163,11 +162,7 @@ var WebExtender = {
     
         this._unloadHandlers.push(callback);
     },
-    
-    getStaticContent: function() {
-        return this._staticContent;
-    },
-    
+ 
     getDirectory: function() {
         return Components.classes["@mozilla.org/extensions/manager;1"]
                     .getService(Components.interfaces.nsIExtensionManager)
@@ -216,7 +211,7 @@ var WebExtender = {
             var page = new Page(doc);
             
             this._initExtendedPage(page);            
-            extenders.process(page, this.getStaticContent());
+            extenders.process(page);
             this._finalizeExtendedPage(page);
         }
     },
@@ -239,7 +234,6 @@ window.addEventListener("load", function(e) { WebExtender._init(e); }, false);
 
 
 /*** Script class ***/
-
 var Script = Object.extend(Script || {}, {
     executeFile: function(doc, src, type) {
         if (!doc) throw "doc is null.";
@@ -275,7 +269,6 @@ var Script = Object.extend(Script || {}, {
 });
 
 /*** Xml class ***/
-
 var Xml = Object.extend(Xml || {}, {
     load: function(url) {
         if (!url) throw "url is null.";
@@ -306,9 +299,157 @@ var Xml = Object.extend(Xml || {}, {
     }
 });
 
+/*** Marshal server component class ***/
+var Marshal = {
+    PROXY_SUFFIX: "_PROXY",
+
+    _objects: new Hash(),
+    _objectId: 0;
+
+    initPage: function(page) {
+        page.document.addEventListener("MarshalMethodCall", function(event) { this._methodCallHandler(event); return false; }, false, true);
+        page.document.addEventListener("MarshalGetProxyDefinition", function(event) { this._getProxyDefinitionHandler(event); return false; }, false, true);
+        
+        Script.executeFile(page.document, WebExtender.getContentUrl() + "interopClient.js");
+    },
+    
+    registerObject: function(name, obj) {
+        if (!name)
+            throw "name is null.";
+        if (!obj)
+            throw "obj is null.";
+        if (obj == this)
+            throw "Invalid operation.";
+        
+        name = String(name);
+        if (_objects[name])
+            throw String.format("Object '{0}' already exists.", name);
+        
+        _objects[name] = obj;
+    },
+    
+    _methodCallHandler: function(event) {
+        var elem = event.originalTarget;
+        
+        try {
+            var objectName = elem.originalTarget.getAttribute("objectName");
+            var methodName = elem.getAttribute("methodName");
+            var resultName = elem.getAttribute("resultName");
+            var argsStr = elem.getAttribute("arguments");
+            
+            if (!objectName)
+                throw "Missing object name.";
+            if (!/^[\w_$]+$/.test(methodName))
+                throw "Invalid method name.";
+                
+            var obj = this._objects[objectName];
+            if (!obj)
+                throw String.format("Object '{0}' not found.", objectName);
+            
+            var method = obj[methodName];
+            if (!method || typeof method != "function")
+                throw String.format("Method '{0}' not found.", methodName);
+                
+            var methodType = this._getMethodType(methodName);
+            if (methodType == 0)
+                throw String.format("Method '{0}' cannot be marshaled.", methodName);
+            
+            var args = !argsStr.empty() ? argsStr.evalJSON() : null;
+            
+            // Call method
+            var retval = func.apply(obj, args);
+            
+            if (retval) {
+                // Process result
+                switch (methodType) {
+                    case MARSHAL_BY_VALUE:
+                        elem.setAttribute("retval", Object.toJSON(retval));
+                        break;
+                    
+                    case MARSHAL_BY_REF:
+                        // TODO optimize code so same objects will have same id
+                        var objectId = ++this._objectId;
+                    
+                        // Create list of methods
+                        var marshalObjects = elem.ownerDocument._marshalObjects;
+                        if (!marshalObjects) {
+                            marshalObjects = new Hash();
+                            elem.ownerDocument._marshalObjects = marshalObjects;
+                        }
+                        
+                        var def = this._createProxyDefinition(retval);
+                        
+                        marshalObjects[objectId] = retval;
+                        elem.setAttribute("objectId", objectId);
+                        elem.setAttribute("proxyDefinition", Object.toJSON(def));
+                        break;
+                        
+                    default:
+                        throw String.format("Invalid method marshal type ({0}).", methodType);
+                }
+            }
+        }
+        catch (e) {
+            elem.setAttribute("exception", Object.toJSON(e));
+        }
+    },
+    
+    _getProxyDefinitionHandler: function(event) {
+        var elem = event.originalTarget;
+        var objectName = elem.originalTarget.getAttribute("objectName");
+        
+        if (!objectName)
+            throw "Missing object name.";
+            
+        var obj = this._objects[objectName];
+        if (!obj)
+            throw String.format("Object '{0}' not found.", objectName);
+        
+        var def = this._createProxyDefinition(obj);
+        
+        elem.setAttribute("proxyDefinition", Object.toJSON(def));
+    },
+    
+    _createProxyDefinition: function(obj) {
+        var def = {
+            methods: new Array()
+        };
+        
+        for (var f in obj) {
+            if (typeof obj[f] == "function") {
+                var type = this._getMethodType(f);
+            
+                methods.push({ 
+                    name: f,
+                    type: type
+                });
+            }
+        }
+        
+        return def;
+    },
+
+    _getMethodType: function(methodName) {
+        var attr = obj[methodName + this.PROXY_SUFFIX];
+        
+        switch (attr) {
+            case null:
+                return MARSHAL_DEFAULT;
+            
+            case MARSHAL_BY_VALUE:
+                return MARSHAL_BY_VALUE;
+                
+            case MARSHAL_BY_REF:
+                return MARSHAL_BY_REF;
+                
+            default:
+                return MARSHAL_NONE;
+        }
+    }
+};
+
 
 /*** ExtenderManager class ***/
-
 var ExtenderManager = {    
     load: function(definitionUrl) {
         if (!definitionUrl) throw "definitionUrl is null.";
@@ -331,8 +472,6 @@ var ExtenderManager = {
             var scripts = XPath.evaluateList('/webExtender/extenders/script', definition);
             scripts.each(function(s) { _this._processScript(extendersLocationUrl, aliasesMap, s); });
         }
-        
-        this._init = null;
     },
     
     // Called directly by WebExtender
@@ -340,28 +479,17 @@ var ExtenderManager = {
         Script.executeFile(page.document, WebExtender.getContentUrl() + "prototype.js");
         Script.executeFile(page.document, WebExtender.getContentUrl() + "webExtenderLib.js");
         Script.executeFile(page.document, WebExtender.getContentUrl() + "constants.js");
+        
+        Marshal.initPage(page);
     
         Script.execute(page.document, "var pageExtenders = new PageExtenderCollection();");
     },
     
     // Called directly by WebExtender
     finalizePage: function(page) {
-        var transport = page.document.createElement("WebExtenderTransport");
-        transport.setAttribute("id", "id_WebExtenderTransport");
-        transport.pageObject = page;
-        transport.staticContent = WebExtender.getStaticContent();
-        page.document.body.appendChild(transport);
-        
         Script.executeJavascriptFunction(page.document, function() {
-                var eTransport = $XF('\\WebExtenderTransport[@id = "id_WebExtenderTransport"]');
-                if (!eTransport.pageObject)
-                    throw "Unable to get page object.";
-                if (eTransport.pageObject.document != document)
-                    throw "Invalid page object.";
-                if (!eTransport.staticContent)
-                    throw "Unable to get static content.";
-                
-                pageExtenders.process(eTransport.pageObject, eTransport.staticContent);
+                var page = new Page();
+                pageExtenders.process(page);
             });
     },
     
@@ -372,7 +500,7 @@ var ExtenderManager = {
         
         if (url && src) {                    
             var extender = new StyleExtender(src);
-            extender.weak = (weak != null && (weak.toLowerCase() == "true" || parseInt(weak) > 0));
+            extender.weak = this._parseBoolean(weak);
             WebExtender.registerExtender(url, extender);
         }
     },
@@ -381,29 +509,16 @@ var ExtenderManager = {
         var url = new Template(s.getAttribute("url")).evaluate(aliasesMap);
         var name = s.getAttribute("name");
         var weak = s.getAttribute("weak");
-        var scope = s.getAttribute("scope");
         
         if (url && name) {
             var src = extendersLocationUrl + name;
-            
-            switch (scope) {
-                case "extension":
-                    var js = loadText(src);
-                    if (js) {
-                        eval(js);
-                    }
-                    break;
-                
-                case "page":
-                case null:
-                    var extender = new ScriptExtender(src, "text/javascript");
-                    extender.weak = (weak != null && (weak.toLowerCase() == "true" || parseInt(weak) > 0));
-                    WebExtender.registerExtender(url, extender);
-                    break;
-                
-                default:
-                    throw String.format("Invalid scope ({0}).", scope);
-            }
+            var extender = new ScriptExtender(src, "text/javascript");
+            extender.weak = this._parseBoolean(weak);
+            WebExtender.registerExtender(url, extender);
         }
+    },
+    
+    _parseBoolean: function(value) {
+        return value != null && (value.toLowerCase() == "true" || parseInt(value) > 0);
     }
 };

@@ -9,9 +9,10 @@
   </stylesheets>
   <extenders>
     <!-- Generic -->
-    <script url="#{melior}/*" name="analyzes.js" scope="page" weak="true" />
-    <script url="#{melior}/*" name="config.js" scope="extension" weak="true" />
-    <script url="#{melior}/*" name="menu.js" scope="page" weak="true" />
+    <script url="#{melior}/*" name="interop.js" weak="true" />
+    <script url="#{melior}/*" name="analyzes.js" weak="true" />
+    <script url="#{melior}/*" name="config.js" weak="true" />
+    <script url="#{melior}/*" name="menu.js" weak="true" />
     
     <!-- Specific -->
     <script url="#{melior}/obchod.html" name="bestiar.js" />

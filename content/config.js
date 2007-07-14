@@ -33,12 +33,27 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
- 
-var bestiar = PageExtender.create({
-    process: function(page, context, static) {
-        alert(page.id);
+
+const CONFIG_ROOT_NAME = "prefs";
+var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME, function(cfg) { MaPlus.initConfig(cfg); });
+
+var plusConfigAutosave = PageExtender.create({
+    SAVE_INTERVAL: 100,
+    
+    weak: true,
+    _hits = 0,
+    
+    analyze: function(page, context) {
+        if (++this._hits > this.SAVE_INTERVAL) {
+            this._hits = 0;
+            plusConfig.saveAll();
+        }
+        
+        return false;
     }
 });
 
-pageExtenders.add(bestiar);
+// Register
+Marshal.registerObject("configManager", configManager);
+WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
+WebExtender.registerUnloadHandler(function() { plusConfig.saveAll(); });

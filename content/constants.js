@@ -38,7 +38,15 @@ const EXTENSION_NAME = "maplus";
 const EXTENSION_ID = "maplus@michal.dvorak";
 const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
 
+// Constants for Marshal class
+const MARSHAL_NONE = 0;
+const MARSHAL_BY_VALUE = 1;
+const MARSHAL_BY_REF = 2;
 
+// Change with care
+const MARSHAL_DEFAULT = MARSHAL_NONE; 
+
+// Custom constants
 const JMENA_PRESVEDCENI = new Hash();
 JMENA_PRESVEDCENI["D"] = "Dobré";
 JMENA_PRESVEDCENI["N"] = "Neutrální";

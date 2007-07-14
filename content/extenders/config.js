@@ -34,21 +34,70 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const CONFIG_ROOT_NAME = "prefs";
-var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME, function(cfg) { MaPlus.initConfig(cfg); });
+var PlusConfigTemplate = {
+    getPrefNode: function() {
+        throw "Not supported.";
+    },
+    getPrefNodeByXPath: function() {
+        throw "Not supported.";
+    },
 
-var plusConfig = PageExtender.create({
-    weak: true,
+    getEnabled: function() { 
+        return this.getBoolean("enabled", true);
+    },
+    
+    getMaxTahu: function() { 
+        return this.getNumber("maxTahu", 30); 
+    },
+    
+    getTemneBarvy: function() { 
+        return this.getBoolean("temneBarvy", true); 
+    },
 
-    analyze: function(page, context, static) {
-        page.config = configManager.getConfig(page.id);
-        if (!page.config)
-            throw String.format("Nepodarilo se nacist konfiguraci pro id {0}.", page.id);
-        
-        return true;
+    getAliance: function() {
+        throw "Not implemented.";
+    },
+    
+    getNastaveni: function() {
+        throw "Not implemented.";
     }
-});
+};
 
-// Register extender
-WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfig);
-WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });
+var PlusConfigNastaveniTemplate = {
+};
+
+
+// TODO jako extender, special metodu na proxy configu
+var PlusConfig = {
+    _configCache: new Hash(),
+    
+    getConfig: function(id) {
+        if (!id || isNaN(parseInt(id)))
+            throw "id is invalid.";
+        id = String(id);
+        
+        var cfg = this._configCache[id];
+        if (!cfg) {
+            var configName = "config." + id;
+            Marshal.registerMethodCall(configName, "configManager", "getConfig", [id]);
+            cfg = Marshal.createObjectProxy(configName);
+            this._configCache[id] = cfg;
+            
+            Object.extend(cfg, PlusConfigTemplate);
+            cfg.addPref = function() { cfg.addPref.apply(cfg, arguments); }; // odstrani navratovou hodnotu
+            
+            Marshal.registerMethodCall(configName + ".aliance", configName, "getPrefNode", ["aliance", true]);
+            var aliance = Marshal.createObjectProxy(configName + ".aliance");
+            cfg.getAliance = function() { return aliance; };
+            
+            var nastaveniName = configName + ".nastaveni";
+            Marshal.registerMethodCall(nastaveniName, configName, "getPrefNode", ["nastaveni", true]);
+            Marshal.registerMethodCall(nastaveniName + ".utok", nastaveniName, "getPrefNode", ["utok", true]);
+            Marshal.registerMethodCall(nastaveniName + ".boj", nastaveniName, "getPrefNode", ["boj", true]);
+            
+            
+        }
+        
+        return cfg;
+    },
+};

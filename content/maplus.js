@@ -54,11 +54,13 @@ var MaPlus = {
         cfg.getMaxTahu = function() { return this.getNumber("maxTahu", 30); };
         cfg.getTemneBarvy = function() { return this.getBoolean("temneBarvy", true); };
         
+        /*
         cfg.aliance = cfg.getPrefNode("aliance", true);
         cfg.nastaveni = cfg.getPrefNode("nastaveni", true);
       
         cfg.nastaveni.utok = cfg.nastaveni.getPrefNode("utok", true);
         cfg.nastaveni.boj = cfg.nastaveni.getPrefNode("boj", true);
+        */
     }
 };
 
