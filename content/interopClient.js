@@ -104,7 +104,7 @@ var Marshal = {
         var _this = this;
         proxyMethods.each(
             function(method) {
-                proxy[method.name] = function() { return _this.callMethod(objectName, method.name, arguments); };
+                proxy[method.name] = function() { return _this.callMethod(objectName, method.name, $A(arguments)); };
             });
             
         return proxy;

@@ -345,6 +345,10 @@ var Marshal = {
                 throw "Invalid method name.";
                 
             var obj = this._objects[objectName];
+            
+            if (!obj && elem.ownerDocument._marshalObjects)
+                obj = elem.ownerDocument._marshalObjects[objectName];
+            
             if (!obj)
                 throw String.format("Object '{0}' is not registered.", objectName);
             
@@ -357,7 +361,7 @@ var Marshal = {
                 throw String.format("Method '{0}' cannot be marshaled.", methodName);
             
             var args = !argsStr.empty() ? argsStr.evalJSON() : null;
-            
+  
             // Call method
             var retval = method.apply(obj, args);
             

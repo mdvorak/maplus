@@ -36,7 +36,7 @@
  
 var bestiar = PageExtender.create({
     process: function(page, context) {
-        alert("ID: " + page.id);
+        alert(page.config.getEnabled());
     }
 });
 
