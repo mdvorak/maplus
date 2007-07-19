@@ -67,7 +67,7 @@ var XmlConfig = {
         var root = null;
         
         try {
-            var doc = Xml.loadFile(path);
+            var doc = FileIO.loadXmlFile(path);
             
             root = XPath.evaluateSingle(rootName, doc);
             // if (!root)
@@ -93,7 +93,7 @@ var XmlConfig = {
     save: function(path, rootNode) {
         try {
             if (rootNode && rootNode.ownerDocument)
-                Xml.saveFile(path, rootNode.ownerDocument);
+                FileIO.saveXmlFile(path, rootNode.ownerDocument);
         }
         catch (e) {
             // TODO Log error
@@ -109,10 +109,10 @@ XmlConfigNode.prototype = {
     initialize: function() {
     },
 
-    getAttribute_PROXY: MARSHAL_BY_VALUE,
-    setAttribute_PROXY: MARSHAL_BY_VALUE,
+    getAttribute_PROXY: Marshal.BY_VALUE,
+    setAttribute_PROXY: Marshal.BY_VALUE,
 
-    addPref_PROXY: MARSHAL_BY_REF,
+    addPref_PROXY: Marshal.BY_REF,
     addPref: function(name, value) {
         var elem = this.ownerDocument.createElement(name);
         
@@ -124,7 +124,7 @@ XmlConfigNode.prototype = {
         return elem;
     },
 
-    getPrefNode_PROXY: MARSHAL_BY_REF,
+    getPrefNode_PROXY: Marshal.BY_REF,
     getPrefNode: function(name, create) {
         if (!name || !name.match(/^[\w_-.:]+$/))
             throw "Name contains invalid characters.";
@@ -141,13 +141,13 @@ XmlConfigNode.prototype = {
         return elem;
     },
     
-    getPref_PROXY: MARSHAL_BY_VALUE,
+    getPref_PROXY: Marshal.BY_VALUE,
     getPref: function(name, defaultValue) {
         var elem = this.getPrefNode(name);
         return elem ? elem.textContent : defaultValue;
     },
     
-    setPref_PROXY: MARSHAL_BY_VALUE,
+    setPref_PROXY: Marshal.BY_VALUE,
     setPref: function(name, value) {
         var elem = this.getPrefNode(name);
         if (!elem)
@@ -156,20 +156,20 @@ XmlConfigNode.prototype = {
         return value;
     },
     
-    getBoolean_PROXY: MARSHAL_BY_VALUE,
+    getBoolean_PROXY: Marshal.BY_VALUE,
     getBoolean: function(name, defaultValue) {
         var v = this.getPref(name, defaultValue);
         return Boolean(v) && (v.toLowerCase == null || v.toLowerCase() != "false");
     },
     
-    getNumber_PROXY: MARSHAL_BY_VALUE,
+    getNumber_PROXY: Marshal.BY_VALUE,
     getNumber: function(name, defaultValue) {
         var v = Number(this.getPref(name, defaultValue));
         if (!isNaN(v)) return v;
         else return defaultValue;
     },
        
-    getPrefNodeByXPath_PROXY: MARSHAL_BY_REF,
+    getPrefNodeByXPath_PROXY: Marshal.BY_REF,
     getPrefNodeByXPath: function(xpath) {
         var elem = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ANY_TYPE, null).iterateNext();
         if (elem) {
@@ -178,13 +178,13 @@ XmlConfigNode.prototype = {
         return elem;
     },
     
-    getPrefByName_PROXY: MARSHAL_BY_VALUE,
+    getPrefByName_PROXY: Marshal.BY_VALUE,
     getPrefByName: function(tagName, name, defaultValue) {
         var elem = this.getPrefNodeByXPath(tagName + '[@name = "' + name + '"]');
         return elem ? elem.textContent : defaultValue;
     },
     
-    setPrefByName_PROXY: MARSHAL_BY_VALUE,
+    setPrefByName_PROXY: Marshal.BY_VALUE,
     setPrefByName: function(tagName, name, value) {
         var elem = this.getPrefNodeByXPath(tagName + '[@name = "' + name + '"]');
         if (value) {
@@ -202,7 +202,7 @@ XmlConfigNode.prototype = {
         return value;
     },
 
-    clearChildNodes_PROXY: MARSHAL_BY_VALUE,
+    clearChildNodes_PROXY: Marshal.BY_VALUE,
     clearChildNodes: function() {
         while (this.firstChild) {
             this.removeChild(this.firstChild);
@@ -240,7 +240,7 @@ XmlConfigManager.prototype = {
         return path;
     },
     
-    getConfig_PROXY: MARSHAL_BY_REF,
+    getConfig_PROXY: Marshal.BY_REF,
     getConfig: function(name, dontCreate) {
         name = String(name);
         var config = this._cache[name];
@@ -254,7 +254,7 @@ XmlConfigManager.prototype = {
         return config;
     },
     
-    saveConfig_PROXY: MARSHAL_BY_VALUE,
+    saveConfig_PROXY: Marshal.BY_VALUE,
     saveConfig: function(name) {
         name = String(name);
         var config = this._cache[name];
@@ -265,7 +265,7 @@ XmlConfigManager.prototype = {
         }
     },
     
-    saveAll_PROXY: MARSHAL_BY_VALUE,
+    saveAll_PROXY: Marshal.BY_VALUE,
     saveAll: function(name) {
         var _this = this;
         this._cache.keys().each(function(e) { _this.saveConfig(e); });

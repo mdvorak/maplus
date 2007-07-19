@@ -34,13 +34,16 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-function loadText(url) {
-    var req = new XMLHttpRequest();
-    req.open("GET", url, false); 
-    req.send(null);
-    
-    return req.responseText;
-}
+Object.extend(Class, {
+    inherit: function(baseType) {
+        var cls = Class.create();
+        // copy "static" methods
+        Object.extend(cls, baseType);
+        // copy "instance" methods and set base type
+        cls.prototype = Object.extend({ base: baseType.prototype }, baseType.prototype);
+        return cls;
+    }
+});
 
 Object.extend(Event, {
     dispatch: function(element, eventName, bubbles, cancelable) {
@@ -197,7 +200,7 @@ var PageExtender = Class.create();
 
 PageExtender.prototype = {
     initialize: function() {
-        this.weak = false;
+        this.supporting = false;
     },
 
     analyze: function(page, context) {
@@ -205,47 +208,12 @@ PageExtender.prototype = {
     },
     
     process: function(page, context) {
+    },
+    
+    isSignificant: function() {
+        return !this.supporting;
     }
 };
-
-Object.extend(PageExtender, {
-    // Creates instance of PageExtender with customized implementation. Ideal for single-purpose extenders
-    create: function(definition) {
-        return Object.extend(new PageExtender(), definition);
-    },
-    
-    createClass: function(definition) {
-        var cls = Class.create();
-        Object.extend(cls.prototype, PageExtender.prototype);
-        Object.extend(cls.prototype, definition);
-        return cls;
-    }
-});
-
-/* PageExtender example
-
-var myPageExtender = PageExtender.create({
-    analyze: function(page, context) {
-        // Use page for data used in other extenders, and context for local.
-        page.something = $('something');
-        context.else = $('else');
-        
-        if (!Page.something || !context.else)
-            return false;
-        
-        return true;
-    },
-    
-    process: function(page, context) {
-        context.else.hide();
-        page.something.style.width = "10px";
-    }
-});
-
-// Register extender
-
-*/
-
 
 /*** PageExtenderCollection class ***/
 var PageExtenderCollection = Class.create();
@@ -253,50 +221,49 @@ var PageExtenderCollection = Class.create();
 PageExtenderCollection.prototype = {
     initialize: function() {
         this._extenders = new Array();
-        this._significant = 0;
+        this._significantSize = 0;
     },
     
     size: function() {
         return this._extenders.length;
     },
     
-    significantSize: function() {
-        return this._significant;
+    needsExecution: function() {
+        return this._significantSize > 0;
     },
 
     add: function(extender) {
         if (!extender) return;
-        this._extenders.push(extender);
         
-        if (!extender.weak)
-            this._significant++;
+        this._extenders.push(extender);
+            
+        if (extender.isSignificant())
+            this._significantSize++;
     },
-
-    process: function(page) {
+    
+    run: function(page) {
         try {
             var processList = new Array();
-            
-            // Analyze 
-            this._extenders.each(function(e) {
-                    if (!e) return;
-                    
+
+            // Analyze
+            this._extenders.each(function(e)
+                {
                     var context = new Object();
                     if (e.analyze(page, context))
                         processList.push([e, context]);
                 });
-
+                
             // Process
-            processList.each(function(entry) {
+            processList.each(function(entry)
+                {
                     var extender = entry[0];
                     var context = entry[1];
                     extender.process(page, context);
                 });
-
-            return true;
         }
         catch (ex) {
             // TODO: log error
-            alert(Object.toJSON(ex));
+            alert(ex);
             return false;
         }
     }
@@ -305,10 +272,14 @@ PageExtenderCollection.prototype = {
 
 /*** Custom extender classes ***/
 
-var ScriptExtender = PageExtender.createClass({
+var ScriptExtender = Class.inherit(PageExtender);
+
+Object.extend(ScriptExtender.prototype, {
     DEFAULT_TYPE: "text/javascript",
 
     initialize: function(src, type) {
+        this.base.initialize();
+    
         if (!src)
             throw "src is null.";
         this._src = src;
@@ -323,8 +294,12 @@ var ScriptExtender = PageExtender.createClass({
     }
 });
 
-var StyleExtender = PageExtender.createClass({
+var StyleExtender = Class.inherit(PageExtender);
+
+Object.extend(StyleExtender.prototype, {
     initialize: function(src) {
+        this.base.initialize();
+        
         if (!src)
             throw "src is null.";
         this._src = src;

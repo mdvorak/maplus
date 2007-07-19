@@ -169,15 +169,7 @@ var WebExtender = {
                     .getInstallLocation(EXTENSION_ID)
                     .getItemLocation(EXTENSION_ID);
     },
-    
-    getChromeUrl: function() {
-        return "chrome://" + EXTENSION_NAME + "/";
-    },
-    
-    getContentUrl: function() {
-        return this.getChromeUrl() + "content/";
-    },
- 
+     
     /** Object implementation **/
     
     _init: function() {
@@ -207,11 +199,11 @@ var WebExtender = {
     
     _callExtenders: function(doc) {
         var extenders = this._extenders.getList(doc.location.href);
-        if (extenders && extenders.significantSize() > 0) {
+        if (extenders && extenders.needsExecution() > 0) {
             var page = new Page(doc);
             
             this._initExtendedPage(page);            
-            extenders.process(page);
+            extenders.run(page);
             this._finalizeExtendedPage(page);
         }
     },
@@ -268,9 +260,22 @@ var Script = Object.extend(Script || {}, {
     }
 });
 
-/*** Xml class ***/
-var Xml = Object.extend(Xml || {}, {
-    load: function(url) {
+/*** FileIO class ***/
+var FileIO = {
+    loadText: function(url) {
+        var req = new XMLHttpRequest();
+        req.open("GET", url, false); 
+        req.send(null);
+        
+        return req.responseText;
+    },
+    
+    loadTextFile: function(file) {
+        var url = this._getFileUrl(file);
+        return this.loadText(url);
+    },
+
+    loadXml: function(url) {
         if (!url) throw "url is null.";
     
         var req = new XMLHttpRequest();
@@ -280,15 +285,12 @@ var Xml = Object.extend(Xml || {}, {
         return req.responseXML;
     },
 
-    loadFile: function(file) {
-        var ios = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
-        var fileHandler = ios.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
-        var url = fileHandler.getURLSpecFromFile(file);
-
-        return Xml.load(url);
+    loadXmlFile: function(file) {
+        var url = this._getFileUrl(file);
+        return this.loadXml(url);
     },
 
-    saveFile: function(file, dom) {
+    saveXmlFile: function(file, dom) {
         var serializer = new XMLSerializer();
         var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
                        .createInstance(Components.interfaces.nsIFileOutputStream);
@@ -296,13 +298,30 @@ var Xml = Object.extend(Xml || {}, {
         foStream.init(file, 0x02 | 0x08 | 0x20, 0664, 0);   // write, create, truncate
         serializer.serializeToStream(dom, foStream, ""); 
         foStream.close();
+    },
+    
+    _getFileUrl: function(file) {
+        var ios = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+        var fileHandler = ios.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+        var url = fileHandler.getURLSpecFromFile(file);
+        
+        return url;
     }
-});
+};
+
 
 /*** Marshal server component class ***/
 var Marshal = {
+    // Constants
+    NONE: 0,
+    BY_VALUE: 1,
+    BY_REF: 2,
+    // Change with care
+    DEFAULT: 0,
+
     PROXY_SUFFIX: "_PROXY",
 
+    // Private members
     _objects: new Hash(),
     _objectId: 0,
 
@@ -312,7 +331,7 @@ var Marshal = {
         page.document.addEventListener("MarshalMethodCall", function(event) { _this._methodCallHandler(event); }, false);
         page.document.addEventListener("MarshalGetProxyDefinition", function(event) { _this._getProxyDefinitionHandler(event); }, false);
         
-        Script.executeFile(page.document, WebExtender.getContentUrl() + "interopClient.js");
+        Script.executeFile(page.document, CHROME_CONTENT_URL + "interopClient.js");
     },
     
     registerObject: function(name, obj) {
@@ -368,11 +387,11 @@ var Marshal = {
             if (retval) {
                 // Process result
                 switch (methodType) {
-                    case MARSHAL_BY_VALUE:
+                    case Marshal.BY_VALUE:
                         elem.setAttribute("retval", Object.toJSON(retval));
                         break;
                     
-                    case MARSHAL_BY_REF:
+                    case Marshal.BY_REF:
                         // TODO optimize code so same objects will have same id
                         var objectId = ++this._objectId;
                     
@@ -442,14 +461,14 @@ var Marshal = {
             case null:
                 return MARSHAL_DEFAULT;
             
-            case MARSHAL_BY_VALUE:
-                return MARSHAL_BY_VALUE;
+            case Marshal.BY_VALUE:
+                return Marshal.BY_VALUE;
                 
-            case MARSHAL_BY_REF:
-                return MARSHAL_BY_REF;
+            case Marshal.BY_REF:
+                return Marshal.BY_REF;
                 
             default:
-                return MARSHAL_NONE;
+                return Marshal.NONE;
         }
     }
 };
@@ -460,31 +479,38 @@ var ExtenderManager = {
     load: function(definitionUrl) {
         if (!definitionUrl) throw "definitionUrl is null.";
         
-        var definition = Xml.load(definitionUrl);
+        var definition = FileIO.loadXml(definitionUrl);
         if (definition) {
             var extendersLocationUrl = definitionUrl.replace(/\/[^\/]+$/, "/");
-            var _this = this;
         
             // Read aliases definitions
             var aliasesDef = XPath.evaluateList('/webExtender/urls/alias', definition);
             var aliasesMap = new Hash();
             aliasesDef.each(function(a) { aliasesMap[a.getAttribute("name")] = a.textContent; });
             
-            // Process stylesheets
-            var stylesheets = XPath.evaluateList('/webExtender/stylesheets/style', definition);
-            stylesheets.each(function(s) { _this._processStyle(aliasesMap, s); });
-
-            // Process scripts
-            var scripts = XPath.evaluateList('/webExtender/extenders/script', definition);
-            scripts.each(function(s) { _this._processScript(extendersLocationUrl, aliasesMap, s); });
+            // Register extenders
+            var scripts = XPath.evaluateList('/webExtender/extenders/*', definition);
+            scripts.each(function(def) {
+                    var url = new Template(def.getAttribute("url")).evaluate(aliasesMap);
+                    var parser = ExtenderManager.Extenders[def.tagName];
+                    
+                    if (!url || url.empty())
+                        throw "url not set.";
+                    
+                    if (!parser || typeof parser != "function")
+                        throw String.format("Unsupported extender type ('{0}').", def.tagName);
+                    
+                    var extender = parser(def, aliasesMap);
+                    WebExtender.registerExtender(url, extender);
+                });
         }
     },
     
     // Called directly by WebExtender
     initPage: function(page) {
-        Script.executeFile(page.document, WebExtender.getContentUrl() + "prototype.js");
-        Script.executeFile(page.document, WebExtender.getContentUrl() + "webExtenderLib.js");
-        Script.executeFile(page.document, WebExtender.getContentUrl() + "constants.js");
+        Script.executeFile(page.document, CHROME_CONTENT_URL + "prototype.js");
+        Script.executeFile(page.document, CHROME_CONTENT_URL + "webExtenderLib.js");
+        Script.executeFile(page.document, CHROME_CONTENT_URL + "constants.js");
         
         Marshal.initPage(page);
     
@@ -495,36 +521,37 @@ var ExtenderManager = {
     finalizePage: function(page) {
         Script.executeJavascriptFunction(page.document, function() {
                 var page = new Page();
-                pageExtenders.process(page);
+                pageExtenders.run(page);
             });
-    },
-    
-    _processStyle: function(aliasesMap, s) {
-        var url = new Template(s.getAttribute("url")).evaluate(aliasesMap);
-        var src = new Template(s.getAttribute("src")).evaluate(aliasesMap);
-        var weak = s.getAttribute("weak");
+    }
+}
+
+ExtenderManager.Extenders = {
+    script: function(def, aliases) {
+        var name = def.getAttribute("name");
+        var type = def.getAttribute("type");
         
-        if (url && src) {                    
-            var extender = new StyleExtender(src);
-            extender.weak = this._parseBoolean(weak);
-            WebExtender.registerExtender(url, extender);
-        }
-    },
-    
-    _processScript: function(extendersLocationUrl, aliasesMap, s) {
-        var url = new Template(s.getAttribute("url")).evaluate(aliasesMap);
-        var name = s.getAttribute("name");
-        var weak = s.getAttribute("weak");
+        if (!name || !/^[\w.\/_-~]+$/.test(name))
+            throw String.format("Invalid script name ('{0}').", name);
         
-        if (url && name) {
-            var src = extendersLocationUrl + name;
-            var extender = new ScriptExtender(src, "text/javascript");
-            extender.weak = this._parseBoolean(weak);
-            WebExtender.registerExtender(url, extender);
-        }
+        var src = extendersLocationUrl + name;
+        var extender = new ScriptExtender(src, "text/javascript");
+        return extender;
     },
     
-    _parseBoolean: function(value) {
-        return value != null && (value.toLowerCase() == "true" || parseInt(value) > 0);
+    style: function(def, aliases) {
+        var src = new Template(def.getAttribute("src")).evaluate(aliases);
+        var extender = new StyleExtender(src);
+        return extender;
     }
 };
+
+// Methods available to the client via proxy
+var Chrome = {
+    loadText_PROXY: Marshal.BY_VALUE,
+    loadText: function(path) {
+        return FileIO.loadText(CHROME_CONTENT_URL + path);
+    }
+};
+
+Marshal.registerObject("Chrome", Chrome);

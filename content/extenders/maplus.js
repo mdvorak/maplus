@@ -33,8 +33,15 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
-
-var menuExtender = PageExtender.create({
+ 
+ var MaPlus = {
+    loadHtml: function(path) {
+        return loadText("chrome://" + EXTENSION_NAME + "/content/html/" + path);
+    }
+ };
+ 
+ // Plus menu
+ var plusMenuExtender = PageExtender.create({
     analyze: function(page, context) {
         // TODO load html
         context.html = null;
@@ -43,20 +50,20 @@ var menuExtender = PageExtender.create({
     },
     
     process: function(page, context) {
-    },
-    
-    _createPlusMenu: function(page) {
-        page.document.addEventListener("maplus_enabled", function(e)
+        var div = document.createElement("div");
+        div.innerHTML = context.html;
+        div.className = "maplusFrame";
+        
+        document.body.appendChild(div);
+        
+        var link = $XF('//a[@id = "plus_enable"');
+        Event.observe(link, "click", function(event) 
             {
-                if (e.target.getAttribute("maplus_toggle") == "true")
-                    page.prefs.setPref("enabled", !page.prefs.getEnabled());
-                    
-                e.target.setAttribute("maplus_enabled", page.prefs.getEnabled());
-            }, false, true);
-            
-        var html = loadTextFromChrome("maplus.htm");
-        page.addElement(page.document.body, "div", html, null, [["class", "maplusFrame"]]);
-    }
+                var value = !page.prefs.getEnabled();
+                page.config.setPref("enabled", value);
+                link.updateText(value); // Defined in 'maplus.htm'
+            });
+    },
 });
 
-pageExtenders.add(menuExtender);
+pageExtenders.add(plusMenuExtender);

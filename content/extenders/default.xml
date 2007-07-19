@@ -9,9 +9,10 @@
   </stylesheets>
   <extenders>
     <!-- Generic -->
-    <script url="#{melior}/*" name="interop.js" weak="true" />
     <script url="#{melior}/*" name="analyzes.js" weak="true" />
     <script url="#{melior}/*" name="config.js" weak="true" />
+    <script url="#{melior}/*" name="maplus.js" type="standalone" />
+    
     <script url="#{melior}/*" name="menu.js" weak="true" />
     
     <!-- Specific -->
