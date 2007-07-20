@@ -34,29 +34,45 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-var menuExtender = PageExtender.create({
+var sidebarExtender = PageExtender.create({
     analyze: function(page, context) {
-        context.calcHtml = Chrome.loadText("html/kalkulacka.html");
+        context.kalkulackaHtml = Chrome.loadText("html/kalkulacka.html");
+        context.poznamkyHtml = Chrome.loadText("html/poznamky.html");
     
-        return true;
+        return (context.kalkulackaHtml || context.poznamkyHtml);
     },
     
     process: function(page, context) {
         // Kalkulacka
-        if (context.calcHtml) {
-            var kalkulacka = document.createElement("div");
-            kalkulacka.innerHTML = context.calcHtml;
-            page.leftMenu.appendChild(kalkulacka);
+        if (context.kalkulackaHtml) {
+            var div = document.createElement("div");
+            div.innerHTML = context.kalkulackaHtml;
+            page.leftMenu.appendChild(div);
 
-            var localConfig = page.localConfig;
+            var cfg = page.localConfig;
             // Definovano v html
-            Kalkulacka.init(localConfig.getPref("kalkulacka", ""), 
+            Kalkulacka.init(cfg.getPref("kalkulacka", ""), 
                 function(e)
                 {
-                    localConfig.setPref("kalkulacka", e.target.value);
+                    cfg.setPref("kalkulacka", e.target.value);
+                });
+        }
+        
+        // Poznamky
+        if (context.poznamkyHtml) {
+            var div = document.createElement("div");
+            div.innerHTML = context.poznamkyHtml;
+            page.leftMenu.appendChild(div);
+
+            var cfg = page.config;
+            // Definovano v html
+            Poznamky.init(cfg.getPref("poznamky", ""), 
+                function(e)
+                {
+                    cfg.setPref("poznamky", e.target.value);
                 });
         }
     }
 });
 
-pageExtenders.add(menuExtender);
+pageExtenders.add(sidebarExtender);

@@ -1,0 +1,44 @@
+﻿<style type="text/css">
+.poznamky
+{
+    text-align: left;
+    width: 150px;
+    background-color: #0F0F0F;
+    border-width: 0px;
+    color: Gray;
+}
+.poznamky:focus
+{
+    border-width: 0px;
+}
+</style>
+
+<script type="text/javascript">
+var Poznamky = {
+    vymaz: function() {
+        var poznamky = $('plus_poznamky');
+        poznamky.value = "";
+        
+        Event.dispatch(poznamky, "change", true);
+    },
+
+    init: function(value, onchange) {
+        var poznamky = $('plus_poznamky');
+        poznamky.value = value || "";
+
+        if (onchange) {
+            Event.observe(poznamky, "change", onchange, true);
+        }
+    }
+}
+</script>
+
+<br />
+<br />
+<span>Poznámky</span>
+<br />
+<textarea id="plus_poznamky" onkeyup="Event.dispatch(this, 'change', true);" rows="5" class="poznamky"></textarea>
+<br />
+<a href="javascript://" onclick="Poznamky.vymaz();">
+    <span class="small">Vymaž</span>
+</a>
