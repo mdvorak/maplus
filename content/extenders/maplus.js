@@ -33,19 +33,11 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
- var MaPlus = {
-    loadHtml: function(path) {
-        return loadText("chrome://" + EXTENSION_NAME + "/content/html/" + path);
-    }
- };
- 
+  
  // Plus menu
  var plusMenuExtender = PageExtender.create({
     analyze: function(page, context) {
-        // TODO load html
-        context.html = null;
-    
+        context.html = Chrome.loadText("html/maplus.html");
         return (context.html != null);
     },
     
@@ -56,14 +48,21 @@
         
         document.body.appendChild(div);
         
-        var link = $XF('//a[@id = "plus_enable"');
+        var link = $XF('//a[@id = "plus_enable"]');
         Event.observe(link, "click", function(event) 
             {
-                var value = !page.prefs.getEnabled();
+                var value = !page.config.getEnabled();
                 page.config.setPref("enabled", value);
                 link.updateText(value); // Defined in 'maplus.htm'
             });
-    },
+            
+        var enabled = page.config.getEnabled();
+        link.updateText(enabled);
+        
+        // Stop execution
+        if (!enabled)
+            throw "MaPlus is disabled.";
+    }
 });
 
 pageExtenders.add(plusMenuExtender);

@@ -37,8 +37,6 @@
 
 /*** Basic page analyzes ***/
 var analyzeLayout = PageExtender.create({
-    weak: true,
-
     analyze: function(page, context) {
         if (page.name == null || page.name == "" || page.name == "login.html")
             throw "Unsupported page name.";

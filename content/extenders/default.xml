@@ -4,16 +4,16 @@
     <alias name="chrome">chrome://maplus/content</alias>
     <alias name="melior">http://meliorannis.idnes.cz</alias>
   </urls>
-  <stylesheets>
-    <style url="#{melior}/*" src="#{chrome}/html/maplus.css" weak="true" />
-  </stylesheets>
   <extenders>
+    <script url="#{melior}/*" name="interop.js" />
+
     <!-- Generic -->
-    <script url="#{melior}/*" name="analyzes.js" weak="true" />
-    <script url="#{melior}/*" name="config.js" weak="true" />
-    <script url="#{melior}/*" name="maplus.js" type="standalone" />
+    <style url="#{melior}/*" src="#{chrome}/html/maplus.css" />
+    <script url="#{melior}/*" name="analyzes.js" />
+    <script url="#{melior}/*" name="config.js" />
+    <script url="#{melior}/*" name="maplus.js" />
     
-    <script url="#{melior}/*" name="menu.js" weak="true" />
+    <script url="#{melior}/*" name="menu.js" />
     
     <!-- Specific -->
     <script url="#{melior}/obchod.html" name="bestiar.js" />

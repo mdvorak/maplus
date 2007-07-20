@@ -38,6 +38,8 @@
 /*** Marshal client component class ***/
 
 var Marshal = {
+    _proxyCache: new Hash(),
+
     callMethod: function(objectName, methodName, args) {
         if (!objectName)
             throw "objectName is null.";
@@ -65,31 +67,40 @@ var Marshal = {
             
             if (!proxyDefinition)
                 throw String.format("Unable to find proxy definition.");
-                
-            return this._createProxyFromDefinition(objectId, proxyDefinition.evalJSON());
+
+            var proxy = this._proxyCache[objectId];
+            if (!proxy) {
+                proxy = this._createProxyFromDefinition(objectId, proxyDefinition.evalJSON());
+            }
+            
+            return proxy;
         }
         else
             return;
     },
     
-    createObjectProxy: function(objectName) {
+    getObjectProxy: function(objectName) {
         if (!objectName)
             throw "objectName is null.";
-        if (!methodName)
-            throw "methodName is null.";
+  
+        var proxy = this._proxyCache[objectName];
         
-        var elem = document.createElement("marshal");
-        elem.setAttribute("objectName", objectName);
+        if (!proxy) {
+            var elem = document.createElement("marshal");
+            document.body.appendChild(elem);
+            elem.setAttribute("objectName", objectName);
+            
+            Event.dispatch(elem, "MarshalGetProxyDefinition", true);
+            
+            var defJSON = elem.getAttribute("proxyDefinition");
+            if (!defJSON || defJSON.empty())
+                throw String.format("Unable to get proxy definition for object '{0}'.", objectName);
+            
+            var def = defJSON.evalJSON();
+            proxy = this._createProxyFromDefinition(objectName, def);
+        }
         
-        Event.dispatch(elem, "MarshalGetProxyDefinition");
-
-        var defJSON = elem.getAttribute("proxyDefinition");
-        if (!defJSON)
-            throw String.format("Unable to get proxy definition for object '{0}'.", objectName);
-        
-        var def = defJSON.evalJSON();
-        
-        return this._createProxyFromDefinition(objectName, def);
+        return proxy;
     },
     
     _createProxyFromDefinition: function(objectName, def) {

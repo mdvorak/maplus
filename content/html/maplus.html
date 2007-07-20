@@ -66,7 +66,8 @@
 </table>
 
 <script type="text/javascript">
-document.getElementById('plus_enable').updateText = function(value) {
+// Pro uziti v extenderu
+$XF('//a[@id = "plus_enable"]').updateText = function(value) {
     this.innerHTML = (value ? "Deaktivovat Plus" : "Aktivovat Plus");
 }
 

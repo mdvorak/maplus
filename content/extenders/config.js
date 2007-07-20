@@ -97,8 +97,6 @@ Object.extend(PlusConfig, {
 
 // Extender
 var configExtender = PageExtender.create({
-    weak: true,
-
     analyze: function(page) {
         page.config = PlusConfig.getConfig(page.id);
         

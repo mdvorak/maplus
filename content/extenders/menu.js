@@ -36,26 +36,10 @@
 
 var menuExtender = PageExtender.create({
     analyze: function(page, context) {
-        // TODO load html
-        context.html = null;
-    
-        return (context.html != null);
+        return true;
     },
     
     process: function(page, context) {
-    },
-    
-    _createPlusMenu: function(page) {
-        page.document.addEventListener("maplus_enabled", function(e)
-            {
-                if (e.target.getAttribute("maplus_toggle") == "true")
-                    page.prefs.setPref("enabled", !page.prefs.getEnabled());
-                    
-                e.target.setAttribute("maplus_enabled", page.prefs.getEnabled());
-            }, false, true);
-            
-        var html = loadTextFromChrome("maplus.htm");
-        page.addElement(page.document.body, "div", html, null, [["class", "maplusFrame"]]);
     }
 });
 

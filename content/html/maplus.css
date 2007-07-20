@@ -1,1 +1,10 @@
-﻿
+﻿.maplusFrame
+{
+    left: 10px;
+    top: 10px;
+    position: absolute;
+    color: gainsboro;
+    font-family: Arial;
+    font-size: small;
+    display: block;
+}

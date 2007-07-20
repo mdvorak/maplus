@@ -77,8 +77,13 @@ Object.extend(String, {
         if (!str) return null;
         
         for (var i = 1; i < arguments.length; i++) {
-            str = str.replace("\{" + String(i - 1) + "\}", arguments[i]);
-        } 
+            var val = arguments[i] ? arguments[i] : "";
+            str = str.replace("{" + String(i - 1) + "}", val);
+        }
+        
+        var m = str.match(/\{(\d+)\}/);
+        if (m) throw "Argument index (" + m[1] + ") is out of range.";
+        
         return str;
     }
 });
@@ -215,6 +220,18 @@ PageExtender.prototype = {
     }
 };
 
+Object.extend(PageExtender, {
+    create: function(definition) {
+        return Object.extend(new PageExtender(), definition);
+    },
+    
+    createClass: function(definition) {
+        var cls = Class.inherit(PageExtender);
+        Object.extend(cls.prototype, definition);
+        return cls;
+    }
+});
+
 /*** PageExtenderCollection class ***/
 var PageExtenderCollection = Class.create();
 
@@ -272,9 +289,7 @@ PageExtenderCollection.prototype = {
 
 /*** Custom extender classes ***/
 
-var ScriptExtender = Class.inherit(PageExtender);
-
-Object.extend(ScriptExtender.prototype, {
+var ScriptExtender = PageExtender.createClass({
     DEFAULT_TYPE: "text/javascript",
 
     initialize: function(src, type) {
@@ -294,9 +309,7 @@ Object.extend(ScriptExtender.prototype, {
     }
 });
 
-var StyleExtender = Class.inherit(PageExtender);
-
-Object.extend(StyleExtender.prototype, {
+var StyleExtender = PageExtender.createClass({
     initialize: function(src) {
         this.base.initialize();
         

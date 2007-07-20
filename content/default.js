@@ -35,4 +35,4 @@
  * ***** END LICENSE BLOCK ***** */
 
 // Load extenders
-ExtenderManager.load(WebExtender.getContentUrl() + "extenders/default.xml");
+ExtenderManager.load(CHROME_CONTENT_URL + "extenders/default.xml");

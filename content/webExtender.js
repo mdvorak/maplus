@@ -199,7 +199,7 @@ var WebExtender = {
     
     _callExtenders: function(doc) {
         var extenders = this._extenders.getList(doc.location.href);
-        if (extenders && extenders.needsExecution() > 0) {
+        if (extenders && extenders.needsExecution()) {
             var page = new Page(doc);
             
             this._initExtendedPage(page);            
@@ -421,7 +421,7 @@ var Marshal = {
     
     _getProxyDefinitionHandler: function(event) {
         var elem = event.originalTarget;
-        var objectName = elem.originalTarget.getAttribute("objectName");
+        var objectName = elem.getAttribute("objectName");
         
         if (!objectName)
             throw "Missing object name.";
@@ -431,7 +431,6 @@ var Marshal = {
             throw String.format("Object '{0}' not found.", objectName);
         
         var def = this._createProxyDefinition(obj);
-        
         elem.setAttribute("proxyDefinition", Object.toJSON(def));
     },
     
@@ -444,10 +443,12 @@ var Marshal = {
             if (typeof obj[f] == "function") {
                 var type = this._getMethodType(obj, f);
             
-                def.methods.push({ 
-                    name: f,
-                    type: type
-                });
+                if (type != Marshal.NONE) {
+                    def.methods.push({ 
+                        name: f,
+                        type: type
+                    });
+                }
             }
         }
         
@@ -459,7 +460,7 @@ var Marshal = {
         
         switch (attr) {
             case null:
-                return MARSHAL_DEFAULT;
+                return Marshal.DEFAULT;
             
             case Marshal.BY_VALUE:
                 return Marshal.BY_VALUE;
@@ -481,17 +482,25 @@ var ExtenderManager = {
         
         var definition = FileIO.loadXml(definitionUrl);
         if (definition) {
-            var extendersLocationUrl = definitionUrl.replace(/\/[^\/]+$/, "/");
+            var data = {
+                location: definitionUrl.replace(/\/[^\/]+$/, "/"),
+                aliases: new Hash()
+            }
         
             // Read aliases definitions
             var aliasesDef = XPath.evaluateList('/webExtender/urls/alias', definition);
-            var aliasesMap = new Hash();
-            aliasesDef.each(function(a) { aliasesMap[a.getAttribute("name")] = a.textContent; });
+            aliasesDef.each(function(a) {
+                    var name = a.getAttribute("name");
+                    if (!name || !/^[\w._-~]+$/.test(name))
+                        throw String.format("Invalid or missing alias name ('{0}')", name);
+                        
+                    data.aliases[name] = a.textContent; 
+                });
             
             // Register extenders
             var scripts = XPath.evaluateList('/webExtender/extenders/*', definition);
             scripts.each(function(def) {
-                    var url = new Template(def.getAttribute("url")).evaluate(aliasesMap);
+                    var url = new Template(def.getAttribute("url")).evaluate(data.aliases);
                     var parser = ExtenderManager.Extenders[def.tagName];
                     
                     if (!url || url.empty())
@@ -500,7 +509,7 @@ var ExtenderManager = {
                     if (!parser || typeof parser != "function")
                         throw String.format("Unsupported extender type ('{0}').", def.tagName);
                     
-                    var extender = parser(def, aliasesMap);
+                    var extender = parser(def, data);
                     WebExtender.registerExtender(url, extender);
                 });
         }
@@ -527,20 +536,20 @@ var ExtenderManager = {
 }
 
 ExtenderManager.Extenders = {
-    script: function(def, aliases) {
+    script: function(def, data) {
         var name = def.getAttribute("name");
         var type = def.getAttribute("type");
         
         if (!name || !/^[\w.\/_-~]+$/.test(name))
             throw String.format("Invalid script name ('{0}').", name);
         
-        var src = extendersLocationUrl + name;
+        var src = data.location + name;
         var extender = new ScriptExtender(src, "text/javascript");
         return extender;
     },
     
-    style: function(def, aliases) {
-        var src = new Template(def.getAttribute("src")).evaluate(aliases);
+    style: function(def, data) {
+        var src = new Template(def.getAttribute("src")).evaluate(data.aliases);
         var extender = new StyleExtender(src);
         return extender;
     }
