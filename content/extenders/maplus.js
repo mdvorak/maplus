@@ -44,11 +44,17 @@
     process: function(page, context) {
         var div = document.createElement("div");
         div.innerHTML = context.html;
-        div.className = "maplusFrame";
+        div.style.left = "10px";
+        div.style.top = "10px";
+        div.style.display = 'block';
+        div.style.position = "absolute";
         
         document.body.appendChild(div);
         
         var link = $XF('//a[@id = "plus_enable"]');
+        if (!link) 
+            throw String.format("Unable to find 'plus_enable' link.");
+        
         Event.observe(link, "click", function(event) 
             {
                 var value = !page.config.getEnabled();

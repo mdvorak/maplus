@@ -36,6 +36,7 @@
 
 const CONFIG_ROOT_NAME = "prefs";
 var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME);
+var localConfigManager = new XmlConfigManager(null, CONFIG_ROOT_NAME);
 
 var plusConfigAutosave = PageExtender.create({
     SAVE_INTERVAL: 100,
@@ -55,5 +56,6 @@ var plusConfigAutosave = PageExtender.create({
 
 // Register
 Marshal.registerObject("configManager", configManager);
+Marshal.registerObject("localConfigManager", localConfigManager);
 WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
 WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });

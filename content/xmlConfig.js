@@ -216,9 +216,6 @@ var XmlConfigManager = Class.create();
 
 XmlConfigManager.prototype = {
     initialize: function(directory, rootName, initCallback) {
-        if (!directory)
-            throw "directory is null.";
-            
         if (!rootName)
             rootName = XmlConfig.DEFAULT_ROOT_NAME;
             
@@ -231,6 +228,8 @@ XmlConfigManager.prototype = {
     getConfigPath: function(name) {
         if (!name || name.empty())
             throw "name is null or empty.";
+         if (!this._directory)
+            throw "Invalid operation. Directory not set.";
     
         var path = Components.classes["@mozilla.org/file/local;1"]
                              .createInstance(Components.interfaces.nsILocalFile);
@@ -246,8 +245,17 @@ XmlConfigManager.prototype = {
         var config = this._cache[name];
         
         if (!config && !dontCreate) {
-            var path = this.getConfigPath(name);
-            config = XmlConfig.load(path, this._rootName, this._initCallback);
+            if (this._directory) {
+                var path = this.getConfigPath(name);
+                config = XmlConfig.load(path, this._rootName, this._initCallback);
+            }
+            else {
+                config = XmlConfig.createEmpty(this._rootName);
+                
+                if (this._initCallback)
+                    this._initCallback(config);
+            }
+                
             this._cache[name] = config;
         }
         

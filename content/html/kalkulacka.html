@@ -1,0 +1,79 @@
+﻿<style type="text/css">
+.kalkulackaIn
+{
+    text-align: left;
+    width: 150px;
+    background-color: #0F0F0F;
+    border-width: 0px;
+    color: Gray;
+}
+
+.kalkulackaIn:focus
+{
+    border-width: 0px;
+}
+
+.kalkulackaOut
+{
+    text-align: left;
+    background-color: Transparent;
+    width: 150px;
+    border-width: 0px;
+    color: #C0C0C0;
+}
+</style>
+
+<script type="text/javascript">
+var Kalkulacka = {
+    vypocitej: function() {
+        var kalkulacka = $('plus_kalkulacka');
+        var vysledek = $('plus_kalkulackaVysledek');
+        
+        var expression = kalkulacka.value;
+        
+        expression = expression.replace(/\b(\d+)K\b/g, "$1*1000")
+                               .replace(/\b(\d+)M\b/g, "$1*1000000")
+                               .replace(/(\d*),(\d+)\b/g, "$1.$2")
+                               .replace(/\b(\d+(?:[.]\d+)?)[%](?=\D|$)/g, "$1/100");
+
+        var r;
+        try {
+            r = eval(expression);
+        }
+        catch(e) { }
+        
+        vysledek.update(r || "&nbsp;");
+        return r;
+    },
+    
+    vymaz: function() {
+        var kalkulacka = $('plus_kalkulacka');
+        var vysledek = $('plus_kalkulackaVysledek');
+        
+        kalkulacka.value = "";
+        vysledek.update("&nbsp;");
+        
+        Event.dispatch(kalkulacka, 'change', true);
+    },
+    
+    init: function(value, onchange) {
+        var kalkulacka = $('plus_kalkulacka');
+        kalkulacka.value = value || "";
+        this.vypocitej();
+        
+        if (onchange) {
+            Event.observe(kalkulacka, 'change', onchange, true);
+        }
+    }
+}
+</script>
+
+<br />
+<br />
+<span>Kalkulačka</span>
+<br />
+&nbsp;<input id="plus_kalkulacka" type="text" class="kalkulackaIn" onchange="Kalkulacka.vypocitej();" onkeyup="Kalkulacka.vypocitej();" />
+<br />
+<div class="kalkulackaOut">&nbsp;<span id="plus_kalkulackaVysledek">&nbsp;</span>
+</div>
+<a href="javascript://" onclick="Kalkulacka.vymaz();"><span class="small">Vymaž</span></a>

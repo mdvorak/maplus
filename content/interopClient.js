@@ -50,33 +50,41 @@ var Marshal = {
         
         var elem = document.createElement("marshal");
         document.body.appendChild(elem);
-        elem.setAttribute("objectName", objectName);
-        elem.setAttribute("methodName", methodName);
-        elem.setAttribute("arguments", argsStr);
         
-        Event.dispatch(elem, "MarshalMethodCall", true);
-        
-        if (elem.getAttribute("exception"))
-            throw elem.getAttribute("exception").evalJSON();
-        else if (elem.getAttribute("retval"))
-            return elem.getAttribute("retval").evalJSON();
-        else if (elem.getAttribute("objectId")) {
-            // Create proxy object
-            var objectId = elem.getAttribute("objectId");
-            var proxyDefinition = elem.getAttribute("proxyDefinition");
+        try {
+            elem.setAttribute("objectName", objectName);
+            elem.setAttribute("methodName", methodName);
+            elem.setAttribute("arguments", argsStr);
             
-            if (!proxyDefinition)
-                throw String.format("Unable to find proxy definition.");
+            Event.dispatch(elem, "MarshalMethodCall", true);
+            
+            if (elem.getAttribute("exception"))
+                throw elem.getAttribute("exception").evalJSON();
+            else if (elem.getAttribute("retval"))
+                return elem.getAttribute("retval").evalJSON();
+            else if (elem.getAttribute("objectId")) {
+                // Create proxy object
+                var objectId = elem.getAttribute("objectId");
+                var proxyDefinition = elem.getAttribute("proxyDefinition");
+                
+                if (!proxyDefinition)
+                    throw String.format("Unable to find proxy definition.");
 
-            var proxy = this._proxyCache[objectId];
-            if (!proxy) {
-                proxy = this._createProxyFromDefinition(objectId, proxyDefinition.evalJSON());
+                var proxy = this._proxyCache[objectId];
+                if (!proxy) {
+                    proxy = this._createProxyFromDefinition(objectId, proxyDefinition.evalJSON());
+                }
+                
+                return proxy;
             }
-            
-            return proxy;
+            else {
+                return;
+            }
         }
-        else
-            return;
+        finally {
+            // Comment this for easier debugging
+            document.body.removeChild(elem);
+        }
     },
     
     getObjectProxy: function(objectName) {
@@ -88,16 +96,23 @@ var Marshal = {
         if (!proxy) {
             var elem = document.createElement("marshal");
             document.body.appendChild(elem);
-            elem.setAttribute("objectName", objectName);
             
-            Event.dispatch(elem, "MarshalGetProxyDefinition", true);
-            
-            var defJSON = elem.getAttribute("proxyDefinition");
-            if (!defJSON || defJSON.empty())
-                throw String.format("Unable to get proxy definition for object '{0}'.", objectName);
-            
-            var def = defJSON.evalJSON();
-            proxy = this._createProxyFromDefinition(objectName, def);
+            try {
+                elem.setAttribute("objectName", objectName);
+                
+                Event.dispatch(elem, "MarshalGetProxyDefinition", true);
+                
+                var defJSON = elem.getAttribute("proxyDefinition");
+                if (!defJSON || defJSON.empty())
+                    throw String.format("Unable to get proxy definition for object '{0}'.", objectName);
+                
+                var def = defJSON.evalJSON();
+                proxy = this._createProxyFromDefinition(objectName, def);
+            }
+            finally {
+                // Comment this for easier debugging
+                document.body.removeChild(elem);
+            }
         }
         
         return proxy;

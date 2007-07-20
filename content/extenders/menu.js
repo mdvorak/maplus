@@ -36,10 +36,26 @@
 
 var menuExtender = PageExtender.create({
     analyze: function(page, context) {
+        context.calcHtml = Chrome.loadText("html/kalkulacka.html");
+    
         return true;
     },
     
     process: function(page, context) {
+        // Kalkulacka
+        if (context.calcHtml) {
+            var kalkulacka = document.createElement("div");
+            kalkulacka.innerHTML = context.calcHtml;
+            page.leftMenu.appendChild(kalkulacka);
+
+            var localConfig = page.localConfig;
+            // Definovano v html
+            Kalkulacka.init(localConfig.getPref("kalkulacka", ""), 
+                function(e)
+                {
+                    localConfig.setPref("kalkulacka", e.target.value);
+                });
+        }
     }
 });
 

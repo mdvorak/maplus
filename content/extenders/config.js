@@ -93,14 +93,29 @@ Object.extend(PlusConfig, {
         
         return Object.extend(cfg, PlusConfig.prototype);
     },
+    
+    getLocalConfig: function(id) {
+        if (!id || isNaN(parseInt(id)))
+            throw String.format("id '{0}' is invalid.", id);
+        
+        // Note: cfg should be proxy
+        var cfg = Marshal.callMethod("localConfigManager", "getConfig", [id]);
+        if (!cfg)
+            throw String.format("Unable to find local config for id '{0}'.", id);
+        
+        return cfg;
+    }
 });
 
 // Extender
 var configExtender = PageExtender.create({
     analyze: function(page) {
         page.config = PlusConfig.getConfig(page.id);
+        page.localConfig = PlusConfig.getLocalConfig(page.id);
         
         if (!page.config)
+            throw String.format("Unable to get config for id '{0}'.", page.id);
+        if (!page.localConfig)
             throw String.format("Unable to get config for id '{0}'.", page.id);
         
         return true;
