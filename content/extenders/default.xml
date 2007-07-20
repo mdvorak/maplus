@@ -17,5 +17,9 @@
     
     <!-- Specific -->
     <script url="#{melior}/obchod.html" name="bestiar.js" />
+
+    <!-- Post processing -->
+    <script url="#{melior}/*" name="postprocessing.js" />
+    <script url="#{melior}/*" name="theme.js" />
   </extenders>
 </webExtender>
