@@ -72,3 +72,70 @@
 });
 
 pageExtenders.add(plusMenuExtender);
+
+
+// Obecne pomucky
+var plusExtender = PageExtender.create({
+    analyze: function(page, context) {
+        context.koho = XPath.evaluateList('//input[@type = "text" and @name = "koho"]');
+
+        if (page.config.getMaxTahu() > 0) {        
+            context.kolikwait = XPath.evaluateList('//input[@type = "text" and @name = "kolikwait"]');
+        }
+    
+        return true;
+    },
+    
+    process: function(page, context) {
+        // Aby se nesralo formatovani
+        if (page.content)
+            page.content.setAttribute("valign", "top");
+            
+        // Oprava idcek
+        context.koho.each(function(e) 
+            {
+                Event.observe(e, 'blur', function() { this.value = this.value.replace(/^\\s+|\\s+$/g, ''); }, true);
+            });
+            
+        // Limit TU
+        if (context.kolikwait) {        
+            var maxTahu = page.config.getMaxTahu();
+            var zprava = "Opravdu chcete odehrát více jak " + maxTahu + " tahů?";
+            var buttons = XPath.evaluateList('//input[@type = "submit"]');
+            
+            context.kolikwait.each(function(e)
+                {
+                    buttons.each(function(i)
+                        {
+                            if (i.form == e.form) {
+                                Event.observe(i, 'click', function()
+                                    {
+                                        return (parseInt(e.value) < maxTahu) || confirm(zprava);
+                                    }, true);
+                                    
+                                i.setAttribute("plus", true);
+                            }
+                        });
+                });
+                
+            // Pridej kontrolu i na objevovat
+            if (context.kolikwait.length > 0 && parseInt(context.kolikwait[0].value) > maxTahu) {
+                var cekat = $XF('//a[starts-with(@href, "wait.html")]');
+                var objevovat = $XF('//a[starts-with(@href, "explore.html")]');
+                
+                var zprava2 = "Je možné, že odehrajete více jak " + maxTahu + " tahů, chcete pokračovat?";
+                
+                if (cekat) {
+                    Event.observe(cekat, "click", function() { return confirm(zprava2); }, true);
+                    cekat.setAttribute("plus", true);
+                }
+                if (objevovat) {
+                    Event.observe(objevovat, "click", function() { return confirm(zprava2); }, true);
+                    objevovat.setAttribute("plus", true);
+                }
+            }
+        }
+    }    
+});
+
+pageExtenders.add(plusExtender);

@@ -33,6 +33,29 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
+ 
+var menuExtender = PageExtender.create({
+    analyze: function(page, context) {
+        context.utoky = $XF('font/a[contains(., "Výpisy") and contains(., "útoků")]', page.rightMenu); // pozn: netusim jak ho donutit brat mezeru
+        
+        return (context.utoky != null);
+    },
+    
+    process: function(page, context) {
+        // Pridani primeho linku na detail utoku
+        var link = context.utoky;
+        
+        var br = document.createElement("br");
+        var detail = document.createElement("a");
+        detail.href = link.href + "_detailne";
+        detail.innerHTML = "Výpisy útoků 2";
+        
+        link.parentNode.insertBefore(detail, link.nextSibling);
+        link.parentNode.insertBefore(br, detail);
+    }    
+});
+
+pageExtenders.add(menuExtender);
 
 var sidebarExtender = PageExtender.create({
     analyze: function(page, context) {
