@@ -67,7 +67,7 @@
         
         // Stop execution
         if (!enabled)
-            throw "MaPlus is disabled.";
+            throw new AbortException("MaPlus is disabled.");
     }
 });
 
@@ -113,7 +113,7 @@ var plusExtender = PageExtender.create({
                                         return (parseInt(e.value) < maxTahu) || confirm(zprava);
                                     }, true);
                                     
-                                i.setAttribute("plus", true);
+                                i.setAttribute("plus", true); // Debug
                             }
                         });
                 });
@@ -127,11 +127,11 @@ var plusExtender = PageExtender.create({
                 
                 if (cekat) {
                     Event.observe(cekat, "click", function() { return confirm(zprava2); }, true);
-                    cekat.setAttribute("plus", true);
+                    cekat.setAttribute("plus", true); // Debug
                 }
                 if (objevovat) {
                     Event.observe(objevovat, "click", function() { return confirm(zprava2); }, true);
-                    objevovat.setAttribute("plus", true);
+                    objevovat.setAttribute("plus", true); // Debug
                 }
             }
         }

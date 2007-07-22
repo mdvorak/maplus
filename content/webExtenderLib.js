@@ -161,6 +161,12 @@ Exception.prototype = {
     }
 };
 
+Object.extend(Exception, {
+    getExceptionType: function(ex) {
+        return (ex && ex.getType) ? ex.getType() : null;
+    }
+});
+
 /*** XPathException class ***/
 var XPathException = Class.inherit(Exception);
 
@@ -346,6 +352,15 @@ Object.extend(PageExtender, {
     }
 });
 
+/*** AbortException class ***/
+var AbortException = Class.inherit(Exception);
+
+Object.extend(AbortException.prototype, {
+    getType: function() {
+        return "AbortException";
+    }
+});
+
 /*** PageExtenderCollection class ***/
 var PageExtenderCollection = Class.create();
 
@@ -393,8 +408,9 @@ PageExtenderCollection.prototype = {
                 });
         }
         catch (ex) {
-            // TODO: log error
-            // alert(ex);
+            if (Exception.getExceptionType(ex) != "AbortException") {
+                alert(ex);
+            }
             return false;
         }
     }

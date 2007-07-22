@@ -88,9 +88,6 @@ Object.extend(PlusConfig, {
         
         // Note: cfg should be proxy
         var cfg = Marshal.callMethod("configManager", "getConfig", [id]);
-        if (!cfg)
-            throw String.format("Unable to find config for id '{0}'.", id);
-        
         return Object.extend(cfg, PlusConfig.prototype);
     },
     
@@ -100,9 +97,6 @@ Object.extend(PlusConfig, {
         
         // Note: cfg should be proxy
         var cfg = Marshal.callMethod("localConfigManager", "getConfig", [id]);
-        if (!cfg)
-            throw String.format("Unable to find local config for id '{0}'.", id);
-        
         return cfg;
     }
 });

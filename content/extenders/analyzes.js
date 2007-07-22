@@ -39,7 +39,7 @@
 var analyzeLayout = PageExtender.create({
     analyze: function(page, context) {
         if (page.name == null || page.name == "" || page.name == "login.html")
-            throw "Unsupported page name.";
+            throw new AbortException("Unsupported page name.");
             
         // Najdi id
         page.id = parseInt(this._findParameter(page, "id"));
@@ -47,7 +47,7 @@ var analyzeLayout = PageExtender.create({
         page.ftc = this._findParameter(page, "ftc");
 
         if (!page.id || isNaN(page.id))
-            throw "Id nenalezeno.";
+            throw new AbortException("Id nenalezeno.");
         
         // Najdi zakladni strukturu stranky
         page.topTable = XPath.evaluateSingle('/html/body/center/table[1]', page.document);
@@ -55,7 +55,7 @@ var analyzeLayout = PageExtender.create({
         page.contentTable = XPath.evaluateSingle('/html/body/center/table[3]', page.document);
         
         if (!page.topTable || !page.playerTable || !page.contentTable)
-            throw "Nepodarilo se najit zakladni strukturu stranky.";
+            throw new AbortException("Nepodarilo se najit zakladni strukturu stranky.");
         
         page.leftMenu = XPath.evaluateSingle('tbody/tr/td[1]', page.contentTable);
         page.rightMenu = XPath.evaluateSingle('tbody/tr/td[last()]', page.contentTable);

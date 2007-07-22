@@ -43,7 +43,8 @@ var alianceLinkExtender = PageExtender.create({
     
     process: function(page, context) {
         // Linky na aliance
-        if (aliance) {
+        if (context.aliance) {
+        /* TODO
             var linky = "";
             
             var ids = elementEvaluate(page.prefs.aliance, 'id');
@@ -66,7 +67,9 @@ var alianceLinkExtender = PageExtender.create({
                 aliance.innerHTML = "Ali";
                 page.addElement(aliance.parentNode, "span", linky, aliance.nextSibling);
             }
+            */
         }
+        
     }    
 });
 
@@ -98,14 +101,14 @@ var SafeLink = {
 
 var safeLinkExtender = PageExtender.create({
     analyze: function(page, context) {
-        context.linky = XPath.evaluateList('//a[@href != "javascript://" and not(@onclick)]');    
+        context.linky = $XL('//a[@href != "javascript://" and not(@onclick)]');    
         return context.linky.length > 0;
     },
     
     process: function(page, context) {
         context.linky.each(function(e)
             {
-                e.onclick = function() { alert("adsad"); SafeLink.initReleaseTimer(this); };
+                e.onclick = function() { SafeLink.initReleaseTimer(this); };
             });
     }
 });
