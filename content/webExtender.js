@@ -46,16 +46,25 @@ ExtenderCollection.prototype = {
     _analyzeUrl: function(url) {
         if (!url) throw "url is null.";
 
-        var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?].+)?$/);
+        var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?](.+))?$/);
         if (!m) return null;
         
         var site = m[1];
         var path = (m[2] != null) ? m[2] : "DEFAULT";
+        var args = new Hash();
         
+        if (m[3]) {
+            $A(m[3].match(/[^&=]+=[^&=]+/g)).each(function(a) {
+                var pair = a.split("=");
+                args[pair[0]] = pair[1];
+            });
+        }
+                
         return {
             site: site,
             path: path,
-            address: (site + path)
+            address: (site + path),
+            args: args
         };
     },
     

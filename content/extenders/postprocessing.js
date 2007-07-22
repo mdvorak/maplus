@@ -83,7 +83,7 @@ var SafeLink = {
             this._last.style.color = "";
             this._last = null;
         }
-    }
+    },
 
     initReleaseTimer: function(elem) {
         this.releaseLink();

@@ -34,13 +34,46 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+Object.extend(Function, {
+    bind: function(object, method) {
+        return function() { return method.apply(object, arguments); };
+    }
+});
+
 Object.extend(Class, {
+    _createBaseTypeObject: function(owner, basePrototype) {
+        var base = new Object();
+        
+        for (var p in basePrototype) {
+            var v = basePrototype[p];
+            
+            if (typeof v == "function") {
+                base[p] = Function.bind(owner, v); 
+            }
+            else {
+                base[p] = v;
+            }
+        }
+        
+        return base;
+    },
+
     inherit: function(baseType) {
-        var cls = Class.create();
+        var _this = this;
+        var basePrototype = baseType.prototype;
+    
+        var cls = function() {
+            // Create base type
+            this.base = _this._createBaseTypeObject(this, basePrototype);
+            // Call initialize method
+            this.initialize.apply(this, arguments);
+        };
+        
         // copy "static" methods
         Object.extend(cls, baseType);
-        // copy "instance" methods and set base type
-        cls.prototype = Object.extend({ base: baseType.prototype }, baseType.prototype);
+        // copy "instance" methods
+        cls.prototype = Object.extend({}, baseType.prototype);
+        
         return cls;
     }
 });
@@ -88,16 +121,93 @@ Object.extend(String, {
     }
 });
 
-/*** XPath class ***/
+/*** Exception class ***/
+var Exception = Class.create();
 
+Exception.prototype = {
+    initialize: function(message, innerException) {
+        this.message = message;
+        this.innerException = innerException;
+    },
+    
+    getType: function() {
+        return "Exception";
+    },
+    
+    getMessage: function() {
+        return this.message;
+    },
+    
+    getInnerException: function() {
+        return this.innerException;
+    },
+    
+    getDescription: function() {
+        var str = this.getType();
+        
+        if (this.getMessage())
+            str += ": " + this.getMessage();
+            
+        return str;
+    },
+    
+    toString: function() {
+        var str = this.getDescription();
+        
+        if (this.getInnerException())
+            str += "\n>>" + this.getInnerException().toString().replace(/\n/g, "\n>>");
+            
+        return str;
+    }
+};
+
+/*** XPathException class ***/
+var XPathException = Class.inherit(Exception);
+
+XPathException.DEFAULT_MESSAGE = "Error evaluating XPath expression.";
+
+Object.extend(XPathException.prototype, {
+    initialize: function(message, expression, innerException) {
+        this.base.initialize(message || XPathException.DEFAULT_MESSAGE, innerException);
+        
+        this.expression = expression;
+    },
+    
+    getType: function() {
+        return "XPathException";
+    },
+    
+    getExpression: function() {
+        return this.expression;
+    },
+    
+    getDescription: function() {
+        var str = this.base.getDescription();
+        
+        if (this.getExpression())
+            str += "\nexpression: '" + this.getExpression() + "'";
+
+        return str;
+    }
+});
+
+/*** XPath class ***/
 var XPath = {
     evaluate: function(xpath, context, resultType) {
-        if (!xpath) return null;
-        if (!context) context = document;
-        if (!resultType) resultType = XPathResult.ANY_TYPE;
-        
-        var doc = context.ownerDocument ? context.ownerDocument : context;
-        return doc.evaluate(xpath, context, null, resultType, null);
+        try {
+            if (!xpath) return null;
+            if (!resultType) resultType = XPathResult.ANY_TYPE;
+            if (!context) 
+                context = document;
+            else
+                context = $(context);
+            
+            var doc = context.ownerDocument ? context.ownerDocument : context;
+            return doc.evaluate(xpath, context, null, resultType, null);
+        }
+        catch (ex) {
+            throw new XPathException(null, xpath, ex);
+        }
     },
     
     evaluateList: function(xpath, context) {
@@ -151,7 +261,7 @@ Object.extend(XPath, {
     extend: function(element) {
         element = $(element);
     
-        if (element._xpathExtended)
+        if (!element || element._xpathExtended)
             return element;
     
         for (var property in XPath.Methods) {
@@ -173,6 +283,10 @@ function $XF(xpath, context) {
     return XPath.evaluateSingle(xpath, context);
 }
 
+function $XL(xpath, context) {
+    return XPath.evaluateList(xpath, context);
+}
+
 /*** Page class ***/
 var Page = Class.create();
 
@@ -188,12 +302,12 @@ Page.prototype = {
         // Analyze url encoded arguments
         this.arguments = new Hash();
         
-        var args = this.url.match(/\b\w+=.+?(?=&|$)/g);
-        if (args) {
+        var argsIndex = this.url.indexOf("?");
+        if (argsIndex > -1) {
             var _this = this;
             
-            args.each(function(arg) {
-                var pair = arg.split("=");
+            $A(this.url.substring(argsIndex + 1).match(/[^&=]+=[^&=]+/g)).each(function(a) {
+                var pair = a.split("=");
                 _this.arguments[pair[0]] = pair[1];
             });
         }
@@ -280,7 +394,7 @@ PageExtenderCollection.prototype = {
         }
         catch (ex) {
             // TODO: log error
-            alert(ex);
+            // alert(ex);
             return false;
         }
     }

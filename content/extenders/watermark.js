@@ -34,11 +34,31 @@
  * 
  * ***** END LICENSE BLOCK ***** */
  
-var bestiarExtender = Object.extend(new PageExtender(), {
+ 
+ // Plus menu
+ var plusMenuExtender = Object.exnted(new PageExtender(), {
+    analyze: function(page, context) {
+        context.html = Chrome.loadText("html/maplus.html");
+        return (context.html != null);
+    },
+    
     process: function(page, context) {
-        // FIXME
-        alert(page.config.getEnabled());
-    }
+        var div = document.createElement("div");
+        div.innerHTML = context.html;
+        div.className = "maplusFrame";
+        
+        document.body.appendChild(div);
+        
+        var link = $XF('//a[@id = "plus_enable"]');
+        Event.observe(link, "click", function(event) 
+            {
+                var value = !page.config.getEnabled();
+                page.config.setPref("enabled", value);
+                link.updateText(value); // Defined in 'maplus.html'
+            });
+            
+        link.updateText(page.config.getEnabled());
+    },
 });
 
-pageExtenders.add(bestiarExtender);
+pageExtenders.add(plusMenuExtender);
