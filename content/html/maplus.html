@@ -57,18 +57,20 @@ $XF('//a[@id = "plus_enable"]').updateText = function(value) {
     this.innerHTML = (value ? "Deaktivovat Plus" : "Aktivovat Plus");
 }
 
-// Cas od zobrazeni                
-var view = new Date().getTime();
+var MaPlus = {
+    // Cas od zobrazeni                
+    view: new Date().getTime(),
 
-function updateTime() {
-    var elapsed = (new Date().getTime() - view) / 1000;
-    var h = Math.floor(elapsed / 3600);
-    var m = Math.floor((elapsed / 60) % 60);
-    var s = Math.floor(elapsed % 60);
-    
-    $('plus_cas').innerHTML = h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
-}
+    updateTime: function() {
+        var elapsed = (new Date().getTime() - this.view) / 1000;
+        var h = Math.floor(elapsed / 3600);
+        var m = Math.floor((elapsed / 60) % 60);
+        var s = Math.floor(elapsed % 60);
+        
+        $('plus_cas').innerHTML = h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    }
+};
 
-updateTime();
-var ma_timer = setInterval(updateTime, 1000);
+MaPlus.updateTime();
+var ma_timer = setInterval(function() { MaPlus.updateTime(); }, 1000);
 </script>
