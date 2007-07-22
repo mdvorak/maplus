@@ -47,7 +47,7 @@ var plusConfigAutosave = PageExtender.create({
     analyze: function(page, context) {
         if (++this._hits > this.SAVE_INTERVAL) {
             this._hits = 0;
-            plusConfig.saveAll();
+            configManager.saveAll();
         }
         
         return false;
