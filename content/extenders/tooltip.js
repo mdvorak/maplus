@@ -33,32 +33,56 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
- 
- // Plus menu
- var plusMenuExtender = Object.exnted(new PageExtender(), {
-    analyze: function(page, context) {
-        context.html = Chrome.loadText("html/maplus.html");
-        return (context.html != null);
+
+var Tooltip = {
+    create: function(html, className, hideOnClick) {
+        var tooltip = document.createElement('div');
+
+        if (className)
+            tooltip.className = className;
+        
+        tooltip.style.display = 'none';
+        tooltip.style.position = 'absolute';
+        tooltip.style.left = '0px';
+        tooltip.style.top = '0px';
+
+        tooltip.innerHTML = html;
+        
+        Event.observe(tooltip, 'mouseout', function(e)
+            {
+                if (e.pageX < this.offsetLeft || e.pageX >= (this.offsetLeft + this.offsetWidth)
+                        || e.pageY < this.offsetTop || e.pageY >= (this.offsetTop + this.offsetHeight)) {
+                    this.hide();
+                }
+            }, false);
+            
+        if (hideOnClick) 
+            Event.observe(tooltip, 'click', function() { this.hide(); }, false);
+            
+        Element.extend(tooltip);
+        Object.extend(tooltip, Tooltip.Methods);
+        
+        document.body.appendChild(tooltip);
+        return tooltip;
+    }
+};
+
+Tooltip.Methods = {
+    show: function(x, y) {
+        tooltip.style.left = (x - 5) + 'px';
+        tooltip.style.top = (y - 5) + 'px';
+        tooltip.style.display = '';
+    }, 
+    
+    hide: function() {
+        this.style.display = 'none';
     },
     
-    process: function(page, context) {
-        var div = document.createElement("div");
-        div.innerHTML = context.html;
-        div.className = "maplusFrame";
-        
-        document.body.appendChild(div);
-        
-        var link = $XF('//a[@id = "plus_enable"]');
-        Event.observe(link, "click", function(event) 
-            {
-                var value = !page.config.getEnabled();
-                page.config.setPref("enabled", value);
-                link.updateText(value); // Defined in 'maplus.html'
-            });
-            
-        link.updateText(page.config.getEnabled());
+    isVisible: function() {
+        return this.style.display != 'none';
     },
-});
-
-pageExtenders.add(plusMenuExtender);
+    
+    showHandler: function(e) {
+        this.show(e.pageX, e.pageY);
+    }
+};

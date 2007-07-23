@@ -121,6 +121,27 @@ Object.extend(String, {
     }
 });
 
+Object.extend(Element, {
+    create: function(tagName, innerHtml, attributes, doc) {
+        if (!tagName)
+            throw new ArgumentNullException("tagName");
+    
+        if (!doc) doc = document;
+        var e = doc.createElement(tagName);
+        
+        if (attributes) {
+            $H(attributes).each(function(attrName)
+                {
+                    e.setAttribute(attrName, attributes[attrName] || "");
+                });
+        }
+        
+        e.innerHTML = innerHtml || "";
+        
+        return e;
+    }
+});
+
 /*** Exception class ***/
 var Exception = Class.create();
 
@@ -164,6 +185,61 @@ Exception.prototype = {
 Object.extend(Exception, {
     getExceptionType: function(ex) {
         return (ex && ex.getType) ? ex.getType() : null;
+    }
+});
+
+/*** ArgumentException class ***/
+var ArgumentException = Class.inherit(Exception);
+
+Object.extend(ArgumentException.prototype, {
+    initialize: function(argName, argValue, message, innerException) {
+        this.base.initialize(message, innerException);
+        
+        this.name = argName;
+        this.value = argValue;
+    },
+
+    getType: function() {
+        return "ArgumentException";
+    },
+    
+    getName: function() {
+        return this.name;
+    },
+    
+    getValue: function() {
+        return this.value;
+    },
+    
+    getDescription: function() {
+        var str = this.base.getDescription();
+        
+        if (this.getName())
+            str += String.format("\nargument name='{0}' value='{1}'", this.getName(), String(this.getValue()));
+    }
+});
+
+/*** ArgumentNullException ***/
+var ArgumentNullException = Class.inherit(ArgumentException);
+
+ArgumentNullException.MESSAGE = "Argument is null.";
+
+Object.extend(ArgumentNullException.prototype, {
+    initialize: function(argName, innerException) {
+        this.base.initialize(argName, null, ArgumentNullException.MESSAGE, innerException);
+    },
+    
+    getType: function() {
+        return "ArgumentNullException";
+    }
+});
+
+/*** InvalidOperationException ***/
+var InvalidOperationException = Class.inherit(Exception);
+
+Object.extend(InvalidOperationException.prototype, {
+    getType: function() {
+        return "InvalidOperationException";
     }
 });
 
@@ -426,7 +502,7 @@ var ScriptExtender = PageExtender.createClass({
         this.base.initialize();
     
         if (!src)
-            throw "src is null.";
+            throw new ArgumentNullException("src");
         this._src = src;
         this._type = (type ? type : this.DEFAULT_TYPE);
     },
@@ -444,7 +520,7 @@ var StyleExtender = PageExtender.createClass({
         this.base.initialize();
         
         if (!src)
-            throw "src is null.";
+            throw new ArgumentNullException("src");
         this._src = src;
     },
 
@@ -459,5 +535,36 @@ var StyleExtender = PageExtender.createClass({
         e.setAttribute("type", "text/css");
         e.setAttribute("href", this._src);
         context.head.appendChild(e);
+    }
+});
+
+/*** MarshalException ***/
+var MarshalException = Class.inherit(Exception);
+
+Object.extend(MarshalException.prototype, {
+    initialize: function(message, objectName, methodName, innerException) {
+        this.base.initialize(message, innerException);
+        
+        this.objectName = objectName;
+        this.methodName = methodName;
+    },
+
+    getType: function() {
+        return "MarshalException";
+    },
+    
+    getObjectName: function() { return this.objectName; },
+    getMethodName: function() { return this.methodName; },
+    
+    getDescription: function() {
+        var str = this.base.getDescription();
+        
+        if (this.getObjectName())
+            str += "\nobject name='" + this.getObjectName() + "'";
+            
+        if (this.getMethodName())
+            str += "\nmethod name='" + this.getMethodName() + "'";
+            
+        return str;
     }
 });

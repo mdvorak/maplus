@@ -33,9 +33,10 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
-  
- // Plus menu
- var plusMenuExtender = PageExtender.create({
+
+
+// Plus menu
+var plusMenuExtender = PageExtender.create({
     analyze: function(page, context) {
         context.html = Chrome.loadText("html/maplus.html");
         return (context.html != null);
@@ -74,7 +75,7 @@
 pageExtenders.add(plusMenuExtender);
 
 
-// Obecne pomucky
+// Obecne vylepseni
 var plusExtender = PageExtender.create({
     analyze: function(page, context) {
         context.koho = XPath.evaluateList('//input[@type = "text" and @name = "koho"]');

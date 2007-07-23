@@ -42,9 +42,9 @@ var Marshal = {
 
     callMethod: function(objectName, methodName, args) {
         if (!objectName)
-            throw "objectName is null.";
+            throw new ArgumentNullException("objectName");
         if (!methodName)
-            throw "methodName is null.";
+            throw new ArgumentNullException("methodName");
         
         var argsStr = args ? Object.toJSON(args) : null;
         
@@ -68,7 +68,7 @@ var Marshal = {
                 var proxyDefinition = elem.getAttribute("proxyDefinition");
                 
                 if (!proxyDefinition)
-                    throw String.format("Unable to find proxy definition.");
+                    throw new MarshalException("Unable to find proxy definition.", objectName, methodName);
 
                 var proxy = this._proxyCache[objectId];
                 if (!proxy) {
@@ -89,7 +89,7 @@ var Marshal = {
     
     getObjectProxy: function(objectName) {
         if (!objectName)
-            throw "objectName is null.";
+            throw new ArgumentNullException("objectName");
   
         var proxy = this._proxyCache[objectName];
         
@@ -102,9 +102,12 @@ var Marshal = {
                 
                 Event.dispatch(elem, "MarshalGetProxyDefinition", true);
                 
+                if (elem.getAttribute("exception"))
+                    throw elem.getAttribute("exception").evalJSON();
+                
                 var defJSON = elem.getAttribute("proxyDefinition");
                 if (!defJSON || defJSON.empty())
-                    throw String.format("Unable to get proxy definition for object '{0}'.", objectName);
+                    throw new MarshalException("Unable to get proxy definition.", objectName);
                 
                 var def = defJSON.evalJSON();
                 proxy = this._createProxyFromDefinition(objectName, def);
@@ -120,9 +123,9 @@ var Marshal = {
     
     _createProxyFromDefinition: function(objectName, def) {
         if (!objectName)
-            throw "objectName is null.";
+            throw new ArgumentNullException("objectName");
         if (!def)
-            throw "def is null.";
+            throw new ArgumentNullException("def");
     
         var proxy = new Object();
         var proxyMethods = $A(def.methods);

@@ -41,7 +41,6 @@ var localConfigManager = new XmlConfigManager(null, CONFIG_ROOT_NAME);
 var plusConfigAutosave = PageExtender.create({
     SAVE_INTERVAL: 100,
     
-    weak: true,
     _hits: 0,
     
     analyze: function(page, context) {

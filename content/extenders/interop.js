@@ -35,3 +35,4 @@
  * ***** END LICENSE BLOCK ***** */
  
 var Chrome = Marshal.getObjectProxy("Chrome");
+

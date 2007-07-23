@@ -42,6 +42,8 @@ const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
 const CHROME_CONTENT_URL = CHROME_URL + "content/";
 
 // Custom constants
+const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
+
 const JMENA_PRESVEDCENI = new Hash();
 JMENA_PRESVEDCENI["D"] = "Dobré";
 JMENA_PRESVEDCENI["N"] = "Neutrální";

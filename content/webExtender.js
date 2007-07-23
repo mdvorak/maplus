@@ -44,7 +44,7 @@ ExtenderCollection.prototype = {
     },
     
     _analyzeUrl: function(url) {
-        if (!url) throw "url is null.";
+        if (!url) throw new ArgumentNullException("url");
 
         var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?](.+))?$/);
         if (!m) return null;
@@ -68,21 +68,21 @@ ExtenderCollection.prototype = {
         };
     },
     
-    add: function(url, e) {
-        if (!e) throw "extender is null.";
+    add: function(url, extender) {
+        if (!extender) throw new ArgumentNullException("extender");
         
         // Clear cache
         this._cache.remove();
         
         // Special case - generic extender
         if (url == "*") {
-            this._generic.push(e);
-            return e;
+            this._generic.push(extender);
+            return extender;
         }
         
         var analyzedUrl = this._analyzeUrl(url);
         if (!analyzedUrl)
-            throw "Invalid url format.";
+            throw new ArgumentException("url", url, "Invalid url format.");
     
         var site = this._siteMap[analyzedUrl.site];
         if (!site) {
@@ -96,8 +96,8 @@ ExtenderCollection.prototype = {
             site[analyzedUrl.path] = extenders;
         }
         
-        extenders.push(e);
-        return e;
+        extenders.push(extender);
+        return extender;
     },
     
     getList: function(url) {
@@ -147,16 +147,16 @@ var WebExtender = {
     _unloadHandlers: new Array(),
     
     registerExtender: function(url, extender) {
-        if (!url) throw "url is null.";
-        if (!extender) throw "extender is null.";
+        if (!url) throw new ArgumentNullException("url");
+        if (!extender) throw new ArgumentNullException("extender");
         
         this._extenders.add(url, extender);
         return extender;
     },
     
     registerCallback: function(url, callback) {
-        if (!url) throw "url is null.";
-        if (!callback) throw "callback is null.";
+        if (!url) throw new ArgumentNullException("url");
+        if (!callback) throw new ArgumentNullException("callback");
     
         var extender = PageExtender.create({
                 process: function(page) {
@@ -237,8 +237,8 @@ window.addEventListener("load", function(e) { WebExtender._init(e); }, false);
 /*** Script class ***/
 var Script = Object.extend(Script || {}, {
     executeFile: function(doc, src, type) {
-        if (!doc) throw "doc is null.";
-        if (!src) throw "src is null.";
+        if (!doc) throw new ArgumentNullException("doc");
+        if (!src) throw new ArgumentNullException("src");
         if (!type) type = "text/javascript";
         
         var e = doc.createElement("script");
@@ -249,8 +249,8 @@ var Script = Object.extend(Script || {}, {
     },
 
     execute: function(doc, code, type) {
-        if (!doc) throw "doc is null.";
-        if (!code) throw "code is null.";
+        if (!doc) throw new ArgumentNullException("doc");
+        if (!code) throw new ArgumentNullException("code");
         if (!type) type = "text/javascript";
         
         var e = doc.createElement("script");
@@ -262,8 +262,8 @@ var Script = Object.extend(Script || {}, {
     
     // This will execute function in the dom of doc
     executeJavascriptFunction: function(doc, func) {
-        if (!doc) throw "doc is null.";
-        if (!func) throw "func is null.";
+        if (!doc) throw new ArgumentNullException("doc");
+        if (!func) throw new ArgumentNullException("func");
         
         this.execute(doc, "(" + func.toString() + ")();", "text/javascript");
     }
@@ -272,6 +272,8 @@ var Script = Object.extend(Script || {}, {
 /*** FileIO class ***/
 var FileIO = {
     loadText: function(url) {
+        if (!url) throw new ArgumentNullException("url");
+        
         var req = new XMLHttpRequest();
         req.open("GET", url, false); 
         req.send(null);
@@ -280,12 +282,14 @@ var FileIO = {
     },
     
     loadTextFile: function(file) {
+        if (!file) throw new ArgumentNullException("file");
+        
         var url = this._getFileUrl(file);
         return this.loadText(url);
     },
 
     loadXml: function(url) {
-        if (!url) throw "url is null.";
+        if (!url) throw new ArgumentNullException("url");
     
         var req = new XMLHttpRequest();
         req.open("GET", url, false); 
@@ -295,11 +299,16 @@ var FileIO = {
     },
 
     loadXmlFile: function(file) {
+        if (!file) throw new ArgumentNullException("file");
+        
         var url = this._getFileUrl(file);
         return this.loadXml(url);
     },
 
     saveXmlFile: function(file, dom) {
+        if (!file) throw new ArgumentNullException("file");
+        if (!dom) throw new ArgumentNullException("dom");
+        
         var serializer = new XMLSerializer();
         var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
                        .createInstance(Components.interfaces.nsIFileOutputStream);
@@ -310,6 +319,8 @@ var FileIO = {
     },
     
     _getFileUrl: function(file) {
+        if (!file) throw new ArgumentNullException("file");
+        
         var ios = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
         var fileHandler = ios.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
         var url = fileHandler.getURLSpecFromFile(file);
@@ -345,15 +356,15 @@ var Marshal = {
     
     registerObject: function(name, obj) {
         if (!name)
-            throw "name is null.";
+            throw new ArgumentNullException("name");
         if (!obj)
-            throw "obj is null.";
+            throw new ArgumentNullException("obj");
         if (obj == this)
-            throw "Invalid operation.";
+            throw new ArgumentException("obj", null, "Invalid operation.");
         
         name = String(name);
         if (this._objects[name])
-            throw String.format("Object '{0}' already exists.", name);
+            throw new ArgumentException("name", name, "Object already exists.");
         
         this._objects[name] = obj;
     },
@@ -368,9 +379,9 @@ var Marshal = {
             var argsStr = elem.getAttribute("arguments");
             
             if (!objectName)
-                throw "Missing object name.";
+                throw new MarshalException("Missing object name.", objectName, methodName);
             if (!/^[\w_$]+$/.test(methodName))
-                throw "Invalid method name.";
+                throw new MarshalException("Invalid method name.", objectName, methodName);
                 
             var obj = this._objects[objectName];
             
@@ -378,15 +389,15 @@ var Marshal = {
                 obj = elem.ownerDocument._marshalObjects[objectName];
             
             if (!obj)
-                throw String.format("Object '{0}' is not registered.", objectName);
+                throw new MarshalException("Object is not registered.", objectName, methodName);
             
             var method = obj[methodName];
             if (!method || typeof method != "function")
-                throw String.format("Method '{0}' not found.", methodName);
+                throw new MarshalException("Method not found.", objectName, methodName);
                 
             var methodType = this._getMethodType(obj, methodName);
             if (methodType == 0)
-                throw String.format("Method '{0}' cannot be marshaled.", methodName);
+                throw new MarshalException("Method cannot be marshaled.", objectName, methodName);
             
             var args = !argsStr.empty() ? argsStr.evalJSON() : null;
   
@@ -419,7 +430,7 @@ var Marshal = {
                         break;
                         
                     default:
-                        throw String.format("Invalid method marshal type ({0}).", methodType);
+                        throw new MarshalException(String.format("Invalid method marshal type ({0}).", methodType), objectName, methodName);
                 }
             }
         }
@@ -429,18 +440,23 @@ var Marshal = {
     },
     
     _getProxyDefinitionHandler: function(event) {
-        var elem = event.originalTarget;
-        var objectName = elem.getAttribute("objectName");
-        
-        if (!objectName)
-            throw "Missing object name.";
+        try {
+            var elem = event.originalTarget;
+            var objectName = elem.getAttribute("objectName");
             
-        var obj = this._objects[objectName];
-        if (!obj)
-            throw String.format("Object '{0}' not found.", objectName);
-        
-        var def = this._createProxyDefinition(obj);
-        elem.setAttribute("proxyDefinition", Object.toJSON(def));
+            if (!objectName)
+                throw new MarshalException("Missing object name.");
+                
+            var obj = this._objects[objectName];
+            if (!obj)
+                throw new MarshalException("Object is not registered.", objectName);
+            
+            var def = this._createProxyDefinition(obj);
+            elem.setAttribute("proxyDefinition", Object.toJSON(def));
+        }
+        catch (e) {
+            elem.setAttribute("exception", Object.toJSON(e));
+        }
     },
     
     _createProxyDefinition: function(obj) {
@@ -487,7 +503,7 @@ var Marshal = {
 /*** ExtenderManager class ***/
 var ExtenderManager = {    
     load: function(definitionUrl) {
-        if (!definitionUrl) throw "definitionUrl is null.";
+        if (!definitionUrl) throw new ArgumentNullException("definitionUrl");
         
         var definition = FileIO.loadXml(definitionUrl);
         if (definition) {
@@ -550,7 +566,7 @@ ExtenderManager.Extenders = {
         var type = def.getAttribute("type");
         
         if (!name || !/^[\w.\/_-~]+$/.test(name))
-            throw String.format("Invalid script name ('{0}').", name);
+            throw new Exception(String.format("Invalid script name ('{0}').", name));
         
         var src = data.location + name;
         var extender = new ScriptExtender(src, "text/javascript");

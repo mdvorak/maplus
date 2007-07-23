@@ -29,6 +29,9 @@ var Kalkulacka = {
         var kalkulacka = $('plus_kalkulacka');
         var vysledek = $('plus_kalkulackaVysledek');
         
+        if (kalkulacka.value.length > 255)
+            kalkulacka.value = kalkulacka.value.substring(0, 255);
+        
         var expression = kalkulacka.value;
         
         expression = expression.replace(/\b(\d+)K\b/g, "$1*1000")
@@ -72,7 +75,7 @@ var Kalkulacka = {
 <br />
 <span>Kalkulačka</span>
 <br />
-&nbsp;<input id="plus_kalkulacka" type="text" class="kalkulackaIn" onchange="Kalkulacka.vypocitej();" onkeyup="Kalkulacka.vypocitej();" />
+&nbsp;<input id="plus_kalkulacka" type="text" maxlength="255" class="kalkulackaIn" onchange="Kalkulacka.vypocitej();" onkeyup="Kalkulacka.vypocitej();" />
 <br />
 <div class="kalkulackaOut">&nbsp;<span id="plus_kalkulackaVysledek">&nbsp;</span>
 </div>

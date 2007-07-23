@@ -77,12 +77,13 @@ pageExtenders.add(alianceLinkExtender);
 
 // Zabranit dvojklikum na linky
 var SafeLink = {
+    TIMEOUT: 2000,
+
     releaseLink: function() {
         if (this._last != null) {
             clearTimeout(this._timer);
         
-            var _this = this;
-            this._last.onclick = function() { _this.initReleaseTimer(this); };
+            this._last.onclick = function() { SafeLink.initReleaseTimer(this); };
             this._last.style.color = "";
             this._last = null;
         }
@@ -95,7 +96,7 @@ var SafeLink = {
         elem.onclick = function() { return false; };
         elem.style.color = "red";
         
-        this._timer = setTimeout(function() { this.releaseLink(); }, 1500);
+        this._timer = setTimeout(function() { SafeLink.releaseLink(); }, SafeLink.TIMEOUT);
     }
 };
 
