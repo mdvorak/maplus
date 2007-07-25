@@ -49,3 +49,17 @@ var MaPlus = {
         return path;
     }
 };
+
+var Clipboard = {
+    _helper: Components.classes["@mozilla.org/widget/clipboardhelper;1"].getService(Components.interfaces.nsIClipboardHelper),
+    
+    copyId_PROXY: Marshal.BY_VALUE,
+    copyId: function(id) {
+        if (isNaN(parseInt(id));
+            throw new ArgumentException("id", id, "Not a number.");
+        
+        this._helper.copyString(id);
+    }
+};
+
+Marshal.registerObject("Clipboard", Clipboard);

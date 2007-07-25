@@ -45,6 +45,102 @@ var MaPlus = {
         args.each(function(k) { url += "&" + k + "=" + args[k]; });
         
         return url;
+    },
+    
+    createActiveId: function(page, id) {
+        // Najdi informace o hraci
+        var provincie = MaData.najdiProvincii(id);
+
+        // Vytvoreni linku
+        var link = document.createElement("a");
+        link.className = "idLink";
+        link.href = "javascript://";
+        link.innerHTML = id;
+        
+
+        var html = '<table>';
+        html += '<tr>';
+        html += '  <td colspan="2"><span><b>' + id + '</b>&nbsp;</span>';
+        html += '  <a href="javascript://"><sup><span class="small">(zkopírovat)</span></sup></a></td>';
+        html += '</tr>';
+        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: id}) + '"><span>Vyslat špehy</span></a></td></tr>';
+        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: id}) + '"><span>Napsat zprávu</span></a></td></tr>';
+
+        // Dalsi info
+        if (provincie) {
+            var pridejRadek = function(jmeno, hodnota)
+                {
+                    if (hodnota && hodnota != "")
+                        html += '<tr><td><span class="small">' + jmeno + '&nbsp;&nbsp;</span></td><td><span class="small">' + hodnota + '</span></td></tr>'
+                };
+        
+            html += '<tr><td height="5"></td></tr>';
+            pridejRadek("Regent", provincie.regent);
+            pridejRadek("Provincie", provincie.provincie);
+            pridejRadek("Přesvědčení", JMENA_PRESVEDCENI[provincie.presvedceni]);
+            pridejRadek("Povolání", provincie.povolani);
+
+            if (provincie.aliance) {
+                var aliance = MaData.najdiAlianci(provincie.aliance);
+                
+                if (aliance) {
+                    var url = MaPlus.buildUrl(page, "aliance.html", {aliance: "vypis_clenu_v_ally_" + aliance.id});
+                    pridejRadek("Aliance", '<a href="' + url + '">' + provincie.aliance + '</a>');
+                }
+                else {
+                    pridejRadek("Aliance", provincie.aliance);
+                }
+            }
+        }
+        
+        html += '</table>';
+
+        var tooltip = Tooltip.create(html, "idTooltip", false);
+        var copyLink = $X(tooltip).evaluateSingle('table/tr/a');
+        
+        Event.observe(copyLink, 'click', function() {
+                Clipboard.copyId(id);
+            }, false);
+            
+        Tooltip.attach(link, tooltip);
+        return link;
+    },
+    
+    createActiveUnit: function(page, jmeno) {
+        var jednotka = Jednotky.vyhledej(jmeno);
+        if (!jednotka)
+            return null;
+            
+        // Vytvoreni linku
+        var link = document.createElement("a");
+        link.className = "idLink";
+        link.href = "javascript://";
+        link.innerHTML = jmeno;
+
+        // Sestav html tooltipu
+        if (!page.jednotkaTemplate) {
+            page.jednotkaTemplate = new Template(Chrome.loadText("html/jednotka.htm"));
+            page.jednotkaTooltips = new Hash();
+        }
+        
+        // Najdi tooltip pro danou jednotku
+        var tooltip = page.jednotkaTooltips[jednotka.jmeno];
+        
+        // Vytvor tooltip
+        if (!tooltip) {
+            // Uprav data o jednotce pro zobrazeni
+            jednotka.iniColor = Color.fromRange(jednotka.realIni, 5, 35, Color.Pickers.redGreen);
+            jednotka.phb = (jednotka.typ != "Str.") ? jednotka.phb : "";
+            jednotka.druh = jednotka.druh.replace(/[.]$/, ""));
+            jednotka.typ = jednotka.typ.replace(/[.]$/, ""));
+            
+            var html = page.jednotkaTemplate.evaluate(jednotka);
+            tooltip = Tooltip.create(html, "jednotkaTooltip", false);    
+            page.jednotkaTooltips[jednotka.jmeno] = tooltip;
+        }   
+        
+        Tooltip.attach(link, tooltip);
+        return link;
     }
 };
 
@@ -94,7 +190,7 @@ var TableHelper = {
 
 /*** Colors ***/
 
-var Colors = {
+var Color = {
     fromRange: function(value, min, max, colorPicker) {
         if (isNaN(value) || isNaN(min) || isNaN(max))
             return null;
@@ -120,7 +216,7 @@ var Colors = {
     }
 };
 
-Colors.Picker = {
+Color.Pickers = {
     redGreen: function(colors) {
         colors.red = Math.min(250, 225 * (1 - colors.koeficient) * 2);
         colors.green = Math.min(240, 220 * colors.koeficient * 2);
@@ -141,3 +237,36 @@ Colors.Picker = {
     }
 };
 
+/*** SafeLink class ***/
+
+// Brani dvojklikum na linky
+var SafeLink = {
+    TIMEOUT: 2000,
+    
+    initLink: function(link) {
+        if (!link)
+            throw new ArgumentNullException("link");
+            
+        link.onclick = function() { SafeLink._startTimer(this); };
+    },
+
+    _releaseLink: function() {
+        if (this._last != null) {
+            clearTimeout(this._timer);
+        
+            this._last.onclick = function() { SafeLink._startTimer(this); };
+            this._last.style.color = "";
+            this._last = null;
+        }
+    },
+
+    _startTimer: function(elem) {
+        this.releaseLink();
+        
+        this._last = elem;
+        elem.onclick = function() { return false; };
+        elem.style.color = "red";
+        
+        this._timer = setTimeout(function() { SafeLink._releaseLink(); }, SafeLink.TIMEOUT);
+    }
+};

@@ -34,9 +34,8 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-
 // Plus menu
-var plusMenuExtender = PageExtender.create({
+pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         context.html = Chrome.loadText("html/maplus.html");
         return (context.html != null);
@@ -69,74 +68,68 @@ var plusMenuExtender = PageExtender.create({
         // Stop execution
         if (!enabled)
             throw new AbortException("MaPlus is disabled.");
-    }
-});
-
-pageExtenders.add(plusMenuExtender);
-
-
-// Obecne vylepseni
-var plusExtender = PageExtender.create({
-    analyze: function(page, context) {
-        context.koho = XPath.evaluateList('//input[@type = "text" and @name = "koho"]');
-
-        if (page.config.getMaxTahu() > 0) {        
-            context.kolikwait = XPath.evaluateList('//input[@type = "text" and @name = "kolikwait"]');
-        }
-    
-        return true;
-    },
-    
-    process: function(page, context) {
+            
         // Aby se nesralo formatovani
         if (page.content)
             page.content.setAttribute("valign", "top");
-            
-        // Oprava idcek
-        context.koho.each(function(e) 
+    }
+}));
+
+// Vyhledavani podle id (@name="koho")
+pageExtenders.add(PageExtender.create({
+    analyze: function(page, context) {
+        context.list = $XL('//input[@type = "text" and @name = "koho"]');
+        return context.list.length > 0;
+    },
+    
+    process: function(page, context) {
+        context.list.each(function(e) 
             {
-                Event.observe(e, 'blur', function() { this.value = this.value.replace(/^\\s+|\\s+$/g, ''); }, true);
+                Event.observe(e, 'blur', function() { this.value = this.value.replace(/^\\s+|\\s+$/g, ''); }, false);
+            });
+    }
+}));
+
+// Upozorneni pri odkliku vice nez X tahu
+pageExtenders.add(PageExtender.create({
+    analyze: function(page, context) {
+        if (page.config.getNumber("maxTahu", MAX_TAHU_DEFAULT) > 0) {
+            context.fields = $XL('//input[@type = "text" and @name = "kolikwait"]');
+            context.buttons = $XL('//input[@type = "submit"]');
+            return context.list.length > 0;
+        }
+        return false;
+    },
+    
+    process: function(page, context) {
+        var maxTahu = page.config.getNumber("maxTahu", MAX_TAHU_DEFAULT);
+        var zprava = "Opravdu chcete odehrát více jak " + maxTahu + " tahů?";
+        
+        context.fields.each(function(e) {
+                context.buttons.each(function(i) {
+                        // Prasacky ale funkcni reseni (bohuzel '//' neuznava kontext :-( )
+                        if (i.form == e.form) {
+                            Event.observe(i, 'click', function() { return (parseInt(e.value) < maxTahu) || confirm(zprava); }, false);
+                            i.setAttribute("plus", true); // Debug
+                        }
+                    });
             });
             
-        // Limit TU
-        if (context.kolikwait) {        
-            var maxTahu = page.config.getMaxTahu();
-            var zprava = "Opravdu chcete odehrát více jak " + maxTahu + " tahů?";
-            var buttons = XPath.evaluateList('//input[@type = "submit"]');
+        // Pridej kontrolu i na objevovat
+        if (context.fields.length > 0 && parseInt(context.fields[0].value) > maxTahu) {
+            var cekat = $XF('//a[starts-with(@href, "wait.html")]');
+            var objevovat = $XF('//a[starts-with(@href, "explore.html")]');
             
-            context.kolikwait.each(function(e)
-                {
-                    buttons.each(function(i)
-                        {
-                            if (i.form == e.form) {
-                                Event.observe(i, 'click', function()
-                                    {
-                                        return (parseInt(e.value) < maxTahu) || confirm(zprava);
-                                    }, true);
-                                    
-                                i.setAttribute("plus", true); // Debug
-                            }
-                        });
-                });
-                
-            // Pridej kontrolu i na objevovat
-            if (context.kolikwait.length > 0 && parseInt(context.kolikwait[0].value) > maxTahu) {
-                var cekat = $XF('//a[starts-with(@href, "wait.html")]');
-                var objevovat = $XF('//a[starts-with(@href, "explore.html")]');
-                
-                var zprava2 = "Je možné, že odehrajete více jak " + maxTahu + " tahů, chcete pokračovat?";
-                
-                if (cekat) {
-                    Event.observe(cekat, "click", function() { return confirm(zprava2); }, true);
-                    cekat.setAttribute("plus", true); // Debug
-                }
-                if (objevovat) {
-                    Event.observe(objevovat, "click", function() { return confirm(zprava2); }, true);
-                    objevovat.setAttribute("plus", true); // Debug
-                }
+            var zprava2 = "Je možné, že odehrajete více jak " + maxTahu + " tahů, chcete pokračovat?";
+            
+            if (cekat) {
+                Event.observe(cekat, "click", function() { return confirm(zprava2); }, false);
+                cekat.setAttribute("plus", true); // Debug
+            }
+            if (objevovat) {
+                Event.observe(objevovat, "click", function() { return confirm(zprava2); }, false);
+                objevovat.setAttribute("plus", true); // Debug
             }
         }
-    }    
-});
-
-pageExtenders.add(plusExtender);
+    }
+}));

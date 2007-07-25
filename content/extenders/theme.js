@@ -33,11 +33,42 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
-var themeExtender = PageExtender.create({
+
+function updateImgs(origSrc, newSrc) {
+    $XL('//img[@src = "' + origSrc + '"]').each(function(e) { e.src = newSrc; });
+}
+
+// Barvy povolani
+pageExtenders.add(PageExtender.create({
+    process: function(page, context) {
+        // Zmena obrazku
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/barvy/fialova.jpg", CHROME_CONTENT_URL + "html/img/barvy/fialova2.png");
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/barvy/seda.gif", CHROME_CONTENT_URL + "html/img/barvy/seda.png");
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/barvy/bila.gif", CHROME_CONTENT_URL + "html/img/barvy/bila.png");
+    }
+}));
+
+// Temne barvy
+pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
+        return page.prefs.getBoolean("temneBarvy", true);
     },
     
     process: function(page, context) {
+        // Barvy tabulek
+        $XL('//tr[@bgcolor = "#303030"]').each(function(e) { e.bgColor = "#1b1b1b" }); // Tohle musi byt prvni
+        $XL('//table[@bgcolor = "#505050"]').each(function(e) { e.bgColor = "#303030" });
+        $XL('//tr[@bgcolor = "#505050"]').each(function(e) { e.bgColor = "#303030" });
+        $XL('//tr[@bgcolor = "#404040"]').each(function(e) { e.bgColor = "#2b2b2b" });
+
+        // Rohy tabulek
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/rohy/ld.jpg", CHROME_CONTENT_URL + "html/img/rohy/ld.png");
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/rohy/levdolroh.jpg", CHROME_CONTENT_URL + "html/img/rohy/levdolroh.png");
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/rohy/levhorroh.jpg", CHROME_CONTENT_URL + "html/img/rohy/levhorroh.png");
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/rohy/lh.jpg", CHROME_CONTENT_URL + "html/img/rohy/lh.png");
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/rohy/pd.jpg", CHROME_CONTENT_URL + "html/img/rohy/pd.png");
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/rohy/ph.jpg", CHROME_CONTENT_URL + "html/img/rohy/ph.png");
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/rohy/pravdolroh.jpg", CHROME_CONTENT_URL + "html/img/rohy/pravdolroh.png");
+        updateImgs(MELIOR_ANNIS_URL + "/html/img/rohy/pravhorroh.jpg", CHROME_CONTENT_URL + "html/img/rohy/pravhorroh.png");
     }    
-});
+}));

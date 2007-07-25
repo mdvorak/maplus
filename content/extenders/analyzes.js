@@ -35,8 +35,8 @@
  * ***** END LICENSE BLOCK ***** */
  
 
-/*** Basic page analyzes ***/
-var analyzeLayout = PageExtender.create({
+// Analyze page layout
+pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         if (page.name == null || page.name == "" || page.name == "login.html")
             throw new AbortException("Unsupported page name.");
@@ -83,8 +83,5 @@ var analyzeLayout = PageExtender.create({
         
         return value;
     }
-});
-
-pageExtenders.add(analyzeLayout);
-
+}));
 

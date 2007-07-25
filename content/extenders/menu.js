@@ -33,8 +33,9 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
-var menuExtender = PageExtender.create({
+
+// Rozsirene menu
+pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         context.utoky = $XF('font/a[contains(., "Výpisy") and contains(., "útoků")]', page.rightMenu); // pozn: netusim jak ho donutit brat mezeru
         
@@ -53,49 +54,48 @@ var menuExtender = PageExtender.create({
         link.parentNode.insertBefore(detail, link.nextSibling);
         link.parentNode.insertBefore(br, detail);
     }    
-});
+}));
 
-pageExtenders.add(menuExtender);
-
-var sidebarExtender = PageExtender.create({
+// Kalkulacka
+pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         context.kalkulackaHtml = Chrome.loadText("html/kalkulacka.html");
-        context.poznamkyHtml = Chrome.loadText("html/poznamky.html");
-    
-        return (context.kalkulackaHtml || context.poznamkyHtml);
+        return (kalkulackaHtml != null);
     },
     
     process: function(page, context) {
-        // Kalkulacka
-        if (context.kalkulackaHtml) {
-            var div = document.createElement("div");
-            div.innerHTML = context.kalkulackaHtml;
-            page.leftMenu.appendChild(div);
+        var div = document.createElement("div");
+        div.innerHTML = context.kalkulackaHtml;
+        page.leftMenu.appendChild(div);
 
-            var cfg = page.localConfig;
-            // Definovano v html
-            Kalkulacka.init(cfg.getPref("kalkulacka", ""), 
-                function(e)
-                {
-                    cfg.setPref("kalkulacka", e.target.value);
-                });
-        }
-        
-        // Poznamky
-        if (context.poznamkyHtml) {
-            var div = document.createElement("div");
-            div.innerHTML = context.poznamkyHtml;
-            page.leftMenu.appendChild(div);
-
-            var cfg = page.config;
-            // Definovano v html
-            Poznamky.init(cfg.getPref("poznamky", ""), 
-                function(e)
-                {
-                    cfg.setPref("poznamky", e.target.value);
-                });
-        }
+        var cfg = page.localConfig;
+        // Definovano v html
+        Kalkulacka.init(cfg.getPref("kalkulacka", ""), 
+            function(e)
+            {
+                cfg.setPref("kalkulacka", e.target.value);
+            });
     }
-});
+}));
 
-pageExtenders.add(sidebarExtender);
+// Poznamky
+pageExtenders.add(PageExtender.create({
+    analyze: function(page, context) {
+        context.poznamkyHtml = Chrome.loadText("html/poznamky.html");
+        return (poznamkyHtml != null);
+    },
+    
+    process: function(page, context) {
+        var div = document.createElement("div");
+        div.innerHTML = context.poznamkyHtml;
+        page.leftMenu.appendChild(div);
+
+        var cfg = page.config;
+        // Definovano v html
+        Poznamky.init(cfg.getPref("poznamky", ""), 
+            function(e)
+            {
+                cfg.setPref("poznamky", e.target.value);
+            });
+    }
+}));

@@ -40,14 +40,6 @@ PlusConfig.prototype = {
         return this.getBoolean("enabled", true); 
     },
     
-    getMaxTahu: function() {
-        return this.getNumber("maxTahu", 30); 
-    },
-    
-    getTemneBarvy: function() {
-        return this.getBoolean("temneBarvy", true);
-    },
-    
     getAliance: function() {
         if (!this._aliance) {
             this._aliance = this.getPrefNode("aliance", true);
@@ -101,8 +93,8 @@ Object.extend(PlusConfig, {
     }
 });
 
-// Extender
-var configExtender = PageExtender.create({
+// Config extender
+pageExtenders.add(PageExtender.create({
     analyze: function(page) {
         page.config = PlusConfig.getConfig(page.id);
         page.localConfig = PlusConfig.getLocalConfig(page.id);
@@ -114,6 +106,4 @@ var configExtender = PageExtender.create({
         
         return true;
     }
-});
-
-pageExtenders.add(configExtender);
+}));

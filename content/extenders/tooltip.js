@@ -35,7 +35,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 var Tooltip = {
-    create: function(html, className, hideOnClick) {
+    create: function(html, className, hideOnClick) {    
         var tooltip = document.createElement('div');
 
         if (className)
@@ -46,7 +46,8 @@ var Tooltip = {
         tooltip.style.left = '0px';
         tooltip.style.top = '0px';
 
-        tooltip.innerHTML = html;
+        if (html)
+            tooltip.innerHTML = html;
         
         Event.observe(tooltip, 'mouseout', function(e)
             {
@@ -64,6 +65,35 @@ var Tooltip = {
         
         document.body.appendChild(tooltip);
         return tooltip;
+    },
+    
+    // Shows tooltip and prevents showing multiple tooltips at one time.
+    show: function(event, tooltip) {
+        if (!tooltip) throw new ArgumentNullException("tooltip");
+        
+        this.hide();
+        
+        var _this = this;
+        tooltip.onHide = function() {
+                _this._currentTooltip = null;
+            };
+            
+        this._currentTooltip = tooltip;
+        tooltip.showHandler(event);
+    },
+    
+    hide: function() {
+        if (this._currentTooltip) {
+            this._currentTooltip.hide();
+            this._currentTooltip = null;
+        }
+    },
+    
+    attach: function(link, tooltip) {
+        if (!link) throw new ArgumentNullException("link");
+        if (!tooltip) throw new ArgumentNullException("tooltip");
+        
+        Event.observe(link, function(event) { Tooltip.show(event, tooltip); }, false);
     }
 };
 
@@ -76,6 +106,9 @@ Tooltip.Methods = {
     
     hide: function() {
         this.style.display = 'none';
+        
+        if (this.onHide)
+            this.onHide();
     },
     
     isVisible: function() {

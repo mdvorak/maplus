@@ -35,7 +35,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 // Rozsirit menu alianci
-var alianceLinkExtender = PageExtender.create({
+pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         context.aliance = $XF('font/a[. = "Aliance"]', page.rightMenu); 
         return (context.aliance != null);
@@ -71,47 +71,16 @@ var alianceLinkExtender = PageExtender.create({
         }
         
     }    
-});
-
-pageExtenders.add(alianceLinkExtender);
+}));
 
 // Zabranit dvojklikum na linky
-var SafeLink = {
-    TIMEOUT: 2000,
-
-    releaseLink: function() {
-        if (this._last != null) {
-            clearTimeout(this._timer);
-        
-            this._last.onclick = function() { SafeLink.initReleaseTimer(this); };
-            this._last.style.color = "";
-            this._last = null;
-        }
-    },
-
-    initReleaseTimer: function(elem) {
-        this.releaseLink();
-        
-        this._last = elem;
-        elem.onclick = function() { return false; };
-        elem.style.color = "red";
-        
-        this._timer = setTimeout(function() { SafeLink.releaseLink(); }, SafeLink.TIMEOUT);
-    }
-};
-
-var safeLinkExtender = PageExtender.create({
+pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
-        context.linky = $XL('//a[@href != "javascript://" and not(@onclick)]');    
-        return context.linky.length > 0;
+        context.list = $XL('//a[@href != "javascript://" and not(@onclick)]');    
+        return context.list.length > 0;
     },
     
     process: function(page, context) {
-        context.linky.each(function(e)
-            {
-                e.onclick = function() { SafeLink.initReleaseTimer(this); };
-            });
+        context.list.each(function(e) { SafeLink.initLink(e); });
     }
-});
-    
-pageExtenders.add(safeLinkExtender);
+}));

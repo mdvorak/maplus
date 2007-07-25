@@ -34,11 +34,9 @@
  * 
  * ***** END LICENSE BLOCK ***** */
  
-var bestiarExtender = Object.extend(new PageExtender(), {
+pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         // FIXME
-        alert(page.config.getEnabled());
+        // alert(page.config.getEnabled());
     }
-});
-
-pageExtenders.add(bestiarExtender);
+}));
