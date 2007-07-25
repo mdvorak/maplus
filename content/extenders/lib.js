@@ -131,8 +131,8 @@ var MaPlus = {
             // Uprav data o jednotce pro zobrazeni
             jednotka.iniColor = Color.fromRange(jednotka.realIni, 5, 35, Color.Pickers.redGreen);
             jednotka.phb = (jednotka.typ != "Str.") ? jednotka.phb : "";
-            jednotka.druh = jednotka.druh.replace(/[.]$/, ""));
-            jednotka.typ = jednotka.typ.replace(/[.]$/, ""));
+            jednotka.druh = jednotka.druh.replace(/[.]$/, "");
+            jednotka.typ = jednotka.typ.replace(/[.]$/, "");
             
             var html = page.jednotkaTemplate.evaluate(jednotka);
             tooltip = Tooltip.create(html, "jednotkaTooltip", false);    
@@ -221,13 +221,13 @@ Color.Pickers = {
         colors.red = Math.min(250, 225 * (1 - colors.koeficient) * 2);
         colors.green = Math.min(240, 220 * colors.koeficient * 2);
         colors.blue = 30; 
-    }
+    },
 
     blueWhite: function(colors) {
         colors.red = Math.min(240, 240 * colors.koeficient);
         colors.green = Math.max(40, Math.min(240, 240 * colors.koeficient));
         colors.blue = 240; 
-    }
+    },
 
 
     grayGold: function(colors) {

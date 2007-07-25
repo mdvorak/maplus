@@ -60,7 +60,7 @@ pageExtenders.add(PageExtender.create({
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         context.kalkulackaHtml = Chrome.loadText("html/kalkulacka.html");
-        return (kalkulackaHtml != null);
+        return (context.kalkulackaHtml != null);
     },
     
     process: function(page, context) {
@@ -82,7 +82,7 @@ pageExtenders.add(PageExtender.create({
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         context.poznamkyHtml = Chrome.loadText("html/poznamky.html");
-        return (poznamkyHtml != null);
+        return (context.poznamkyHtml != null);
     },
     
     process: function(page, context) {

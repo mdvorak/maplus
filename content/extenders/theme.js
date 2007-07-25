@@ -51,7 +51,7 @@ pageExtenders.add(PageExtender.create({
 // Temne barvy
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
-        return page.prefs.getBoolean("temneBarvy", true);
+        return page.config.getBoolean("temneBarvy", true);
     },
     
     process: function(page, context) {

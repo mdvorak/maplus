@@ -83,8 +83,7 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        context.list.each(function(e) 
-            {
+        context.list.each(function(e) {
                 Event.observe(e, 'blur', function() { this.value = this.value.replace(/^\\s+|\\s+$/g, ''); }, false);
             });
     }
@@ -96,7 +95,7 @@ pageExtenders.add(PageExtender.create({
         if (page.config.getNumber("maxTahu", MAX_TAHU_DEFAULT) > 0) {
             context.fields = $XL('//input[@type = "text" and @name = "kolikwait"]');
             context.buttons = $XL('//input[@type = "submit"]');
-            return context.list.length > 0;
+            return context.fields.length > 0;
         }
         return false;
     },

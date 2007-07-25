@@ -55,7 +55,7 @@ var Clipboard = {
     
     copyId_PROXY: Marshal.BY_VALUE,
     copyId: function(id) {
-        if (isNaN(parseInt(id));
+        if (isNaN(parseInt(id)))
             throw new ArgumentException("id", id, "Not a number.");
         
         this._helper.copyString(id);

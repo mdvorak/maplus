@@ -149,6 +149,7 @@ Exception.prototype = {
     initialize: function(message, innerException) {
         this.message = message;
         this.innerException = innerException;
+        this.stack = dump();
     },
     
     getType: function() {
