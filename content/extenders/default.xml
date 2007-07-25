@@ -20,6 +20,7 @@
     
     <!-- Specific -->
     <script url="#{melior}/obchod.html" name="bestiar.js" />
+    <script url="#{melior}/magie.html" name="magie.js" />
 
     <!-- Post processing -->
     <script url="#{melior}/*" name="theme.js" />

@@ -261,7 +261,7 @@ var SafeLink = {
     },
 
     _startTimer: function(elem) {
-        this.releaseLink();
+        this._releaseLink();
         
         this._last = elem;
         elem.onclick = function() { return false; };
