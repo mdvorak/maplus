@@ -149,7 +149,6 @@ Exception.prototype = {
     initialize: function(message, innerException) {
         this.message = message;
         this.innerException = innerException;
-        this.stack = dump();
     },
     
     getType: function() {
@@ -483,10 +482,13 @@ PageExtenderCollection.prototype = {
                     var context = entry[1];
                     extender.process(page, context);
                 });
+                
+            return true;
         }
         catch (ex) {
             if (Exception.getExceptionType(ex) != "AbortException") {
-                alert(ex);
+                dump(String.format("Unhandled exception occured during extenders execution:\n'{0}'", ex));
+                // alert(ex);
             }
             return false;
         }

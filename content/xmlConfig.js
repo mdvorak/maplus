@@ -70,13 +70,13 @@ var XmlConfig = {
             var doc = FileIO.loadXmlFile(path);
             
             root = XPath.evaluateSingle(rootName, doc);
-            // if (!root)
-            //    TODO Log error            
+            if (!root)
+                dump(String.format("Root node '{0}' not found in the file '{1}'.", rootName, path));
             
             XmlConfig.extendNode(root);
         }
         catch (e) {
-            // TODO Log error
+            dump(String.format("Error loading file '{0}':\n{1}", path, e));
         }
     
         if (!root) {
@@ -96,7 +96,7 @@ var XmlConfig = {
                 FileIO.saveXmlFile(path, rootNode.ownerDocument);
         }
         catch (e) {
-            // TODO Log error
+            dump(String.format("Error saving file '{0}':\n{1}", path, e));
         }
     },
 };

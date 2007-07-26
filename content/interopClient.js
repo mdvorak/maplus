@@ -36,7 +36,6 @@
 
 
 /*** Marshal client component class ***/
-
 var Marshal = {
     _proxyCache: new Hash(),
 
