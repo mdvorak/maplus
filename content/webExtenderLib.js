@@ -41,42 +41,60 @@ Object.extend(Function, {
 });
 
 Object.extend(Class, {
-    _createBaseTypeObject: function(owner, basePrototype) {
-        var base = new Object();
-        
-        for (var p in basePrototype) {
-            var v = basePrototype[p];
-            
-            if (typeof v == "function") {
-                base[p] = Function.bind(owner, v); 
-            }
-            else {
-                base[p] = v;
-            }
-        }
-        
-        return base;
+    _createMethodWithBase: function(__owner, base /*, method */) {
+        var __method = eval("(" + arguments[2] + ")");
+        return function() {
+                return __method.apply(__owner, arguments);
+            };
     },
-
-    inherit: function(baseType) {
-        var _this = this;
-        var basePrototype = baseType.prototype;
     
+    inherit: function(baseClass) {
+        if (!baseClass)
+            throw "baseClass is null.";
+                
         var cls = function() {
-            // Create base type
-            this.base = _this._createBaseTypeObject(this, basePrototype);
+            // Create base object
+            var base = new Class.BaseObject(this, baseClass);
+            // Override local methods so they will support base variable
+            for (var p in this) {
+                var v = this[p];
+                if (typeof v == "function")
+                    this[p] = Class._createMethodWithBase(this, base, v);
+            }
+            
             // Call initialize method
             this.initialize.apply(this, arguments);
         };
         
+        // Set baseClass property
+        cls.__baseClass = baseClass;
+        
         // copy "static" methods
-        Object.extend(cls, baseType);
+        Object.extend(cls, baseClass);
         // copy "instance" methods
-        cls.prototype = Object.extend({}, baseType.prototype);
+        cls.prototype = Object.extend({}, baseClass.prototype);
         
         return cls;
     }
 });
+
+Class.BaseObject = function(owner, clazz) {
+    var base = null;
+    if (clazz.__baseClass) {
+        base = new Class.BaseObject(owner, clazz.__baseClass);
+    }
+
+    for (var p in clazz.prototype) {
+        var v = clazz.prototype[p];
+        
+        if (typeof v == "function") {
+            if (base)
+                this[p] = Class._createMethodWithBase(owner, base, v);
+            else
+                this[p] = Function.bind(owner, v);
+        }
+    }
+};
 
 Object.extend(Event, {
     dispatch: function(element, eventName, bubbles, cancelable) {
@@ -142,13 +160,14 @@ Object.extend(Element, {
     }
 });
 
-/*** Exception class ***/
+/*** Exception clazz ***/
 var Exception = Class.create();
 
 Exception.prototype = {
     initialize: function(message, innerException) {
         this.message = message;
         this.innerException = innerException;
+        this.caller = arguments.callee.caller;
     },
     
     getType: function() {
@@ -188,12 +207,12 @@ Object.extend(Exception, {
     }
 });
 
-/*** ArgumentException class ***/
+/*** ArgumentException clazz ***/
 var ArgumentException = Class.inherit(Exception);
 
 Object.extend(ArgumentException.prototype, {
     initialize: function(argName, argValue, message, innerException) {
-        this.base.initialize(message, innerException);
+        base.initialize(message, innerException);
         
         this.name = argName;
         this.value = argValue;
@@ -212,7 +231,7 @@ Object.extend(ArgumentException.prototype, {
     },
     
     getDescription: function() {
-        var str = this.base.getDescription();
+        var str = base.getDescription();
         
         if (this.getName())
             str += String.format("\nargument name='{0}' value='{1}'", this.getName(), String(this.getValue()));
@@ -226,7 +245,7 @@ ArgumentNullException.MESSAGE = "Argument is null.";
 
 Object.extend(ArgumentNullException.prototype, {
     initialize: function(argName, innerException) {
-        this.base.initialize(argName, null, ArgumentNullException.MESSAGE, innerException);
+        base.initialize(argName, null, ArgumentNullException.MESSAGE, innerException);
     },
     
     getType: function() {
@@ -243,14 +262,14 @@ Object.extend(InvalidOperationException.prototype, {
     }
 });
 
-/*** XPathException class ***/
+/*** XPathException clazz ***/
 var XPathException = Class.inherit(Exception);
 
 XPathException.DEFAULT_MESSAGE = "Error evaluating XPath expression.";
 
 Object.extend(XPathException.prototype, {
     initialize: function(message, expression, innerException) {
-        this.base.initialize(message || XPathException.DEFAULT_MESSAGE, innerException);
+        base.initialize(message || XPathException.DEFAULT_MESSAGE, innerException);
         
         this.expression = expression;
     },
@@ -264,7 +283,7 @@ Object.extend(XPathException.prototype, {
     },
     
     getDescription: function() {
-        var str = this.base.getDescription();
+        var str = base.getDescription();
         
         if (this.getExpression())
             str += "\nexpression: '" + this.getExpression() + "'";
@@ -273,7 +292,7 @@ Object.extend(XPathException.prototype, {
     }
 });
 
-/*** XPath class ***/
+/*** XPath clazz ***/
 var XPath = {
     evaluate: function(xpath, context, resultType) {
         try {
@@ -369,7 +388,7 @@ function $XL(xpath, context) {
     return XPath.evaluateList(xpath, context);
 }
 
-/*** Page class ***/
+/*** Page clazz ***/
 var Page = Class.create();
 
 Page.prototype = {
@@ -396,7 +415,7 @@ Page.prototype = {
     }
 };
 
-/*** PageExtender class ***/
+/*** PageExtender clazz ***/
 var PageExtender = Class.create();
 
 PageExtender.prototype = {
@@ -428,7 +447,7 @@ Object.extend(PageExtender, {
     }
 });
 
-/*** AbortException class ***/
+/*** AbortException clazz ***/
 var AbortException = Class.inherit(Exception);
 
 Object.extend(AbortException.prototype, {
@@ -437,7 +456,7 @@ Object.extend(AbortException.prototype, {
     }
 });
 
-/*** PageExtenderCollection class ***/
+/*** PageExtenderCollection clazz ***/
 var PageExtenderCollection = Class.create();
 
 PageExtenderCollection.prototype = {
@@ -502,7 +521,7 @@ var ScriptExtender = PageExtender.createClass({
     DEFAULT_TYPE: "text/javascript",
 
     initialize: function(src, type) {
-        this.base.initialize();
+        base.initialize();
     
         if (!src)
             throw new ArgumentNullException("src");
@@ -520,7 +539,7 @@ var ScriptExtender = PageExtender.createClass({
 
 var StyleExtender = PageExtender.createClass({
     initialize: function(src) {
-        this.base.initialize();
+        base.initialize();
         
         if (!src)
             throw new ArgumentNullException("src");
@@ -546,7 +565,7 @@ var MarshalException = Class.inherit(Exception);
 
 Object.extend(MarshalException.prototype, {
     initialize: function(message, objectName, methodName, innerException) {
-        this.base.initialize(message, innerException);
+        base.initialize(message, innerException);
         
         this.objectName = objectName;
         this.methodName = methodName;
@@ -560,7 +579,7 @@ Object.extend(MarshalException.prototype, {
     getMethodName: function() { return this.methodName; },
     
     getDescription: function() {
-        var str = this.base.getDescription();
+        var str = base.getDescription();
         
         if (this.getObjectName())
             str += "\nobject name='" + this.getObjectName() + "'";
@@ -571,3 +590,4 @@ Object.extend(MarshalException.prototype, {
         return str;
     }
 });
+

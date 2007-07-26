@@ -93,15 +93,15 @@ var Tooltip = {
         if (!link) throw new ArgumentNullException("link");
         if (!tooltip) throw new ArgumentNullException("tooltip");
         
-        Event.observe(link, function(event) { Tooltip.show(event, tooltip); }, false);
+        Event.observe(link, "click", function(event) { Tooltip.show(event, tooltip); }, false);
     }
 };
 
 Tooltip.Methods = {
     show: function(x, y) {
-        tooltip.style.left = (x - 5) + 'px';
-        tooltip.style.top = (y - 5) + 'px';
-        tooltip.style.display = '';
+        this.style.left = (x - 5) + 'px';
+        this.style.top = (y - 5) + 'px';
+        this.style.display = '';
     }, 
     
     hide: function() {

@@ -53,6 +53,7 @@ var MaData = {
         XmlConfig.save(path, this.data);
     },
     
+    najdiProvincii_PROXY: Marshal.BY_VALUE,
     najdiProvincii: function(id) {
         if (id == null || isNaN(id))
             return null;
@@ -76,6 +77,7 @@ var MaData = {
         return null;
     },
     
+    aktualizujProvincii_PROXY: Marshal.BY_VALUE,
     aktualizujProvincii: function(id, regent, provincie, povolani, presvedceni, aliance) {
         if (id == null || isNaN(id))
             return;
@@ -97,6 +99,7 @@ var MaData = {
         if (aliance && aliance != "") provi.setPref("aliance", (aliance != ZADNA_ALIANCE) ? aliance : null);
     },
     
+    najdiAlianci_PROXY: Marshal.BY_VALUE,
     najdiAlianci: function(jmeno) {
         if (jmeno == null || jmeno == ZADNA_ALIANCE)
             return null;
@@ -117,6 +120,7 @@ var MaData = {
         return null;
     },
     
+    najdiJmenoAliance_PROXY: Marshal.BY_VALUE,
     najdiJmenoAliance: function(zacatekJmena) {
         if (zacatekJmena == null || zacatekJmena == ZADNA_ALIANCE)
             return null;
@@ -135,6 +139,7 @@ var MaData = {
             return null;
     },
     
+    aktualizujAlianci_PROXY: Marshal.BY_VALUE,
     aktualizujAlianci: function(jmeno, id, presvedceni) {
         if (jmeno == null || jmeno == ZADNA_ALIANCE)
             return;

@@ -42,7 +42,10 @@ var MaPlus = {
         var url = pageName + "?id=" + page.id + "&code=" + page.code;
         if (page.ftc) url += "&ftc=" + page.ftc;
         
-        args.each(function(k) { url += "&" + k + "=" + args[k]; });
+        if (args) {
+            args = $H(args);
+            args.keys().each(function(k) { url += "&" + k + "=" + args[k]; });
+        }
         
         return url;
     },
@@ -96,7 +99,9 @@ var MaPlus = {
         html += '</table>';
 
         var tooltip = Tooltip.create(html, "idTooltip", false);
-        var copyLink = $X(tooltip).evaluateSingle('table/tr/a');
+        var copyLink = $XF('table/tbody/tr/td/a', tooltip);
+        if (!copyLink)
+            throw new Exception("Internal error. Copy link not found.");
         
         Event.observe(copyLink, 'click', function() {
                 Clipboard.copyId(id);

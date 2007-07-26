@@ -34,57 +34,65 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+// Skryti popisku kouzel
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
-        context.eKouzlaTable = $XF('//table[contains(tbody/tr[2]/td[4]/font, "seslání")]');
-        context.ePredkouzlenoTable = $XF('//table[tbody/tr[2]/td[4]/font/b = "Název"]');
-        
-        if (context.ePredkouzlenoTable) {
-            context.naProvincii = $XL('tbody/tr/td[5]/font', context.ePredkouzlenoTable);
-        }
-        
-        return (context.eKouzlaTable != null);
+        context.tableKouzla = $XF('//table[contains(tbody/tr[2]/td[4]/font, "seslání")]');
+        return (context.tableKouzla != null && context.tableKouzla.rows.length > 3);
     },
     
     process: function(page, context) {
-        if (context.eKouzlaTable && eKouzlaTable.rows.length > 3) {
-            context.eKouzlaTable.id = "id_kouzlaTable";
-        
-            for (var i = 2; i < context.eKouzlaTable.rows.length - 1; i++) {
-                var row = context.eKouzlaTable.rows[i];
-                
-                // Radek s popiskem nebo meziradek, skryt oba
-                if (row.bgColor == "#303030" || row.bgColor == "") {
-                    row.style.display = 'none';
-                }
-                else {
-                    if (i % 2) row.bgColor = "#000000";
-                    else row.bgColor = "#1b1b1b";
-                }
+        context.tableKouzla.id = "id_kouzlaTable";
+    
+        for (var i = 2; i < context.tableKouzla.rows.length - 1; i++) {
+            var row = context.tableKouzla.rows[i];
+            
+            // Radek s popiskem nebo meziradek, skryt oba
+            if (row.bgColor == "#303030" || row.bgColor == "") {
+                row.style.display = 'none';
             }
-            
-            var zobrazPopiskyScript = "var t = document.getElementById('id_kouzlaTable');";
-            zobrazPopiskyScript += " for (var i = 0; i < t.rows.length; i++)";
-            zobrazPopiskyScript += "   t.rows[i].style.display = '';";
-            zobrazPopiskyScript += " this.style.display = 'none';";
-            zobrazPopiskyScript += " t.style.overflowX = 'scroll';"; // Tohle donuti preklesleni tabulky takze se roztahne
-            
-            var lastRow = context.eKouzlaTable.rows[context.eKouzlaTable.rows.length - 1];
-            lastRow.cells[1].innerHTML = '<a href="javascript://" onclick="' + zobrazPopiskyScript + '"><font size="1">Zobrazit popisky</font></a>';
+            else {
+                if (i % 2) row.bgColor = "#000000";
+                else row.bgColor = "#1b1b1b";
+            }
         }
         
-        if (context.naProvincii && context.naProvincii.length > 0) {
-            for (var i = 0; i < context.naProvincii.length; i++) {
-                var m = context.naProvincii[i].innerHTML.match(/^\((\d+)\)(.*)/);
+        var zobrazPopiskyScript = "var t = document.getElementById('id_kouzlaTable');";
+        zobrazPopiskyScript += " for (var i = 0; i < t.rows.length; i++)";
+        zobrazPopiskyScript += "   t.rows[i].style.display = '';";
+        zobrazPopiskyScript += " this.style.display = 'none';";
+        zobrazPopiskyScript += " t.style.overflowX = 'scroll';"; // Tohle donuti preklesleni tabulky takze se roztahne
+        
+        var lastRow = context.tableKouzla.rows[context.tableKouzla.rows.length - 1];
+        lastRow.cells[1].innerHTML = '<a href="javascript://" onclick="' + zobrazPopiskyScript + '"><font size="1">Zobrazit popisky</font></a>';
+    }
+}));
+
+// Aktivni id v cilech kouzel
+pageExtenders.add(PageExtender.create({
+    analyze: function(page, context) {
+        context.tablePredkouzleno = $XF('//table[tbody/tr[2]/td[4]/font/b = "Název"]');
+        
+        if (context.tablePredkouzleno) {
+            context.naProvincii = $XL('tbody/tr/td[5]/font', context.tablePredkouzleno);
+        }
+        
+        return (context.naProvincii != null && context.naProvincii.length > 0);
+    },
+    
+    process: function(page, context) {
+        context.naProvincii.each(function(e) {
+                var m = e.innerHTML.match(/^\((\d+)\)(.*)/);
                 var id = (m ? parseInt(m[1]) : null);
-                var provincie = (m ? m[2] : null);
+                var provincie = (m ? m[2].replace(/&nbsp;/g, " ") : null);
                 
                 if (id && !isNaN(id)) {
-                    var eId = MaPlus.createActiveId(page, id);
-                    context.naProvincii[i].innerHTML = "(<span></span>)" + provincie;
-                    context.naProvincii[i].childNodes[1].appendChild(eId);
+                    e.innerHTML = "";
+                    e.appendChild(document.createTextNode("("));
+                    e.appendChild(MaPlus.createActiveId(page, id));
+                    e.appendChild(document.createTextNode(")"));
+                    e.appendChild(document.createTextNode(provincie));
                 }
-            }
-        }        
+            });      
     }
 }));

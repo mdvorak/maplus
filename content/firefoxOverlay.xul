@@ -48,6 +48,8 @@
   <!-- MaPlus backend -->
   <script src="maplus.js" />
   <script src="config.js" />
+  <script src="jednotky.js" />
+  <script src="madata.js" />
   
   <!-- Extenders -->
   <script src="default.js" />

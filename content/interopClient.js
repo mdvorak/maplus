@@ -34,7 +34,6 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-
 /*** Marshal client component class ***/
 var Marshal = {
     _proxyCache: new Hash(),
@@ -57,8 +56,10 @@ var Marshal = {
             
             Event.dispatch(elem, "MarshalMethodCall", true);
             
-            if (elem.getAttribute("exception"))
-                throw elem.getAttribute("exception").evalJSON();
+            if (elem.getAttribute("exception")) {
+                var ex = elem.getAttribute("exception").evalJSON();
+                throw new RemoteException(objectName, methodName, ex);
+            }
             else if (elem.getAttribute("retval"))
                 return elem.getAttribute("retval").evalJSON();
             else if (elem.getAttribute("objectId")) {
@@ -101,8 +102,10 @@ var Marshal = {
                 
                 Event.dispatch(elem, "MarshalGetProxyDefinition", true);
                 
-                if (elem.getAttribute("exception"))
-                    throw elem.getAttribute("exception").evalJSON();
+                if (elem.getAttribute("exception")) {
+                    var ex = elem.getAttribute("exception").evalJSON();
+                    throw new RemoteException(objectName, null, ex);
+                }
                 
                 var defJSON = elem.getAttribute("proxyDefinition");
                 if (!defJSON || defJSON.empty())
@@ -138,3 +141,36 @@ var Marshal = {
         return proxy;
     }
 };
+
+
+/*** RemoteExceptionWrapper class ***/
+var RemoteExceptionWrapper = Class.create();
+
+RemoteExceptionWrapper.prototype = {
+    initialize: function(remoteException) {  
+        this.remoteException = remoteException;
+        
+        var str = "";
+        for (var i in remoteException) {
+            if (str) str += "\n";
+            str += i + ": " + remoteException[i];
+        }
+        
+        this.string = str;
+    },
+    
+    toString: function() {
+        return this.string;
+    }
+};
+
+/*** RemoteException class ***/
+var RemoteException = Class.inherit(MarshalException);
+
+RemoteException.MESSAGE = "Service returned an exception.";
+
+Object.extend(RemoteException.prototype, {
+    initialize: function(objectName, methodName, remoteException) {
+        base.initialize(RemoteException.MESSAGE, objectName, methodName, new RemoteExceptionWrapper(remoteException));
+    }
+});

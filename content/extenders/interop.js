@@ -38,3 +38,4 @@ var Chrome = Marshal.getObjectProxy("Chrome");
 
 var MaData = Marshal.getObjectProxy("MaData");
 var Jednotky = Marshal.getObjectProxy("Jednotky");
+var Clipboard = Marshal.getObjectProxy("Clipboard");
