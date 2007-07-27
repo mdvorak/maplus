@@ -21,6 +21,7 @@
     <!-- Specific -->
     <script url="#{melior}/obchod.html" name="bestiar.js" />
     <script url="#{melior}/magie.html" name="magie.js" />
+    <script url="#{melior}/aliance.html" name="aliance.js" />
 
     <!-- Post processing -->
     <script url="#{melior}/*" name="postprocessing.js" />

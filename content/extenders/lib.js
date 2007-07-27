@@ -50,17 +50,10 @@ var MaPlus = {
         return url;
     },
     
-    createActiveId: function(page, id) {
+    createActiveIdTooltip: function(page, id) {
         // Najdi informace o hraci
         var provincie = MaData.najdiProvincii(id);
-
-        // Vytvoreni linku
-        var link = document.createElement("a");
-        link.className = "idLink";
-        link.href = "javascript://";
-        link.innerHTML = id;
         
-
         var html = '<table>';
         html += '<tr>';
         html += '  <td colspan="2"><span><b>' + id + '</b>&nbsp;</span>';
@@ -97,8 +90,10 @@ var MaPlus = {
         }
         
         html += '</table>';
-
+        
         var tooltip = Tooltip.create(html, "idTooltip", false);
+        tooltip.setAttribute("provincie", id); // Debug
+        
         var copyLink = $XF('table/tbody/tr/td/a', tooltip);
         if (!copyLink)
             throw new Exception("Internal error. Copy link not found.");
@@ -107,7 +102,24 @@ var MaPlus = {
                 Clipboard.copyId(id);
             }, false);
             
-        Tooltip.attach(link, tooltip);
+        return tooltip;
+    },
+    
+    createActiveId: function(page, id) {
+        // Vytvoreni linku
+        var link = document.createElement("a");
+        link.className = "idLink";
+        link.href = "javascript://";
+        link.innerHTML = id;
+            
+        var tooltipName = "id_" + id;
+        
+        if (!Tooltip.isRegistered(tooltipName)) {
+            Tooltip.register(tooltipName, function() { return MaPlus.createActiveIdTooltip(page, id); });
+        }
+                
+        Tooltip.attach(link, tooltipName);
+        
         return link;
     },
     

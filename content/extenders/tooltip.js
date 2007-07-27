@@ -35,6 +35,10 @@
  * ***** END LICENSE BLOCK ***** */
 
 var Tooltip = {
+    _callbacks: new Hash(),
+    _library: new Hash(),
+
+    // Creates tooltip element
     create: function(html, className, hideOnClick) {    
         var tooltip = document.createElement('div');
 
@@ -67,9 +71,54 @@ var Tooltip = {
         return tooltip;
     },
     
+    getTooltip: function(tooltip) {
+        if (!tooltip) 
+            throw new ArgumentNullException("tooltip");
+            
+        if (typeof tooltip == "string") {
+            var name = tooltip;
+            tooltip = this._library[name];
+            
+            if (!tooltip) {
+                var callback = this._callbacks[name];
+                if (!callback)
+                    throw new ArgumentException("tooltip", tooltip, "No tooltip of that name registered.");
+                    
+                tooltip = callback();
+                if (!tooltip || !tooltip.ownerDocument)
+                    throw new Exception(String.format("Callback for tooltip '{0}' did not returned element.", name));
+                
+                tooltip.setAttribute("tooltipName", name); //Debug
+                this._library[name] = tooltip;
+            }
+        }
+        
+        return tooltip;
+    },
+
+    register: function(name, createCallback) {
+        if (!name || name.empty())
+            throw new ArgumentNullException("name");
+        if (!createCallback)
+            throw new ArgumentNullException("createCallback");
+        if (typeof createCallback != "function")
+            throw new ArgumentException("createCallback", createCallback, "Callback must be a function.");
+        if (this._callbacks[name])
+            throw new ArgumentException("name", name, "Callback of that name is already registered.");
+            
+        this._callbacks[name] = createCallback;
+    },
+    
+    isRegistered: function(name) {
+        if (!name || name.empty())
+            throw new ArgumentNullException("name");
+            
+        return (this._callbacks[name] != null);
+    },
+    
     // Shows tooltip and prevents showing multiple tooltips at one time.
     show: function(event, tooltip) {
-        if (!tooltip) throw new ArgumentNullException("tooltip");
+        tooltip = this.getTooltip(tooltip);
         
         this.hide();
         
@@ -93,7 +142,9 @@ var Tooltip = {
         if (!link) throw new ArgumentNullException("link");
         if (!tooltip) throw new ArgumentNullException("tooltip");
         
-        Event.observe(link, "click", function(event) { Tooltip.show(event, tooltip); }, false);
+        Event.observe(link, "click", function(event) { 
+                Tooltip.show(event, tooltip); 
+            }, false);
     }
 };
 
