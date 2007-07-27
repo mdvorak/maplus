@@ -425,20 +425,35 @@ var Marshal = {
                     
                     case Marshal.BY_REF:
                         // TODO optimize code so same objects will have same id
-                        var objectId = ++this._objectId;
-                    
-                        // Create list of methods
+                        
+                        // Create list of temporary objects
                         var marshalObjects = elem.ownerDocument._marshalObjects;
                         if (!marshalObjects) {
                             marshalObjects = new Hash();
                             elem.ownerDocument._marshalObjects = marshalObjects;
                         }
                         
-                        var def = this._createProxyDefinition(retval);
+                        if (!Object.isArray(retval)) {
+                            // Return value is single object
+                            var objectId = ++this._objectId;
+                            var def = this._createProxyDefinition(retval);
+                            marshalObjects[objectId] = retval;
+                            
+                            elem.setAttribute("objectId", objectId);
+                            elem.setAttribute("proxyDefinition", Object.toJSON(def));
+                        }
+                        else {
+                            // Return value is array of objects
+                            var objectIds = new Array();
+                            
+                            for (var i = 0; i < retval.length; i++) {
+                                var objectId = ++this._objectId;
+                                marshalObjects[objectId] = retval[i];
+                                
+                                objectIds.push(objectId);
+                            }
+                        }
                         
-                        marshalObjects[objectId] = retval;
-                        elem.setAttribute("objectId", objectId);
-                        elem.setAttribute("proxyDefinition", Object.toJSON(def));
                         break;
                         
                     default:
@@ -525,7 +540,7 @@ var ExtenderManager = {
             }
         
             // Read aliases definitions
-            var aliasesDef = XPath.evaluateList('/webExtender/urls/alias', definition);
+            var aliasesDef = XPath.evalList('/webExtender/urls/alias', definition);
             aliasesDef.each(function(a) {
                     var name = a.getAttribute("name");
                     if (!name || !/^[\w._-~]+$/.test(name))
@@ -535,7 +550,7 @@ var ExtenderManager = {
                 });
             
             // Register extenders
-            var scripts = XPath.evaluateList('/webExtender/extenders/*', definition);
+            var scripts = XPath.evalList('/webExtender/extenders/*', definition);
             scripts.each(function(def) {
                     var url = new Template(def.getAttribute("url")).evaluate(data.aliases);
                     var parser = ExtenderManager.Extenders[def.tagName];

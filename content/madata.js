@@ -130,7 +130,7 @@ var MaData = {
             
         zacatekJmena = zacatekJmena.replace(/[.]{2,3}$/, "");
         
-        var mozneAliance = elementEvaluate(this.seznamAlianci, 'aliance[starts-with(jmeno, "' + zacatekJmena + '")]');
+        var mozneAliance = XPath.evalList('aliance[starts-with(jmeno, "' + zacatekJmena + '")]', this.seznamAlianci);
         if (mozneAliance.length == 1) {
             initPrefNode(mozneAliance[0]);
             return mozneAliance[0].getPref("jmeno");

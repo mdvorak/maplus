@@ -50,8 +50,12 @@ var Tooltip = {
         tooltip.style.left = '0px';
         tooltip.style.top = '0px';
 
-        if (html)
-            tooltip.innerHTML = html;
+        if (html) {
+            if (typeof html == "string")
+                tooltip.innerHTML = html;
+            else
+                tooltip.appendChild(html);
+        }
         
         Event.observe(tooltip, 'mouseout', function(e)
             {

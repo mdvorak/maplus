@@ -48,116 +48,6 @@ var MaPlus = {
         }
         
         return url;
-    },
-    
-    createActiveIdTooltip: function(page, id) {
-        // Najdi informace o hraci
-        var provincie = MaData.najdiProvincii(id);
-        
-        var html = '<table>';
-        html += '<tr>';
-        html += '  <td colspan="2"><span><b>' + id + '</b>&nbsp;</span>';
-        html += '  <a href="javascript://"><sup><span class="small">(zkopírovat)</span></sup></a></td>';
-        html += '</tr>';
-        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: id}) + '"><span>Vyslat špehy</span></a></td></tr>';
-        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: id}) + '"><span>Napsat zprávu</span></a></td></tr>';
-
-        // Dalsi info
-        if (provincie) {
-            var pridejRadek = function(jmeno, hodnota)
-                {
-                    if (hodnota && hodnota != "")
-                        html += '<tr><td><span class="small">' + jmeno + '&nbsp;&nbsp;</span></td><td><span class="small">' + hodnota + '</span></td></tr>'
-                };
-        
-            html += '<tr><td height="5"></td></tr>';
-            pridejRadek("Regent", provincie.regent);
-            pridejRadek("Provincie", provincie.provincie);
-            pridejRadek("Přesvědčení", JMENA_PRESVEDCENI[provincie.presvedceni]);
-            pridejRadek("Povolání", provincie.povolani);
-
-            if (provincie.aliance) {
-                var aliance = MaData.najdiAlianci(provincie.aliance);
-                
-                if (aliance) {
-                    var url = MaPlus.buildUrl(page, "aliance.html", {aliance: "vypis_clenu_v_ally_" + aliance.id});
-                    pridejRadek("Aliance", '<a href="' + url + '">' + provincie.aliance + '</a>');
-                }
-                else {
-                    pridejRadek("Aliance", provincie.aliance);
-                }
-            }
-        }
-        
-        html += '</table>';
-        
-        var tooltip = Tooltip.create(html, "idTooltip", false);
-        tooltip.setAttribute("provincie", id); // Debug
-        
-        var copyLink = $XF('table/tbody/tr/td/a', tooltip);
-        if (!copyLink)
-            throw new Exception("Internal error. Copy link not found.");
-        
-        Event.observe(copyLink, 'click', function() {
-                Clipboard.copyId(id);
-            }, false);
-            
-        return tooltip;
-    },
-    
-    createActiveId: function(page, id) {
-        // Vytvoreni linku
-        var link = document.createElement("a");
-        link.className = "idLink";
-        link.href = "javascript://";
-        link.innerHTML = id;
-            
-        var tooltipName = "id_" + id;
-        
-        if (!Tooltip.isRegistered(tooltipName)) {
-            Tooltip.register(tooltipName, function() { return MaPlus.createActiveIdTooltip(page, id); });
-        }
-                
-        Tooltip.attach(link, tooltipName);
-        
-        return link;
-    },
-    
-    createActiveUnit: function(page, jmeno) {
-        var jednotka = Jednotky.vyhledej(jmeno);
-        if (!jednotka)
-            return null;
-            
-        // Vytvoreni linku
-        var link = document.createElement("a");
-        link.className = "idLink";
-        link.href = "javascript://";
-        link.innerHTML = jmeno;
-
-        // Sestav html tooltipu
-        if (!page.jednotkaTemplate) {
-            page.jednotkaTemplate = new Template(Chrome.loadText("html/jednotka.htm"));
-            page.jednotkaTooltips = new Hash();
-        }
-        
-        // Najdi tooltip pro danou jednotku
-        var tooltip = page.jednotkaTooltips[jednotka.jmeno];
-        
-        // Vytvor tooltip
-        if (!tooltip) {
-            // Uprav data o jednotce pro zobrazeni
-            jednotka.iniColor = Color.fromRange(jednotka.realIni, 5, 35, Color.Pickers.redGreen);
-            jednotka.phb = (jednotka.typ != "Str.") ? jednotka.phb : "";
-            jednotka.druh = jednotka.druh.replace(/[.]$/, "");
-            jednotka.typ = jednotka.typ.replace(/[.]$/, "");
-            
-            var html = page.jednotkaTemplate.evaluate(jednotka);
-            tooltip = Tooltip.create(html, "jednotkaTooltip", false);    
-            page.jednotkaTooltips[jednotka.jmeno] = tooltip;
-        }   
-        
-        Tooltip.attach(link, tooltip);
-        return link;
     }
 };
 
@@ -285,5 +175,121 @@ var SafeLink = {
         elem.style.color = "red";
         
         this._timer = setTimeout(function() { SafeLink._releaseLink(); }, SafeLink.TIMEOUT);
+    }
+};
+
+/*** MaPlus.Tooltips ***/
+
+MaPlus.Tooltips = {
+    createActiveId: function(page, id) {
+        // Vytvoreni linku
+        var link = document.createElement("a");
+        link.className = "idLink";
+        link.href = "javascript://";
+        link.innerHTML = id;
+            
+        var tooltipName = "id_" + id;
+        
+        if (!Tooltip.isRegistered(tooltipName)) {
+            var _this = this;
+            Tooltip.register(tooltipName, function() { return _this._createActiveIdTooltip(page, id); });
+        }
+                
+        Tooltip.attach(link, tooltipName);
+        return link;
+    },
+    
+    createActiveUnit: function(page, jmeno) {
+        var jednotka = Jednotky.vyhledej(jmeno);
+        if (!jednotka)
+            return null;
+            
+        // Vytvoreni linku
+        var link = document.createElement("a");
+        link.className = "idLink";
+        link.href = "javascript://";
+        link.innerHTML = jmeno;
+            
+        var tooltipName = "jednotka_" + jmeno;
+        
+        if (!Tooltip.isRegistered(tooltipName)) {
+            var _this = this;
+            Tooltip.register(tooltipName, function() { return _this._createActiveUnitTooltip(page, jednotka); });
+        }
+                
+        Tooltip.attach(link, tooltipName);
+        return link;
+    },
+
+    _createActiveIdTooltip: function(page, id) {
+        // Najdi informace o hraci
+        var provincie = MaData.najdiProvincii(id);
+        
+        var html = '<table>';
+        html += '<tr>';
+        html += '  <td colspan="2"><span><b>' + id + '</b>&nbsp;</span>';
+        html += '  <a href="javascript://"><sup><span class="small">(zkopírovat)</span></sup></a></td>';
+        html += '</tr>';
+        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: id}) + '"><span>Vyslat špehy</span></a></td></tr>';
+        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: id}) + '"><span>Napsat zprávu</span></a></td></tr>';
+
+        // Dalsi info
+        if (provincie) {
+            var pridejRadek = function(jmeno, hodnota)
+                {
+                    if (hodnota && hodnota != "")
+                        html += '<tr><td><span class="small">' + jmeno + '&nbsp;&nbsp;</span></td><td><span class="small">' + hodnota + '</span></td></tr>'
+                };
+        
+            html += '<tr><td height="5"></td></tr>';
+            pridejRadek("Regent", provincie.regent);
+            pridejRadek("Provincie", provincie.provincie);
+            pridejRadek("Přesvědčení", JMENA_PRESVEDCENI[provincie.presvedceni]);
+            pridejRadek("Povolání", provincie.povolani);
+
+            if (provincie.aliance) {
+                var aliance = MaData.najdiAlianci(provincie.aliance);
+                
+                if (aliance) {
+                    var url = MaPlus.buildUrl(page, "aliance.html", {aliance: "vypis_clenu_v_ally_" + aliance.id});
+                    pridejRadek("Aliance", '<a href="' + url + '">' + provincie.aliance + '</a>');
+                }
+                else {
+                    pridejRadek("Aliance", provincie.aliance);
+                }
+            }
+        }
+        
+        html += '</table>';
+        
+        var tooltip = Tooltip.create(html, "tooltip", false);
+        
+        var copyLink = $XF('table/tbody/tr/td/a', tooltip);
+        if (!copyLink)
+            throw new Exception("Internal error. Copy link not found.");
+        
+        Event.observe(copyLink, 'click', function() {
+                Clipboard.copyId(id);
+            }, false);
+            
+        return tooltip;
+    },
+    
+    _createActiveUnitTooltip: function(page, jednotka) {
+        // Sestav html tooltipu
+        if (!page.jednotkaTemplate) {
+            page.jednotkaTemplate = new Template(Chrome.loadText("html/jednotka.htm"));
+        }
+        
+        // Uprav data o jednotce pro zobrazeni
+        jednotka.iniColor = Color.fromRange(jednotka.realIni, 5, 35, Color.Pickers.redGreen);
+        jednotka.phb = (jednotka.typ != "Str.") ? jednotka.phb : "";
+        jednotka.druh = jednotka.druh.replace(/[.]$/, "");
+        jednotka.typ = jednotka.typ.replace(/[.]$/, "");
+        
+        var html = page.jednotkaTemplate.evaluate(jednotka);
+        var tooltip = Tooltip.create(html, "tooltip", false);
+        
+        return tooltip;
     }
 };

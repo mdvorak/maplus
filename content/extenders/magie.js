@@ -41,7 +41,7 @@ pageExtenders.add(PageExtender.create({
         if (!context.tableKouzla)
             return false;
             
-        if (XPath.evaluateNumber('count(tbody/tr[@bgColor = "#303030"])', context.tableKouzla) == 0)
+        if (XPath.evalNumber('count(tbody/tr[@bgColor = "#303030"])', context.tableKouzla) == 0)
             return false;
             
         context.tdBottom = $XF('tbody/tr[last()]/td[2]', context.tableKouzla);
@@ -103,7 +103,7 @@ pageExtenders.add(PageExtender.create({
                 if (id && !isNaN(id)) {
                     e.innerHTML = "";
                     e.appendChild(document.createTextNode("("));
-                    e.appendChild(MaPlus.createActiveId(page, id));
+                    e.appendChild(MaPlus.Tooltips.createActiveId(page, id));
                     e.appendChild(document.createTextNode(")"));
                     e.appendChild(document.createTextNode(provincie));
                 }

@@ -120,6 +120,11 @@ Object.extend(Object, {
         }
         else // obj2 == NaN, obj1 == Number
             return -1;
+    },
+    
+    isArray: function(obj) {
+        // May look wierd but should work
+        return obj && (obj.slice == new Array().slice) && (obj.length != null); 
     }
 });
 
@@ -160,7 +165,7 @@ Object.extend(Element, {
     }
 });
 
-/*** Exception clazz ***/
+/*** Exception class ***/
 var Exception = Class.create();
 
 Exception.prototype = {
@@ -207,7 +212,7 @@ Object.extend(Exception, {
     }
 });
 
-/*** ArgumentException clazz ***/
+/*** ArgumentException class ***/
 var ArgumentException = Class.inherit(Exception);
 
 Object.extend(ArgumentException.prototype, {
@@ -262,7 +267,7 @@ Object.extend(InvalidOperationException.prototype, {
     }
 });
 
-/*** XPathException clazz ***/
+/*** XPathException class ***/
 var XPathException = Class.inherit(Exception);
 
 XPathException.DEFAULT_MESSAGE = "Error evaluating XPath expression.";
@@ -292,7 +297,7 @@ Object.extend(XPathException.prototype, {
     }
 });
 
-/*** XPath clazz ***/
+/*** XPath class ***/
 var XPath = {
     evaluate: function(xpath, context, resultType) {
         try {
@@ -311,7 +316,7 @@ var XPath = {
         }
     },
     
-    evaluateList: function(xpath, context) {
+    evalList: function(xpath, context) {
         var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
         var list = new Array();
         
@@ -324,37 +329,37 @@ var XPath = {
         return list;
     },
     
-    evaluateSingle: function(xpath, context) {
+    evalSingle: function(xpath, context) {
         var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
         return result ? $X(result.iterateNext()) : null;
     },
     
-    evaluateString: function(xpath, context) {
+    evalString: function(xpath, context) {
         var result = this.evaluate(xpath, context, XPathResult.STRING_TYPE);
         return result ? result.stringValue : null;
     },
     
-    evaluateNumber: function(xpath, context) {
+    evalNumber: function(xpath, context) {
         var result = this.evaluate(xpath, context, XPathResult.NUMBER_TYPE);
         return result ? result.numberValue : null;
     }
 };
 
 XPath.Methods = {
-    evaluateList: function(xpath) {
-        return XPath.evaluateList(xpath, this);
+    evalList: function(xpath) {
+        return XPath.evalList(xpath, this);
     },
     
-    evaluateSingle: function(xpath) {
-        return XPath.evaluateSingle(xpath, this);
+    evalSingle: function(xpath) {
+        return XPath.evalSingle(xpath, this);
     },
     
-    evaluateString: function(xpath) {
-        return XPath.evaluateString(xpath, this);
+    evalString: function(xpath) {
+        return XPath.evalString(xpath, this);
     },
     
-    evaluateNumber: function(xpath) {
-        return XPath.evaluateNumber(xpath, this);
+    evalNumber: function(xpath) {
+        return XPath.evalNumber(xpath, this);
     }
 };
 
@@ -381,14 +386,14 @@ function $X(element) {
 }
 
 function $XF(xpath, context) {
-    return XPath.evaluateSingle(xpath, context);
+    return XPath.evalSingle(xpath, context);
 }
 
 function $XL(xpath, context) {
-    return XPath.evaluateList(xpath, context);
+    return XPath.evalList(xpath, context);
 }
 
-/*** Page clazz ***/
+/*** Page class ***/
 var Page = Class.create();
 
 Page.prototype = {
@@ -415,7 +420,7 @@ Page.prototype = {
     }
 };
 
-/*** PageExtender clazz ***/
+/*** PageExtender class ***/
 var PageExtender = Class.create();
 
 PageExtender.prototype = {
@@ -447,7 +452,7 @@ Object.extend(PageExtender, {
     }
 });
 
-/*** AbortException clazz ***/
+/*** AbortException class ***/
 var AbortException = Class.inherit(Exception);
 
 Object.extend(AbortException.prototype, {
@@ -456,7 +461,7 @@ Object.extend(AbortException.prototype, {
     }
 });
 
-/*** PageExtenderCollection clazz ***/
+/*** PageExtenderCollection class ***/
 var PageExtenderCollection = Class.create();
 
 PageExtenderCollection.prototype = {
@@ -547,7 +552,7 @@ var StyleExtender = PageExtender.createClass({
     },
 
     analyze: function(page, context) {
-        context.head = XPath.evaluateSingle('/html/head', page.document);
+        context.head = XPath.evalSingle('/html/head', page.document);
         return (context.head != null);
     },
     

@@ -50,16 +50,16 @@ pageExtenders.add(PageExtender.create({
             throw new AbortException("Id nenalezeno.");
         
         // Najdi zakladni strukturu stranky
-        page.topTable = XPath.evaluateSingle('/html/body/center/table[1]', page.document);
-        page.playerTable = XPath.evaluateSingle('/html/body/center/table[2]', page.document);
-        page.contentTable = XPath.evaluateSingle('/html/body/center/table[3]', page.document);
+        page.topTable = XPath.evalSingle('/html/body/center/table[1]', page.document);
+        page.playerTable = XPath.evalSingle('/html/body/center/table[2]', page.document);
+        page.contentTable = XPath.evalSingle('/html/body/center/table[3]', page.document);
         
         if (!page.topTable || !page.playerTable || !page.contentTable)
             throw new AbortException("Nepodarilo se najit zakladni strukturu stranky.");
         
-        page.leftMenu = XPath.evaluateSingle('tbody/tr/td[1]', page.contentTable);
-        page.rightMenu = XPath.evaluateSingle('tbody/tr/td[last()]', page.contentTable);
-        page.content = XPath.evaluateSingle('tbody/tr/td[2]', page.contentTable);
+        page.leftMenu = XPath.evalSingle('tbody/tr/td[1]', page.contentTable);
+        page.rightMenu = XPath.evalSingle('tbody/tr/td[last()]', page.contentTable);
+        page.content = XPath.evalSingle('tbody/tr/td[2]', page.contentTable);
         
         return true;
     },
@@ -68,7 +68,7 @@ pageExtenders.add(PageExtender.create({
         var value;
         
         // Link
-        var e = XPath.evaluateSingle('//a[contains(@href, "&' + name + '=") or contains(@href, "?' + name + '=")]', page.document);
+        var e = XPath.evalSingle('//a[contains(@href, "&' + name + '=") or contains(@href, "?' + name + '=")]', page.document);
         if (e) {
             var m = e.href.match("[?&]" + name + "=(.+?)(?:&|$)");
             value = (m ? m[1] : null);
@@ -76,7 +76,7 @@ pageExtenders.add(PageExtender.create({
         
         // Form input (toto by nemelo byt nikdy potreba ale proc to tu nenechat?)
         if (!value) {
-            var e = XPath.evaluateSingle('//input[@name = "' + name + '"]', page.document);
+            var e = XPath.evalSingle('//input[@name = "' + name + '"]', page.document);
             if (e)
                 value = elem.value;
         }

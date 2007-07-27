@@ -56,7 +56,7 @@ var Jednotky = {
             this.root = document.implementation.createDocument("", "", null);
         }
         
-        this.data = elementEvaluateSingle(this.root, '/jednotky')
+        this.data = XPath.evalSingle(this.root, '/jednotky')
         if (this.data == null) {
             this.data = this.root.createElement("jednotky");
             this.root.appendChild(this.data);

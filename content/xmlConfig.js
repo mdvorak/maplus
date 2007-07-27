@@ -69,7 +69,7 @@ var XmlConfig = {
         try {
             var doc = FileIO.loadXmlFile(path);
             
-            root = XPath.evaluateSingle(rootName, doc);
+            root = XPath.evalSingle(rootName, doc);
             if (!root)
                 dump(String.format("Root node '{0}' not found in the file '{1}'.", rootName, path));
             
