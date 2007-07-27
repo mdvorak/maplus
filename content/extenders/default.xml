@@ -23,7 +23,7 @@
     <script url="#{melior}/magie.html" name="magie.js" />
 
     <!-- Post processing -->
-    <script url="#{melior}/*" name="theme.js" />
     <script url="#{melior}/*" name="postprocessing.js" />
+    <script url="#{melior}/*" name="theme.js" />
   </extenders>
 </webExtender>

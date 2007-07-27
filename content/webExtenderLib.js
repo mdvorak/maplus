@@ -507,7 +507,7 @@ PageExtenderCollection.prototype = {
         catch (ex) {
             if (Exception.getExceptionType(ex) != "AbortException") {
                 dump(String.format("Unhandled exception occured during extenders execution:\n'{0}'", ex));
-                // alert(ex);
+                alert(ex);
             }
             return false;
         }

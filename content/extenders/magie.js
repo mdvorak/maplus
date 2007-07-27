@@ -38,18 +38,28 @@
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         context.tableKouzla = $XF('//table[contains(tbody/tr[2]/td[4]/font, "seslání")]');
-        return (context.tableKouzla != null && context.tableKouzla.rows.length > 3);
+        if (!context.tableKouzla)
+            return false;
+            
+        if (XPath.evaluateNumber('count(tbody/tr[@bgColor = "#303030"])', context.tableKouzla) == 0)
+            return false;
+            
+        context.tdBottom = $XF('tbody/tr[last()]/td[2]', context.tableKouzla);
+        
+        return (context.tdBottom != null);
     },
     
     process: function(page, context) {
-        context.tableKouzla.id = "id_kouzlaTable";
+        var tableKouzla = context.tableKouzla;
+        var hiddenRows = new Array();
     
-        for (var i = 2; i < context.tableKouzla.rows.length - 1; i++) {
-            var row = context.tableKouzla.rows[i];
+        for (var i = 2; i < tableKouzla.rows.length - 1; i++) {
+            var row = tableKouzla.rows[i];
             
             // Radek s popiskem nebo meziradek, skryt oba
             if (row.bgColor == "#303030" || row.bgColor == "") {
-                row.style.display = 'none';
+                $(row).hide();
+                hiddenRows.push(row);
             }
             else {
                 if (i % 2) row.bgColor = "#000000";
@@ -57,14 +67,18 @@ pageExtenders.add(PageExtender.create({
             }
         }
         
-        var zobrazPopiskyScript = "var t = document.getElementById('id_kouzlaTable');";
-        zobrazPopiskyScript += " for (var i = 0; i < t.rows.length; i++)";
-        zobrazPopiskyScript += "   t.rows[i].style.display = '';";
-        zobrazPopiskyScript += " this.style.display = 'none';";
-        zobrazPopiskyScript += " t.style.overflowX = 'scroll';"; // Tohle donuti preklesleni tabulky takze se roztahne
-        
-        var lastRow = context.tableKouzla.rows[context.tableKouzla.rows.length - 1];
-        lastRow.cells[1].innerHTML = '<a href="javascript://" onclick="' + zobrazPopiskyScript + '"><font size="1">Zobrazit popisky</font></a>';
+        // Link na zobrazeni popisku
+        var aZobrazPopisky = document.createElement("a");
+        aZobrazPopisky.innerHTML = '<span class="small">Zobrazit popisky</small>';
+        aZobrazPopisky.href = "javascript://";
+        context.tdBottom.appendChild(aZobrazPopisky);
+
+        Event.observe(aZobrazPopisky, 'click', function(event) {
+                hiddenRows.each(function(e) { $(e).show(); });
+                $(this).hide();
+                // Tohle donuti preklesleni tabulky takze se roztahne
+                tableKouzla.style.overflowX = "scroll"; 
+            }, false);
     }
 }));
 
@@ -72,12 +86,12 @@ pageExtenders.add(PageExtender.create({
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         context.tablePredkouzleno = $XF('//table[tbody/tr[2]/td[4]/font/b = "Název"]');
+        if (!context.tablePredkouzleno)
+            return false;
         
-        if (context.tablePredkouzleno) {
-            context.naProvincii = $XL('tbody/tr/td[5]/font', context.tablePredkouzleno);
-        }
+        context.naProvincii = $XL('tbody/tr/td[5]/font', context.tablePredkouzleno);
         
-        return (context.naProvincii != null && context.naProvincii.length > 0);
+        return (context.naProvincii.length > 0);
     },
     
     process: function(page, context) {

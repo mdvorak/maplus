@@ -38,6 +38,7 @@ var ExtenderCollection = Class.create();
 
 ExtenderCollection.prototype = {
     initialize: function() {
+        this._position = 0;
         this._generic = new Array();
         this._siteMap = new Hash();
         this._cache = new Hash();
@@ -73,6 +74,9 @@ ExtenderCollection.prototype = {
         
         // Clear cache
         this._cache.remove();
+        
+        // Because generic extenders are in different list, we needs to track the real order
+        extender._ExtenderCollection_position = this._position++;
         
         // Special case - generic extender
         if (url == "*") {
@@ -110,10 +114,11 @@ ExtenderCollection.prototype = {
         if (!extenders) {  
             var site = this._siteMap[analyzedUrl.site];
             if (site) {
-                extenders = new PageExtenderCollection();
+                // We need to sort extenders
+                var tmpList = new Array();
                 
                 // Add generic extenders
-                this._generic.each(function(e) { extenders.add(e); });
+                this._generic.each(function(e) { tmpList.add(e); });
             
                 // Find all suitable extenders
                 site.keys().each(function(k) {
@@ -130,8 +135,15 @@ ExtenderCollection.prototype = {
                         }
                         
                         if (add)
-                            site[k].each(function(e) { extenders.add(e); });
+                            site[k].each(function(e) { tmpList.push(e); });
                     });
+                    
+                // Sort them
+                tmpList.sort(function(a, b) { return a._ExtenderCollection_position - b._ExtenderCollection_position; });
+                
+                // Create collection
+                extenders = new PageExtenderCollection();
+                tmpList.each(function(e) { extenders.add(e); });
                     
                 this._cache[analyzedUrl.address] = extenders;
             }
