@@ -42,7 +42,9 @@ Object.extend(Function, {
 
 Object.extend(Class, {
     _createMethodWithBase: function(__owner, base /*, method */) {
+        // Redeclaring method is nescessary because it automaticly takes local variable base.
         var __method = eval("(" + arguments[2] + ")");
+        // Return new method called in the context of object instance
         return function() {
                 return __method.apply(__owner, arguments);
             };
@@ -51,8 +53,12 @@ Object.extend(Class, {
     inherit: function(baseClass) {
         if (!baseClass)
             throw "baseClass is null.";
-                
+            
         var cls = function() {
+            // Object is not completed - it's prototype is created right now
+            if (!arguments.callee.__baseClass)
+                return;
+        
             // Create base object
             var base = new Class.BaseObject(this, baseClass);
             // Override local methods so they will support base variable
@@ -66,18 +72,19 @@ Object.extend(Class, {
             this.initialize.apply(this, arguments);
         };
         
+        // copy "static" methods (this will also copy parent prototype object)
+        Object.extend(cls, baseClass);
+        // copy "instance" methods (and set proper constructor reference)
+        cls.prototype = Object.extend(new cls(), baseClass.prototype);
+        
         // Set baseClass property
         cls.__baseClass = baseClass;
-        
-        // copy "static" methods
-        Object.extend(cls, baseClass);
-        // copy "instance" methods
-        cls.prototype = Object.extend({}, baseClass.prototype);
         
         return cls;
     }
 });
 
+// Helper class
 Class.BaseObject = function(owner, clazz) {
     var base = null;
     if (clazz.__baseClass) {
@@ -120,11 +127,6 @@ Object.extend(Object, {
         }
         else // obj2 == NaN, obj1 == Number
             return -1;
-    },
-    
-    isArray: function(obj) {
-        // May look wierd but should work
-        return obj && (obj.slice == new Array().slice) && (obj.length != null); 
     }
 });
 
@@ -178,20 +180,12 @@ Exception.prototype = {
     getType: function() {
         return "Exception";
     },
-    
-    getMessage: function() {
-        return this.message;
-    },
-    
-    getInnerException: function() {
-        return this.innerException;
-    },
-    
+        
     getDescription: function() {
         var str = this.getType();
         
-        if (this.getMessage())
-            str += ": " + this.getMessage();
+        if (this.message)
+            str += ": " + this.message;
             
         return str;
     },
@@ -199,8 +193,8 @@ Exception.prototype = {
     toString: function() {
         var str = this.getDescription();
         
-        if (this.getInnerException())
-            str += "\n>>" + this.getInnerException().toString().replace(/\n/g, "\n>>");
+        if (this.innerException)
+            str += "\n>>" + this.innerException.toString().replace(/\n/g, "\n>>");
             
         return str;
     }
@@ -226,20 +220,12 @@ Object.extend(ArgumentException.prototype, {
     getType: function() {
         return "ArgumentException";
     },
-    
-    getName: function() {
-        return this.name;
-    },
-    
-    getValue: function() {
-        return this.value;
-    },
-    
+
     getDescription: function() {
         var str = base.getDescription();
         
-        if (this.getName())
-            str += String.format("\nargument name='{0}' value='{1}'", this.getName(), String(this.getValue()));
+        if (this.name)
+            str += String.format("\nargument name='{0}' value='{1}'", this.name, String(this.value));
     }
 });
 
@@ -283,15 +269,11 @@ Object.extend(XPathException.prototype, {
         return "XPathException";
     },
     
-    getExpression: function() {
-        return this.expression;
-    },
-    
     getDescription: function() {
         var str = base.getDescription();
         
-        if (this.getExpression())
-            str += "\nexpression: '" + this.getExpression() + "'";
+        if (this.expression)
+            str += "\nexpression: '" + this.expression + "'";
 
         return str;
     }
@@ -322,7 +304,7 @@ var XPath = {
         
         if (result) {
             for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
-                list.push($X(i));
+                list.push($(i));
             }
         }
         
@@ -331,7 +313,7 @@ var XPath = {
     
     evalSingle: function(xpath, context) {
         var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
-        return result ? $X(result.iterateNext()) : null;
+        return result ? $(result.iterateNext()) : null;
     },
     
     evalString: function(xpath, context) {
@@ -345,47 +327,7 @@ var XPath = {
     }
 };
 
-XPath.Methods = {
-    evalList: function(xpath) {
-        return XPath.evalList(xpath, this);
-    },
-    
-    evalSingle: function(xpath) {
-        return XPath.evalSingle(xpath, this);
-    },
-    
-    evalString: function(xpath) {
-        return XPath.evalString(xpath, this);
-    },
-    
-    evalNumber: function(xpath) {
-        return XPath.evalNumber(xpath, this);
-    }
-};
-
-Object.extend(XPath, {
-    extend: function(element) {
-        element = $(element);
-    
-        if (!element || element._xpathExtended)
-            return element;
-    
-        for (var property in XPath.Methods) {
-            var value = XPath.Methods[property];
-            if (typeof value == 'function' && !(property in element)) 
-                element[property] = value;
-        }
-        
-        element._xpathExtended = true;
-        return element;
-    }
-});
-
-function $X(element) {
-    return XPath.extend(element);
-}
-
-function $XF(xpath, context) {
+function $X(xpath, context) {
     return XPath.evalSingle(xpath, context);
 }
 
@@ -580,17 +522,14 @@ Object.extend(MarshalException.prototype, {
         return "MarshalException";
     },
     
-    getObjectName: function() { return this.objectName; },
-    getMethodName: function() { return this.methodName; },
-    
     getDescription: function() {
         var str = base.getDescription();
         
-        if (this.getObjectName())
-            str += "\nobject name='" + this.getObjectName() + "'";
+        if (this.objectName)
+            str += "\nobject name='" + this.objectName + "'";
             
-        if (this.getMethodName())
-            str += "\nmethod name='" + this.getMethodName() + "'";
+        if (this.methodName)
+            str += "\nmethod name='" + this.methodName + "'";
             
         return str;
     }

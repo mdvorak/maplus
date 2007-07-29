@@ -348,6 +348,8 @@ var Marshal = {
     NONE: 0,
     BY_VALUE: 1,
     BY_REF: 2,
+    // Method must return either null or array of objects
+    BY_REF_ARRAY: 3,
     // Change with care
     DEFAULT: 0,
 
@@ -425,35 +427,37 @@ var Marshal = {
                     
                     case Marshal.BY_REF:
                         // TODO optimize code so same objects will have same id
+                        var objectId = this._getLocalObjectId(elem.ownerDocument, retval);
+                        var def = this._createProxyDefinition(retval);
                         
-                        // Create list of temporary objects
-                        var marshalObjects = elem.ownerDocument._marshalObjects;
-                        if (!marshalObjects) {
-                            marshalObjects = new Hash();
-                            elem.ownerDocument._marshalObjects = marshalObjects;
-                        }
+                        var reference = {
+                            objectId: objectId,
+                            proxyDefinition: def
+                        };
                         
-                        if (!Object.isArray(retval)) {
-                            // Return value is single object
-                            var objectId = ++this._objectId;
-                            var def = this._createProxyDefinition(retval);
-                            marshalObjects[objectId] = retval;
+                        elem.setAttribute("reference", Object.toJSON(reference));
+                        break;
+                        
+                    case Marshal.BY_REF_ARRAY:
+                        if (!(retval instanceof Array))
+                            throw new MarshalException("Returned object is not an array.", objectName, methodName);
+                    
+                        var objects = new Array();
+                    
+                        for (var i = 0; i < retval.length; i++) {
+                            var obj = retval[i];
+                            var objectId = this._getLocalObjectId(elem.ownerDocument, obj);
+                            var def = this._createProxyDefinition(obj);
                             
-                            elem.setAttribute("objectId", objectId);
-                            elem.setAttribute("proxyDefinition", Object.toJSON(def));
-                        }
-                        else {
-                            // Return value is array of objects
-                            var objectIds = new Array();
+                            var reference = {
+                                objectId: objectId,
+                                proxyDefinition: def
+                            };
                             
-                            for (var i = 0; i < retval.length; i++) {
-                                var objectId = ++this._objectId;
-                                marshalObjects[objectId] = retval[i];
-                                
-                                objectIds.push(objectId);
-                            }
+                            objects.push(reference);
                         }
-                        
+                    
+                        elem.setAttribute("list", Object.toJSON(objects));
                         break;
                         
                     default:
@@ -520,9 +524,43 @@ var Marshal = {
             case Marshal.BY_REF:
                 return Marshal.BY_REF;
                 
+            case Marshal.BY_REF_ARRAY:
+                return Marshal.BY_REF_ARRAY;
+                
             default:
                 return Marshal.NONE;
         }
+    },
+    
+    _getLocalObjectId: function(doc, obj) {
+        var objectId;
+    
+        // Create list of methods
+        var marshalObjects = doc._marshalObjects;
+        if (!marshalObjects) {
+            marshalObjects = new Hash();
+            doc._marshalObjects = marshalObjects;
+        }
+        else {
+            try {
+                marshalObjects.keys().each(
+                    function(k) {
+                        if (marshalObjects[k] == obj) {
+                            objectId = k;
+                            throw null;
+                        }
+                    });
+            }
+            catch(ex) {
+                if (ex) throw ex;
+            }
+        }
+        
+        if (!objectId)
+            objectId = ++this._objectId;
+        
+        marshalObjects[objectId] = obj;
+        return objectId;
     }
 };
 

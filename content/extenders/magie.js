@@ -37,14 +37,14 @@
 // Skryti popisku kouzel
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
-        context.tableKouzla = $XF('//table[contains(tbody/tr[2]/td[4]/font, "seslání")]');
+        context.tableKouzla = $X('//table[contains(tbody/tr[2]/td[4]/font, "seslání")]');
         if (!context.tableKouzla)
             return false;
             
         if (XPath.evalNumber('count(tbody/tr[@bgColor = "#303030"])', context.tableKouzla) == 0)
             return false;
             
-        context.tdBottom = $XF('tbody/tr[last()]/td[2]', context.tableKouzla);
+        context.tdBottom = $X('tbody/tr[last()]/td[2]', context.tableKouzla);
         
         return (context.tdBottom != null);
     },
@@ -85,7 +85,7 @@ pageExtenders.add(PageExtender.create({
 // Aktivni id v cilech kouzel
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
-        context.tablePredkouzleno = $XF('//table[tbody/tr[2]/td[4]/font/b = "Název"]');
+        context.tablePredkouzleno = $X('//table[tbody/tr[2]/td[4]/font/b = "Název"]');
         if (!context.tablePredkouzleno)
             return false;
         

@@ -264,7 +264,7 @@ MaPlus.Tooltips = {
         
         var tooltip = Tooltip.create(html, "tooltip", false);
         
-        var copyLink = $XF('table/tbody/tr/td/a', tooltip);
+        var copyLink = $X('table/tbody/tr/td/a', tooltip);
         if (!copyLink)
             throw new Exception("Internal error. Copy link not found.");
         

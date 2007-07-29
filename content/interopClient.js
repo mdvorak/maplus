@@ -56,27 +56,59 @@ var Marshal = {
             
             Event.dispatch(elem, "MarshalMethodCall", true);
             
+            // Exception
             if (elem.getAttribute("exception")) {
                 var ex = elem.getAttribute("exception").evalJSON();
                 throw new RemoteException(objectName, methodName, ex);
             }
-            else if (elem.getAttribute("retval"))
+            // Simple type
+            else if (elem.getAttribute("retval")) {
                 return elem.getAttribute("retval").evalJSON();
-            else if (elem.getAttribute("objectId")) {
+            }
+            // Single object reference
+            else if (elem.getAttribute("reference")) {
                 // Create proxy object
-                var objectId = elem.getAttribute("objectId");
-                var proxyDefinition = elem.getAttribute("proxyDefinition");
+                var reference = elem.getAttribute("reference").evalJSON();
                 
-                if (!proxyDefinition)
-                    throw new MarshalException("Unable to find proxy definition.", objectName, methodName);
+                if (!reference.objectId)
+                    throw new MarshalException("Unable to find returned reference id.", objectName, methodName);
+                if (!reference.proxyDefinition)
+                    throw new MarshalException("Unable to find returned reference proxy definition.", objectName, methodName);
 
-                var proxy = this._proxyCache[objectId];
+                var proxy = this._proxyCache[reference.objectId];
                 if (!proxy) {
-                    proxy = this._createProxyFromDefinition(objectId, proxyDefinition.evalJSON());
+                    proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition);
+                    this._proxyCache[reference.objectId] = proxy;
                 }
                 
                 return proxy;
             }
+            // Object reference list
+            else if (elem.getAttribute("list")) {
+                var list = elem.getAttribute("list").evalJSON();
+                var proxies = new Array();
+                
+                // Create list of proxy objects
+                for (var i = 0; i < list.length; i++) {
+                    var reference = list[i];
+                    
+                    if (!reference.objectId)
+                        throw new MarshalException("Unable to find returned reference id.", objectName, methodName);
+                    if (!reference.proxyDefinition)
+                        throw new MarshalException("Unable to find returned reference proxy definition.", objectName, methodName);
+
+                    var proxy = this._proxyCache[reference.objectId];
+                    if (!proxy) {
+                        proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition);
+                        this._proxyCache[reference.objectId] = proxy;
+                    }
+                    
+                    proxies[i] = proxy;
+                }
+                
+                return proxies;
+            }
+            // No return value
             else {
                 return;
             }

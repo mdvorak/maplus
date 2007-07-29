@@ -34,10 +34,10 @@ var Kalkulacka = {
         
         var expression = kalkulacka.value;
         
-        expression = expression.replace(/\b(\d+)K\b/g, "$1*1000")
-                               .replace(/\b(\d+)M\b/g, "$1*1000000")
-                               .replace(/(\d*),(\d+)\b/g, "$1.$2")
-                               .replace(/\b(\d+(?:[.]\d+)?)[%](?=\D|$)/g, "$1/100");
+        expression = expression.replace(/\b(\d+)K\b/g, "($1*1000)")
+                               .replace(/\b(\d+)M\b/g, "($1*1000000)")
+                               .replace(/(\d*),(\d+)\b/g, "($1.$2)")
+                               .replace(/\b(\d+(?:[.]\d+)?)[%](?=\D|$)/g, "($1/100)");
 
         var r;
         try {

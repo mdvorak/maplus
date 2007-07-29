@@ -37,7 +37,7 @@
 // Rozsirene menu
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
-        context.utoky = $XF('font/a[contains(., "Výpisy") and contains(., "útoků")]', page.rightMenu); // pozn: netusim jak ho donutit brat mezeru
+        context.utoky = $X('font/a[contains(., "Výpisy") and contains(., "útoků")]', page.rightMenu); // pozn: netusim jak ho donutit brat mezeru
         
         return (context.utoky != null);
     },

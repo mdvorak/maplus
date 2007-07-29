@@ -207,6 +207,11 @@ XmlConfigNode.prototype = {
         while (this.firstChild) {
             this.removeChild(this.firstChild);
         }
+    },
+    
+    getPrefNodeList_PROXY: Marshal.BY_REF_ARRAY,
+    getPrefNodeList: function(xpath) {
+        return XPath.evalList(xpath, this);
     }
 };
 

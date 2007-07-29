@@ -51,7 +51,7 @@ pageExtenders.add(PageExtender.create({
         
         document.body.appendChild(div);
         
-        var link = $XF('//a[@id = "plus_enable"]');
+        var link = $X('//a[@id = "plus_enable"]');
         if (!link) 
             throw String.format("Unable to find 'plus_enable' link.");
         
@@ -116,8 +116,8 @@ pageExtenders.add(PageExtender.create({
             
         // Pridej kontrolu i na objevovat
         if (context.fields.length > 0 && parseInt(context.fields[0].value) > maxTahu) {
-            var cekat = $XF('//a[starts-with(@href, "wait.html")]');
-            var objevovat = $XF('//a[starts-with(@href, "explore.html")]');
+            var cekat = $X('//a[starts-with(@href, "wait.html")]');
+            var objevovat = $X('//a[starts-with(@href, "explore.html")]');
             
             var zprava2 = "Je možné, že odehrajete více jak " + maxTahu + " tahů, chcete pokračovat?";
             

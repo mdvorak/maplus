@@ -37,13 +37,11 @@
 // Linky na aliance
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
-        context.aliance1 = page.config.getAliance().getNumber("aliance1");
-        context.aliance2 = page.config.getAliance().getNumber("aliance2");
-        
-        if (context.aliance1 == null || isNaN(context.aliance1))
+        context.aliance = page.config.getAliance().getPrefNodeList("aliance");
+        if (context.aliance == null || context.aliance.length == 0)
             return false;
     
-        context.alianceLink = $XF('font/a[. = "Aliance"]', page.rightMenu); 
+        context.alianceLink = $X('font/a[. = "Aliance"]', page.rightMenu); 
         
         return (context.alianceLink != null);
     },

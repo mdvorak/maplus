@@ -33,13 +33,62 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
+
+// Analyza alianci kde sem clenem
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
+        var typStranky = page.arguments["aliance"];
+
+        if (!typStranky) {
+            var nastavit = $XL('//a[starts-with(@href, "aliance.html") and font = "Nastavit"]');
+            
+            if (nastavit.length > 0) {
+                // page.prefs.aliance.clearChildNodes();
+                
+                nastavit.each(function(a) {
+                        var m = a.href.match(/&aliance=nastavit_(\d+)/);
+                        var id = m ? m[1] : null;
+                        
+                        if (id) {
+                           // TODO 
+                        }
+                    });
+            }
+        }
+    
         return false;
+    }
+}));
+
+// Analyza clenu aliance
+pageExtenders.add(PageExtender.create({
+    analyze: function(page, context) {
+        var typStranky = page.arguments["aliance"];
+        return (typStranky && typStranky.search("vypis_clenu_v_ally_") == 0);
     },
     
     process: function(page, context) {
     }
-}
+}));
 
+// Analyza seznamu alianci
+pageExtenders.add(PageExtender.create({
+    analyze: function(page, context) {
+        var typStranky = page.arguments["aliance"];
+        return (typStranky == "vypis_alianci");
+    },
+    
+    process: function(page, context) {
+    }
+}));
+
+// Hromadne zpravy - Nastaveni aliance
+pageExtenders.add(PageExtender.create({
+    analyze: function(page, context) {
+        var typStranky = page.arguments["aliance"];
+        return (typStranky && typStranky.search("nastavit_") == 0);
+    },
+    
+    process: function(page, context) {
+    }
+}));
