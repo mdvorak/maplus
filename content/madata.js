@@ -53,13 +53,17 @@ var MaData = {
         XmlConfig.save(path, this.data);
     },
     
+    _ensureDataAreLoaded: function() {
+        if (!this.data)
+            this.load();
+    },
+    
     najdiProvincii_PROXY: Marshal.BY_VALUE,
     najdiProvincii: function(id) {
         if (id == null || isNaN(id))
             return null;
             
-        if (!this.root)
-            this.load();
+        this._ensureDataAreLoaded();
     
         var provi = this.seznamProvincii.getPrefNodeByXPath('provincie[@id = "' + id + '"]');
         
@@ -82,8 +86,7 @@ var MaData = {
         if (id == null || isNaN(id))
             return;
             
-        if (!this.root)
-            this.load();
+        this._ensureDataAreLoaded();
     
         var provi = this.seznamProvincii.getPrefNodeByXPath('provincie[@id = "' + id + '"]');
         
@@ -104,8 +107,7 @@ var MaData = {
         if (jmeno == null || jmeno == ZADNA_ALIANCE)
             return null;
     
-        if (!this.root)
-            this.load();
+        this._ensureDataAreLoaded();
     
         var ali = this.seznamAlianci.getPrefNodeByXPath('aliance[jmeno = "' + jmeno + '"]');
         
@@ -125,8 +127,7 @@ var MaData = {
         if (zacatekJmena == null || zacatekJmena == ZADNA_ALIANCE)
             return null;
             
-        if (!this.root)
-            this.load();
+        this._ensureDataAreLoaded();
             
         zacatekJmena = zacatekJmena.replace(/[.]{2,3}$/, "");
         
@@ -144,8 +145,7 @@ var MaData = {
         if (jmeno == null || jmeno == ZADNA_ALIANCE)
             return;
             
-        if (!this.root)
-            this.load();
+        this._ensureDataAreLoaded();
         
         var ali = this.seznamAlianci.getPrefNodeByXPath('aliance[jmeno = "' + jmeno + '"]');
         

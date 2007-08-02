@@ -143,13 +143,15 @@ XmlConfigNode.prototype = {
     
     getPref_PROXY: Marshal.BY_VALUE,
     getPref: function(name, defaultValue) {
-        var elem = this.getPrefNode(name);
+        // Use this when no name where specified
+        var elem = (name ? this.getPrefNode(name) : this);
         return elem ? elem.textContent : defaultValue;
     },
     
     setPref_PROXY: Marshal.BY_VALUE,
     setPref: function(name, value) {
-        var elem = this.getPrefNode(name);
+        // Use this when no name where specified
+        var elem = (name ? this.getPrefNode(name) : this);
         if (!elem)
             elem = this.addPref(name);
         elem.textContent = (value ? value : ""); // Lepsi prazdny string nez undefined

@@ -34,58 +34,6 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-// Linky na aliance
-pageExtenders.add(PageExtender.create({
-    analyze: function(page, context) {
-        context.aliance = page.config.getAliance().getPrefNodeList("aliance");
-        if (context.aliance == null || context.aliance.length == 0)
-            return false;
-    
-        context.alianceLink = $X('font/a[. = "Aliance"]', page.rightMenu); 
-        
-        return (context.alianceLink != null);
-    },
-    
-    process: function(page, context) {
-        // Prejmenovani puvodniho linku
-        context.alianceLink.innerHTML = "Ali";
-    
-        // Vytvoreni elementu
-        var elems = new Array();
-        
-        elems.push(document.createTextNode("&nbsp;"));
-        elems.push(this._createLink(page, "vypsat", context.aliance1, "V1"));
-        
-        if (context.aliance2) {
-            elems.push(document.createTextNode("&nbsp;"));
-            elems.push(this._createLink(page, "vypsat", context.aliance2, "V2"));
-        }
-        
-        elems.push(document.createTextNode("&nbsp;"));
-        elems.push(this._createLink(page, "nastavit", context.aliance1, "N1"));
-        
-        if (context.aliance2) {
-            elems.push(document.createTextNode("&nbsp;"));
-            elems.push(this._createLink(page, "nastavit", context.aliance2, "N2"));
-        }
-        
-        // Vlozeni elementu
-        var parent = context.alianceLink.parentNode;
-        var insertionPoint = context.alianceLink.nextSibling;
-        
-        elems.each(function(e) {
-                parent.insertBefore(e, insertionPoint);
-            });
-    },
-    
-    _createLink: function(page, akce, id, text) {
-        var e = document.createElement("a");
-        e.href = MaPlus.buildUrl(page, "aliance.html", {aliance: akce + "_" + id});
-        e.innerHTML = text;        
-        return e;
-    }
-}));
-
 // Zabranit dvojklikum na linky
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {

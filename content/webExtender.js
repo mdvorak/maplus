@@ -358,6 +358,7 @@ var Marshal = {
     // Private members
     _objects: new Hash(),
     _objectId: 0,
+    _validators: new Array(),
 
     initPage: function(page) {
         var _this = this;
@@ -366,6 +367,26 @@ var Marshal = {
         page.document.addEventListener("MarshalGetProxyDefinition", function(event) { _this._getProxyDefinitionHandler(event); }, false);
         
         Script.executeFile(page.document, CHROME_CONTENT_URL + "interopClient.js");
+    },
+    
+    // Callback must be function(document, objectName) which must throw exception when call is invalid
+    registerCallValidator: function(callback) {
+        if (!callback) 
+            throw new ArgumentNullException("callback");
+        if (typeof callback != "function")
+            throw new ArgumentException("callback", callback, "Argument is not a function.");
+            
+        this._validators.push(callback);
+    },
+    
+    registerUrlCallValidator: function(pattern) {
+        if (!pattern)
+            throw new ArgumentNullException("pattern");
+            
+        this.registerCallValidator(function(doc) {
+                if (!doc.location.href.match(pattern))
+                    throw new InvalidOperationException("This call is not enabled by the host security.");
+            });
     },
     
     registerObject: function(name, obj) {
@@ -396,7 +417,9 @@ var Marshal = {
                 throw new MarshalException("Missing object name.", objectName, methodName);
             if (!/^[\w_$]+$/.test(methodName))
                 throw new MarshalException("Invalid method name.", objectName, methodName);
-                
+            
+            this._validateCall(elem.ownerDocument, objectName);
+            
             var obj = this._objects[objectName];
             
             if (!obj && elem.ownerDocument._marshalObjects)
@@ -478,6 +501,8 @@ var Marshal = {
             if (!objectName)
                 throw new MarshalException("Missing object name.");
                 
+            this._validateCall(elem.ownerDocument, objectName);
+
             var obj = this._objects[objectName];
             if (!obj)
                 throw new MarshalException("Object is not registered.", objectName);
@@ -488,6 +513,15 @@ var Marshal = {
         catch (e) {
             elem.setAttribute("exception", Object.toJSON(e));
         }
+    },
+    
+    _validateCall: function(doc, objectName) {
+        if (this._validators.length == 0)
+            throw new InvalidOperationException("This call is not enabled by the host security.");
+            
+        this._validators.each(function(v) {
+                v.call(null, doc, objectName);
+            });
     },
     
     _createProxyDefinition: function(obj) {
@@ -563,7 +597,6 @@ var Marshal = {
         return objectId;
     }
 };
-
 
 /*** ExtenderManager class ***/
 var ExtenderManager = {    

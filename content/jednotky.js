@@ -36,47 +36,7 @@
 
 var Jednotky = {
     load: function() {
-        try { 
-            var req = new XMLHttpRequest();
-            req.open("GET", "chrome://maplus/content/jednotky.xml", false); 
-            req.send(null);
-            this.root = req.responseXML;
-            
-            /*
-            var path = maplus.getDirectory();
-            path.append("content");
-            path.append("jednotky.xml");
-            this.root = loadXmlFile(path);
-            */
-        }
-        catch(e) {
-        }
-        
-        if (!this.root) {
-            this.root = document.implementation.createDocument("", "", null);
-        }
-        
-        this.data = XPath.evalSingle(this.root, '/jednotky')
-        if (this.data == null) {
-            this.data = this.root.createElement("jednotky");
-            this.root.appendChild(this.data);
-        }
-        
-        // Definovano v config.js
-        initPrefNode(this.data);
-    },
-    
-    save: function() {
-        /* 
-        try {
-            var path = maplus.getDirectory();
-            path.append("content");
-            path.append("jednotky.xml");
-            saveXmlFile(path, this.root);
-        }
-        catch(e) {
-        }
-        */
+        this.data = XmlConfig.load(CHROME_CONTENT_URL + "jednotky.xml", "jednotky");
     },
     
     vyhledej_PROXY: Marshal.BY_VALUE,
@@ -109,36 +69,7 @@ var Jednotky = {
         }
         
         return null;
-    },
-    /*
-    aktualizuj_PROXY: Marshal.BY_VALUE,
-    aktualizuj: function(data) {
-        // jmeno, pwr, barva, typ, druh, phb, dmg, brn, zvt, ini, realIni, zlataTU, manyTU, popTU
-
-        if (data.jmeno == null)
-            return null;
-    
-        var jednotka = this.data.getPrefNodeByXPath('jednotka[jmeno = "' + data.jmeno + '"]');
-        
-        if (!jednotka) {
-            jednotka = this.data.addPref("jednotka");
-            jednotka.setPref("jmeno", data.jmeno);
-        }
-        
-        if (data.pwr) jednotka.setPref("pwr", data.pwr.toString());
-        if (data.barva) jednotka.setPref("barva", data.barva);
-        if (data.typ) jednotka.setPref("typ", data.typ);
-        if (data.druh) jednotka.setPref("druh", data.druh);
-        if (data.phb) jednotka.setPref("phb", data.phb.toString());
-        if (data.dmg) jednotka.setPref("dmg", data.dmg.toString());
-        if (data.brn) jednotka.setPref("brn", data.brn.toString());
-        if (data.zvt) jednotka.setPref("zvt", data.zvt.toString());
-        if (data.ini) jednotka.setPref("ini", data.ini.toString());
-        if (data.realIni) jednotka.setPref("realIni", data.realIni.toString());
-        if (data.zlataTU) jednotka.setPref("zlataTU", data.zlataTU.toString());
-        if (data.manyTU) jednotka.setPref("manyTU", data.manyTU.toString());
-        if (data.popTU) jednotka.setPref("popTU", data.popTU.toString());
-    }*/
+    }
 };
 
 Marshal.registerObject("Jednotky", Jednotky);

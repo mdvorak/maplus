@@ -34,6 +34,9 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+// Volani sou platna pouze z domeny MA
+Marshal.registerUrlCallValidator("^" + MELIOR_ANNIS_URL);
+
 var MaPlus = {
     getDataDirectory: function() {
         var path = Components.classes["@mozilla.org/file/directory_service;1"]

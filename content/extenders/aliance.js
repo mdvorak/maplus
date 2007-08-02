@@ -43,15 +43,13 @@ pageExtenders.add(PageExtender.create({
             var nastavit = $XL('//a[starts-with(@href, "aliance.html") and font = "Nastavit"]');
             
             if (nastavit.length > 0) {
-                // page.prefs.aliance.clearChildNodes();
+                var aliConfig = page.config.getAliance();
+                aliConfig.clearChildNodes();
                 
                 nastavit.each(function(a) {
                         var m = a.href.match(/&aliance=nastavit_(\d+)/);
-                        var id = m ? m[1] : null;
-                        
-                        if (id) {
-                           // TODO 
-                        }
+                        if (m && m[1])
+                           aliConfig.addPref("id", m[1]);
                     });
             }
         }
@@ -60,14 +58,63 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-// Analyza clenu aliance
+// Analyza clenu aliance + aktivni id
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
-        return (typStranky && typStranky.search("vypis_clenu_v_ally_") == 0);
+        if (!typStranky || typStranky.search("vypis_clenu_v_ally_") != 0)
+            return false;
+        
+        var tableClenove = XPath.evalSingle('table[2]', page.content);
+        if (!tableClenove)
+            return false;
+        
+        var jmenoAliance = XPath.evalString('font/i', page.content);
+        var idAliance = page.arguments["aliance"].match(/vypis_clenu_v_ally_(\d+)$/);
+        if (idAliance) idAliance = parseInt(idAliance[1]);
+        
+        if (!jmenoAliance || !idAliance || isNaN(idAliance))
+            return false;
+            
+        // Prvne aktualizuj samotnou ali
+        MaData.aktualizujAlianci(jmenoAliance, idAliance, null);
+        
+        // Zjisti presvedceni
+        var aliance = MaData.najdiAlianci(jmenoAliance);
+        var presvedceni = (aliance && aliance.presvedceni != "") ? aliance.presvedceni : null;
+        
+        // Pak ji nastav clenum
+        context.idClenu = new Array();
+        
+        for (var i = 1; i < tableClenove.rows.length - 2; i++) {
+            var tr = tableClenove.rows[i];
+            
+            var id = parseInt(tr.cells[0].textContent.replace(/\s+$/, ""));
+            var regent = tr.cells[1].textContent.replace(/\s+$/, "");
+            var provincie = tr.cells[2].textContent.replace(/\s+$/, "");
+            
+            if (!isNaN(id)) {
+                MaData.aktualizujProvincii(id, regent, provincie, null, presvedceni, jmenoAliance);
+                
+                // Pro aktivni id
+                context.idClenu.push({ 
+                        id: id,
+                        element: tr.cells[0].childNodes[0]
+                    });
+            }
+        }
+            
+        return (context.idClenu.length > 0);
     },
     
     process: function(page, context) {
+        // Aktivni id
+        context.idClenu.each(function(i) {
+                var a = MaPlus.Tooltips.createActiveId(page, i.id)
+                
+                i.element.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                i.element.insertBefore(a, i.element.firstChild);
+            });
     }
 }));
 
@@ -75,10 +122,30 @@ pageExtenders.add(PageExtender.create({
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
-        return (typStranky == "vypis_alianci");
-    },
-    
-    process: function(page, context) {
+        if (typStranky != "vypis_alianci")
+            return false;
+        
+        var tableAliance = $X('font[2]/table', page.content);
+        
+        for (var i = 2; i < tableAliance.rows.length - 1; i++) {
+            var tr = tableAliance.rows[i];
+            var aVypis = $X('td[1]/font/a', tr);
+            if (!aVypis)
+                continue;
+            
+            var id = aVypis.getAttribute("href");
+            if (id) id = id.match(/&aliance=vypis_clenu_v_ally_(\d+)\b/);
+            if (id) id = parseInt(id[1]);
+            
+            if (id && !isNaN(id)) {
+                var jmeno = tr.cells[1].textContent.replace(/\s+$/, "");
+                var presvedceni = tr.cells[4].textContent.replace(/\s/g, "")[0];
+                
+                MaData.aktualizujAlianci(jmeno, id, presvedceni);
+            }
+        }
+        
+        return false;
     }
 }));
 
@@ -86,7 +153,10 @@ pageExtenders.add(PageExtender.create({
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
-        return (typStranky && typStranky.search("nastavit_") == 0);
+        if (!typStranky || typStranky.search("nastavit_") != 0)
+            return false;
+        
+        return true;
     },
     
     process: function(page, context) {

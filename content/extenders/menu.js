@@ -56,6 +56,65 @@ pageExtenders.add(PageExtender.create({
     }    
 }));
 
+// Linky na aliance
+pageExtenders.add(PageExtender.create({
+    analyze: function(page, context) {
+        context.alianceLink = $X('font/a[. = "Aliance"]', page.rightMenu); 
+        return (context.alianceLink != null);
+    },
+    
+    process: function(page, context) {
+        // Nacteni ulozenych alianci (musi byt v process protoze behem analyzy se teprv zjistuji id alianci)
+        var seznam = page.config.getAliance().getPrefNodeList("id");
+        if (!seznam)
+            return false;
+            
+        context.aliance = new Array();
+        $A(seznam).each(function(i) {
+                var id = i.getNumber();
+                if (id && !isNaN(id))
+                    context.aliance.push(id);
+            });
+        
+        if (context.aliance.length == 0)
+            return false;
+    
+        // Prejmenovani puvodniho linku
+        context.alianceLink.innerHTML = "Ali";
+    
+        // Vytvoreni elementu
+        var elems = new Array();
+        
+        for (var i = 0; i < context.aliance.length; i++) {
+            var id = context.aliance[i];
+            var text = String.format("V{0}", i + 1);
+            elems.push(this._createLink(page, "vypsat", id, text));
+        }
+        
+        for (var i = 0; i < context.aliance.length; i++) {
+            var id = context.aliance[i];
+            var text = String.format("N{0}", i + 1);
+            elems.push(this._createLink(page, "nastavit", id, text));
+        }
+        
+        // Vlozeni elementu
+        var parent = context.alianceLink.parentNode;
+        var insertionPoint = context.alianceLink.nextSibling;
+        
+        elems.each(function(e) {
+                parent.insertBefore(document.createTextNode(" "), insertionPoint);
+                parent.insertBefore(e, insertionPoint);
+            });
+    },
+    
+    _createLink: function(page, akce, id, text) {
+        var e = document.createElement("a");
+        e.href = MaPlus.buildUrl(page, "aliance.html", {aliance: akce + "_" + id});
+        e.innerHTML = text;        
+        return e;
+    }
+}));
+
 // Kalkulacka
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
