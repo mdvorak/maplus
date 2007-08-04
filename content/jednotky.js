@@ -35,20 +35,38 @@
  * ***** END LICENSE BLOCK ***** */
 
 var Jednotky = {
+    NO_DATA: "NO_DATA",
+
     load: function() {
-        this.data = XmlConfig.load(CHROME_CONTENT_URL + "jednotky.xml", "jednotky");
+        try { 
+            var req = new XMLHttpRequest();
+            req.open("GET", CHROME_CONTENT_URL + "jednotky.xml", false); 
+            req.send(null);
+            
+            var doc = req.responseXML;
+            return XmlConfig.extendNode($X("jednotky", doc));
+        }
+        catch(e) {
+        }
     },
     
     vyhledej_PROXY: Marshal.BY_VALUE,
     vyhledej: function(jmeno) {
         if (jmeno == null)
             return null;
-            
-        if (!this.data)
-            this.load();
-    
-        var jednotka = this.data.getPrefNodeByXPath('jednotka[jmeno = "' + jmeno + '"]');
         
+        // Nacti data pokud se tak jeste nestalo
+        if (!this.data) {
+            this.data = this.load() || this.NO_DATA;
+        }
+        
+        // Pokud data nejsou k dispozici vrat null
+        if (this.data == this.NO_DATA)
+            return null;
+    
+        // Pokus se najit jednotku
+        var jednotka = this.data.getPrefNodeByXPath('jednotka[jmeno = "' + jmeno + '"]');
+
         if (jednotka) {
             return {
                 jmeno: jmeno,

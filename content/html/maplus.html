@@ -68,9 +68,16 @@ var MaPlusMenu = {
         var s = Math.floor(elapsed % 60);
         
         $('plus_cas').innerHTML = h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    },
+    
+    startTimer: function() {
+        this.timer = setInterval(function() { MaPlusMenu.updateTime(); }, 1000)
     }
 };
 
 MaPlusMenu.updateTime();
-var ma_timer = setInterval(function() { MaPlusMenu.updateTime(); }, 1000);
+
+if (!TIMERS_DISABLED) {
+    MaPlusMenu.startTimer();
+}
 </script>

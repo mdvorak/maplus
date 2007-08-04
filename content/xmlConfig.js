@@ -49,7 +49,7 @@ var XmlConfig = {
 
     extendNode: function(node) {
         if (!node || node._configNodeInitialized)
-            return;
+            return node;
 
         Object.extend(node, XmlConfigNode.prototype);
            

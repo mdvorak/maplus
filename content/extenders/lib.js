@@ -278,7 +278,11 @@ MaPlus.Tooltips = {
     _createActiveUnitTooltip: function(page, jednotka) {
         // Sestav html tooltipu
         if (!page.jednotkaTemplate) {
-            page.jednotkaTemplate = new Template(Chrome.loadText("html/jednotka.htm"));
+            var html = Chrome.loadText("html/jednotka.html");
+            if (!html)
+                throw new Exception("Nepodarilo se nacist html template jednotky.");
+        
+            page.jednotkaTemplate = new Template(html);
         }
         
         // Uprav data o jednotce pro zobrazeni
