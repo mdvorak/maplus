@@ -34,7 +34,6 @@
  * 
  * ***** END LICENSE BLOCK ***** */
  
-
 // Analyze page layout
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {

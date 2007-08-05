@@ -35,8 +35,17 @@
  * ***** END LICENSE BLOCK ***** */
  
 pageExtenders.add(PageExtender.create({
+    analyze: function(page, context) {
+        // Bestiar
+        if (page.arguments["obchod"] != "jedn_new")
+            return false;
+            
+        // TODO
+        
+        return false;
+    },
+
     process: function(page, context) {
-        // FIXME
-        // alert(page.config.getEnabled());
+        // TODO
     }
 }));

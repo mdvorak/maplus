@@ -53,8 +53,6 @@ pageExtenders.add(PageExtender.create({
                     });
             }
         }
-    
-        return false;
     }
 }));
 
@@ -126,6 +124,8 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         var tableAliance = $X('font[2]/table', page.content);
+        if (!tableAliance)
+            return false;
         
         for (var i = 2; i < tableAliance.rows.length - 1; i++) {
             var tr = tableAliance.rows[i];
@@ -144,8 +144,6 @@ pageExtenders.add(PageExtender.create({
                 MaData.aktualizujAlianci(jmeno, id, presvedceni);
             }
         }
-        
-        return false;
     }
 }));
 

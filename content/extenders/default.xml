@@ -24,6 +24,8 @@
     <script url="#{melior}/aliance.html" name="aliance.js" />
     <script url="#{melior}/armada.html" name="armada.js" />
     <script url="#{melior}/odmeny.html" name="blacklist.js" />
+    <script url="#{melior}/setup.html" name="obrana.js" />
+    <script url="#{melior}/setup.html" name="spehove.js" />
 
     <!-- Post processing -->
     <script url="#{melior}/*" name="postprocessing.js" />
