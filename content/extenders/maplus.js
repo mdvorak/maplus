@@ -34,14 +34,17 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-// Plus menu
+// Plus menu (zobrazit vzdy)
 pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
-        context.html = Chrome.loadText("html/maplus.html");
-        return (context.html != null);
-    },
+        // Tohle je vyjimka: aby se neprovadela zbytecne analyza pro vsechny extendery
+        // a pritom se vzdy zobrazilo menu, je jeho zobrani uz v analyze, kde je taky
+        // vyhozena vyjimka AbortException pokud je plus zakazano.
     
-    process: function(page, context) {
+        context.html = Chrome.loadText("html/maplus.html");
+        if (!context.html)
+            throw new Exception("Unable to load maplus.html");
+        
         var div = document.createElement("div");
         div.innerHTML = context.html;
         div.style.left = "10px";
@@ -53,7 +56,7 @@ pageExtenders.add(PageExtender.create({
         
         var link = $X('//a[@id = "plus_enable"]');
         if (!link) 
-            throw String.format("Unable to find 'plus_enable' link.");
+            throw new Exception(String.format("Unable to find 'plus_enable' link."));
         
         Event.observe(link, "click", function(event) 
             {
@@ -69,7 +72,11 @@ pageExtenders.add(PageExtender.create({
         if (!enabled)
             throw new AbortException("MaPlus is disabled.");
             
-        // Aby se nesralo formatovani
+        return true;
+    },
+    
+    process: function(page, context) {
+        // Aby se nesralo v urcitych mistech formatovani
         if (page.content)
             page.content.setAttribute("valign", "top");
     }
