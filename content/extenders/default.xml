@@ -26,6 +26,7 @@
     <script url="#{melior}/odmeny.html" name="blacklist.js" />
     <script url="#{melior}/setup.html" name="obrana.js" />
     <script url="#{melior}/setup.html" name="spehove.js" />
+    <script url="#{melior}/banka.html" name="banka.js" />
 
     <!-- Post processing -->
     <script url="#{melior}/*" name="postprocessing.js" />
