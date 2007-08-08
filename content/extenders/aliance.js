@@ -36,6 +36,8 @@
 
 // Analyza alianci kde sem clenem
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Aliance - Moje"; },
+
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
 
@@ -53,11 +55,15 @@ pageExtenders.add(PageExtender.create({
                     });
             }
         }
-    }
+    },
+    
+    process: null
 }));
 
 // Analyza clenu aliance + aktivni id
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Aliance - Clenove"; },
+
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
         if (!typStranky || typStranky.search("vypis_clenu_v_ally_") != 0)
@@ -118,6 +124,8 @@ pageExtenders.add(PageExtender.create({
 
 // Analyza seznamu alianci
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Aliance - Seznam"; },
+
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
         if (typStranky != "vypis_alianci")
@@ -144,17 +152,21 @@ pageExtenders.add(PageExtender.create({
                 MaData.aktualizujAlianci(jmeno, id, presvedceni);
             }
         }
-    }
+    },
+    
+    process: null
 }));
 
 // Hromadne zpravy - Nastaveni aliance
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Aliance - Hromadne zpravy"; },
+
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
         if (!typStranky || typStranky.search("nastavit_") != 0)
             return false;
         
-        return true;
+        return false;
     },
     
     process: function(page, context) {

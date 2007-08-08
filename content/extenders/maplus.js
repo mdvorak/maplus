@@ -36,6 +36,8 @@
 
 // Plus menu (zobrazit vzdy)
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "MaPlus menu"; },
+
     analyze: function(page, context) {
         // Tohle je vyjimka: aby se neprovadela zbytecne analyza pro vsechny extendery
         // a pritom se vzdy zobrazilo menu, je jeho zobrani uz v analyze, kde je taky
@@ -84,6 +86,8 @@ pageExtenders.add(PageExtender.create({
 
 // Vyhledavani podle id (@name="koho")
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Kontrola - ID"; },
+
     analyze: function(page, context) {
         context.list = $XL('//input[@type = "text" and @name = "koho"]');
         return context.list.length > 0;
@@ -98,6 +102,8 @@ pageExtenders.add(PageExtender.create({
 
 // Upozorneni pri odkliku vice nez X tahu
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Kontrola - Tahy"; },
+
     analyze: function(page, context) {
         if (page.config.getNumber("maxTahu", MAX_TAHU_DEFAULT) > 0) {
             context.fields = $XL('//input[@type = "text" and @name = "kolikwait"]');

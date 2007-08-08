@@ -35,6 +35,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Blacklist"; },
+
     analyze: function(page, context) {
         context.table = $X('//table[tbody/tr[1]/td[2]/font/b = "Odměna"]');
         if (!context.table)

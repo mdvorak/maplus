@@ -36,6 +36,8 @@
 
 // Analyze spehu
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Spehove"; },
+
     analyze: function(page, context) {
         // Spehove (pokud je stranka zobrazena pres POST tak argument samozrejme neni)
         if (page.arguments["setup"] && page.arguments["setup"] != "spehovani")

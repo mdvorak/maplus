@@ -37,7 +37,7 @@
 /*** Marshal client component class ***/
 var Marshal = {
     _proxyCache: new Hash(),
-
+    
     callMethod: function(objectName, methodName, args) {
         if (!objectName)
             throw new ArgumentNullException("objectName");
@@ -50,20 +50,26 @@ var Marshal = {
         document.body.appendChild(elem);
         
         try {
+            this._group("Marshal: Calling method %s.%s(%s)", objectName, methodName, args.join(", "));
+            
             elem.setAttribute("objectName", objectName);
             elem.setAttribute("methodName", methodName);
             elem.setAttribute("arguments", argsStr);
             
             Event.dispatch(elem, "MarshalMethodCall", true);
+            this._debug("%o", elem);
             
             // Exception
             if (elem.getAttribute("exception")) {
                 var ex = elem.getAttribute("exception").evalJSON();
+                this._debug("Exception=%o", ex);
                 throw new RemoteException(objectName, methodName, ex);
             }
             // Simple type
             else if (elem.getAttribute("retval")) {
-                return elem.getAttribute("retval").evalJSON();
+                var retval = elem.getAttribute("retval").evalJSON();
+                this._debug("Return value=%o", retval);
+                return retval;
             }
             // Single object reference
             else if (elem.getAttribute("reference")) {
@@ -81,6 +87,7 @@ var Marshal = {
                     this._proxyCache[reference.objectId] = proxy;
                 }
                 
+                this._debug("Reference=%o", proxy);
                 return proxy;
             }
             // Object reference list
@@ -106,6 +113,7 @@ var Marshal = {
                     proxies[i] = proxy;
                 }
                 
+                this._debug("ReferenceList=%o", proxies);
                 return proxies;
             }
             // No return value
@@ -116,6 +124,7 @@ var Marshal = {
         finally {
             // Comment this for easier debugging
             document.body.removeChild(elem);
+            this._groupEnd();
         }
     },
     
@@ -130,8 +139,9 @@ var Marshal = {
             document.body.appendChild(elem);
             
             try {
+                this._group("Marshal: Creating proxy object '%s'", objectName);
+            
                 elem.setAttribute("objectName", objectName);
-                
                 Event.dispatch(elem, "MarshalGetProxyDefinition", true);
                 
                 if (elem.getAttribute("exception")) {
@@ -144,11 +154,14 @@ var Marshal = {
                     throw new MarshalException("Unable to get proxy definition.", objectName);
                 
                 var def = defJSON.evalJSON();
+                this._debug("%o", def);
+                
                 proxy = this._createProxyFromDefinition(objectName, def);
             }
             finally {
                 // Comment this for easier debugging
                 document.body.removeChild(elem);
+                this._groupEnd();
             }
         }
         
@@ -171,6 +184,23 @@ var Marshal = {
             });
             
         return proxy;
+    },
+    
+    _debug: function() {
+        if (MARSHAL_DEBUG >= 2)
+            console.debug.apply(console, arguments);
+    },
+    
+    _group: function() {
+        if (MARSHAL_DEBUG >= 2)
+            console.group.apply(console, arguments);
+        else if (MARSHAL_DEBUG >= 1)
+            console.debug.apply(console, arguments);
+    },
+    
+    _groupEnd: function() {
+        if (MARSHAL_DEBUG >= 2)
+            console.groupEnd.apply(console, arguments);
     }
 };
 
@@ -206,3 +236,4 @@ Object.extend(RemoteException.prototype, {
         base.initialize(RemoteException.MESSAGE, objectName, methodName, new RemoteExceptionWrapper(remoteException));
     }
 });
+

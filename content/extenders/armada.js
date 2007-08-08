@@ -36,6 +36,8 @@
 
 // Aktivni jednotky
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Armada - Jednotky"; },
+
     analyze: function(page, context) {
         context.cells = $XL('form/table[1]/tbody/tr/td[1]/font', page.content);
         return context.cells.length > 0;
@@ -58,6 +60,8 @@ pageExtenders.add(PageExtender.create({
 pageExtenders.add(PageExtender.create({
     MESSAGE: "Jste si jisti že chcete odehrát potřebný počet tahů pro dokončení rekrutu?",
 
+    getName: function() { return "Armada - Cekat"; },
+
     analyze: function(page, context) {
         context.button = $X('//input[@type="submit" and contains(@value, "Čekat")]', page.content);
         return (context.button != null);
@@ -71,6 +75,8 @@ pageExtenders.add(PageExtender.create({
 
 // Prepocitavat pocet tahu/jednotek pri kazdem zmacknuti klavesy
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Armada - Prepocitavani"; },
+
     analyze: function(page, context) {
         // Funkce definovane v MA
         if (!spocitat_pocet || typeof spocitat_pocet != "function"
@@ -99,6 +105,8 @@ pageExtenders.add(PageExtender.create({
 // bezpecnostni pojistka pro propousteni Propustit
 pageExtenders.add(PageExtender.create({
     NOTES: "(Pro propusteni jednotky stisknete tlacitko 'Propustit' 2x)",
+
+    getName: function() { return "Armada - Propustit"; },
 
     analyze: function(page, context) {
         context.propustit = $X('//input[@type="submit" and contains(@value, "Propustit")]', page.content);

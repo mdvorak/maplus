@@ -36,6 +36,8 @@
 
 // Rozsirene menu
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Menu - Vypis Utoku 2"; },
+
     analyze: function(page, context) {
         context.utoky = $X('font/a[contains(., "Výpisy") and contains(., "útoků")]', page.rightMenu); // pozn: netusim jak ho donutit brat mezeru
         
@@ -58,6 +60,8 @@ pageExtenders.add(PageExtender.create({
 
 // Linky na aliance
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Menu - Aliance"; },
+
     analyze: function(page, context) {
         context.alianceLink = $X('font/a[. = "Aliance"]', page.rightMenu); 
         return (context.alianceLink != null);
@@ -117,6 +121,8 @@ pageExtenders.add(PageExtender.create({
 
 // Kalkulacka
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Menu - Kalkulacka"; },
+
     analyze: function(page, context) {
         context.kalkulackaHtml = Chrome.loadText("html/kalkulacka.html");
         return (context.kalkulackaHtml != null);
@@ -139,6 +145,8 @@ pageExtenders.add(PageExtender.create({
 
 // Poznamky
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Menu - Poznamky"; },
+
     analyze: function(page, context) {
         context.poznamkyHtml = Chrome.loadText("html/poznamky.html");
         return (context.poznamkyHtml != null);

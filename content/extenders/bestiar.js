@@ -35,6 +35,8 @@
  * ***** END LICENSE BLOCK ***** */
  
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - "; },
+
     analyze: function(page, context) {
         // Bestiar
         if (page.arguments["obchod"] != "jedn_new")

@@ -174,7 +174,7 @@ Exception.prototype = {
     initialize: function(message, innerException) {
         this.message = message;
         this.innerException = innerException;
-        this.caller = arguments.callee.caller;
+        this.caller = arguments.callee.caller; 
     },
     
     getType: function() {
@@ -281,7 +281,8 @@ Object.extend(XPathException.prototype, {
 
 /*** XPath class ***/
 var XPath = {
-    evaluate: function(xpath, context, resultType) {
+    evaluate: function(xpath, context, resultType, noLog) {
+        var retval;
         try {
             if (!xpath) return null;
             if (!resultType) resultType = XPathResult.ANY_TYPE;
@@ -291,39 +292,92 @@ var XPath = {
                 context = $(context);
             
             var doc = context.ownerDocument ? context.ownerDocument : context;
-            return doc.evaluate(xpath, context, null, resultType, null);
+            retval = doc.evaluate(xpath, context, null, resultType, null);
+            return retval;
         }
         catch (ex) {
-            throw new XPathException(null, xpath, ex);
+            retval = new XPathException(null, xpath, ex);
+            throw retval;
+        }
+        finally {
+            if (XPATH_DEBUG && !noLog)
+                console.debug("XPath.evaluate('%s', %o, %d): %o", xpath, context, resultType, retval);
         }
     },
     
     evalList: function(xpath, context) {
-        var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
-        var list = new Array();
-        
-        if (result) {
-            for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
-                list.push($(i));
+        var retval;
+        try {
+            var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE, true);
+            retval = new Array();
+            
+            if (result) {
+                for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
+                    retval.push($(i));
+                }
             }
+            
+            return retval;
         }
-        
-        return list;
+        catch (ex) {
+            retval = ex;
+            throw ex;
+        }
+        finally {
+            if (XPATH_DEBUG)
+                console.debug("XPath.evalList('%s', %o): %o", xpath, context, retval);
+        }
     },
     
     evalSingle: function(xpath, context) {
-        var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
-        return result ? $(result.iterateNext()) : null;
+        var retval;
+        try {
+            var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE, true);
+            retval = result ? $(result.iterateNext()) : null;
+            return retval;
+        }
+        catch (ex) {
+            retval = ex;
+            throw ex;
+        }
+        finally {
+            if (XPATH_DEBUG)
+                console.debug("XPath.evalSingle('%s', %o): %o", xpath, context, retval);
+        }
     },
     
     evalString: function(xpath, context) {
-        var result = this.evaluate(xpath, context, XPathResult.STRING_TYPE);
-        return result ? result.stringValue : null;
+        var retval;
+        try {
+            var result = this.evaluate(xpath, context, XPathResult.STRING_TYPE, true);
+            retval = result ? result.stringValue : null;
+            return retval;
+        }
+        catch (ex) {
+            retval = ex;
+            throw ex;
+        }
+        finally {
+            if (XPATH_DEBUG)
+                console.debug("XPath.evalString('%s', %o): %o", xpath, context, retval);
+        }
     },
     
     evalNumber: function(xpath, context) {
-        var result = this.evaluate(xpath, context, XPathResult.NUMBER_TYPE);
-        return result ? result.numberValue : null;
+        var retval;
+        try {
+            var result = this.evaluate(xpath, context, XPathResult.NUMBER_TYPE, true);
+            retval = result ? result.numberValue : null;
+            return retval;
+        }
+        catch (ex) {
+            retval = ex;
+            throw ex;
+        }
+        finally {
+            if (XPATH_DEBUG)
+                console.debug("XPath.evalNumber('%s', %o): %o", xpath, context, retval);
+        }
     }
 };
 
@@ -369,16 +423,16 @@ PageExtender.prototype = {
     initialize: function() {
         this.supporting = false;
     },
+    
+    getName: function() {
+        return "(anonymous)";
+    },
 
     analyze: function(page, context) {
         return true;
     },
     
     process: function(page, context) {
-    },
-    
-    isSignificant: function() {
-        return !this.supporting;
     }
 };
 
@@ -425,20 +479,40 @@ PageExtenderCollection.prototype = {
         
         this._extenders.push(extender);
             
-        if (extender.isSignificant())
+        if (!extender.supporting)
             this._significantSize++;
     },
     
     run: function(page) {
         try {
+            console.group("Running %d extenders..", this._extenders.length);
+            console.time("Extenders finished in");
+
             var processList = new Array();
 
             // Analyze
             this._extenders.each(function(e)
                 {
-                    var context = new Object();
-                    if (e.analyze(page, context))
-                        processList.push([e, context]);
+                    try {
+                        console.group("Analyze '%s'...", e.getName());
+                        
+                        var context = new Object();
+                        if (e.analyze(page, context) && e.process) {
+                            processList.push([e, context]);
+                            result = "OK";
+                        }
+                        else if (!e.process)
+                            console.info("NoProcess");
+                        else 
+                            console.info("Failed");
+                    }
+                    catch (ex) {
+                        console.warn("Error");
+                        throw ex;
+                    }
+                    finally {
+                        console.groupEnd();
+                    }
                 });
                 
             // Process
@@ -446,17 +520,47 @@ PageExtenderCollection.prototype = {
                 {
                     var extender = entry[0];
                     var context = entry[1];
-                    extender.process(page, context);
+                    
+                    var result;
+                    try {
+                        console.group("Process '%s'...", extender.getName());
+                        
+                        extender.process(page, context);
+                        result = "OK";
+                    }
+                    catch (ex) {
+                        result = "Error";
+                        throw ex;
+                    }
+                    finally {
+                        console.info(result);
+                        console.groupEnd();
+                    }
                 });
                 
             return true;
         }
         catch (ex) {
-            if (Exception.getExceptionType(ex) != "AbortException") {
-                dump(String.format("Unhandled exception occured during extenders execution:\n'{0}'", ex));
-                alert(ex);
+            if (ex instanceof AbortException) {
+                console.debug(ex.toString());
+            }
+            else {
+                var msg = String.format("Unhandled exception occured during extenders execution:\n{0}", ex);
+                dump(msg);
+                
+                if (!console.firebug) {
+                    // This is for development
+                    alert(ex);
+                }
+                else {
+                    console.error(msg);
+                }
             }
             return false;
+        }
+        finally {
+            console.timeEnd("Extenders finished in");
+            console.groupEnd();
         }
     }
 };
@@ -475,7 +579,11 @@ var ScriptExtender = PageExtender.createClass({
         this._src = src;
         this._type = (type ? type : this.DEFAULT_TYPE);
     },
-
+    
+    getName: function() {
+        return String.format("ScriptExtender[{0}, {1}]", this._src, this._type);
+    },
+    
     process: function(page, context) {
         var e = page.document.createElement("script");
         e.setAttribute("type", this._type);
@@ -491,6 +599,10 @@ var StyleExtender = PageExtender.createClass({
         if (!src)
             throw new ArgumentNullException("src");
         this._src = src;
+    },
+
+    getName: function() {
+        return String.format("StyleExtender[{0}]", this._src);
     },
 
     analyze: function(page, context) {
@@ -535,3 +647,16 @@ Object.extend(MarshalException.prototype, {
     }
 });
 
+/*** Logging ***/
+
+// Firebug console properties for version "1.05"
+const _FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
+
+if (!window.console || !console.firebug) {
+    // Dummy object
+    window.console = new Object();
+    
+    _FIREBUG_METHODS.each(function(p) {
+            window.console[p] = function() { };
+        });
+}

@@ -40,6 +40,8 @@ function updateImgs(origSrc, newSrc) {
 
 // Barvy povolani
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Barvy povolani"; },
+
     process: function(page, context) {
         // Zmena obrazku
         updateImgs(MELIOR_ANNIS_URL + "/html/img/barvy/fialova.jpg", CHROME_CONTENT_URL + "html/img/barvy/fialova2.png");
@@ -50,6 +52,8 @@ pageExtenders.add(PageExtender.create({
 
 // Temne barvy
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Temne barvy"; },
+
     analyze: function(page, context) {
         return page.config.getBoolean("temneBarvy", true);
     },

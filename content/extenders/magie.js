@@ -36,6 +36,8 @@
 
 // Skryti popisku kouzel
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Magie - Popisky"; },
+
     analyze: function(page, context) {
         context.tableKouzla = $X('//table[contains(tbody/tr[2]/td[4]/font, "seslání")]');
         if (!context.tableKouzla)
@@ -84,6 +86,8 @@ pageExtenders.add(PageExtender.create({
 
 // Aktivni id v cilech kouzel
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Magie - Aktivni id"; },
+
     analyze: function(page, context) {
         context.tablePredkouzleno = $X('//table[tbody/tr[2]/td[4]/font/b = "Název"]');
         if (!context.tablePredkouzleno)

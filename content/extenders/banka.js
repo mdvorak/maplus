@@ -35,6 +35,8 @@
  * ***** END LICENSE BLOCK ***** */
  
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Banka - Splatka"; },
+
     analyze: function(page, context) {
         context.splatka = $X('//input[@type="text" and @name="splatka"]');
         if (!context.splatka)

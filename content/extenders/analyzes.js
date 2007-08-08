@@ -36,6 +36,8 @@
  
 // Analyze page layout
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Analyza stranky"; },
+
     analyze: function(page, context) {
         if (page.name == null || page.name == "" || page.name == "login.html")
             throw new AbortException("Unsupported page name.");

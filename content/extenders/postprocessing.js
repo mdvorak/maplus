@@ -36,6 +36,8 @@
 
 // Zabranit dvojklikum na linky
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bezpecne linky"; },
+
     analyze: function(page, context) {
         context.list = $XL('//a[@href != "javascript://" and not(@onclick)]');    
         return context.list.length > 0;

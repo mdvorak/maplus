@@ -95,6 +95,8 @@ Object.extend(PlusConfig, {
 
 // Config extender
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Konfigurace"; },
+
     analyze: function(page) {
         page.config = PlusConfig.getConfig(page.id);
         page.localConfig = PlusConfig.getLocalConfig(page.id);

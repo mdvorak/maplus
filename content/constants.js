@@ -41,6 +41,10 @@ const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
 const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
 const CHROME_CONTENT_URL = CHROME_URL + "content/";
 
+// Debugging
+const MARSHAL_DEBUG = 1; // 0=None, 1=Basic, 2=Verbose
+const XPATH_DEBUG = 1;
+
 // Custom constants
 const TIMERS_DISABLED = true;
 

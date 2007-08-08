@@ -36,13 +36,19 @@
 
 // Najdi tabulku obrana
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Obrana - Tabulka"; },
+
     analyze: function(page, context) {
         page.tableObrana = $X('form/font/table/tbody/tr[9]/td/table', page.content);
-    }
+    },
+    
+    process: null
 }));
  
 // Aktivni id paktaru + Napsat vsem link
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Obrana - Aktivni id, Napsat vsem"; },
+
     analyze: function(page, context) {
         if (page.arguments["setup"] != "obrana")
             return false;
@@ -87,6 +93,8 @@ pageExtenders.add(PageExtender.create({
 
 // Aktivni nazvy jednotek
 pageExtenders.add(PageExtender.create({
+    getName: function() { return "Obrana - Jednotky"; },
+
     analyze: function(page, context) {
         if (page.arguments["setup"] != "obrana")
             return false;
