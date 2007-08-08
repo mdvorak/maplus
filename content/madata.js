@@ -118,7 +118,7 @@ var MaData = {
             return {
                 id: ali.getPref("id"),
                 jmeno: jmeno,
-                presvedceni: ali.getPref("presvedceni")
+                presvedceni: ali.getPref("presvedceni"),
                 update: new Date(ali.getAttribute("update"))
             };
         }

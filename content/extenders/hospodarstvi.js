@@ -172,14 +172,7 @@ pageExtenders.add(PageExtender.create({
                 r.cells.many.style.color = Color.fromRange(manyKoef, 2.0, 0.2, Color.Pickers.blueWhite);
                 r.cells.pop.style.color = Color.fromRange(popKoef, 2.0, 0.2, Color.Pickers.whiteBrown);
                 
-                switch (r.data.phb) {
-                    case 2:
-                        r.cells.phb.style.color = "#FFE8B5";
-                        break;
-                    case 3:
-                        r.cells.phb.style.color = "#FFB656";
-                        break;
-                }
+                r.cells.phb.className = "phb" + r.data.phb;
             });
             
         // Zcervenej zaporne zisky
@@ -205,6 +198,7 @@ pageExtenders.add(PageExtender.create({
                 if (link) {
                     var font = r.cells.jmeno.firstChild;
                     font.replaceChild(link, font.firstChild);
+                    new Insertion.Top(link, "&nbsp;");
                 }
             });
     }
