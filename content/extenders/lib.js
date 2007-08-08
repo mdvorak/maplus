@@ -302,3 +302,19 @@ MaPlus.Tooltips = {
         return tooltip;
     }
 };
+
+var TableHelper = Object.extend(TableHelper || {}, {
+    thinBorders: function(table) {
+        // Zestihli okraje
+        $XL('tbody/tr/td', table).each(function(e) { 
+                e.style.borderRight = "0px";
+                e.style.borderBottom = "0px";
+            });
+        $XL('tbody/tr[1]/td', table).each(function(e) { 
+                e.style.borderTop = "0px";
+            });
+        $XL('tbody/tr/td[1]', table).each(function(e) { 
+                e.style.borderLeft = "0px";
+            });
+    }
+});

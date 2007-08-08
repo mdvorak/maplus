@@ -117,3 +117,19 @@ pageExtenders.add(PageExtender.create({
             });
     }
 }));
+
+// Okraje tabulky
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Obrana - Okraje"; },
+
+    analyze: function(page, context) {
+        if (page.arguments["setup"] != "obrana")
+            return false;
+        
+        return (page.tableObrana != null);
+    },
+
+    process: function(page, context) {
+        TableHelper.thinBorders(page.tableObrana);
+    }
+}));

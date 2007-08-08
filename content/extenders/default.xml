@@ -28,6 +28,7 @@
     <script url="#{melior}/setup.html" name="spehove.js" />
     <script url="#{melior}/banka.html" name="banka.js" />
     <script url="#{melior}/status.html" name="hospodarstvi.js" />
+    <script url="#{melior}/main.html" name="utoky.js" />
 
     <!-- Post processing -->
     <script url="#{melior}/*" name="postprocessing.js" />
