@@ -75,6 +75,10 @@ pageExtenders.add(PageExtender.create({
             data.aliance = fontAliance.textContent;
             context.aliance = MaData.najdiAlianci(data.aliance);
         }
+        else {
+            // Vymaz alianci kdyz uz tam neni
+            data.aliance = ZADNA_ALIANCE;
+        }
         
         // Aktualizuj data
         MaData.aktualizujProvincii(data.id, data.regent, data.provincie, data.povolani, data.presvedceni, data.aliance);

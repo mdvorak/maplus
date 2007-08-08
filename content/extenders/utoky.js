@@ -35,36 +35,170 @@
  * ***** END LICENSE BLOCK ***** */
  
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Vypis Utoku - TODO"; },
+    getName: function() { return "Vypis Utoku - Analyza"; },
 
     analyze: function(page, context) {
         if (page.arguments["vypis"] != "utoky_detailne")
             return false;
             
-        // TODO
+        page.tableRozdane = $X('table[tbody/tr[1]/td[1]/font/b = "Rozdané útoky"]', page.content);
+        page.tableBranene = $X('table[tbody/tr[1]/td[1]/font/b = "Bráněné útoky"]', page.content);
+        if (!page.tableRozdane || !page.tableBranene)
+            return false;
+            
+        page.tableRozdane.utoky = this._zpracujTabulku(page.tableRozdane);
+        page.tableBranene.utoky = this._zpracujTabulku(page.tableBranene);
         
-        return false;
+        console.debug("Utoky rozdane=%d branene=%d", page.tableRozdane.utoky.length, page.tableBranene.utoky.length);
+        
+        return true;
     },
 
-    process: function(page, context) {
-        // TODO
+    process: null,
+    
+    _zpracujTabulku: function(table) {
+        var utoky = new Array();
+        
+        for (var i = 0; i < table.rows.length; i++) {
+            var tr = table.rows[i];
+            if (tr.cells.length < 14)
+                continue;
+            
+            var tdId = tr.cells[2];
+            var id = parseInt(tdId.textContent);
+            
+            if (isNaN(id))
+                continue;
+            
+            // Bunky
+            tr.cells.barva = tr.cells[1];
+            tr.cells.id = tr.cells[2];
+            tr.cells.regent = tr.cells[3];
+            tr.cells.presvedceni = tr.cells[4];
+            tr.cells.cas = tr.cells[5];
+            tr.cells.sila = tr.cells[6];
+            tr.cells.uroven = tr.cells[7];
+            tr.cells.typ = tr.cells[8];
+            tr.cells.status = tr.cells[9];
+            tr.cells.utok = tr.cells[10];
+            tr.cells.ztratyUtocnik = tr.cells[11];
+            tr.cells.ztratyObrance = tr.cells[13];
+            
+            // Data
+            var m = tr.cells.cas.textContent.match(/(\d+):(\d+)/);
+            var cas = m ? parseInt(m[1]) * 60 + parseInt(m[2]) : Number.NaN;
+            
+            var utok = {
+                row: tr,
+            
+                barva: tr.cells.barva.textContent,
+                id: id,
+                regent: tr.cells.regent.textContent,
+                presvedceni: tr.cells.presvedceni.textContent[0],
+                cas: cas, // Cas od utoku v minutach
+                sila: parseInt(tr.cells.sila.textContent),
+                uroven: parseFloat(tr.cells.uroven.textContent),
+                typ: tr.cells.typ.textContent,
+                status: tr.cells.status.textContent,
+                ztratyUtocnik: parseFloat(tr.cells.ztratyUtocnik.textContent),
+                ztratyObrance: parseFloat(tr.cells.ztratyObrance.textContent)
+            };
+            
+            tr.data = utok;
+            utoky.push(utok);
+        }
+        
+        return utoky;
     }
 }));
 
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Vypis Utoku - TODO"; },
+    getName: function() { return "Vypis Utoku - Statistiky"; },
 
     analyze: function(page, context) {
         if (page.arguments["vypis"] != "utoky_detailne")
             return false;
             
-        // TODO
+        if (!page.tableRozdane || !page.tableBranene)
+            return false;
+            
+        page.tableRozdane.tdStats = $X('tbody/tr[last()]/td[1]', page.tableRozdane);
+        page.tableBranene.tdStats = $X('tbody/tr[last()]/td[1]', page.tableBranene);
         
-        return false;
+        if (!page.tableRozdane.tdStats || !page.tableBranene.tdStats)
+            return false;
+        
+        // Vypocitej statistiky
+        context.utokuZaPosledniDen = 0;
+        context.nevracenoPrv = 0;
+        context.posledniBojMinuty = null;
+        
+        page.tableRozdane.utoky.each(function(utok) {
+                if (utok.cas < 24*60)
+                    context.utokuZaPosledniDen++;
+                if (utok.typ.search("nevráceno") > -1)
+                    context.nevracenoPrv++;
+                if (context.posledniBojMinuty == null || utok.dobaMinuty < context.posledniBojMinuty)
+                    context.posledniBojMinuty = utok.cas;
+            });
+        
+        context.nevracenoCsek = 0;
+        context.prvDoProtu = 3;
+        
+        page.tableBranene.utoky.each(function(utok) {
+                if (utok.typ.search("nevráceno") > -1)
+                    context.nevracenoCsek++; 
+                if (utok.typ.search("prvoútok") > -1 
+                        && utok.status == "prošel" 
+                        && (context.posledniBojMinuty == null || utok.cas < context.posledniBojMinuty))
+                    context.prvDoProtu--;
+            });
+            
+        // TODO nejsem uz v protu?
+        context.prvDoProtu = Math.max(0, context.prvDoProtu);
+        
+        return true;
     },
 
     process: function(page, context) {
-        // TODO
+        // Utok
+        var utokyStats = "<i>" + context.nevracenoPrv + "</i> ";
+        if (context.nevracenoPrv == 1)
+           utokyStats += "csko se ještě nevrátilo.";
+        else if (context.nevracenoPrv > 1 && context.nevracenoPrv < 5)
+            utokyStats += "cska se ještě nevrátila.";
+        else
+            utokyStats += "csek se ještě nevrátilo.";
+            
+        utokyStats += "<br/>";
+        utokyStats += "Za posledních 24 hodin ";
+        if (context.utokuZaPosledniDen == 1)
+            utokyStats += "rozdán <i>" + context.utokuZaPosledniDen + "</i> útok.";
+        else if (context.utokuZaPosledniDen > 1 && context.utokuZaPosledniDen < 5)
+            utokyStats += "rozdány <i>" + context.utokuZaPosledniDen + "</i> útoky.";
+        else
+            utokyStats += "rozdáno <i>" + context.utokuZaPosledniDen + "</i> útoků.";
+            
+        page.tableRozdane.tdStats.innerHTML = '<font size="1">' + utokyStats + '</font>';
+        
+        // Obrana
+        obranaStats = "Zbývá vrátit <i>" + context.nevracenoCsek + "</i> ";
+        if (context.nevracenoCsek == 1)
+            obranaStats += "csko.";
+        else if (context.nevracenoCsek > 1 && context.nevracenoCsek < 5)
+            obranaStats += "cska.";
+        else
+            obranaStats += "csek.";
+            
+        if (context.prvDoProtu && context.prvDoProtu > 0) {
+            if (context.prvDoProtu == 1)
+                obranaStats += "<br/>Zbývá <i>1</i> prvoútok do protu.";
+            else
+                obranaStats += "<br/>Zbývají <i>" + context.prvDoProtu + "</i> prvoútoky do protu.";
+        }
+        
+        page.tableBranene.tdStats.innerHTML = '<font size="1">' + obranaStats + '</font>';
+        
     }
 }));
 
@@ -74,172 +208,52 @@ pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         if (page.arguments["vypis"] != "utoky_detailne")
             return false;
-
-        context.tableRozdane = $X('table[tbody/tr[1]/td[1]/font/b = "Rozdané útoky"]', page.content);
-        context.tableBranene = $X('table[tbody/tr[1]/td[1]/font/b = "Bráněné útoky"]', page.content);
-        if (!context.tableRozdane || !context.tableBranene)
+        if (!page.tableRozdane || !page.tableBranene)
             return false;
-
         return true;
     },
 
     process: function(page, context) {
-        TableHelper.thinBorders(context.tableRozdane);
-        TableHelper.thinBorders(context.tableBranene);
+        TableHelper.thinBorders(page.tableRozdane);
+        TableHelper.thinBorders(page.tableBranene);
     }
 }));
 
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Vypis Utoku - Vzhled"; },
 
+    analyze: function(page, context) {
+        if (page.arguments["vypis"] != "utoky_detailne")
+            return false;
+        if (!page.tableRozdane || !page.tableBranene)
+            return false;
+            
+        context.vsechnyUtoky = $A(page.tableRozdane.utoky).concat($A(page.tableBranene.utoky));
+        return context.vsechnyUtoky.length > 0;
+    },
 
-/*
+    process: function(page, context) {
+        context.vsechnyUtoky.each(function(utok) {
+                var tr = utok.row;
+        
+                // Obarvy uroven
+                tr.cells.uroven.style.color = Color.fromRange(utok.uroven, 125, 50, Color.Pickers.redGreen);
+                
+                // Linky
+                var link = MaPlus.Tooltips.createActiveId(page, utok.id);
+                tr.cells.id.innerHTML = "<span></span>";
+                tr.cells.id.valign = "middle";
+                tr.cells.id.firstChild.appendChild(link);
 
-function vypis_process(page) {
-    var rozdaneTable = page.evaluateSingle('table[tbody/tr[1]/td[1]/font/b = "Rozdané útoky"]', page.content);
-    var braneneTable = page.evaluateSingle('table[tbody/tr[1]/td[1]/font/b = "Bráněné útoky"]', page.content);
-    
-    if (!rozdaneTable || !braneneTable)
-        return;
-        
-    // Obecne zpracovani tabulek
-    var rozdaneUtoky = vypis_zpracujTabulku(page, rozdaneTable);
-    var braneneUtoky = vypis_zpracujTabulku(page, braneneTable);
-    
-    // Vypocitej statistiky
-    var utokuZaPosledniDen = 0;
-    var nevracenoPrv = 0;
-    var posledniBojMinuty = null;
-    
-    for (var i in rozdaneUtoky) {
-        var utok = rozdaneUtoky[i];
-        
-        if (utok.dobaMinuty < 24*60)
-            utokuZaPosledniDen++;
-        if (utok.typ.search("nevráceno") > -1)
-            nevracenoPrv++;
-        if (posledniBojMinuty == null || utok.dobaMinuty < posledniBojMinuty)
-            posledniBojMinuty = utok.dobaMinuty;
+                // Nahrad v typu newline mezerou 
+                tr.cells.typ.innerHTML = tr.cells.typ.innerHTML.replace('<br>', ' ');
+                
+                // Tooltip kdy vyprsi utok
+                var casUtoku = new Date().getTime() - utok.cas * 60 * 1000;
+                var vyprsi = new Date(casUtoku + 72 * 3600 * 1000);
+                vyprsi.setSeconds(0, 0);
+                
+                tr.cells.cas.setAttribute("title", "Vyprší: " + vyprsi.toLocaleString().replace(/:00$/, ""));
+            });
     }
-    
-    var nevracenoCsek = 0;
-    var prvDoProtu = 3;
-    for (var i in braneneUtoky) {
-        var utok = braneneUtoky[i];
-
-        if (utok.typ.search("nevráceno") > -1)
-            nevracenoCsek++; 
-        if (utok.typ.search("prvoútok") > -1 && utok.status == "prošel" && (posledniBojMinuty == null || utok.dobaMinuty < posledniBojMinuty))
-            prvDoProtu--;
-    }
-    prvDoProtu = Math.max(0, prvDoProtu);
-    
-    // Zobraz statistky
-    
-    // Utok
-    var utokyStats = "<i>" + nevracenoPrv + "</i> ";
-    if (nevracenoPrv == 1)
-       utokyStats += "csko se ještě nevrátilo.";
-    else if (nevracenoPrv > 1 && nevracenoPrv < 5)
-        utokyStats += "cska se ještě nevrátila.";
-    else
-        utokyStats += "csek se ještě nevrátilo.";
-        
-    utokyStats += "<br/>";
-    utokyStats += "Za posledních 24 hodin ";
-    if (utokuZaPosledniDen == 1)
-        utokyStats += "rozdán <i>" + utokuZaPosledniDen + "</i> útok.";
-    else if (utokuZaPosledniDen > 1 && utokuZaPosledniDen < 5)
-        utokyStats += "rozdány <i>" + utokuZaPosledniDen + "</i> útoky.";
-    else
-        utokyStats += "rozdáno <i>" + utokuZaPosledniDen + "</i> útoků.";
-    
-    page.evaluateSingle('tbody/tr[last()]/td[1]', rozdaneTable).innerHTML = '<font size="1">' + utokyStats + '</font>';
-    
-    // Obrana
-    orbanaStats = "Zbývá vrátit <i>" + nevracenoCsek + "</i> ";
-    if (nevracenoCsek == 1)
-        orbanaStats += "csko.";
-    else if (nevracenoCsek > 1 && nevracenoCsek < 5)
-        orbanaStats += "cska.";
-    else
-        orbanaStats += "csek.";
-        
-    if (prvDoProtu && prvDoProtu > 0) {
-        if (prvDoProtu == 1)
-            orbanaStats += "<br/>Zbývá <i>1</i> prvoútok do protu.";
-        else
-            orbanaStats += "<br/>Zbývají <i>" + prvDoProtu + "</i> prvoútoky do protu.";
-    }
-    
-    page.evaluateSingle('tbody/tr[last()]/td[1]', braneneTable).innerHTML = '<font size="1">' + orbanaStats + '</font>';
-    
-    // Zestihli okraje
-    var cells = page.evaluate('tbody/tr/td', rozdaneTable).concat(page.evaluate('tbody/tr/td', braneneTable));
-    for (var i = 0; i < cells.length; i++) {
-        cells[i].style.borderRight = "0px";
-        cells[i].style.borderBottom = "0px";
-    }
-    
-    cells = page.evaluate('tbody/tr[1]/td', rozdaneTable).concat(page.evaluate('tbody/tr[1]/td', braneneTable));
-    for (var i = 0; i < cells.length; i++) {
-        cells[i].style.borderTop = "0px";
-    }
-    
-    cells = page.evaluate('tbody/tr/td[1]', rozdaneTable).concat(page.evaluate('tbody/tr/td[1]', braneneTable));
-    for (var i = 0; i < cells.length; i++) {
-        cells[i].style.borderLeft = "0px";
-    }
-}
-
-function vypis_zpracujTabulku(page, table) {
-    var utokyRows = page.evaluate('tbody/tr[position() > 2]', table);
-    var utoky = new Array();
-    
-    for (var i in utokyRows) {
-        var idElem = page.evaluateSingle('td[3]/font', utokyRows[i]);
-        var id = idElem ? parseInt(idElem.innerHTML) : Number.NaN;
-
-        if (isNaN(id))
-            continue;
-        
-        var eCas = page.evaluateSingle('td[6]/font', utokyRows[i]);
-        var eUroven = page.evaluateSingle('td[8]/font', utokyRows[i]);
-        
-        // Data
-        var utok = new Object();
-        utok.id = id;
-        
-        var dobaMinutyMatch = eCas.textContent.match(/(\d+):(\d+)/);
-        utok.dobaMinuty = dobaMinutyMatch ? parseInt(dobaMinutyMatch[1]) * 60 + parseInt(dobaMinutyMatch[2]) : Number.NaN;
-        
-        utok.regent = page.evaluateSingle('td[4]/font', utokyRows[i]).textContent;
-        utok.presvedceni = page.evaluateSingle('td[5]/font', utokyRows[i]).textContent;
-        utok.uroven = parseFloat(eUroven.textContent);
-        utok.typ = page.evaluateSingle('td[9]/font', utokyRows[i]).textContent;
-        utok.status = page.evaluateSingle('td[10]/font', utokyRows[i]).textContent;
-        
-        // Obarvy uroven
-        eUroven.style.color = colorByRange(utok.uroven, 125, 50, redGreenColorPicker);
-        
-        // Linky
-        var eId = createActiveId(page, utok.id);
-        idElem.innerHTML = '<font size="2"></font>';
-        idElem.valign = "middle";
-        idElem.childNodes[0].appendChild(eId);
-        
-        // Nahrad v typu newline mezerou 
-        var eTyp = page.evaluateSingle('td[9]/font', utokyRows[i]);
-        eTyp.innerHTML = eTyp.innerHTML.replace('<br>', ' ');
-        
-        // Tooltip kdy vyprsi utok
-        var casUtoku = new Date().getTime() - utok.dobaMinuty * 60 * 1000;
-        var vyprsi = new Date(casUtoku + 72 * 3600 * 1000);
-        vyprsi.setSeconds(0, 0);
-        
-        eCas.setAttribute("title", "Vyprší: " + vyprsi.toLocaleString());
-        
-        utoky.push(utok);
-    }
-    
-    return utoky;
-}
-*/
+}));

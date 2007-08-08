@@ -74,7 +74,8 @@ var MaData = {
                 provincie: provi.getPref("provincie"),
                 povolani: provi.getPref("povolani"),
                 presvedceni: provi.getPref("presvedceni"),
-                aliance: provi.getPref("aliance")
+                aliance: provi.getPref("aliance"),
+                update: new Date(provi.getAttribute("update"))
             };
         }
         
@@ -100,6 +101,8 @@ var MaData = {
         if (povolani && povolani != "") provi.setPref("povolani", povolani);
         if (presvedceni && presvedceni != "") provi.setPref("presvedceni", presvedceni);
         if (aliance && aliance != "") provi.setPref("aliance", (aliance != ZADNA_ALIANCE) ? aliance : null);
+        
+        provi.setAttribute("update", new Date());
     },
     
     najdiAlianci_PROXY: Marshal.BY_VALUE,
@@ -116,6 +119,7 @@ var MaData = {
                 id: ali.getPref("id"),
                 jmeno: jmeno,
                 presvedceni: ali.getPref("presvedceni")
+                update: new Date(ali.getAttribute("update"))
             };
         }
         
@@ -156,6 +160,8 @@ var MaData = {
         
         if (id && !isNaN(id)) ali.setPref("id", id);
         if (presvedceni && presvedceni != "") ali.setPref("presvedceni", presvedceni);
+        
+        ali.setAttribute("update", new Date());
     }
 };
 
