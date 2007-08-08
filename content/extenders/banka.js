@@ -46,6 +46,7 @@ pageExtenders.add(PageExtender.create({
         var m;
         if ((m = popis.match(/\s(\d+)\szl/)) != null) {
             context.castka = parseInt(m[1]);
+            console.debug("castka=%d", context.castka);
         }
         
         return !isNaN(context.castka);

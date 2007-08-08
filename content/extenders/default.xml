@@ -12,7 +12,7 @@
     <script url="#{melior}/*" name="lib.js" />
     
     <style url="#{melior}/*" src="#{chrome}/html/maplus.css" />
-    <script url="#{melior}/*" name="analyzes.js" />
+    <script url="#{melior}/*" name="analyza.js" />
     <script url="#{melior}/*" name="config.js" />
     <script url="#{melior}/*" name="maplus.js" />
     
@@ -27,6 +27,7 @@
     <script url="#{melior}/setup.html" name="obrana.js" />
     <script url="#{melior}/setup.html" name="spehove.js" />
     <script url="#{melior}/banka.html" name="banka.js" />
+    <script url="#{melior}/status.html" name="hospodarstvi.js" />
 
     <!-- Post processing -->
     <script url="#{melior}/*" name="postprocessing.js" />

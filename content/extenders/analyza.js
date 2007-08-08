@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
  
-// Analyze page layout
+// Analyzuj rozlozeni stranky
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Analyza stranky"; },
 
@@ -49,6 +49,8 @@ pageExtenders.add(PageExtender.create({
 
         if (!page.id || isNaN(page.id))
             throw new AbortException("Id nenalezeno.");
+            
+        console.info("id=%d, code=%s, ftc=%s", page.id, page.code, page.ftc);
         
         // Najdi zakladni strukturu stranky
         page.topTable = XPath.evalSingle('/html/body/center/table[1]', page.document);

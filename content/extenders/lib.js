@@ -136,11 +136,16 @@ Color.Pickers = {
         colors.blue = 240; 
     },
 
-
     grayGold: function(colors) {
         colors.red = 200 + Math.min(55, 55 * colors.koeficient); 
         colors.green = 200 + Math.min(15, 15 * colors.koeficient); ;
         colors.blue = Math.min(200, 200 * (1 - colors.koeficient)); 
+    },
+    
+    whiteBrown: function(colors) {
+        colors.red = Math.max(167, Math.min(240, 240 * colors.koeficient));
+        colors.green = Math.max(118, Math.min(240, 240 * colors.koeficient));
+        colors.blue = Math.max(109, Math.min(240, 240 * colors.koeficient)); 
     }
 };
 

@@ -499,7 +499,7 @@ PageExtenderCollection.prototype = {
                         var context = new Object();
                         if (e.analyze(page, context) && e.process) {
                             processList.push([e, context]);
-                            result = "OK";
+                            console.info("OK");
                         }
                         else if (!e.process)
                             console.info("NoProcess");
@@ -521,19 +521,17 @@ PageExtenderCollection.prototype = {
                     var extender = entry[0];
                     var context = entry[1];
                     
-                    var result;
                     try {
                         console.group("Process '%s'...", extender.getName());
                         
                         extender.process(page, context);
-                        result = "OK";
+                        console.info("OK");
                     }
                     catch (ex) {
-                        result = "Error";
+                        console.warn("Error");
                         throw ex;
                     }
                     finally {
-                        console.info(result);
                         console.groupEnd();
                     }
                 });
