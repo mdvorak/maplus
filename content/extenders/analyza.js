@@ -67,6 +67,8 @@ pageExtenders.add(PageExtender.create({
         return true;
     },
     
+    process: null,
+    
     _findParameter: function(page, name) {
         var value;
         

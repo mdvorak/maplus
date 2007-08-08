@@ -497,12 +497,15 @@ PageExtenderCollection.prototype = {
                         console.group("Analyze '%s'...", e.getName());
                         
                         var context = new Object();
-                        if (e.analyze(page, context) && e.process) {
-                            processList.push([e, context]);
-                            console.info("OK");
+                        if (e.analyze(page, context)) {
+                            if (e.process) {
+                                processList.push([e, context]);
+                                console.info("OK");
+                            }
+                            else {
+                                console.info("NoProcess");
+                            }
                         }
-                        else if (!e.process)
-                            console.info("NoProcess");
                         else 
                             console.info("Failed");
                     }

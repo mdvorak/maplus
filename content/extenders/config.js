@@ -107,5 +107,7 @@ pageExtenders.add(PageExtender.create({
             throw String.format("Unable to get config for id '{0}'.", page.id);
         
         return true;
-    }
+    },
+    
+    process: null
 }));

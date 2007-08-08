@@ -138,7 +138,7 @@ pageExtenders.add(PageExtender.create({
                     context.utokuZaPosledniDen++;
                 if (utok.typ.search("nevráceno") > -1)
                     context.nevracenoPrv++;
-                if (context.posledniBojMinuty == null || utok.dobaMinuty < context.posledniBojMinuty)
+                if (context.posledniBojMinuty == null || utok.cas < context.posledniBojMinuty)
                     context.posledniBojMinuty = utok.cas;
             });
         
