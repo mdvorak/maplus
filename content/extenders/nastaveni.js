@@ -51,13 +51,27 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         page.content.update(context.html);
         
-        $XL('.//*[@onload and @onsave]', page.content).each(
-			function(e) {
+        // Vyhledej vsechny konfiguracni elementy
+        var list = $XL('.//*[@onload and @onsave]', page.content);
+        
+        // Inicializuj vsechny konfiguracni elementy
+        list.each(function(e) {
 				e.config = page.config;
 				e.onload = new Function(e.getAttribute("onload"));
 				e.onsave = new Function(e.getAttribute("onsave"));
-				
-				e.oninit.call(e);
 			});
+	
+		// Load a save funkce ktere nactou/ulozi vsechny elementy
+		var load = function() {
+				list.each(function(e) { e.onload(); });
+			};
+			
+		var save = function() {
+				list.each(function(e) { e.onsave(); });
+			};
+			
+			
+		// Nacti aktualni hodnoty
+		load();
     }
 }));

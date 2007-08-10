@@ -21,8 +21,8 @@
 			<td><span>Temné barvy</span></td>
 			<td>
 				<input type="checkbox" name="plusConfig"
-					oninit="this.checked = this.config.getBoolean('temneBarvy', true);"
-					onclick="this.config.setPref('temneBarvy', this.checked);" />
+					onload="this.checked = this.config.getBoolean('temneBarvy', true);"
+					onsave="this.config.setPref('temneBarvy', this.checked);" />
 			</td>
 			
 			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
@@ -30,8 +30,8 @@
 			<td><span>Limit tahu bez potvrzeni</span></td>
 			<td>
 				<input type="text" name="plusConfig" style="width: 50;"
-					oninit="this.value = this.config.getNumber('maxTahu', MAX_TAHU_DEFAULT);"
-					onchange="this.config.setPref('maxTahu', Number(this.value));" />
+					onload="this.value = this.config.getNumber('maxTahu', MAX_TAHU_DEFAULT);"
+					onsave="this.config.setPref('maxTahu', Number(this.value));" />
 			</td>
 		</tr>
 		<tr>
