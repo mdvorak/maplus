@@ -1,4 +1,4 @@
-ï»¿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -70,6 +70,11 @@ pageExtenders.add(PageExtender.create({
         var enabled = page.config.getEnabled();
         link.updateText(enabled);
         
+        var aNastaveni = $X('//a[@id = "plus_nastaveni"]');
+        if (!aNastaveni) 
+            throw new Exception(String.format("Unable to find 'plus_nastaveni' link."));
+        aNastaveni.href = MaPlus.buildUrl(page, "main.html", { plus: "nastaveni" });
+        
         // Stop execution
         if (!enabled)
             throw new AbortException("MaPlus is disabled.");
@@ -115,13 +120,13 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         var maxTahu = page.config.getNumber("maxTahu", MAX_TAHU_DEFAULT);
-        var zprava = "Opravdu chcete odehrÃ¡t vÃ­ce jak " + maxTahu + " tahÅ¯?";
+        var zprava = "Opravdu chcete odehrát více jak " + maxTahu + " tahù?";
         
         context.fields.each(function(e) {
                 context.buttons.each(function(i) {
                         // Prasacky ale funkcni reseni (bohuzel '//' neuznava kontext :-( )
                         if (i.form == e.form) {
-                            Event.observe(i, 'click', function() { return (parseInt(e.value) < maxTahu) || confirm(zprava); }, false);
+                            i.onclick = function() { return (parseInt(e.value) < maxTahu) || confirm(zprava); };
                             i.setAttribute("plus", true); // Debug
                         }
                     });
@@ -132,14 +137,14 @@ pageExtenders.add(PageExtender.create({
             var cekat = $X('//a[starts-with(@href, "wait.html")]');
             var objevovat = $X('//a[starts-with(@href, "explore.html")]');
             
-            var zprava2 = "Je moÅ¾nÃ©, Å¾e odehrajete vÃ­ce jak " + maxTahu + " tahÅ¯, chcete pokraÄovat?";
+            var zprava2 = "Je možné, že odehrajete více jak " + maxTahu + " tahù, chcete pokraèovat?";
             
             if (cekat) {
-                Event.observe(cekat, "click", function() { return confirm(zprava2); }, false);
+                cekat.onclick = function() { return confirm(zprava2); };
                 cekat.setAttribute("plus", true); // Debug
             }
             if (objevovat) {
-                Event.observe(objevovat, "click", function() { return confirm(zprava2); }, false);
+                objevovat.onclick = function() { return confirm(zprava2); };
                 objevovat.setAttribute("plus", true); // Debug
             }
         }

@@ -1,0 +1,50 @@
+﻿<table>
+    <colgroup>
+        <col width="120" />
+        <col width="80" />
+        <col width="10" />
+        <col width="120" />
+        <col width="80" />
+    </colgroup>
+	<tbody>
+		<tr>
+			<td colspan="5" align="center"><b>Melior Annis Plus - Nastavení</b></td>
+		</tr>
+		
+		<tr><td colspan="5"><img height="10" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
+		<tr>
+		    <td colspan="5" style="border-bottom-width: 1px; border-color: -moz-use-text-color;"><span><b>Obecné</b></span></td>
+		</tr>
+		
+		<tr>
+			<td><span>Temné barvy</span></td>
+			<td>
+				<input type="checkbox" name="plusConfig"
+					oninit="this.checked = this.config.getBoolean('temneBarvy', true);"
+					onclick="this.config.setPref('temneBarvy', this.checked);" />
+			</td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+			
+			<td><span>Limit tahu bez potvrzeni</span></td>
+			<td>
+				<input type="text" name="plusConfig" style="width: 50;"
+					oninit="this.value = this.config.getNumber('maxTahu', MAX_TAHU_DEFAULT);"
+					onchange="this.config.setPref('maxTahu', Number(this.value));" />
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+			
+			<td colspan="2">
+				<span class="small">(Počet tahů které můžete odehrát ani by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
+			</td>
+		</tr>
+		
+		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+	</tbody>
+</table>
