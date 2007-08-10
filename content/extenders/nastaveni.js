@@ -53,6 +53,7 @@ pageExtenders.add(PageExtender.create({
         
         // Vyhledej vsechny konfiguracni elementy
         var list = $XL('.//*[@onload and @onsave]', page.content);
+        var save = $X('.//input[@id="plus_saveConfig" and @type="button"]', page.content);
         
         // Inicializuj vsechny konfiguracni elementy
         list.each(function(e) {
@@ -73,5 +74,7 @@ pageExtenders.add(PageExtender.create({
 			
 		// Nacti aktualni hodnoty
 		load();
+		
+		save.onclick = save;
     }
 }));
