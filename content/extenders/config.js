@@ -80,7 +80,11 @@ Object.extend(PlusConfig, {
         
         // Note: cfg should be proxy
         var cfg = Marshal.callMethod("configManager", "getConfig", [id]);
-        return Object.extend(cfg, PlusConfig.prototype);
+        cfg = Object.extend(cfg, PlusConfig.prototype);
+        
+        cfg.save = function() { PlusConfig.saveConfig(id); };
+        
+        return cfg;
     },
     
     getLocalConfig: function(id) {
@@ -90,6 +94,13 @@ Object.extend(PlusConfig, {
         // Note: cfg should be proxy
         var cfg = Marshal.callMethod("localConfigManager", "getConfig", [id]);
         return cfg;
+    },
+    
+    saveConfig: function(id) {
+        if (!id || isNaN(parseInt(id)))
+            throw String.format("id '{0}' is invalid.", id);
+            
+        Marshal.callMethod("configManager", "saveConfig", [id]);
     }
 });
 

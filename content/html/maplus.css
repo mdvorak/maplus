@@ -44,6 +44,11 @@
     font-size: x-small;
 }
 
+.dark
+{
+	color: #424242;
+}
+
 span 
 {
     font-size: small;

@@ -1,21 +1,38 @@
-﻿<table>
+﻿<style type="text/css">
+td.nadpis 
+{
+	border-bottom-width: 1px;
+	border-bottom-color: #2A2A2A;
+	border-bottom-style: solid;
+}
+</style>
+<table>
     <colgroup>
         <col width="120" />
-        <col width="80" />
+        <col width="100" />
         <col width="10" />
         <col width="120" />
-        <col width="80" />
+        <col width="100" />
     </colgroup>
 	<tbody>
 		<tr>
 			<td colspan="5" align="center"><b>Melior Annis Plus - Nastavení</b></td>
 		</tr>
 		
-		<tr><td colspan="5"><img height="10" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
 		<tr>
-		    <td colspan="5" style="border-bottom-width: 1px; border-color: -moz-use-text-color;"><span><b>Obecné</b></span></td>
+			<td colspan="5"><span class="small" style="color: gray;"><span id="plus_nastaveniZprava" class="small"></span>&nbsp;</span></td>
 		</tr>
+		
+		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
+		<tr>
+		    <td colspan="5" class="nadpis">
+		        <span><b>Obecné</b></span>
+		    </td>
+		</tr>
+		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
 		<tr>
 			<td><span>Temné barvy</span></td>
@@ -41,7 +58,7 @@
 			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
 			
 			<td colspan="2">
-				<span class="small">(Počet tahů které můžete odehrát ani by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
+				<span class="small dark">(Počet tahů které můžete odehrát ani by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
 			</td>
 		</tr>
 		
@@ -52,8 +69,10 @@
 		<tr><td colspan="20"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
 		<tr>
-		    <td colspan="5" align="right">
-		        <input id="plus_saveConfig" type="button" />
+		    <td colspan="5" align="center">
+		        <input id="plus_loadConfig" type="button" value="Zrušit" />
+		        &nbsp;
+		        <input id="plus_saveConfig" type="button" value="Uložit" />
 		    </td>
 		</tr>
 	</tbody>
