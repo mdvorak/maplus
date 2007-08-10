@@ -38,7 +38,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Banka - Splatka"; },
 
     analyze: function(page, context) {
-        context.splatka = $X('//input[@type="text" and @name="splatka"]');
+        context.splatka = $X('.//input[@type="text" and @name="splatka"]', page.content);
         if (!context.splatka)
             return false;
             

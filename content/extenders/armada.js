@@ -63,7 +63,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Armada - Cekat"; },
 
     analyze: function(page, context) {
-        context.button = $X('//input[@type="submit" and contains(@value, "Čekat")]', page.content);
+        context.button = $X('.//input[@type="submit" and contains(@value, "Čekat")]', page.content);
         return (context.button != null);
     },
     
@@ -88,11 +88,7 @@ pageExtenders.add(PageExtender.create({
             return false;
             
         // Najdi 'kolik' pole pro stejny formular jako je pocet tahu (nutne kvuli formulari pro propousteni)
-        $XL('//input[@name = "kolik"]').each(function(i) {
-                if (i.form == context.tahy.form) 
-                    context.kolik = i;
-            });
-    
+        context.kolik = $X('.//input[@name = "kolik"]', context.tahy.form);    
         return (context.kolik != null);
     },
     
@@ -113,8 +109,8 @@ pageExtenders.add(PageExtender.create({
         if (!context.propustit)
             return false;
             
-        context.jednotka = $X('select[@name="jednotka"]', context.propustit.form);
-        context.kolik = $X('input[@name="kolik"]', context.propustit.form);
+        context.jednotka = $X('.//select[@name="jednotka"]', context.propustit.form);
+        context.kolik = $X('.//input[@name="kolik"]', context.propustit.form);
         
         return (context.jednotka != null && context.kolik != null);
     },

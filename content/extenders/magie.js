@@ -39,7 +39,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Magie - Popisky"; },
 
     analyze: function(page, context) {
-        context.tableKouzla = $X('//table[contains(tbody/tr[2]/td[4]/font, "seslání")]');
+        context.tableKouzla = $X('.//table[contains(tbody/tr[2]/td[4]/font, "seslání")]', page.content);
         if (!context.tableKouzla)
             return false;
             
@@ -89,7 +89,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Magie - Aktivni id"; },
 
     analyze: function(page, context) {
-        context.tablePredkouzleno = $X('//table[tbody/tr[2]/td[4]/font/b = "Název"]');
+        context.tablePredkouzleno = $X('.//table[tbody/tr[2]/td[4]/font/b = "Název"]', page.content);
         if (!context.tablePredkouzleno)
             return false;
         

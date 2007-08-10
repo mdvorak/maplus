@@ -51,10 +51,11 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         page.content.update(context.html);
         
-        $XL('//input[@name="plusConfig" and @oninit]').each(
+        $XL('.//*[@onload and @onsave]', page.content).each(
 			function(e) {
 				e.config = page.config;
-				e.oninit = new Function(e.getAttribute("oninit"));
+				e.onload = new Function(e.getAttribute("onload"));
+				e.onsave = new Function(e.getAttribute("onsave"));
 				
 				e.oninit.call(e);
 			});

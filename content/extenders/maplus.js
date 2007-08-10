@@ -56,7 +56,7 @@ pageExtenders.add(PageExtender.create({
         
         document.body.appendChild(div);
         
-        var link = $X('//a[@id = "plus_enable"]');
+        var link = $X('.//a[@id = "plus_enable"]', div);
         if (!link) 
             throw new Exception(String.format("Unable to find 'plus_enable' link."));
         
@@ -70,7 +70,7 @@ pageExtenders.add(PageExtender.create({
         var enabled = page.config.getEnabled();
         link.updateText(enabled);
         
-        var aNastaveni = $X('//a[@id = "plus_nastaveni"]');
+        var aNastaveni = $X('.//a[@id = "plus_nastaveni"]', div);
         if (!aNastaveni) 
             throw new Exception(String.format("Unable to find 'plus_nastaveni' link."));
         aNastaveni.href = MaPlus.buildUrl(page, "main.html", { plus: "nastaveni" });

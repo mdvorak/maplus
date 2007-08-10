@@ -38,7 +38,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Blacklist"; },
 
     analyze: function(page, context) {
-        context.table = $X('//table[tbody/tr[1]/td[2]/font/b = "Odměna"]');
+        context.table = $X('.//table[tbody/tr[1]/td[2]/font/b = "Odměna"]', page.content);
         if (!context.table)
             return false;
             

@@ -42,7 +42,7 @@ pageExtenders.add(PageExtender.create({
         var typStranky = page.arguments["aliance"];
 
         if (!typStranky) {
-            var nastavit = $XL('//a[starts-with(@href, "aliance.html") and font = "Nastavit"]');
+            var nastavit = $XL('.//a[starts-with(@href, "aliance.html") and font = "Nastavit"]', page.content);
             
             if (nastavit.length > 0) {
                 var aliConfig = page.config.getAliance();
