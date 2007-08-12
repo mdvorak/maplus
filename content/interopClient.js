@@ -43,8 +43,18 @@ var Marshal = {
             throw new ArgumentNullException("objectName");
         if (!methodName)
             throw new ArgumentNullException("methodName");
+        if (args && !(args instanceof Array))
+            throw new ArgumentException("args", args, "Arguments must be an array.");
         
-        var argsStr = args ? Object.toJSON(args) : null;
+        var transportArgs = new Array();
+        if (args) {
+            for (var i = 0; i < args.length; i++) {
+                if (this.isProxy(args[i]))
+                    transportArgs.push({ reference: args[i].__proxy });
+                else
+                    transportArgs.push({ value: args[i] });
+            }
+        }
         
         var elem = document.createElement("marshal");
         document.body.appendChild(elem);
@@ -54,7 +64,7 @@ var Marshal = {
             
             elem.setAttribute("objectName", objectName);
             elem.setAttribute("methodName", methodName);
-            elem.setAttribute("arguments", argsStr);
+            elem.setAttribute("arguments", Object.toJSON(transportArgs));
             
             Event.dispatch(elem, "MarshalMethodCall", true);
             this._debug("%o", elem);
@@ -168,11 +178,19 @@ var Marshal = {
         return proxy;
     },
     
+    isProxy: function(object) {
+        if (object == null)
+            return new ArgumentNullException("object");
+        return (typeof object == "object" && object.__proxy && typeof object.__proxy == "string");
+    },
+    
     _createProxyFromDefinition: function(objectName, def) {
         if (!objectName)
             throw new ArgumentNullException("objectName");
         if (!def)
             throw new ArgumentNullException("def");
+    
+        objectName = objectName.toString();
     
         var proxy = new Object();
         var proxyMethods = $A(def.methods);
@@ -182,6 +200,8 @@ var Marshal = {
             function(method) {
                 proxy[method.name] = function() { return _this.callMethod(objectName, method.name, $A(arguments)); };
             });
+            
+        proxy.__proxy = objectName;
             
         return proxy;
     },

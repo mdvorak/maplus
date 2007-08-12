@@ -46,13 +46,26 @@ pageExtenders.add(PageExtender.create({
             
             if (nastavit.length > 0) {
                 var aliConfig = page.config.getAliance();
+                var aliance = new Array();
                 aliConfig.clearChildNodes();
                 
                 nastavit.each(function(a) {
                         var m = a.href.match(/&aliance=nastavit_(\d+)/);
-                        if (m && m[1])
-                           aliConfig.addPref("id", m[1]);
+                        if (m && m[1]) {
+                            aliConfig.addPref("id", m[1]);
+                            aliance.push(Number(m[1]));
+                        }
                     });
+                    
+                console.debug("Jsem clenem alianci: %o", aliance);
+            }
+            else {
+                var nejsemClenem = $X('font[starts-with(., "Momentálně") and contains(., "nejste")]', page.content);
+                
+                if (nejsemClenem != null) {
+                    page.config.getAliance().clearChildNodes();
+                    console.debug("Nejsem clenem zadne aliance.");
+                }
             }
         }
     },

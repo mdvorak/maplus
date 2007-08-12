@@ -37,7 +37,8 @@ var Poznamky = {
 <br />
 <span>Poznámky</span>
 <br />
-<textarea id="plus_poznamky" onkeyup="Event.dispatch(this, 'change', true);" rows="5" class="poznamky"></textarea>
+<textarea id="plus_poznamky" rows="5" class="poznamky"
+    onkeyup="if (event.keyCode == Event.KEY_ESC) this.value = ''; Event.dispatch(this, 'change', true);"></textarea>
 <br />
 <a href="javascript://" onclick="Poznamky.vymaz();">
     <span class="small">Vymaž</span>

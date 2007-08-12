@@ -343,7 +343,87 @@ var FileIO = {
 
 
 /*** Marshal server component class ***/
-var Marshal = {
+var Marshal = new Object();
+
+Marshal.ObjectCollection = Class.create();
+
+Marshal.ObjectCollection.prototype = {
+    initialize: function() {
+        this._list = new Hash();
+        this._lastId = 0;
+    },
+    
+    register: function(name, obj) {
+        if (name == null) throw new ArgumentNullException("name");
+        if (obj == null) throw new ArgumentNullException("obj");
+        
+        name = String(name);
+        if (this._list[name] != null)
+            throw new ArgumentException("name", name, "Object of that name already exists.");
+        
+        this._list[name] = obj;
+    },
+    
+    
+    findName: function(doc, obj) {
+        var name = null;
+
+        var objects = this._list;
+
+        objects.keys().each(function(n) {
+                if (objects[n] == obj) {
+                    name = n;
+                    throw $break;
+                }
+            });
+            
+        if (name == null && doc._marshalObjects != null) {
+            objects = doc._marshalObjects;
+            
+            objects.keys().each(function(n) {
+                    if (objects[n] == obj) {
+                        name = n;
+                        throw $break;
+                    }
+                });
+        }
+            
+        return name;
+    },
+    
+    getName: function(doc, obj) {
+        // Find existing name
+        var objectName = this.findName(doc, obj);
+        
+        if (objectName == null) {
+            var marshalObjects = doc._marshalObjects;
+            if (!marshalObjects) {
+                marshalObjects = new Hash();
+                doc._marshalObjects = marshalObjects;
+            }
+        
+            // Create new one (bound to the current document)
+            objectName = ++this._lastId;
+            marshalObjects[objectName] = obj;
+        }
+            
+        return objectName;
+    },
+    
+    getObject: function(doc, name, throwOnError) {
+        var obj = this._list[name];
+
+        if (doc._marshalObjects != null)
+            obj = doc._marshalObjects[name] || obj;
+        
+        if (obj == null && throwOnError)
+            throw new MarshalException("Object is not registered.", name);
+        
+        return obj;
+    }
+};
+
+Object.extend(Marshal, {
     // Constants
     NONE: 0,
     BY_VALUE: 1,
@@ -356,8 +436,7 @@ var Marshal = {
     PROXY_SUFFIX: "_PROXY",
 
     // Private members
-    _objects: new Hash(),
-    _objectId: 0,
+    _objects: new Marshal.ObjectCollection(),
     _validators: new Array(),
 
     initPage: function(page) {
@@ -390,18 +469,10 @@ var Marshal = {
     },
     
     registerObject: function(name, obj) {
-        if (!name)
-            throw new ArgumentNullException("name");
-        if (!obj)
-            throw new ArgumentNullException("obj");
         if (obj == this)
             throw new ArgumentException("obj", null, "Invalid operation.");
         
-        name = String(name);
-        if (this._objects[name])
-            throw new ArgumentException("name", name, "Object already exists.");
-        
-        this._objects[name] = obj;
+        this._objects.register(name, obj);
     },
     
     _methodCallHandler: function(event) {
@@ -420,11 +491,7 @@ var Marshal = {
             
             this._validateCall(elem.ownerDocument, objectName);
             
-            var obj = this._objects[objectName];
-            
-            if (!obj && elem.ownerDocument._marshalObjects)
-                obj = elem.ownerDocument._marshalObjects[objectName];
-            
+            var obj = this._objects.getObject(elem.ownerDocument, objectName, false);
             if (!obj)
                 throw new MarshalException("Object is not registered.", objectName, methodName);
             
@@ -436,7 +503,19 @@ var Marshal = {
             if (methodType == 0)
                 throw new MarshalException("Method cannot be marshaled.", objectName, methodName);
             
-            var args = !argsStr.empty() ? argsStr.evalJSON() : null;
+            // Create argument array
+            var args = new Array();
+            if (argsStr && !argsStr.empty()) {
+                var objects = this._objects;
+            
+                var transportArgs = argsStr.evalJSON();
+                transportArgs.each(function(a) {
+                        if (a.reference != null)
+                            args.push(objects.getObject(elem.ownerDocument, a.reference, true));
+                        else
+                            args.push(a.value);
+                    });
+            }
   
             // Call method
             var retval = method.apply(obj, args);
@@ -449,8 +528,7 @@ var Marshal = {
                         break;
                     
                     case Marshal.BY_REF:
-                        // TODO optimize code so same objects will have same id
-                        var objectId = this._getLocalObjectId(elem.ownerDocument, retval);
+                        var objectId = this._objects.getName(elem.ownerDocument, retval);
                         var def = this._createProxyDefinition(retval);
                         
                         var reference = {
@@ -469,7 +547,7 @@ var Marshal = {
                     
                         for (var i = 0; i < retval.length; i++) {
                             var obj = retval[i];
-                            var objectId = this._getLocalObjectId(elem.ownerDocument, obj);
+                            var objectId = this._objects.getName(elem.ownerDocument, obj);
                             var def = this._createProxyDefinition(obj);
                             
                             var reference = {
@@ -503,9 +581,7 @@ var Marshal = {
                 
             this._validateCall(elem.ownerDocument, objectName);
 
-            var obj = this._objects[objectName];
-            if (!obj)
-                throw new MarshalException("Object is not registered.", objectName);
+            var obj = this._objects.getObject(elem.ownerDocument, objectName, true);
             
             var def = this._createProxyDefinition(obj);
             elem.setAttribute("proxyDefinition", Object.toJSON(def));
@@ -564,39 +640,9 @@ var Marshal = {
             default:
                 return Marshal.NONE;
         }
-    },
-    
-    _getLocalObjectId: function(doc, obj) {
-        var objectId;
-    
-        // Create list of methods
-        var marshalObjects = doc._marshalObjects;
-        if (!marshalObjects) {
-            marshalObjects = new Hash();
-            doc._marshalObjects = marshalObjects;
-        }
-        else {
-            try {
-                marshalObjects.keys().each(
-                    function(k) {
-                        if (marshalObjects[k] == obj) {
-                            objectId = k;
-                            throw null;
-                        }
-                    });
-            }
-            catch(ex) {
-                if (ex) throw ex;
-            }
-        }
-        
-        if (!objectId)
-            objectId = ++this._objectId;
-        
-        marshalObjects[objectId] = obj;
-        return objectId;
     }
-};
+});
+
 
 /*** ExtenderManager class ***/
 var ExtenderManager = {    

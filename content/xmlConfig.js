@@ -108,6 +108,11 @@ var XmlConfigNode = Class.create();
 XmlConfigNode.prototype = {
     initialize: function() {
     },
+    
+    getName_PROXY: Marshal.BY_VALUE,
+    getName: function() {
+        return this.tagName;
+    },
 
     getAttribute_PROXY: Marshal.BY_VALUE,
     setAttribute_PROXY: Marshal.BY_VALUE,
@@ -117,7 +122,19 @@ XmlConfigNode.prototype = {
         var elem = this.ownerDocument.createElement(name);
         
         this.appendChild(elem);
-        if (value)
+        if (value != null)
+            elem.textContent = value;
+        
+        XmlConfig.extendNode(elem);
+        return elem;
+    },
+    
+    insertPref_PROXY: Marshal.BY_REF,
+    insertPref: function(name, value, before) {
+        var elem = this.ownerDocument.createElement(name);
+        
+        this.insertBefore(elem, before);
+        if (value != null)
             elem.textContent = value;
         
         XmlConfig.extendNode(elem);
@@ -154,7 +171,7 @@ XmlConfigNode.prototype = {
         var elem = (name ? this.getPrefNode(name) : this);
         if (!elem)
             elem = this.addPref(name);
-        elem.textContent = (value ? value : ""); // Lepsi prazdny string nez undefined
+        elem.textContent = (value != null ? value : ""); // Lepsi prazdny string nez undefined
         return value;
     },
     
@@ -173,7 +190,7 @@ XmlConfigNode.prototype = {
        
     getPrefNodeByXPath_PROXY: Marshal.BY_REF,
     getPrefNodeByXPath: function(xpath) {
-        var elem = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ANY_TYPE, null).iterateNext();
+        var elem = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
         if (elem) {
             XmlConfig.extendNode(elem);
         }
@@ -213,7 +230,16 @@ XmlConfigNode.prototype = {
     
     getPrefNodeList_PROXY: Marshal.BY_REF_ARRAY,
     getPrefNodeList: function(xpath) {
-        return XPath.evalList(xpath, this);
+        var result = document.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        retval = new Array();
+        
+        if (result) {
+            for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
+                retval.push(XmlConfig.extendNode(i));
+            }
+        }
+        
+        return retval;
     }
 };
 

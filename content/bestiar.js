@@ -34,60 +34,48 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-var Jednotky = {
-    NO_DATA: "NO_DATA",
-
-    load: function() {
-        try { 
+var BestiarFiltry = {
+    _load: function() {
+        try {
             var req = new XMLHttpRequest();
-            req.open("GET", CHROME_CONTENT_URL + "data/jednotky.xml", false); 
+            req.open("GET", CHROME_CONTENT_URL + "data/bestiar.xml", false); 
             req.send(null);
-            
-            var doc = req.responseXML;
-            return XmlConfig.extendNode($X("jednotky", doc));
+
+            this.data = req.responseXML;
         }
-        catch(e) {
+        catch (e) {
+            dump("Nepodarilo se nacist filtry bestiare:\n" + e);
         }
     },
     
-    vyhledej_PROXY: Marshal.BY_VALUE,
-    vyhledej: function(jmeno) {
-        if (jmeno == null)
-            return null;
-        
-        // Nacti data pokud se tak jeste nestalo
-        if (!this.data) {
-            this.data = this.load() || this.NO_DATA;
-        }
-        
-        // Pokud data nejsou k dispozici vrat null
-        if (this.data == this.NO_DATA)
+    getRules_PROXY: Marshal.BY_VALUE,
+    getRules: function(name, type) {
+        if (!this.data)
+            this._load();
+        if (!this.data)
             return null;
     
-        // Pokus se najit jednotku
-        var jednotka = this.data.getPrefNodeByXPath('jednotka[jmeno = "' + jmeno + '"]');
-
-        if (jednotka) {
-            return {
-                jmeno: jmeno,
-                pwr: jednotka.getNumber("pwr"),
-                barva: jednotka.getPref("barva"),
-                typ: jednotka.getPref("typ"),
-                druh: jednotka.getPref("druh"),
-                phb: jednotka.getNumber("phb"),
-                dmg: jednotka.getNumber("dmg"),
-                brn: jednotka.getNumber("brn"),
-                zvt: jednotka.getNumber("zvt"),
-                ini: jednotka.getNumber("ini"),
-                realIni: jednotka.getNumber("realIni"),
-                zlataTU: jednotka.getNumber("zlataTU"),
-                manyTU: jednotka.getNumber("manyTU"),
-                popTU: jednotka.getNumber("popTU")
+        var path = '/aukce/rulelist';
+        if (name) path += '[@name = "' + name + '"]';
+        path += '/rule';
+        if (type) path += '[@type = "' + type + '"]';
+        
+        var rules = this.data.evaluate(path, this.data, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        var i;
+        var arr = new Array();
+        
+        while((i = rules.iterateNext()) != null) {
+            var rule = {
+                name: name,
+                type: i.getAttribute("type"),
+                condition: i.getAttribute("condition"),
+                title: i.textContent
             };
+            arr.push(rule);
         }
         
-        return null;
+        return arr;
     }
 };
 
-Marshal.registerObject("Jednotky", Jednotky);
+Marshal.registerObject("BestiarFiltry", BestiarFiltry);

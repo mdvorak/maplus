@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ***** BEGIN LICENSE BLOCK *****
+  -   Version: MPL 1.1/GPL 2.0/LGPL 2.1
+  -
+  - The contents of this file are subject to the Mozilla Public License Version
+  - 1.1 (the "License"); you may not use this file except in compliance with
+  - the License. You may obtain a copy of the License at
+  - http://www.mozilla.org/MPL/
+  - 
+  - Software distributed under the License is distributed on an "AS IS" basis,
+  - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+  - for the specific language governing rights and limitations under the
+  - License.
+  -
+  - The Original Code is Melior Annis Plus.
+  -
+  - The Initial Developer of the Original Code is
+  - Michal Dvorak.
+  - Portions created by the Initial Developer are Copyright (C) 2007
+  - the Initial Developer. All Rights Reserved.
+  -
+  - Contributor(s):
+  -
+  - Alternatively, the contents of this file may be used under the terms of
+  - either the GNU General Public License Version 2 or later (the "GPL"), or
+  - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+  - in which case the provisions of the GPL or the LGPL are applicable instead
+  - of those above. If you wish to allow use of your version of this file only
+  - under the terms of either the GPL or the LGPL, and not to allow others to
+  - use your version of this file under the terms of the MPL, indicate your
+  - decision by deleting the provisions above and replace them with the notice
+  - and other provisions required by the GPL or the LGPL. If you do not delete
+  - the provisions above, a recipient may use your version of this file under
+  - the terms of any one of the MPL, the GPL or the LGPL.
+  - 
+  - ***** END LICENSE BLOCK ***** -->
+<aukce>
+  <!-- Funkce compare je definovana v lib.js -->
+  
+  <rulelist name="jmeno" title="Jednotka">
+    <rule type="sort" condition="Object.compare(stack1.jmeno, stack2.jmeno)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.jmeno, stack1.jmeno)">Sestupně</rule>
+  </rulelist>
+
+  <rulelist name="pocet" title="Počet">
+    <rule type="sort" condition="Object.compare(stack1.pocet, stack2.pocet)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.pocet, stack1.pocet)">Sestupně</rule>
+    <rule type="filter" condition="stack.pocet &gt;= 2000">&gt; 2000</rule>
+    <rule type="filter" condition="stack.pocet &gt;= 5000">&gt; 5000</rule>
+  </rulelist>
+  
+  <rulelist name="zkusenost" title="Zkušenost">
+    <rule type="sort" condition="Object.compare(stack1.zkusenost, stack2.zkusenost)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.zkusenost, stack1.zkusenost)">Sestupně</rule>
+    <rule type="filter" condition="stack.zkusenost &gt;= 0.40">&gt; 40%</rule>
+    <rule type="filter" condition="stack.zkusenost &gt;= 0.60">&gt; 60%</rule>
+  </rulelist>
+
+  <rulelist name="silaJednotky" title="Síla jednotky">
+    <rule type="sort" condition="Object.compare(stack1.silaJednotky, stack2.silaJednotky)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.silaJednotky, stack1.silaJednotky)">Sestupně</rule>
+    <rule type="filter" condition="stack.silaJednotky &lt;= 50">&lt;= 50</rule>
+    <rule type="filter" condition="stack.silaJednotky &gt; 50">&gt; 50</rule>
+    <rule type="filter" condition="stack.silaJednotky &gt; 120">&gt; 120</rule>
+  </rulelist>
+
+  <rulelist name="ini" title="Iniciativa">
+    <rule type="sort" condition="Object.compare(stack1.ini, stack2.ini)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.ini, stack1.ini)">Sestupně</rule>
+    <rule type="filter" condition="stack.ini &gt; 10">&gt; 10</rule>
+    <rule type="filter" condition="stack.ini &gt; 20">&gt; 20</rule>
+    <rule type="filter" condition="stack.ini &gt; 30">&gt; 30</rule>
+  </rulelist>
+
+  <rulelist name="druh" title="Druh">
+    <rule type="filter" condition="stack.druh == 'Poz.'">Pozemní</rule>
+    <rule type="filter" condition="stack.druh == 'Let.'">Letecké</rule>
+  </rulelist>
+
+  <rulelist name="typ" title="Typ">
+    <rule type="filter" condition="stack.typ == 'Boj.'">Bojové</rule>
+    <rule type="filter" condition="stack.typ == 'Str.'">Střelecké</rule>
+  </rulelist>
+  
+  <rulelist name="silaStacku" title="Síla stacku">
+    <rule type="sort" condition="Object.compare(stack1.silaStacku, stack2.silaStacku)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.silaStacku, stack1.silaStacku)">Sestupně</rule>
+    <rule type="filter" condition="stack.silaStacku &lt; 2000">&lt; 2000</rule>
+    <rule type="filter" condition="stack.silaStacku &gt; 2000">&gt; 2000</rule>
+    <rule type="filter" condition="stack.silaStacku &gt; 10000">&gt; 10000</rule>
+  </rulelist>
+
+  <rulelist name="cenaZaSilu" title="Cena za 1 síly">
+    <rule type="sort" condition="Object.compare(stack1.cenaZaSilu, stack2.cenaZaSilu)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.cenaZaSilu, stack1.cenaZaSilu)">Sestupně</rule>
+    <rule type="filter" condition="stack.cenaZaSilu &lt;= 15">&lt; 15</rule>
+    <rule type="filter" condition="stack.cenaZaSilu &lt;= 30">&lt; 30</rule>
+  </rulelist>
+  
+  <rulelist name="cas" title="Čas prodeje">
+    <rule type="sort" condition="Object.compare(stack1.cas, stack2.cas)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.cas, stack1.cas)">Sestupně</rule>
+  </rulelist>
+
+  <rulelist name="nabidka" title="Nabídka">
+    <rule type="sort" condition="Object.compare(stack1.nabidka, stack2.nabidka)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.nabidka, stack1.nabidka)">Sestupně</rule>
+  </rulelist>
+</aukce>

@@ -34,13 +34,15 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-// Rozsirene menu
+// Vypis utoku 2
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Menu - Vypis Utoku 2"; },
 
     analyze: function(page, context) {
+        if (!page.config.getMenu().getBoolean('vypisUtoku', true))
+            return false;
+    
         context.utoky = $X('font/a[contains(., "Výpisy") and contains(., "útoků")]', page.rightMenu); // pozn: netusim jak ho donutit brat mezeru
-        
         return (context.utoky != null);
     },
     
@@ -63,6 +65,9 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Menu - Aliance"; },
 
     analyze: function(page, context) {
+        if (!page.config.getMenu().getBoolean('aliance', true))
+            return false;
+    
         context.alianceLink = $X('font/a[. = "Aliance"]', page.rightMenu); 
         return (context.alianceLink != null);
     },
@@ -124,6 +129,10 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Menu - Kalkulacka"; },
 
     analyze: function(page, context) {
+        context.kalkulacka = page.config.getPrefNode("kalkulacka", true);
+        if (!context.kalkulacka.getBoolean("zobrazit", true))
+            return false;
+    
         context.kalkulackaHtml = Chrome.loadText("html/kalkulacka.html");
         return (context.kalkulackaHtml != null);
     },
@@ -133,12 +142,12 @@ pageExtenders.add(PageExtender.create({
         div.innerHTML = context.kalkulackaHtml;
         page.leftMenu.appendChild(div);
 
-        var cfg = page.localConfig;
+        var cfg = page.localConfig.getPrefNode("kalkulacka", true);
         // Definovano v html
-        Kalkulacka.init(cfg.getPref("kalkulacka", ""), 
+        Kalkulacka.init(cfg.getPref("vstup", ""), 
             function(e)
             {
-                cfg.setPref("kalkulacka", e.target.value);
+                cfg.setPref("vstup", e.target.value);
             });
     }
 }));
@@ -148,6 +157,10 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Menu - Poznamky"; },
 
     analyze: function(page, context) {
+        context.poznamky = page.config.getPrefNode("poznamky", true);
+        if (!context.poznamky.getBoolean("zobrazit", true))
+            return false;
+    
         context.poznamkyHtml = Chrome.loadText("html/poznamky.html");
         return (context.poznamkyHtml != null);
     },
@@ -157,12 +170,12 @@ pageExtenders.add(PageExtender.create({
         div.innerHTML = context.poznamkyHtml;
         page.leftMenu.appendChild(div);
 
-        var cfg = page.config;
+        var cfg = context.poznamky;
         // Definovano v html
-        Poznamky.init(cfg.getPref("poznamky", ""), 
+        Poznamky.init(cfg.getPref("text", ""), 
             function(e)
             {
-                cfg.setPref("poznamky", e.target.value);
+                cfg.setPref("text", e.target.value);
             });
     }
 }));

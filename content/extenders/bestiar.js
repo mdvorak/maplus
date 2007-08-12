@@ -33,7 +33,110 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
+
+var BestiarFiltry = Marshal.getObjectProxy("BestiarFiltry");
+
+/*** Implementace pravidel ***/
+var Rules = {
+    sort: function(rules) {
+        if (!rules) return null;
+        
+        return function(row1, row2) {
+            var stack1 = row1.stack;
+            var stack2 = row2.stack;
+            
+            if (stack1 == stack2)
+                return 0;
+            else if (stack1 == null)
+                return -1;
+            else if (stack2 == null)
+                return 1;
+         
+            for (var i = 0; i < rules.length; i++) {
+                if (!rules[i]) continue;
+                
+                var r = eval(rules[i]);
+                if (r != null && r != 0) return r;
+            }
+        };
+    }
+
+    filter: function(rules) {
+        if (!rules) return null;
+        
+        return function(row) {
+            var stack = row.stack;
+            
+            if (stack == null)
+                return true;
+
+            for (var i = 0; i < rules.length; i++) {
+                if (!rules[i]) continue;
+                
+                var r = eval(rules[i]);
+                if (!r) return false;
+            }
+            
+            return true;
+        };
+    }
+};
+
+/*** Konfigurace ***/
+PlusConfig.Aukce = new Object();
+
+PlusConfig.Aukce.prototype = {
+    setRule: function(name, type, condition) {
+        var f = this.getPrefNodeByXPath('filter[@name = "' + name + '" and @type = "' + type + '"]');
+        if (f) {
+            f.setPref(null, condition);
+        }
+        else {
+            var first = this.getPrefNodeByXPath('filter[first()]');
+            (first ? this.insertPref : this.addPref)("filter", condition, first);
+            
+            f.setAttribute("name", name);
+            f.setAttribute("type", type);
+        }
+
+        return f;
+    };
+
+    removeRule: function(name, type) {
+        var path = 'filter[@name = "' + name + '"';
+        if (type) path += ' and @type = "' + type + '"';
+        path += ']';
+        
+        var list = this.getPrefNodeList('filter[@name = "' + name + '" and @type = "' + type + '"]');
+        for (var i = 0; i < list.length; i++) {
+            this.removeChild(list[i]);
+        }
+    };
+
+    clearRules: function() {
+        this.clearChildNodes();
+    };
+
+    createRuleSet: function(type) {
+        var rules = new Array();
+        var list = elementEvaluate(this, 'filter[@type = "' + type + '"]');
+        
+        for (var i = 0; i < list.length; i++) {
+            rules.push(list[i].textContent);
+        }
+        
+        return rules;
+    };
+
+    hasRules: function(type) {
+        var path = 'filter';
+        if (type) path += '[@type = "' + type + '"]';
+        var count = this.ownerDocument.evaluate('count(' + path + ')', this, null, XPathResult.NUMBER_TYPE, null).numberValue;
+        return count > 0;
+    };
+};
+
+/*** Vlastni extender ***/
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Bestiar - "; },
 

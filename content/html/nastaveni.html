@@ -8,17 +8,16 @@ td.nadpis
 </style>
 <table>
     <colgroup>
-        <col width="120" />
+        <col width="140" />
         <col width="100" />
         <col width="10" />
-        <col width="120" />
+        <col width="140" />
         <col width="100" />
     </colgroup>
 	<tbody>
 		<tr>
 			<td colspan="5" align="center"><b>Melior Annis Plus - Nastavení</b></td>
 		</tr>
-		
 		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
 		<tr>
@@ -26,7 +25,6 @@ td.nadpis
 		</tr>
 		
 		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
 		<tr>
 		    <td colspan="5" class="nadpis">
 		        <span><b>Obecné</b></span>
@@ -37,16 +35,16 @@ td.nadpis
 		<tr>
 			<td><span>Temné barvy</span></td>
 			<td>
-				<input type="checkbox" name="plusConfig"
+				<input type="checkbox"
 					onload="this.checked = this.config.getBoolean('temneBarvy', true);"
 					onsave="this.config.setPref('temneBarvy', this.checked);" />
 			</td>
 			
 			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
 			
-			<td><span>Limit tahu bez potvrzeni</span></td>
+			<td><span>Limit tahů bez potvrzení</span></td>
 			<td>
-				<input type="text" name="plusConfig" style="width: 50;"
+				<input type="text" style="width: 50;"
 					onload="this.value = this.config.getNumber('maxTahu', MAX_TAHU_DEFAULT);"
 					onsave="this.config.setPref('maxTahu', Number(this.value));" />
 			</td>
@@ -61,8 +59,67 @@ td.nadpis
 				<span class="small dark">(Počet tahů které můžete odehrát ani by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
 			</td>
 		</tr>
+		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
+		<tr>
+			<td><span>Zobrazit kalkulačku</span></td>
+			<td>
+				<input type="checkbox"
+					onload="this.checked = this.config.getPrefNode('kalkulacka', true).getBoolean('zobrazit', true);"
+					onsave="this.config.getPrefNode('kalkulacka', true).setPref('zobrazit', this.checked);" />
+			</td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+			
+			<td><span>Zobrazit poznámky</span></td>
+			<td>
+				<input type="checkbox"
+					onload="this.checked = this.config.getPrefNode('poznamky', true).getBoolean('zobrazit', true);"
+					onsave="this.config.getPrefNode('poznamky', true).setPref('zobrazit', this.checked);" />
+			</td>
+		</tr>
+		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
+		<!-- TODO -->
 		
 		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		<tr>
+		    <td colspan="5" class="nadpis">
+		        <span><b>Menu</b></span>
+		    </td>
+		</tr>
+		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
+		<tr>
+			<td><span>Rozšíření aliance</span></td>
+			<td>
+				<input type="checkbox"
+					onload="this.checked = this.config.getMenu().getBoolean('aliance', true);"
+					onsave="this.config.getMenu().setPref('aliance', this.checked);" />
+			</td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+			
+			<td><span>Výpis útoků 2</span></td>
+			<td>
+				<input type="checkbox"
+					onload="this.checked = this.config.getMenu().getBoolean('vypisUtoku', true);"
+					onsave="this.config.getMenu().setPref('vypisUtoku', this.checked);" />
+			</td>
+		</tr>
+		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
+		<!-- TODO -->
+		
+		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		<tr>
+		    <td colspan="5" class="nadpis">
+		        <span><b>Bestiář</b></span>
+		    </td>
+		</tr>
+		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
+		
 		
 		<!-- TODO -->
 		

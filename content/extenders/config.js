@@ -54,6 +54,13 @@ PlusConfig.prototype = {
         }
         return this._nastaveni;
     },
+    
+    getMenu: function() {
+        if (!this._menu) {
+            this._menu = this.getPrefNode("menu", true);
+        }
+        return this._menu;
+    }
 };
  
 PlusConfig.Nastaveni = new Object();
@@ -74,33 +81,36 @@ PlusConfig.Nastaveni.prototype = {
 };
 
 Object.extend(PlusConfig, {
-    getConfig: function(id) {
+    EXTENSION: ".xml",
+    
+    getConfigName: function(id) {
         if (!id || isNaN(parseInt(id)))
-            throw String.format("id '{0}' is invalid.", id);
+            throw new ArgumentException("id", id, "Id is invalid.");
         
-        // Note: cfg should be proxy
-        var cfg = Marshal.callMethod("configManager", "getConfig", [id]);
+        return id + this.EXTENSION;
+    },
+
+    getConfig: function(id) {
+        var name = this.getConfigName(id);
+        
+        var cfg = Marshal.callMethod("configManager", "getConfig", [name]);
         cfg = Object.extend(cfg, PlusConfig.prototype);
         
-        cfg.save = function() { PlusConfig.saveConfig(id); };
+        cfg.save = function() { PlusConfig.saveConfig(name); };
         
         return cfg;
     },
     
     getLocalConfig: function(id) {
-        if (!id || isNaN(parseInt(id)))
-            throw String.format("id '{0}' is invalid.", id);
+        var name = this.getConfigName(id);
         
-        // Note: cfg should be proxy
-        var cfg = Marshal.callMethod("localConfigManager", "getConfig", [id]);
+        var cfg = Marshal.callMethod("localConfigManager", "getConfig", [name]);
         return cfg;
     },
     
     saveConfig: function(id) {
-        if (!id || isNaN(parseInt(id)))
-            throw String.format("id '{0}' is invalid.", id);
-            
-        Marshal.callMethod("configManager", "saveConfig", [id]);
+        var name = this.getConfigName(id);
+        Marshal.callMethod("configManager", "saveConfig", [name]);
     }
 });
 
@@ -113,9 +123,9 @@ pageExtenders.add(PageExtender.create({
         page.localConfig = PlusConfig.getLocalConfig(page.id);
         
         if (!page.config)
-            throw String.format("Unable to get config for id '{0}'.", page.id);
+            throw new Exception(String.format("Unable to get config for id '{0}'.", page.id));
         if (!page.localConfig)
-            throw String.format("Unable to get config for id '{0}'.", page.id);
+            throw new Exception(String.format("Unable to get config for id '{0}'.", page.id));
         
         return true;
     },
