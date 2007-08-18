@@ -110,12 +110,12 @@ PlusConfig.Aukce.prototype = {
         if (name == null) throw new ArgumentNullException("name");
         if (type == null) throw new ArgumentNullException("type");
     
-        var f = this.getPrefNodeByXPath('filter[@name = "' + name + '" and @type = "' + type + '"]');
+        var f = this.evalPrefNode('filter[@name = "' + name + '" and @type = "' + type + '"]');
         if (f) {
             f.setPref(null, condition);
         }
         else {
-            var first = this.getPrefNodeByXPath('filter[first()]');
+            var first = this.evalPrefNode('filter[first()]');
             (first ? this.insertPref : this.addPref)("filter", condition, first);
             
             f.setAttribute("name", name);
@@ -133,7 +133,7 @@ PlusConfig.Aukce.prototype = {
         if (type) path += ' and @type = "' + type + '"';
         path += ']';
         
-        var list = this.getPrefNodeList('filter[@name = "' + name + '" and @type = "' + type + '"]');
+        var list = this.evalPrefNodeList('filter[@name = "' + name + '" and @type = "' + type + '"]');
         for (var i = 0; i < list.length; i++) {
             this.removePrefNode(list[i]);
         }
@@ -146,7 +146,7 @@ PlusConfig.Aukce.prototype = {
     createRuleSet: function(type) {
         if (type == null) throw new ArgumentNullException("type");
     
-        var list = this.getPrefNodeList('filter[@type = "' + type + '"]');
+        var list = this.evalPrefNodeList('filter[@type = "' + type + '"]');
         var rules = new Array();
         
         for (var i = 0; i < list.length; i++) {
@@ -159,7 +159,7 @@ PlusConfig.Aukce.prototype = {
     hasRules: function(type) {
         var path = 'filter';
         if (type) path += '[@type = "' + type + '"]';
-        var count = this.getPrefNodeList('count(' + path + ')').length;
+        var count = this.evalPrefNodeList('count(' + path + ')').length;
         return count > 0;
     }
 };

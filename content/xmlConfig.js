@@ -98,14 +98,6 @@ var XmlConfig = {
         catch (e) {
             dump(String.format("Error saving file '{0}':\n{1}", path, e));
         }
-    },
-    
-    useXPathNodeExtension: function() {
-        Object.extend(XmlConfigNode.prototype, XmlConfigNode.XPath.prototype);
-    },
-    
-    useExtendedNodeExtension: function() {
-        Object.extend(XmlConfigNode.prototype, XmlConfigNode.Extended.prototype);
     }
 };
  
@@ -194,28 +186,57 @@ XmlConfigNode.prototype = {
     }
 };
 
+XmlConfigNode.Extension = Class.create();
+XmlConfigNode.Extension.prototype = {
+    initialize: function() {
+        this.activated = false;
+    },
+
+    useExtension: function() {
+        if (this.activated)
+            return;
+        
+        Object.extend(XmlConfigNode.prototype, this.prototype);
+        this.activated = true;
+    }
+};
+
 /*** XmlConfigNode.XPath class ***/
-XmlConfigNode.XPath = new Object();
+XmlConfigNode.XPath = new XmlConfigNode.Extension();
  
 XmlConfigNode.XPath.prototype = {
-    getPrefNodeByXPath_PROXY: Marshal.BY_REF,
-    getPrefNodeByXPath: function(xpath) {
+    evalPrefNode_PROXY: Marshal.BY_REF,
+    evalPrefNode: function(xpath) {
         var elem = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
         if (elem) {
             XmlConfig.extendNode(elem);
         }
         return elem;
     },
+
+    evalPrefNodeList_PROXY: Marshal.BY_REF_ARRAY,
+    evalPrefNodeList: function(xpath) {
+        var result = document.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        retval = new Array();
+        
+        if (result) {
+            for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
+                retval.push(XmlConfig.extendNode(i));
+            }
+        }
+        
+        return retval;
+    },
     
     getPrefByName_PROXY: Marshal.BY_VALUE,
     getPrefByName: function(tagName, name, defaultValue) {
-        var elem = this.getPrefNodeByXPath(tagName + '[@name = "' + name + '"]');
+        var elem = this.evalPrefNode(tagName + '[@name = "' + name + '"]');
         return elem ? elem.textContent : defaultValue;
     },
     
     setPrefByName_PROXY: Marshal.BY_VALUE,
     setPrefByName: function(tagName, name, value) {
-        var elem = this.getPrefNodeByXPath(tagName + '[@name = "' + name + '"]');
+        var elem = this.evalPrefNode(tagName + '[@name = "' + name + '"]');
         if (value) {
             if (!elem) {
                 elem = this.addPref(tagName, value);
@@ -229,26 +250,11 @@ XmlConfigNode.XPath.prototype = {
             this.removeChild(elem);
         }
         return value;
-    },
-
-    getPrefNodeList_PROXY: Marshal.BY_REF_ARRAY,
-    getPrefNodeList: function(xpath) {
-        var result = document.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-        retval = new Array();
-        
-        if (result) {
-            for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
-                retval.push(XmlConfig.extendNode(i));
-            }
-        }
-        
-        return retval;
     }
 };
 
 /*** XmlConfigNode.Extended class ***/
-
-XmlConfigNode.Extended = new Object();
+XmlConfigNode.Extended = new XmlConfigNode.Extension();
  
 XmlConfigNode.Extended.prototype = {
     insertPref_PROXY: Marshal.BY_REF,
@@ -273,13 +279,13 @@ XmlConfigNode.Extended.prototype = {
         return XmlConfig.extendNode(this.lastChild);
     },
     
-    getNextNode_PROXY: Marshal.BY_REF,
-    getNextNode: function() {
-        return XmlConfig.extendNode(this.nextSibing);
+    getNextSibling_PROXY: Marshal.BY_REF,
+    getNextSibling: function() {
+        return XmlConfig.extendNode(this.nextSibling);
     },
     
-    getPreviousNode_PROXY: Marshal.BY_REF,
-    getPreviousNode: function() {
+    getPreviousSibling_PROXY: Marshal.BY_REF,
+    getPreviousSibling: function() {
         return XmlConfig.extendNode(this.previousSibling);
     }
 });

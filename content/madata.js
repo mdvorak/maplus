@@ -65,7 +65,7 @@ var MaData = {
             
         this._ensureDataAreLoaded();
     
-        var provi = this.seznamProvincii.getPrefNodeByXPath('provincie[@id = "' + id + '"]');
+        var provi = this.seznamProvincii.evalPrefNode('provincie[@id = "' + id + '"]');
         
         if (provi) {
           return {
@@ -89,7 +89,7 @@ var MaData = {
             
         this._ensureDataAreLoaded();
     
-        var provi = this.seznamProvincii.getPrefNodeByXPath('provincie[@id = "' + id + '"]');
+        var provi = this.seznamProvincii.evalPrefNode('provincie[@id = "' + id + '"]');
         
         if (!provi) {
             provi = this.seznamProvincii.addPref("provincie");
@@ -112,7 +112,7 @@ var MaData = {
     
         this._ensureDataAreLoaded();
     
-        var ali = this.seznamAlianci.getPrefNodeByXPath('aliance[jmeno = "' + jmeno + '"]');
+        var ali = this.seznamAlianci.evalPrefNode('aliance[jmeno = "' + jmeno + '"]');
         
         if (ali) {
             return {
@@ -151,7 +151,7 @@ var MaData = {
             
         this._ensureDataAreLoaded();
         
-        var ali = this.seznamAlianci.getPrefNodeByXPath('aliance[jmeno = "' + jmeno + '"]');
+        var ali = this.seznamAlianci.evalPrefNode('aliance[jmeno = "' + jmeno + '"]');
         
         if (!ali) {
             ali = this.seznamAlianci.addPref("aliance");

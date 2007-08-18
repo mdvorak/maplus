@@ -35,6 +35,10 @@
  * ***** END LICENSE BLOCK ***** */
 
 const CONFIG_ROOT_NAME = "prefs";
+
+XmlConfigNode.XPath.useExtension();
+XmlConfigNode.Extended.useExtension();
+
 var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME);
 var localConfigManager = new XmlConfigManager(null, CONFIG_ROOT_NAME);
 

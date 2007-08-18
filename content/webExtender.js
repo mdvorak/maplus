@@ -414,7 +414,7 @@ Marshal.ObjectCollection.prototype = {
         var obj = this._list[name];
 
         if (doc._marshalObjects != null)
-            obj = doc._marshalObjects[name] || objd;
+            obj = doc._marshalObjects[name] || obj;
         
         if (obj == null && throwOnError)
             throw new MarshalException("Object is not registered.", name);

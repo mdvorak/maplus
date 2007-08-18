@@ -65,7 +65,7 @@ var Jednotky = {
             return null;
     
         // Pokus se najit jednotku
-        var jednotka = this.data.getPrefNodeByXPath('jednotka[jmeno = "' + jmeno + '"]');
+        var jednotka = this.data.evalPrefNode('jednotka[jmeno = "' + jmeno + '"]');
 
         if (jednotka) {
             return {
