@@ -36,6 +36,26 @@
 
 var BestiarFiltry = Marshal.getObjectProxy("BestiarFiltry");
 
+// Razeni a filtrovani
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Filtry"; },
+
+    analyze: function(page, context) {
+        // Bestiar
+        if (page.arguments["obchod"] != "jedn_new")
+            return false;
+            
+        // TODO
+        
+        return false;
+    },
+
+    process: function(page, context) {
+        // TODO
+    }
+}));
+
+
 /*** Implementace pravidel ***/
 var Rules = {
     sort: function(rules) {
@@ -59,7 +79,7 @@ var Rules = {
                 if (r != null && r != 0) return r;
             }
         };
-    }
+    },
 
     filter: function(rules) {
         if (!rules) return null;
@@ -87,6 +107,9 @@ PlusConfig.Aukce = new Object();
 
 PlusConfig.Aukce.prototype = {
     setRule: function(name, type, condition) {
+        if (name == null) throw new ArgumentNullException("name");
+        if (type == null) throw new ArgumentNullException("type");
+    
         var f = this.getPrefNodeByXPath('filter[@name = "' + name + '" and @type = "' + type + '"]');
         if (f) {
             f.setPref(null, condition);
@@ -100,57 +123,43 @@ PlusConfig.Aukce.prototype = {
         }
 
         return f;
-    };
+    },
 
     removeRule: function(name, type) {
+        if (name == null) throw new ArgumentNullException("name");
+        if (type == null) throw new ArgumentNullException("type");
+    
         var path = 'filter[@name = "' + name + '"';
         if (type) path += ' and @type = "' + type + '"';
         path += ']';
         
         var list = this.getPrefNodeList('filter[@name = "' + name + '" and @type = "' + type + '"]');
         for (var i = 0; i < list.length; i++) {
-            this.removeChild(list[i]);
+            this.removePrefNode(list[i]);
         }
-    };
+    },
 
     clearRules: function() {
         this.clearChildNodes();
-    };
+    },
 
     createRuleSet: function(type) {
+        if (type == null) throw new ArgumentNullException("type");
+    
+        var list = this.getPrefNodeList('filter[@type = "' + type + '"]');
         var rules = new Array();
-        var list = elementEvaluate(this, 'filter[@type = "' + type + '"]');
         
         for (var i = 0; i < list.length; i++) {
-            rules.push(list[i].textContent);
+            rules.push(list[i].getPref());
         }
         
         return rules;
-    };
+    },
 
     hasRules: function(type) {
         var path = 'filter';
         if (type) path += '[@type = "' + type + '"]';
-        var count = this.ownerDocument.evaluate('count(' + path + ')', this, null, XPathResult.NUMBER_TYPE, null).numberValue;
+        var count = this.getPrefNodeList('count(' + path + ')').length;
         return count > 0;
-    };
-};
-
-/*** Vlastni extender ***/
-pageExtenders.add(PageExtender.create({
-    getName: function() { return "Bestiar - "; },
-
-    analyze: function(page, context) {
-        // Bestiar
-        if (page.arguments["obchod"] != "jedn_new")
-            return false;
-            
-        // TODO
-        
-        return false;
-    },
-
-    process: function(page, context) {
-        // TODO
     }
-}));
+};

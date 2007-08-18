@@ -99,16 +99,21 @@ var XmlConfig = {
             dump(String.format("Error saving file '{0}':\n{1}", path, e));
         }
     },
+    
+    useXPathNodeExtension: function() {
+        Object.extend(XmlConfigNode.prototype, XmlConfigNode.XPath.prototype);
+    },
+    
+    useExtendedNodeExtension: function() {
+        Object.extend(XmlConfigNode.prototype, XmlConfigNode.Extended.prototype);
+    }
 };
  
 
 /*** XmlConfigNode class ***/
-var XmlConfigNode = Class.create();
+var XmlConfigNode = new Object();
  
 XmlConfigNode.prototype = {
-    initialize: function() {
-    },
-    
     getName_PROXY: Marshal.BY_VALUE,
     getName: function() {
         return this.tagName;
@@ -122,18 +127,6 @@ XmlConfigNode.prototype = {
         var elem = this.ownerDocument.createElement(name);
         
         this.appendChild(elem);
-        if (value != null)
-            elem.textContent = value;
-        
-        XmlConfig.extendNode(elem);
-        return elem;
-    },
-    
-    insertPref_PROXY: Marshal.BY_REF,
-    insertPref: function(name, value, before) {
-        var elem = this.ownerDocument.createElement(name);
-        
-        this.insertBefore(elem, before);
         if (value != null)
             elem.textContent = value;
         
@@ -186,8 +179,25 @@ XmlConfigNode.prototype = {
         var v = Number(this.getPref(name, defaultValue));
         if (!isNaN(v)) return v;
         else return defaultValue;
+    }
+    
+    removePrefNode_PROXY: Marshal.BY_REF,
+    removePrefNode: function(prefNode) {
+        return this.removeChild(prefNode);
     },
-       
+
+    clearChildNodes_PROXY: Marshal.BY_VALUE,
+    clearChildNodes: function() {
+        while (this.firstChild) {
+            this.removeChild(this.firstChild);
+        }
+    }
+};
+
+/*** XmlConfigNode.XPath class ***/
+XmlConfigNode.XPath = new Object();
+ 
+XmlConfigNode.XPath.prototype = {
     getPrefNodeByXPath_PROXY: Marshal.BY_REF,
     getPrefNodeByXPath: function(xpath) {
         var elem = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
@@ -221,13 +231,6 @@ XmlConfigNode.prototype = {
         return value;
     },
 
-    clearChildNodes_PROXY: Marshal.BY_VALUE,
-    clearChildNodes: function() {
-        while (this.firstChild) {
-            this.removeChild(this.firstChild);
-        }
-    },
-    
     getPrefNodeList_PROXY: Marshal.BY_REF_ARRAY,
     getPrefNodeList: function(xpath) {
         var result = document.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
@@ -242,6 +245,45 @@ XmlConfigNode.prototype = {
         return retval;
     }
 };
+
+/*** XmlConfigNode.Extended class ***/
+
+XmlConfigNode.Extended = new Object();
+ 
+XmlConfigNode.Extended.prototype = {
+    insertPref_PROXY: Marshal.BY_REF,
+    insertPref: function(name, value, before) {
+        var elem = this.ownerDocument.createElement(name);
+        
+        this.insertBefore(elem, before);
+        if (value != null)
+            elem.textContent = value;
+        
+        XmlConfig.extendNode(elem);
+        return elem;
+    },
+    
+    getFirstChild_PROXY: Marshal.BY_REF,
+    getFirstChild: function() {
+        return XmlConfig.extendNode(this.firstChild);
+    },
+    
+    getLastChild_PROXY: Marshal.BY_REF,
+    getLastChild: function() {
+        return XmlConfig.extendNode(this.lastChild);
+    },
+    
+    getNextNode_PROXY: Marshal.BY_REF,
+    getNextNode: function() {
+        return XmlConfig.extendNode(this.nextSibing);
+    },
+    
+    getPreviousNode_PROXY: Marshal.BY_REF,
+    getPreviousNode: function() {
+        return XmlConfig.extendNode(this.previousSibling);
+    }
+});
+
 
 /*** XmlConfigManager class ***/
 

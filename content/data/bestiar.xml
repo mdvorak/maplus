@@ -35,7 +35,7 @@
   - 
   - ***** END LICENSE BLOCK ***** -->
 <aukce>
-  <!-- Funkce compare je definovana v lib.js -->
+  <!-- Funkce Object.compare je definovana v webExtenderLib.js -->
   
   <rulelist name="jmeno" title="Jednotka">
     <rule type="sort" condition="Object.compare(stack1.jmeno, stack2.jmeno)">Vzestupně</rule>
