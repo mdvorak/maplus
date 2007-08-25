@@ -709,7 +709,7 @@ ExtenderManager.Extenders = {
         var name = def.getAttribute("name");
         var type = def.getAttribute("type");
         
-        if (!name || !/^[\w.\/_-~]+$/.test(name))
+        if (!name || !new RegExp("^[\\w./_~-]+$").test(name))
             throw new Exception(String.format("Invalid script name ('{0}').", name));
         
         var src = data.location + name;

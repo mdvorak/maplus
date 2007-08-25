@@ -149,7 +149,7 @@ Object.extend(String, {
         str1 = "" + str1;
         str2 = "" + str2;
     
-        if (ignoreCase)
+        if (ignoreCase) {
             str1 = str1.toLowerCase();
             str2 = str2.toLowerCase();
         }
@@ -163,7 +163,15 @@ Object.extend(String, {
     },
     
     equals: function(str1, str2, ignoreCase) {
-        return String.compare(str1, str2, ignoreCase) == 0;
+        str1 = "" + str1;
+        str2 = "" + str2;
+    
+        if (ignoreCase) {
+            str1 = str1.toLowerCase();
+            str2 = str2.toLowerCase();
+        }
+        
+        return (str1 == str2);
     }
 });
 
@@ -176,9 +184,8 @@ Object.extend(Element, {
         var e = doc.createElement(tagName);
         
         if (attributes) {
-            $H(attributes).each(function(attrName)
-                {
-                    e.setAttribute(attrName, attributes[attrName] || "");
+            $H(attributes).each(function(attr) {
+                    e.setAttribute(attr[0], attr[1] || "");
                 });
         }
         

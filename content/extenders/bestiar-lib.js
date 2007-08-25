@@ -36,6 +36,92 @@
 
 var BestiarFiltry = Marshal.getObjectProxy("BestiarFiltry");
 
+/*** TableSorter class ***/
+var TableSorter = {
+    filter: function(table, callback) {
+        if (table == null) throw new ArgumentNullException("table");
+        if (callback == null) throw new ArgumentNullException("callback");
+        if (!String.equals(table.tagName, "table", true))
+            throw new ArgumentException("table", table, "Argument must be a table element.");
+    
+        for (var i = 0; i < table.rows.length; i++) {
+            var show = callback(table.rows[i], i);
+            table.rows[i].style.display = show ? '' : 'none';
+        }
+    },
+
+    sort: function(table, callback) {
+        if (table == null) throw new ArgumentNullException("table");
+        if (callback == null) throw new ArgumentNullException("callback");
+        if (!String.equals(table.tagName, "table", true))
+            throw new ArgumentException("table", table, "Argument must be a table element.");
+    
+        if (table.rows.length == 0)
+            return;
+            
+        var tbody = table.rows[0].parentNode;
+
+        var sortArr = new Array();
+
+        for (var i = 0; i < table.rows.length; i++) {
+            if (table.rows[i] != table.sortRow)
+                sortArr.push(table.rows[i]);
+        }
+        
+        sortArr.sort(callback);
+        
+        if(!table.sortRow) {
+            table.sortRow = table.ownerDocument.createElement("tr");
+            table.sortRow.style.display = 'none';
+        }
+        if (table.sortRow != table.rows[0]) {
+            tbody.insertBefore(table.sortRow, table.rows[0]);
+        }
+        
+        for (var i = 0; i < sortArr.length; i++) {
+            tbody.insertBefore(sortArr[i], table.sortRow);
+        }
+    }
+};
+
+// Puvodni poradi sloupcu
+var PUVODNI_SLOUPCE = ["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", 
+                               "druh", "typ", "cas", "nabidka"];
+var PUVODNI_SLOUPCE_HLAVICKA = ["jmeno", "pocet", "zkusenost", "silaJednotky", 
+                               "druh", "typ", "cas", "nabidka"];
+
+var NAZVY_SLOUPCU = new Hash();
+// Puvodni
+NAZVY_SLOUPCU["jmeno"] = "Jednotka";
+NAZVY_SLOUPCU["barva"] = "";
+NAZVY_SLOUPCU["pocet"] = "Počet";
+NAZVY_SLOUPCU["zkusenost"] = "Zkušenost";
+NAZVY_SLOUPCU["silaJednotky"] = "Síla J.";
+NAZVY_SLOUPCU["druh"] = "Druh";
+NAZVY_SLOUPCU["typ"] = "Typ";
+NAZVY_SLOUPCU["cas"] = "Čas prodeje";
+NAZVY_SLOUPCU["nabidka"] = "Nabídka";
+// Nove
+NAZVY_SLOUPCU["maxSilaStacku"] = "Max síla";
+NAZVY_SLOUPCU["silaStacku"] = "Síla";
+NAZVY_SLOUPCU["cenaZaSilu"] = "Za 1 síly";
+NAZVY_SLOUPCU["phb"] = "Phb";
+NAZVY_SLOUPCU["ini"] = "Ini";
+NAZVY_SLOUPCU["zlataTU"] = "zl/TU";
+NAZVY_SLOUPCU["manyTU"] = "mn/TU";
+NAZVY_SLOUPCU["popTU"] = "pop/TU";
+
+
+
+
+
+
+
+
+// NEFINALNI
+
+
+
 /*** Implementace pravidel ***/
 var Rules = {
     sort: function(rules) {
@@ -145,50 +231,3 @@ PlusConfig.Aukce.prototype = {
     }
 };
 
-/*** TableSorter class ***/
-var TableSorter = {
-    filter: function(table, callback) {
-        if (table == null) throw new ArgumentNullException("table");
-        if (callback == null) throw new ArgumentNullException("callback");
-        if (!String.equals(table.tagName, "table", true))
-            throw new ArgumentException("table", table, "Argument must be a table element.");
-    
-        for (var i = 0; i < table.rows.length; i++) {
-            var show = callback(table.rows[i], i);
-            table.rows[i].style.display = show ? '' : 'none';
-        }
-    },
-
-    sort: function(table, callback) {
-        if (table == null) throw new ArgumentNullException("table");
-        if (callback == null) throw new ArgumentNullException("callback");
-        if (!String.equals(table.tagName, "table", true))
-            throw new ArgumentException("table", table, "Argument must be a table element.");
-    
-        if (table.rows.length == 0)
-            return;
-            
-        var tbody = table.rows[0].parentNode;
-
-        var sortArr = new Array();
-
-        for (var i = 0; i < table.rows.length; i++) {
-            if (table.rows[i] != table.sortRow)
-                sortArr.push(table.rows[i]);
-        }
-        
-        sortArr.sort(callback);
-        
-        if(!table.sortRow) {
-            table.sortRow = table.ownerDocument.createElement("tr");
-            table.sortRow.style.display = 'none';
-        }
-        if (table.sortRow != table.rows[0]) {
-            tbody.insertBefore(table.sortRow, table.rows[0]);
-        }
-        
-        for (var i = 0; i < sortArr.length; i++) {
-            tbody.insertBefore(sortArr[i], table.sortRow);
-        }
-    }
-};

@@ -171,7 +171,7 @@ XmlConfigNode.prototype = {
         var v = Number(this.getPref(name, defaultValue));
         if (!isNaN(v)) return v;
         else return defaultValue;
-    }
+    },
     
     removePrefNode_PROXY: Marshal.BY_REF,
     removePrefNode: function(prefNode) {
@@ -288,7 +288,7 @@ XmlConfigNode.Extended.prototype = {
     getPreviousSibling: function() {
         return XmlConfig.extendNode(this.previousSibling);
     }
-});
+};
 
 
 /*** XmlConfigManager class ***/
