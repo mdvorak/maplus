@@ -94,7 +94,7 @@ pageExtenders.add(PageExtender.create({
         }
         
         // Vytvor seznam sloupcu ktere maji byt zobrazeny
-        var sloupce = new Array();
+        var sloupce = new Array().concat(["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", "druh", "typ", "cas", "nabidka"]);
         // Povinne
         sloupce.push("jmeno");
         sloupce.push("barva");

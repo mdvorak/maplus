@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <webExtender>
   <urls>
-    <alias name="chrome">chrome://maplus/content</alias>
     <alias name="melior">http://meliorannis.idnes.cz</alias>
+    <alias name="chrome">chrome://maplus/content</alias>
   </urls>
   <extenders>
     <script url="#{melior}/*" name="interop.js" />
@@ -15,7 +15,9 @@
     <script url="#{melior}/*" name="analyza.js" />
     <script url="#{melior}/*" name="config.js" />
     <script url="#{melior}/*" name="maplus.js" />
-    
+
+    <script url="#{melior}/*" name="regent.js" />
+    <script url="#{melior}/*" name="obecne.js" />
     <script url="#{melior}/*" name="menu.js" />
     
     <!-- Specific -->

@@ -45,7 +45,7 @@ pageExtenders.add(PageExtender.create({
             var nastavit = $XL('.//a[starts-with(@href, "aliance.html") and font = "Nastavit"]', page.content);
             
             if (nastavit.length > 0) {
-                var aliConfig = page.config.getAliance();
+                var aliConfig = page.config.getRegent().getPrefNode("aliance", true);
                 var aliance = new Array();
                 aliConfig.clearChildNodes();
                 
@@ -63,7 +63,7 @@ pageExtenders.add(PageExtender.create({
                 var nejsemClenem = $X('font[starts-with(., "Momentálně") and contains(., "nejste")]', page.content);
                 
                 if (nejsemClenem != null) {
-                    page.config.getAliance().clearChildNodes();
+                    page.config.getRegent().getPrefNode("aliance", true).clearChildNodes();
                     console.debug("Nejsem clenem zadne aliance.");
                 }
             }

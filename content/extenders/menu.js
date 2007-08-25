@@ -74,7 +74,7 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         // Nacteni ulozenych alianci (musi byt v process protoze behem analyzy se teprv zjistuji id alianci)
-        var seznam = page.config.getAliance().evalPrefNodeList("id");
+        var seznam = page.config.getRegent().getPrefNode("aliance", true).evalPrefNodeList("id");
         if (!seznam)
             return false;
             

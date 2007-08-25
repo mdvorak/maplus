@@ -40,11 +40,11 @@ PlusConfig.prototype = {
         return this.getBoolean("enabled", true); 
     },
     
-    getAliance: function() {
-        if (!this._aliance) {
-            this._aliance = this.getPrefNode("aliance", true);
+    getRegent: function() {
+        if (!this._regent) {
+            this._regent = this.getPrefNode("regent", true);
         }
-        return this._aliance;
+        return this._regent;
     },
     
     getNastaveni: function() {
