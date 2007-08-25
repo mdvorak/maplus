@@ -143,6 +143,27 @@ Object.extend(String, {
         if (m) throw "Argument index (" + m[1] + ") is out of range.";
         
         return str;
+    },
+    
+    compare: function(str1, str2, ignoreCase) {
+        str1 = "" + str1;
+        str2 = "" + str2;
+    
+        if (ignoreCase)
+            str1 = str1.toLowerCase();
+            str2 = str2.toLowerCase();
+        }
+        
+        if (str1 == str2)
+            return 0;
+        else if (str1 < str2)
+            return -1;
+        else if (str1 > str2)
+            return 1;
+    },
+    
+    equals: function(str1, str2, ignoreCase) {
+        return String.compare(str1, str2, ignoreCase) == 0;
     }
 });
 

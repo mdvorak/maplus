@@ -60,6 +60,13 @@ PlusConfig.prototype = {
             this._menu = this.getPrefNode("menu", true);
         }
         return this._menu;
+    },
+    
+    getAukce: function() {
+        if (!this._aukce) {
+            this._aukce = this.getPrefNode("aukce", true);
+        }
+        return this._aukce;
     }
 };
  

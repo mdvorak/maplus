@@ -19,7 +19,6 @@
     <script url="#{melior}/*" name="menu.js" />
     
     <!-- Specific -->
-    <script url="#{melior}/obchod.html" name="bestiar.js" />
     <script url="#{melior}/magie.html" name="magie.js" />
     <script url="#{melior}/aliance.html" name="aliance.js" />
     <script url="#{melior}/armada.html" name="armada.js" />
@@ -29,6 +28,8 @@
     <script url="#{melior}/banka.html" name="banka.js" />
     <script url="#{melior}/status.html" name="hospodarstvi.js" />
     <script url="#{melior}/main.html" name="utoky.js" />
+    <script url="#{melior}/obchod.html" name="bestiar-lib.js" />
+    <script url="#{melior}/obchod.html" name="bestiar.js" />
     
     <script url="#{melior}/main.html" name="nastaveni.js" />
 
