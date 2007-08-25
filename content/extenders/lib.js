@@ -318,3 +318,15 @@ var TableHelper = Object.extend(TableHelper || {}, {
             });
     }
 });
+
+
+var ElementWrapper = Class.create();
+
+ElementWrapper.prototype = {
+    initialize: function(element) {
+        if (element == null)
+            throw new ArgumentNullException("element");
+            
+        this.element = element;
+    }
+};

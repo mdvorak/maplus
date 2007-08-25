@@ -75,14 +75,14 @@ var Jednotky = {
                 typ: jednotka.getPref("typ"),
                 druh: jednotka.getPref("druh"),
                 phb: jednotka.getNumber("phb"),
-                dmg: jednotka.getNumber("dmg"),
-                brn: jednotka.getNumber("brn"),
-                zvt: jednotka.getNumber("zvt"),
+                dmg: jednotka.getNumber("dmg", 0),
+                brn: jednotka.getNumber("brn", 0),
+                zvt: jednotka.getNumber("zvt", 0),
                 ini: jednotka.getNumber("ini"),
                 realIni: jednotka.getNumber("realIni"),
-                zlataTU: jednotka.getNumber("zlataTU"),
-                manyTU: jednotka.getNumber("manyTU"),
-                popTU: jednotka.getNumber("popTU")
+                zlataTU: jednotka.getNumber("zlataTU", 0),
+                manyTU: jednotka.getNumber("manyTU", 0),
+                popTU: jednotka.getNumber("popTU", 0)
             };
         }
         
