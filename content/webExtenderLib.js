@@ -574,15 +574,12 @@ PageExtenderCollection.prototype = {
                 console.debug(ex.toString());
             }
             else {
-                var msg = String.format("Unhandled exception occured during extenders execution:\n{0}", ex);
-                dump(msg);
-                
                 if (!console.firebug) {
                     // This is for development
-                    alert(ex);
+                    // alert(ex.toString());
                 }
                 else {
-                    console.error(msg);
+                    console.error("Unhandled exception occured during extenders execution:\n", ex.toString());
                 }
             }
             return false;

@@ -77,12 +77,14 @@ pageExtenders.add(PageExtender.create({
             row.data.silaStacku = parseInt(row.data.maxSilaStacku * row.data.zkusenost);
             // Cena za 1 sily
             row.data.cenaZaSilu = parseFloat((row.data.nabidka / row.data.silaStacku).toFixed(1));
-            
+             
             // Dodatecne informace
             var stats = Jednotky.vyhledej(row.data.jmeno);
             if (stats) {
                 row.data.phb = stats.phb;
                 row.data.ini = stats.realIni;
+                // Typ zkracene
+                row.data.typKratce = row.data.druh[0] + row.data.typ[0] + (row.data.typ != "Str." ? row.data.phb : "");
                 
                 // Vezmi v uvahu barvu
                 var koef = (row.data.barva == page.regent.barva) ? 1.5 : 1.0;
@@ -104,7 +106,7 @@ pageExtenders.add(PageExtender.create({
         sloupce.push("barva");
         
         //FIXME
-        sloupce = sloupce.concat(["pocet", "zkusenost", "silaJednotky", "druh", "typ"]); 
+        sloupce = sloupce.concat(["pocet", "zkusenost", "silaJednotky"]); 
                 
         page.config.getAukce().evalPrefNodeList('sloupce/sloupec').each(function(e) {
                 // Duplicita by sice vzniknout nemela, ale lepsi to osetrit
@@ -113,7 +115,7 @@ pageExtenders.add(PageExtender.create({
             });
         
         // FIXME
-        sloupce.push("phb");
+        sloupce.push("typKratce");
         sloupce.push("ini");
         sloupce.push("silaStacku");
         //sloupce.push("maxSilaStacku");
@@ -181,7 +183,8 @@ pageExtenders.add(PageExtender.create({
                 rows.each(function(row) {
                         if (row.columns[s] != null) {
                             row.element.removeChild(row.columns[s]);
-                            row.columns[s] = null;
+                            delete row.columns[s];
+                            // row.columns[s] = null;
                         }
                     });
             });
@@ -214,6 +217,10 @@ pageExtenders.add(PageExtender.create({
                                 
                             td.name = s;
                             row.columns[s] = td;
+                            
+                            // Tohle je sice trosku osklivy ale funkcni ;)
+                            if (s == "typKratce")
+                                td.setAttribute("align", "left");
                         }
                     });
             });
@@ -246,11 +253,10 @@ pageExtenders.add(PageExtender.create({
                 row.columns.each(function(e) {
                         var sloupec = e[0];
                         var td = e[1];
-                        var hodnota = row.data[sloupec];
                         var format = BestiarCellStyles[sloupec];
                         
-                        if (hodnota != null && format != null) {
-                            format(td, hodnota);
+                        if (td != null && format != null) {
+                            format(td, row.data);
                         }
                     });
             });
@@ -258,55 +264,67 @@ pageExtenders.add(PageExtender.create({
 }));
 
 var BestiarCellStyles = {
-    pocet: function(td, hodnota) {
-        td.innerHTML = '<span>&nbsp;' + hodnota + '&nbsp;</span>';
-        td.style.color = Color.fromRange(hodnota, 20, 5000, Color.Pickers.grayWhite);
+    pocet: function(td, data) {
+        td.innerHTML = '<span>&nbsp;' + data.pocet + '&nbsp;</span>';
+        td.style.color = Color.fromRange(data.pocet, 20, 5000, Color.Pickers.grayWhite);
     },
-    zkusenost: function(td, hodnota) {
-        td.innerHTML = '<span>&nbsp;' + (hodnota * 100).toFixed(2) + '%&nbsp;</span>';
-        td.style.color = Color.fromRange(hodnota, 0.20, 0.60, Color.Pickers.redGreen);
+    zkusenost: function(td, data) {
+        td.innerHTML = '<span>&nbsp;' + (data.zkusenost * 100).toFixed(2) + '%&nbsp;</span>';
+        td.style.color = Color.fromRange(data.zkusenost, 0.20, 0.60, Color.Pickers.redGreen);
     },
-    silaJednotky: function(td, hodnota) {
-        td.innerHTML = '<span>&nbsp;' + hodnota.toFixed(2) + '&nbsp;</span>';
-        td.style.color = Color.fromRange(hodnota, 1, 220, Color.Pickers.grayWhite);
+    silaJednotky: function(td, data) {
+        td.innerHTML = '<span>&nbsp;' + data.silaJednotky.toFixed(2) + '&nbsp;</span>';
+        td.style.color = Color.fromRange(data.silaJednotky, 1, 220, Color.Pickers.grayWhite);
     },
-    druh: function(td, hodnota) {
-        td.innerHTML = '<span>&nbsp;' + hodnota + '</span>';
-        td.className = (hodnota == "Let.") ? "druhLet" : "druhPoz"
+    druh: function(td, data) {
+        td.innerHTML = '<span>&nbsp;' + data.druh + '</span>';
+        td.className = (data.druh == "Let.") ? "druhLet" : "druhPoz"
     },
-    typ: function(td, hodnota) {
-        td.innerHTML = '<span>&nbsp;' + hodnota + '</span>';
-        td.className = (hodnota == "Str.") ? "typStr" : "typBoj"
+    typ: function(td, data) {
+        td.innerHTML = '<span>&nbsp;' + data.typ + '</span>';
+        td.className = (data.typ == "Str.") ? "typStr" : "typBoj"
     },
-    cas: function(td, hodnota) {
-        if (!isNaN(hodnota))
-            td.innerHTML = '<span>&nbsp;' + formatTime(hodnota) + '&nbsp;</span>';
+    cas: function(td, data) {
+        if (!isNaN(data.cas))
+            td.innerHTML = '<span>&nbsp;' + formatTime(data.cas) + '&nbsp;</span>';
         else
             td.innerHTML = '<span>&nbsp;Žádná nabídka&nbsp;</span>';
     },
-    phb: function(td, hodnota) {
-        td.className = "phb" + hodnota;
+    phb: function(td, data) {
+        td.className = "phb" + data.phb;
     },
-    ini: function(td, hodnota) {
-        td.style.color = Color.fromRange(hodnota, 5, 35, Color.Pickers.redGreen);
+    typKratce: function(td, data) {
+        var druhClass = (data.druh == "Let.") ? "druhLet" : "druhPoz";
+        var typClass = (data.typ == "Str.") ? "typStr" : "typBoj"
+        
+        var html = '<span class="' + druhClass + '">&nbsp;' + data.druh[0] + '</span>';
+        html += '<span class="' + typClass + '">' + data.typ[0] + '</span>';
+        if (data.typ != "Str.")
+            html += '<span class="phb' + data.phb + '">' + data.phb + '</span>';
+        
+        td.innerHTML = html;
+        td.setAttribute("align", "left");
     },
-    silaStacku: function(td, hodnota) {
-        td.style.color = Color.fromRange(hodnota, 500, 12000, Color.Pickers.grayWhite);
+    ini: function(td, data) {
+        td.style.color = Color.fromRange(data.ini, 5, 35, Color.Pickers.redGreen);
     },
-    maxSilaStacku: function(td, hodnota) {
-        td.style.color = Color.fromRange(hodnota, 1000, 25000, Color.Pickers.grayWhite);
+    silaStacku: function(td, data) {
+        td.style.color = Color.fromRange(data.silaStacku, 500, 12000, Color.Pickers.grayWhite);
     },
-    cenaZaSilu: function(td, hodnota) {
-        td.style.color = Color.fromRange(hodnota, 30, 5, Color.Pickers.redGreen);
+    maxSilaStacku: function(td, data) {
+        td.style.color = Color.fromRange(data.maxSilaStacku, 1000, 25000, Color.Pickers.grayWhite);
     },
-    zlataTU: function(td, hodnota) {
-        td.style.color = Color.fromRange(hodnota, 100, 3000, Color.Pickers.grayGold);
+    cenaZaSilu: function(td, data) {
+        td.style.color = Color.fromRange(data.cenaZaSilu, 30, 5, Color.Pickers.redGreen);
     },
-    manyTU: function(td, hodnota) {
-        td.style.color = Color.fromRange(hodnota, 3000, 100, Color.Pickers.blueWhite);
+    zlataTU: function(td, data) {
+        td.style.color = Color.fromRange(data.zlataTU, 100, 3000, Color.Pickers.grayGold);
     },
-    popTU: function(td, hodnota) {
-        td.style.color = Color.fromRange(hodnota, 400, 5, Color.Pickers.grayBrown);
+    manyTU: function(td, data) {
+        td.style.color = Color.fromRange(data.manyTU, 3000, 100, Color.Pickers.blueWhite);
+    },
+    popTU: function(td, data) {
+        td.style.color = Color.fromRange(data.popTU, 400, 5, Color.Pickers.grayBrown);
     }
 }
 

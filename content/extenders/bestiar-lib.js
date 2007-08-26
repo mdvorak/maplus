@@ -49,11 +49,12 @@ NAZVY_SLOUPCU["typ"] = "Typ";
 NAZVY_SLOUPCU["cas"] = "Čas prodeje";
 NAZVY_SLOUPCU["nabidka"] = "Nabídka";
 // Nove
+NAZVY_SLOUPCU["typKratce"] = "Typ";
+NAZVY_SLOUPCU["phb"] = "Phb";
+NAZVY_SLOUPCU["ini"] = "Ini";
 NAZVY_SLOUPCU["maxSilaStacku"] = "Max síla";
 NAZVY_SLOUPCU["silaStacku"] = "Síla";
 NAZVY_SLOUPCU["cenaZaSilu"] = "Za 1 síly";
-NAZVY_SLOUPCU["phb"] = "Phb";
-NAZVY_SLOUPCU["ini"] = "Ini";
 NAZVY_SLOUPCU["zlataTU"] = "zl/TU";
 NAZVY_SLOUPCU["manyTU"] = "mn/TU";
 NAZVY_SLOUPCU["popTU"] = "pop/TU";
