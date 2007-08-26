@@ -51,50 +51,6 @@ var MaPlus = {
     }
 };
 
-function parseTime(str) {
-    if (!str) return Number.NaN;
-    var m = str.match(/(\d+):(\d+)/);
-    return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : Number.NaN;
-}
-
-/*** TableHelper ***/
-
-var TableHelper = {
-    filter: function(table, callback) {
-        for (var i = 0; i < table.rows.length; i++) {
-            var show = callback(table.rows[i], i);
-            table.rows[i].style.display = show ? '' : 'none';
-        }
-    },
-
-    sort: function(table, callback) {
-        if (table.rows.length == 0)
-            return;
-            
-        var tbody = table.rows[0].parentNode;
-        var sortArr = new Array();
-
-        for (var i = 0; i < table.rows.length; i++) {
-            if (table.rows[i] != table.sortRow)
-                sortArr.push(table.rows[i]);
-        }
-        
-        sortArr.sort(callback);
-        
-        if(!table.sortRow) {
-            table.sortRow = table.ownerDocument.createElement("tr");
-            table.sortRow.style.display = 'none';
-        }
-        if (table.sortRow != table.rows[0]) {
-            tbody.insertBefore(table.sortRow, table.rows[0]);
-        }
-        
-        for (var i = 0; i < sortArr.length; i++) {
-            tbody.insertBefore(sortArr[i], table.sortRow);
-        }
-    }
-};
-
 /*** Colors ***/
 
 var Color = {
@@ -135,7 +91,7 @@ Color.Pickers = {
         colors.green = Math.max(40, Math.min(240, 240 * colors.koeficient));
         colors.blue = 240; 
     },
-
+  
     grayGold: function(colors) {
         colors.red = 200 + Math.min(55, 55 * colors.koeficient); 
         colors.green = 200 + Math.min(15, 15 * colors.koeficient); ;
@@ -146,6 +102,16 @@ Color.Pickers = {
         colors.red = Math.max(167, Math.min(240, 240 * colors.koeficient));
         colors.green = Math.max(118, Math.min(240, 240 * colors.koeficient));
         colors.blue = Math.max(109, Math.min(240, 240 * colors.koeficient)); 
+    },
+    
+    grayBrown: function(colors) {
+        colors.red = Math.max(167, Math.min(180, 180 * colors.koeficient));
+        colors.green = Math.max(118, Math.min(180, 180 * colors.koeficient));
+        colors.blue = Math.max(109, Math.min(180, 180 * colors.koeficient)); 
+    },
+    
+    grayWhite: function(colors) {
+        colors.blue = colors.green = colors.red = 160 + 60 * colors.koeficient; 
     }
 };
 
@@ -303,7 +269,52 @@ MaPlus.Tooltips = {
     }
 };
 
-var TableHelper = Object.extend(TableHelper || {}, {
+var TableHelper = {
+    filter: function(table, callback) {
+        if (table == null) throw new ArgumentNullException("table");
+        if (callback == null) throw new ArgumentNullException("callback");
+        if (!String.equals(table.tagName, "table", true))
+            throw new ArgumentException("table", table, "Argument must be a table element.");
+    
+        for (var i = 0; i < table.rows.length; i++) {
+            var show = callback(table.rows[i], i);
+            table.rows[i].style.display = show ? '' : 'none';
+        }
+    },
+
+    sort: function(table, callback) {
+        if (table == null) throw new ArgumentNullException("table");
+        if (callback == null) throw new ArgumentNullException("callback");
+        if (!String.equals(table.tagName, "table", true))
+            throw new ArgumentException("table", table, "Argument must be a table element.");
+    
+        if (table.rows.length == 0)
+            return;
+            
+        var tbody = table.rows[0].parentNode;
+
+        var sortArr = new Array();
+
+        for (var i = 0; i < table.rows.length; i++) {
+            if (table.rows[i] != table.sortRow)
+                sortArr.push(table.rows[i]);
+        }
+        
+        sortArr.sort(callback);
+        
+        if(!table.sortRow) {
+            table.sortRow = table.ownerDocument.createElement("tr");
+            table.sortRow.style.display = 'none';
+        }
+        if (table.sortRow != table.rows[0]) {
+            tbody.insertBefore(table.sortRow, table.rows[0]);
+        }
+        
+        for (var i = 0; i < sortArr.length; i++) {
+            tbody.insertBefore(sortArr[i], table.sortRow);
+        }
+    },
+
     thinBorders: function(table) {
         // Zestihli okraje
         $XL('tbody/tr/td', table).each(function(e) { 
@@ -316,17 +327,5 @@ var TableHelper = Object.extend(TableHelper || {}, {
         $XL('tbody/tr/td[1]', table).each(function(e) { 
                 e.style.borderLeft = "0px";
             });
-    }
-});
-
-
-var ElementWrapper = Class.create();
-
-ElementWrapper.prototype = {
-    initialize: function(element) {
-        if (element == null)
-            throw new ArgumentNullException("element");
-            
-        this.element = element;
     }
 };

@@ -51,8 +51,8 @@ pageExtenders.add(PageExtender.create({
             table: new ElementWrapper(tableData)
         };
         
-        // Zpracuj hlavicku
-        bestiar.table.header = new RowWrapper(tableData.rows[0], PUVODNI_SLOUPCE_HLAVICKA);
+        // Zpracuj hlavicku (chyby v ni sloupec barva)
+        bestiar.table.header = new RowWrapper(tableData.rows[0], PUVODNI_SLOUPCE.without("barva"));
         bestiar.table.data = new Array();
         
         // Zpracuj jednotlive radky
@@ -60,31 +60,35 @@ pageExtenders.add(PageExtender.create({
             var row = new RowWrapper(tableData.rows[i], PUVODNI_SLOUPCE);
 
             // Analyzuj data
-            row.jmeno = row.columns["jmeno"].textContent.replace(/\s+(\[\s*\d+\s*\])?\s*$/, "");
-            row.barva = row.columns["barva"].textContent;
-            row.pocet = parseInt(row.columns["pocet"].textContent);
-            row.zkusenost = parseFloat(row.columns["zkusenost"].textContent) / 100;
-            row.silaJednotky = parseFloat(row.columns["silaJednotky"].textContent);
-            row.druh = row.columns["druh"].textContent.replace(/\s+$/, "");
-            row.typ = row.columns["typ"].textContent.replace(/\s+$/, "");
-            row.cas = row.columns["cas"].textContent.replace(/\s+$/, "");
-            row.nabidka = parseInt(row.columns["nabidka"].textContent);
+            row.data = new Hash();
+            row.data.jmeno = row.columns["jmeno"].textContent.replace(/\s+(\[\s*\d+\s*\])?\s*$/, "");
+            row.data.barva = row.columns["barva"].textContent.replace(/\s/g, "");
+            row.data.pocet = parseInt(row.columns["pocet"].textContent);
+            row.data.zkusenost = parseFloat(row.columns["zkusenost"].textContent) / 100;
+            row.data.silaJednotky = parseFloat(row.columns["silaJednotky"].textContent);
+            row.data.druh = row.columns["druh"].textContent.replace(/\s+$/, "");
+            row.data.typ = row.columns["typ"].textContent.replace(/\s+$/, "");
+            row.data.cas = parseTime(row.columns["cas"].textContent.replace(/\s+$/, ""));
+            row.data.nabidka = parseInt(row.columns["nabidka"].textContent);
 
             // Max sila stacku
-            row.maxSilaStacku = parseInt(row.pocet * row.silaJednotky);
+            row.data.maxSilaStacku = parseInt(row.data.pocet * row.data.silaJednotky);
             // Sila stacku
-            row.silaStacku = parseInt(row.maxSilaStacku * row.zkusenost);
+            row.data.silaStacku = parseInt(row.data.maxSilaStacku * row.data.zkusenost);
             // Cena za 1 sily
-            row.cenaZaSilu = parseFloat((row.nabidka / row.silaStacku).toFixed(1));
+            row.data.cenaZaSilu = parseFloat((row.data.nabidka / row.data.silaStacku).toFixed(1));
             
             // Dodatecne informace
-            var stats = Jednotky.vyhledej(row.jmeno);
+            var stats = Jednotky.vyhledej(row.data.jmeno);
             if (stats) {
-                row.phb = stats.phb;
-                row.ini = stats.realIni;
-                row.zlataTU = parseFloat((row.pocet * stats.zlataTU).toFixed(1));
-                row.manyTU = parseFloat((row.pocet * stats.manyTU).toFixed(1));
-                row.popTU = parseFloat((row.pocet * stats.popTU).toFixed(1));
+                row.data.phb = stats.phb;
+                row.data.ini = stats.realIni;
+                
+                // Vezmi v uvahu barvu
+                var koef = (row.data.barva == page.regent.barva) ? 1.5 : 1.0;
+                row.data.zlataTU = parseFloat((row.data.pocet * (stats.zlataTU / koef)).toFixed(1));
+                row.data.manyTU = parseFloat((row.data.pocet * (stats.manyTU / koef)).toFixed(1));
+                row.data.popTU = parseFloat((row.data.pocet * (stats.popTU / koef)).toFixed(1));
             }
             else {
                 console.warn("Nenalezeny informace o jednotce %s.", row.jmeno);
@@ -94,10 +98,13 @@ pageExtenders.add(PageExtender.create({
         }
         
         // Vytvor seznam sloupcu ktere maji byt zobrazeny
-        var sloupce = new Array().concat(["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", "druh", "typ", "cas", "nabidka"]);
+        var sloupce = new Array();
         // Povinne
         sloupce.push("jmeno");
         sloupce.push("barva");
+        
+        //FIXME
+        sloupce = sloupce.concat(["pocet", "zkusenost", "silaJednotky", "druh", "typ"]); 
                 
         page.config.getAukce().evalPrefNodeList('sloupce/sloupec').each(function(e) {
                 // Duplicita by sice vzniknout nemela, ale lepsi to osetrit
@@ -105,15 +112,15 @@ pageExtenders.add(PageExtender.create({
                     sloupce.push(e.getPref());
             });
         
+        // FIXME
         sloupce.push("phb");
         sloupce.push("ini");
-        sloupce.push("silaJednotky");
         sloupce.push("silaStacku");
-        sloupce.push("maxSilaStacku");
+        //sloupce.push("maxSilaStacku");
         sloupce.push("zlataTU");
         sloupce.push("manyTU");
         sloupce.push("popTU");
-        sloupce.push("zkusenost");
+        sloupce.push("cenaZaSilu");
         // Povinne
         sloupce.push("cas");
         sloupce.push("nabidka");
@@ -135,8 +142,6 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         // Bestiar
-        if (page.arguments["obchod"] != "jedn_new")
-            return false;
         if (!page.bestiar || !page.bestiar.table || !page.bestiar.sloupce)
             return false;    
        
@@ -154,6 +159,14 @@ pageExtenders.add(PageExtender.create({
             });
         
         context.skryteSloupce = skryteSloupce;
+        
+        // Vytvor seznam chybejicich sloupcu
+        var chybejiciSloupce = new Array();
+        NAZVY_SLOUPCU.keys().each(function(s) {
+                if (sloupce.indexOf(s) < 0)
+                    chybejiciSloupce.push(s);
+            });
+        context.chybejiciSloupce = chybejiciSloupce;
         
         return true;
     },
@@ -195,7 +208,7 @@ pageExtenders.add(PageExtender.create({
                 sloupce.each(function(s) {
                         // Pridavej pouze nove
                         if (PUVODNI_SLOUPCE.indexOf(s) < 0) {
-                            var hodnota = row[s];
+                            var hodnota = (row.data[s] != null ? row.data[s] : "");
                             var td = Element.create("td", '<span>' + hodnota + '&nbsp;</span>', {align: "right"});
                             row.element.appendChild(td);
                                 
@@ -216,6 +229,86 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Barvy
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Barvy"; },
+
+    analyze: function(page, context) {
+        // Bestiar
+        if (!page.bestiar || !page.bestiar.table)
+            return false;    
+       
+       return true;
+    },
+    
+    process: function(page, context) {
+        page.bestiar.table.data.each(function(row) {
+                row.columns.each(function(e) {
+                        var sloupec = e[0];
+                        var td = e[1];
+                        var hodnota = row.data[sloupec];
+                        var format = BestiarCellStyles[sloupec];
+                        
+                        if (hodnota != null && format != null) {
+                            format(td, hodnota);
+                        }
+                    });
+            });
+    }
+}));
+
+var BestiarCellStyles = {
+    pocet: function(td, hodnota) {
+        td.innerHTML = '<span>&nbsp;' + hodnota + '&nbsp;</span>';
+        td.style.color = Color.fromRange(hodnota, 20, 5000, Color.Pickers.grayWhite);
+    },
+    zkusenost: function(td, hodnota) {
+        td.innerHTML = '<span>&nbsp;' + (hodnota * 100).toFixed(2) + '%&nbsp;</span>';
+        td.style.color = Color.fromRange(hodnota, 0.20, 0.60, Color.Pickers.redGreen);
+    },
+    silaJednotky: function(td, hodnota) {
+        td.innerHTML = '<span>&nbsp;' + hodnota.toFixed(2) + '&nbsp;</span>';
+        td.style.color = Color.fromRange(hodnota, 1, 220, Color.Pickers.grayWhite);
+    },
+    druh: function(td, hodnota) {
+        td.innerHTML = '<span>&nbsp;' + hodnota + '</span>';
+        td.className = (hodnota == "Let.") ? "druhLet" : "druhPoz"
+    },
+    typ: function(td, hodnota) {
+        td.innerHTML = '<span>&nbsp;' + hodnota + '</span>';
+        td.className = (hodnota == "Str.") ? "typStr" : "typBoj"
+    },
+    cas: function(td, hodnota) {
+        if (!isNaN(hodnota))
+            td.innerHTML = '<span>&nbsp;' + formatTime(hodnota) + '&nbsp;</span>';
+        else
+            td.innerHTML = '<span>&nbsp;Žádná nabídka&nbsp;</span>';
+    },
+    phb: function(td, hodnota) {
+        td.className = "phb" + hodnota;
+    },
+    ini: function(td, hodnota) {
+        td.style.color = Color.fromRange(hodnota, 5, 35, Color.Pickers.redGreen);
+    },
+    silaStacku: function(td, hodnota) {
+        td.style.color = Color.fromRange(hodnota, 500, 12000, Color.Pickers.grayWhite);
+    },
+    maxSilaStacku: function(td, hodnota) {
+        td.style.color = Color.fromRange(hodnota, 1000, 25000, Color.Pickers.grayWhite);
+    },
+    cenaZaSilu: function(td, hodnota) {
+        td.style.color = Color.fromRange(hodnota, 30, 5, Color.Pickers.redGreen);
+    },
+    zlataTU: function(td, hodnota) {
+        td.style.color = Color.fromRange(hodnota, 100, 3000, Color.Pickers.grayGold);
+    },
+    manyTU: function(td, hodnota) {
+        td.style.color = Color.fromRange(hodnota, 3000, 100, Color.Pickers.blueWhite);
+    },
+    popTU: function(td, hodnota) {
+        td.style.color = Color.fromRange(hodnota, 400, 5, Color.Pickers.grayBrown);
+    }
+}
 
 
 

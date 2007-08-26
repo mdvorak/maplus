@@ -189,7 +189,7 @@ Object.extend(Element, {
                 });
         }
         
-        e.innerHTML = innerHtml || "";
+        e.innerHTML = (innerHtml != null ? innerHtml : "");
         
         return e;
     }

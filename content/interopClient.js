@@ -179,9 +179,10 @@ var Marshal = {
     },
     
     isProxy: function(object) {
-        if (object == null)
-            return new ArgumentNullException("object");
-        return (typeof object == "object" && object.__proxy != null && typeof object.__proxy == "string");
+        return (object != null 
+                && typeof object == "object" 
+                && object.__proxy != null 
+                && typeof object.__proxy == "string");
     },
     
     _createProxyFromDefinition: function(objectName, def) {

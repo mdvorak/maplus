@@ -170,7 +170,7 @@ pageExtenders.add(PageExtender.create({
                 
                 r.cells.zlata.style.color = Color.fromRange(zlataKoef, 0.2, 2.0, Color.Pickers.grayGold);
                 r.cells.many.style.color = Color.fromRange(manyKoef, 2.0, 0.2, Color.Pickers.blueWhite);
-                r.cells.pop.style.color = Color.fromRange(popKoef, 2.0, 0.2, Color.Pickers.whiteBrown);
+                r.cells.pop.style.color = Color.fromRange(popKoef, 2.0, 0.2, Color.Pickers.grayBrown);
                 
                 r.cells.phb.className = "phb" + r.data.phb;
             });

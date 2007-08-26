@@ -36,7 +36,6 @@
 
 // Puvodni poradi sloupcu
 var PUVODNI_SLOUPCE = ["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", "druh", "typ", "cas", "nabidka"];
-var PUVODNI_SLOUPCE_HLAVICKA = ["jmeno", "pocet", "zkusenost", "silaJednotky", "druh", "typ", "cas", "nabidka"];
 
 var NAZVY_SLOUPCU = new Hash();
 // Puvodni
@@ -62,6 +61,19 @@ NAZVY_SLOUPCU["popTU"] = "pop/TU";
 /** BestiarFiltry proxy **/
 var BestiarFiltry = Marshal.getObjectProxy("BestiarFiltry");
 
+/** ElementWrapper class **/
+// FF ztraci JS objekty naveseny na elementy pri manipulaci s nima
+var ElementWrapper = Class.create();
+ElementWrapper.prototype = {
+    initialize: function(element) {
+        if (element == null)
+            throw new ArgumentNullException("element");
+            
+        this.element = element;
+    }
+};
+
+
 /** RowWrapper class **/
 var RowWrapper = Class.inherit(ElementWrapper);
 Object.extend(RowWrapper.prototype, {
@@ -83,56 +95,17 @@ Object.extend(RowWrapper.prototype, {
     }
 });
 
-/*** TableSorter class ***/
-var TableSorter = {
-    filter: function(table, callback) {
-        if (table == null) throw new ArgumentNullException("table");
-        if (callback == null) throw new ArgumentNullException("callback");
-        if (!String.equals(table.tagName, "table", true))
-            throw new ArgumentException("table", table, "Argument must be a table element.");
-    
-        for (var i = 0; i < table.rows.length; i++) {
-            var show = callback(table.rows[i], i);
-            table.rows[i].style.display = show ? '' : 'none';
-        }
-    },
+function parseTime(str) {
+    if (!str) return Number.NaN;
+    var m = str.match(/(\d+):(\d+)/);
+    return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : Number.NaN;
+}
 
-    sort: function(table, callback) {
-        if (table == null) throw new ArgumentNullException("table");
-        if (callback == null) throw new ArgumentNullException("callback");
-        if (!String.equals(table.tagName, "table", true))
-            throw new ArgumentException("table", table, "Argument must be a table element.");
-    
-        if (table.rows.length == 0)
-            return;
-            
-        var tbody = table.rows[0].parentNode;
-
-        var sortArr = new Array();
-
-        for (var i = 0; i < table.rows.length; i++) {
-            if (table.rows[i] != table.sortRow)
-                sortArr.push(table.rows[i]);
-        }
-        
-        sortArr.sort(callback);
-        
-        if(!table.sortRow) {
-            table.sortRow = table.ownerDocument.createElement("tr");
-            table.sortRow.style.display = 'none';
-        }
-        if (table.sortRow != table.rows[0]) {
-            tbody.insertBefore(table.sortRow, table.rows[0]);
-        }
-        
-        for (var i = 0; i < sortArr.length; i++) {
-            tbody.insertBefore(sortArr[i], table.sortRow);
-        }
-    }
-};
-
-
-
+function formatTime(totalSeconds) {
+    var m = Math.floor(totalSeconds / 60);
+    var s = Math.floor(totalSeconds % 60);
+    return m + ":" + (s < 10 ? "0" + s : s)
+}
 
 
 
