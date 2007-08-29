@@ -31,6 +31,7 @@
     <script url="#{melior}/status.html" name="hospodarstvi.js" />
     <script url="#{melior}/main.html" name="utoky.js" />
     <script url="#{melior}/obchod.html" name="bestiar-lib.js" />
+    <script url="#{melior}/obchod.html" name="bestiar-style.js" />
     <script url="#{melior}/obchod.html" name="bestiar.js" />
     
     <script url="#{melior}/main.html" name="nastaveni.js" />

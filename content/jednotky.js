@@ -78,7 +78,7 @@ var Jednotky = {
                 dmg: jednotka.getNumber("dmg", 0),
                 brn: jednotka.getNumber("brn", 0),
                 zvt: jednotka.getNumber("zvt", 0),
-                ini: jednotka.getNumber("ini"),
+                ini: jednotka.getNumber("ini", 0),
                 realIni: jednotka.getNumber("realIni"),
                 zlataTU: jednotka.getNumber("zlataTU", 0),
                 manyTU: jednotka.getNumber("manyTU", 0),

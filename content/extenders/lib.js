@@ -269,6 +269,8 @@ MaPlus.Tooltips = {
     }
 };
 
+/** TableHelper class **/
+
 var TableHelper = {
     filter: function(table, callback) {
         if (table == null) throw new ArgumentNullException("table");
@@ -327,5 +329,36 @@ var TableHelper = {
         $XL('tbody/tr/td[1]', table).each(function(e) { 
                 e.style.borderLeft = "0px";
             });
+    }
+};
+
+/** ElementDataStore class **/
+
+// FF ztraci JS objekty naveseny na elementy pri manipulaci s nima
+var ElementDataStore = {
+    _lastId: 0,
+    _data: new Hash(),
+    
+    _getElementId: function(element) {
+        var id = element.getAttribute("datastoreid");
+        
+        if (id == null) {
+            id = String(++this._lastId);
+            element.setAttribute("datastoreid", id);
+        }
+        
+        return id;
+    },
+    
+    get: function(element) {
+        var id = this._getElementId(element);
+        var data = this._data[id];
+        
+        if (data == null) {
+            data = { element: element };
+            this._data[id] = data;
+        }
+        
+        return data;
     }
 };

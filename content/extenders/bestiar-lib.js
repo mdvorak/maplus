@@ -62,40 +62,7 @@ NAZVY_SLOUPCU["popTU"] = "pop/TU";
 /** BestiarFiltry proxy **/
 var BestiarFiltry = Marshal.getObjectProxy("BestiarFiltry");
 
-/** ElementWrapper class **/
-// FF ztraci JS objekty naveseny na elementy pri manipulaci s nima
-var ElementWrapper = Class.create();
-ElementWrapper.prototype = {
-    initialize: function(element) {
-        if (element == null)
-            throw new ArgumentNullException("element");
-            
-        this.element = element;
-    }
-};
-
-
-/** RowWrapper class **/
-var RowWrapper = Class.inherit(ElementWrapper);
-Object.extend(RowWrapper.prototype, {
-    initialize: function(element, cellNames) {
-        base.initialize(element);
-        
-        if (cellNames == null)
-            throw new ArgumentNullException("cellNames");
-    
-        this.columns = new Hash();
-    
-        for (var i = 0; i < element.cells.length && i < cellNames.length; i++) {
-            var td = element.cells[i];
-            var column = String(cellNames[i]);
-            
-            td.name = column;
-            this.columns[column] = td;
-        }
-    }
-});
-
+/** Basic time functions **/
 function parseTime(str) {
     if (!str) return Number.NaN;
     var m = str.match(/(\d+):(\d+)/);

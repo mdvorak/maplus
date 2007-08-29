@@ -38,6 +38,20 @@
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Bestiar - Analyza"; },
     
+    _createColumnsMap: function(row, sloupce) {
+        var columns = new Hash();
+    
+        for (var i = 0; i < row.cells.length && i < sloupce.length; i++) {
+            var td = row.cells[i];
+            var column = String(sloupce[i]);
+            
+            td.setAttribute("name", column);
+            columns[column] = td;
+        }
+        
+        return columns;
+    },
+    
     analyze: function(page, context) {
         // Bestiar
         if (page.arguments["obchod"] != "jedn_new")
@@ -48,16 +62,23 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         var bestiar = {
-            table: new ElementWrapper(tableData)
+            table: ElementDataStore.get(tableData)
         };
         
         // Zpracuj hlavicku (chyby v ni sloupec barva)
-        bestiar.table.header = new RowWrapper(tableData.rows[0], PUVODNI_SLOUPCE.without("barva"));
+        var header = ElementDataStore.get(tableData.rows[0]);
+        header.columns = this._createColumnsMap(header.element, PUVODNI_SLOUPCE.without("barva"));
+        
+        bestiar.table.header = header;
         bestiar.table.data = new Array();
         
         // Zpracuj jednotlive radky
         for (var i = 1; i < tableData.rows.length; i++) {
-            var row = new RowWrapper(tableData.rows[i], PUVODNI_SLOUPCE);
+            var row = ElementDataStore.get(tableData.rows[i]);
+            row.columns = this._createColumnsMap(row.element, PUVODNI_SLOUPCE);
+
+            // Puvodni text
+            row.description = row.element.textContent; 
 
             // Analyzuj data
             row.data = new Hash();
@@ -236,9 +257,9 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-// Barvy
+// Styl
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Bestiar - Barvy"; },
+    getName: function() { return "Bestiar - Styl"; },
 
     analyze: function(page, context) {
         // Bestiar
@@ -249,11 +270,12 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
+        // Pozn: styly sou definovany v bestiar-style.js
         page.bestiar.table.data.each(function(row) {
                 row.columns.each(function(e) {
                         var sloupec = e[0];
                         var td = e[1];
-                        var format = BestiarCellStyles[sloupec];
+                        var format = BestiarColumnStyle[sloupec];
                         
                         if (td != null && format != null) {
                             format(td, row.data);
@@ -263,70 +285,34 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-var BestiarCellStyles = {
-    pocet: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + data.pocet + '&nbsp;</span>';
-        td.style.color = Color.fromRange(data.pocet, 20, 5000, Color.Pickers.grayWhite);
+// Aktivni jmena jednotek
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Jednotky"; },
+
+    analyze: function(page, context) {
+        // Bestiar
+        if (!page.bestiar || !page.bestiar.table)
+            return false;    
+       
+       return true;
     },
-    zkusenost: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + (data.zkusenost * 100).toFixed(2) + '%&nbsp;</span>';
-        td.style.color = Color.fromRange(data.zkusenost, 0.20, 0.60, Color.Pickers.redGreen);
-    },
-    silaJednotky: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + data.silaJednotky.toFixed(2) + '&nbsp;</span>';
-        td.style.color = Color.fromRange(data.silaJednotky, 1, 220, Color.Pickers.grayWhite);
-    },
-    druh: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + data.druh + '</span>';
-        td.className = (data.druh == "Let.") ? "druhLet" : "druhPoz"
-    },
-    typ: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + data.typ + '</span>';
-        td.className = (data.typ == "Str.") ? "typStr" : "typBoj"
-    },
-    cas: function(td, data) {
-        if (!isNaN(data.cas))
-            td.innerHTML = '<span>&nbsp;' + formatTime(data.cas) + '&nbsp;</span>';
-        else
-            td.innerHTML = '<span>&nbsp;Žádná nabídka&nbsp;</span>';
-    },
-    phb: function(td, data) {
-        td.className = "phb" + data.phb;
-    },
-    typKratce: function(td, data) {
-        var druhClass = (data.druh == "Let.") ? "druhLet" : "druhPoz";
-        var typClass = (data.typ == "Str.") ? "typStr" : "typBoj"
-        
-        var html = '<span class="' + druhClass + '">&nbsp;' + data.druh[0] + '</span>';
-        html += '<span class="' + typClass + '">' + data.typ[0] + '</span>';
-        if (data.typ != "Str.")
-            html += '<span class="phb' + data.phb + '">' + data.phb + '</span>';
-        
-        td.innerHTML = html;
-        td.setAttribute("align", "left");
-    },
-    ini: function(td, data) {
-        td.style.color = Color.fromRange(data.ini, 5, 35, Color.Pickers.redGreen);
-    },
-    silaStacku: function(td, data) {
-        td.style.color = Color.fromRange(data.silaStacku, 500, 12000, Color.Pickers.grayWhite);
-    },
-    maxSilaStacku: function(td, data) {
-        td.style.color = Color.fromRange(data.maxSilaStacku, 1000, 25000, Color.Pickers.grayWhite);
-    },
-    cenaZaSilu: function(td, data) {
-        td.style.color = Color.fromRange(data.cenaZaSilu, 30, 5, Color.Pickers.redGreen);
-    },
-    zlataTU: function(td, data) {
-        td.style.color = Color.fromRange(data.zlataTU, 100, 3000, Color.Pickers.grayGold);
-    },
-    manyTU: function(td, data) {
-        td.style.color = Color.fromRange(data.manyTU, 3000, 100, Color.Pickers.blueWhite);
-    },
-    popTU: function(td, data) {
-        td.style.color = Color.fromRange(data.popTU, 400, 5, Color.Pickers.grayBrown);
+    
+    process: function(page, context) {
+        // Pozn: styly sou definovany v bestiar-style.js
+        page.bestiar.table.data.each(function(row) {
+                var td = row.columns["jmeno"];
+                var jmeno = row.data["jmeno"];
+                
+                var link = MaPlus.Tooltips.createActiveUnit(page, jmeno);
+                link.innerHTML = td.innerHTML;
+                td.innerHTML = '<span>&nbsp;</span>';
+                td.appendChild(link);
+            });
     }
-}
+}));
+
+
+
 
 
 
