@@ -119,7 +119,28 @@ td.nadpis
 		</tr>
 		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
+		<tbody id="plus_bestiarSloupce"></tbody>
 		
+		<script type="text/javascript">
+		    function generujSloupceBestiare() {
+		        var tbody = $('plus_bestiarSloupce');
+		    
+		        for (var i = 0; i < BESTIAR_PORADI_SLOUPCU.length; i++) {
+		            var s = BESTIAR_PORADI_SLOUPCU[i];
+		            
+		            var tr = document.createElement("tr");
+		            var name = document.createElement("td");
+		            var value = document.createElement("td");
+		            
+		            name.innerHTML = '<span>' + BESTIAR_NAZVY_SLOUPCU[s] + '</span>';
+		            value.innerHTML = '<span><input type="checked" onload="" /></span>';
+		            
+		            tr.appendChild(name);
+		            tr.appendChild(value);
+		            tbody.appendChild(tr);
+		        }
+		    }
+		</script>
 		
 		<!-- TODO -->
 		

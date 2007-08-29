@@ -8,6 +8,7 @@
     <script url="#{melior}/*" name="interop.js" />
 
     <!-- Generic -->
+    <script url="#{melior}/*" name="constants.js" />
     <script url="#{melior}/*" name="tooltip.js" />
     <script url="#{melior}/*" name="lib.js" />
     

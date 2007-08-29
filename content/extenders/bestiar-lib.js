@@ -34,31 +34,6 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-// Puvodni poradi sloupcu
-var PUVODNI_SLOUPCE = ["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", "druh", "typ", "cas", "nabidka"];
-
-var NAZVY_SLOUPCU = new Hash();
-// Puvodni
-NAZVY_SLOUPCU["jmeno"] = "Jednotka";
-NAZVY_SLOUPCU["barva"] = "";
-NAZVY_SLOUPCU["pocet"] = "Počet";
-NAZVY_SLOUPCU["zkusenost"] = "Zkušenost";
-NAZVY_SLOUPCU["silaJednotky"] = "Síla J.";
-NAZVY_SLOUPCU["druh"] = "Druh";
-NAZVY_SLOUPCU["typ"] = "Typ";
-NAZVY_SLOUPCU["cas"] = "Čas prodeje";
-NAZVY_SLOUPCU["nabidka"] = "Nabídka";
-// Nove
-NAZVY_SLOUPCU["typKratce"] = "Typ";
-NAZVY_SLOUPCU["phb"] = "Phb";
-NAZVY_SLOUPCU["ini"] = "Ini";
-NAZVY_SLOUPCU["maxSilaStacku"] = "Max síla";
-NAZVY_SLOUPCU["silaStacku"] = "Síla";
-NAZVY_SLOUPCU["cenaZaSilu"] = "Za 1 síly";
-NAZVY_SLOUPCU["zlataTU"] = "zl/TU";
-NAZVY_SLOUPCU["manyTU"] = "mn/TU";
-NAZVY_SLOUPCU["popTU"] = "pop/TU";
-
 /** BestiarFiltry proxy **/
 var BestiarFiltry = Marshal.getObjectProxy("BestiarFiltry");
 
