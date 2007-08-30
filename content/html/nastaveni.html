@@ -119,28 +119,96 @@ td.nadpis
 		</tr>
 		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
-		<tbody id="plus_bestiarSloupce"></tbody>
-		
+		<tr>
+			<td colspan="2"><span>Vybrané sloupce</span></td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+			    <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;" />
+			</td>
+        </tr>
+		<tr>
+			<td colspan="2" style="text-align: justify;">
+			    <span class="small">
+			        <a id="plus_bestiarVychozi" href="javascript://">Výchozí</a>
+			        &nbsp;
+			        <a id="plus_bestiarKompletni" href="javascript://">Kompletní</a>
+			        &nbsp;
+			        <a id="plus_bestiarPuvodni" href="javascript://">Původní</a>
+			        &nbsp;
+			    </span>
+			</td>
+        </tr>
 		<script type="text/javascript">
-		    function generujSloupceBestiare() {
-		        var tbody = $('plus_bestiarSloupce');
-		    
-		        for (var i = 0; i < BESTIAR_PORADI_SLOUPCU.length; i++) {
-		            var s = BESTIAR_PORADI_SLOUPCU[i];
-		            
-		            var tr = document.createElement("tr");
-		            var name = document.createElement("td");
-		            var value = document.createElement("td");
-		            
-		            name.innerHTML = '<span>' + BESTIAR_NAZVY_SLOUPCU[s] + '</span>';
-		            value.innerHTML = '<span><input type="checked" onload="" /></span>';
-		            
-		            tr.appendChild(name);
-		            tr.appendChild(value);
-		            tbody.appendChild(tr);
-		        }
-		    }
-		</script>
+		    function bestiarInit() {
+		        var selectBestiarSloupce = $('plus_bestiarSloupce');
+
+		        // Pridej vsechny sloupce
+	            BestiarSloupce.nepovinne.each(function(s) {
+	                    var o = new Option(BestiarSloupce.getData(s).popis, s);
+	                    selectBestiarSloupce.options.add(o);
+	                });
+    			
+			    // onload
+			    selectBestiarSloupce.setAttribute("onload", "(" + function() {
+					    this.selectedIndex = -1;
+					    var selected = new Array();
+    					
+					    this.config.getAukce().evalPrefNodeList('sloupce/sloupec[@hidden != "true"]').each(
+							    function(n) { selected.push(n.getAttribute("jmeno")); }
+						    );
+						
+						// Pokud neni nic vybrano pouzij vychozi
+						if (selected.length == 0)
+						    selected = BestiarSloupce.vychozi;
+    						
+					    for (var i = this.options.length - 1; i >= 0; i--) {
+						    this.options[i].selected = selected.indexOf(this.options[i].value) >= 0;
+					    }
+				    } + ").call(this)");
+    				
+			    // onsave
+			    selectBestiarSloupce.setAttribute("onsave", "(" + function() {
+			            var sloupce = this.config.getAukce().getPrefNode("sloupce", true);
+			            sloupce.clearChildNodes();
+    			
+			            for (var i = 0; i < this.options.length; i++) {
+			                var o = this.options[i];
+			                var c = sloupce.addPref("sloupec");
+			                c.setAttribute("jmeno", o.value);
+			                c.setAttribute("hidden", !o.selected);
+			            }
+				    } + ").call(this)");
+            }
+            
+            bestiarInit();
+            
+            // Skupiny
+            function bestairSloupceSkupina(callback) {
+	            var select = $('plus_bestiarSloupce');
+	            select.selectedIndex = -1;
+	            for (var i = 0; i < select.options.length; i++) {
+	                if (callback(select.options[i].value)) {
+	                    select.options[i].selected = true;
+	                }
+	            }
+	        }
+				
+		    // Vychozi
+		    Event.observe('plus_bestiarVychozi', 'click', function() {
+		            bestairSloupceSkupina(function(s) { return BestiarSloupce.jeVychozi(s); });
+		        });
+		    // Kompletni
+		    Event.observe('plus_bestiarKompletni', 'click', function() {
+		            bestairSloupceSkupina(function(s) { return (["typ", "druh", "phb"].indexOf(s) < 0); });
+		        });
+		    // Puvodni
+		    Event.observe('plus_bestiarPuvodni', 'click', function() {
+		            bestairSloupceSkupina(function(s) { return BestiarSloupce.jePuvodni(s); });
+		        });
+	    </script>
 		
 		<!-- TODO -->
 		

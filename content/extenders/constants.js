@@ -90,7 +90,7 @@ BESTIAR_NAZVY_SLOUPCU["typ"] = "Typ";
 BESTIAR_NAZVY_SLOUPCU["cas"] = "Čas prodeje";
 BESTIAR_NAZVY_SLOUPCU["nabidka"] = "Nabídka";
 // Nove
-BESTIAR_NAZVY_SLOUPCU["typKratce"] = "Typ";
+BESTIAR_NAZVY_SLOUPCU["typKratce"] = "Povaha";
 BESTIAR_NAZVY_SLOUPCU["phb"] = "Phb";
 BESTIAR_NAZVY_SLOUPCU["ini"] = "Ini";
 BESTIAR_NAZVY_SLOUPCU["maxSilaStacku"] = "Max síla";
@@ -101,4 +101,4 @@ BESTIAR_NAZVY_SLOUPCU["manyTU"] = "mn/TU";
 BESTIAR_NAZVY_SLOUPCU["popTU"] = "pop/TU";
 
 // Vychozi poradi sloupcu
-var BESTIAR_PORADI_SLOUPCU = ["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", "phb", "ini", "druh", "typ", "silaStacku", "cenaZaSilu", "cas", "nabidka"];
+var BESTIAR_PORADI_SLOUPCU = ["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", "ini", "typKratce", "druh", "typ", "phb", "maxSilaStacku", "silaStacku", "cenaZaSilu", "zlataTU", "manyTU", "popTU", "cas", "nabidka"];

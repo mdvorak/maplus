@@ -67,7 +67,7 @@ pageExtenders.add(PageExtender.create({
         
         // Zpracuj hlavicku (chyby v ni sloupec barva)
         var header = ElementDataStore.get(tableData.rows[0]);
-        header.columns = this._createColumnsMap(header.element, BESTIAR_PUVODNI_SLOUPCE.without("barva"));
+        header.columns = this._createColumnsMap(header.element, BestiarSloupce.puvodni.without("barva"));
         
         bestiar.table.header = header;
         bestiar.table.data = new Array();
@@ -75,7 +75,7 @@ pageExtenders.add(PageExtender.create({
         // Zpracuj jednotlive radky
         for (var i = 1; i < tableData.rows.length; i++) {
             var row = ElementDataStore.get(tableData.rows[i]);
-            row.columns = this._createColumnsMap(row.element, BESTIAR_PUVODNI_SLOUPCE);
+            row.columns = this._createColumnsMap(row.element, BestiarSloupce.puvodni);
 
             // Puvodni text
             row.description = row.element.textContent; 
@@ -121,36 +121,30 @@ pageExtenders.add(PageExtender.create({
         }
         
         // Vytvor seznam sloupcu ktere maji byt zobrazeny
-        var sloupce = new Array();
-        // Povinne
-        sloupce.push("jmeno");
-        sloupce.push("barva");
-        
-        //FIXME
-        sloupce = sloupce.concat(["pocet", "zkusenost", "silaJednotky"]); 
-
+        var zobrazitSloupce = new Array();
         page.config.getAukce().evalPrefNodeList('sloupce/sloupec[@hidden != "true"]').each(function(e) {
-                // Duplicita by sice vzniknout nemela, ale lepsi to osetrit
-                var s = e.getAttribute("jmeno");
-                if (s != null && sloupce.indexOf(s))
-                    sloupce.push(s);
+                zobrazitSloupce.push(e.getAttribute("jmeno"));
             });
         
-        // FIXME
-        sloupce.push("typKratce");
-        sloupce.push("ini");
-        sloupce.push("silaStacku");
-        //sloupce.push("maxSilaStacku");
-        sloupce.push("zlataTU");
-        sloupce.push("manyTU");
-        sloupce.push("popTU");
-        sloupce.push("cenaZaSilu");
-        // Povinne
-        if (sloupce.indexOf("cas") < 0)
-            sloupce.push("cas");
-        if (sloupce.indexOf("nabidka") < 0)
-            sloupce.push("nabidka");
+        var sloupce = new Array();
         
+        if (zobrazitSloupce.length > 0) {
+            BestiarSloupce.getAll().each(function(s) {
+        		    if (sloupce.indexOf(s.jmeno) >= 0)
+        			    return; // continue
+            			
+        		    if (s.povinny || zobrazitSloupce.indexOf(s.jmeno) >= 0)
+        			    sloupce.push(s.jmeno);
+        	    });
+        }
+        else {
+            // Pouzij vychozi nastaveni
+            BestiarSloupce.getAll().each(function(s) {
+                    if (s.vychozi)
+                        sloupce.push(s.jmeno);
+                });
+        }
+
         bestiar.sloupce = sloupce;
         
         // Vse uloz do kontextu stranky
@@ -179,7 +173,7 @@ pageExtenders.add(PageExtender.create({
         
         // Skryte puvodni sloupce
         var skryteSloupce = new Array();
-        BESTIAR_PUVODNI_SLOUPCE.each(function(s) {
+        BestiarSloupce.puvodni.each(function(s) {
                 if (sloupce.indexOf(s) < 0)
                     skryteSloupce.push(s);
             });
@@ -188,9 +182,9 @@ pageExtenders.add(PageExtender.create({
         
         // Vytvor seznam chybejicich sloupcu
         var chybejiciSloupce = new Array();
-        BESTIAR_NAZVY_SLOUPCU.keys().each(function(s) {
-                if (sloupce.indexOf(s) < 0)
-                    chybejiciSloupce.push(s);
+        BestiarSloupce.getAll().each(function(s) {
+                if (sloupce.indexOf(s.jmeno) < 0)
+                    chybejiciSloupce.push(s.jmeno);
             });
         context.chybejiciSloupce = chybejiciSloupce;
         
@@ -214,11 +208,11 @@ pageExtenders.add(PageExtender.create({
             });
     
         // Pridej chybejici sloupce
-        sloupce.each(function(s) {
-                var text = '<span><b>&nbsp;' + BESTIAR_NAZVY_SLOUPCU[s] + '&nbsp;</b></span>';
+        sloupce.without("barva").each(function(s) {
+                var text = '<span><b>&nbsp;' + BestiarSloupce.getData(s).nazev + '&nbsp;</b></span>';
                 
                 // Pridavej pouze nove
-                if (BESTIAR_PUVODNI_SLOUPCE.indexOf(s) < 0) {
+                if (!BestiarSloupce.jePuvodni(s)) {
                     var td = Element.create("td", text);
                     table.header.element.appendChild(td);
                     
@@ -234,7 +228,7 @@ pageExtenders.add(PageExtender.create({
         table.data.each(function(row) {
                 sloupce.each(function(s) {
                         // Pridavej pouze nove
-                        if (BESTIAR_PUVODNI_SLOUPCE.indexOf(s) < 0) {
+                        if (!BestiarSloupce.jePuvodni(s)) {
                             var hodnota = (row.data[s] != null ? row.data[s] : "");
                             var td = Element.create("td", '<span>' + hodnota + '&nbsp;</span>', {align: "right"});
                             row.element.appendChild(td);

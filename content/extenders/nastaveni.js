@@ -49,8 +49,10 @@ pageExtenders.add(PageExtender.create({
     },
 
     process: function(page, context) {
-        page.content.update(context.html);
+        page.content.innerHTML = context.html.stripScripts();
         
+        context.html.evalScripts();
+
         // Vyhledej vsechny konfiguracni elementy
         var list = $XL('.//*[@onload and @onsave]', page.content);
         var inputLoad = $X('.//input[@id="plus_loadConfig" and @type="button"]', page.content);

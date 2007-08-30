@@ -34,7 +34,9 @@
     <script url="#{melior}/obchod.html" name="bestiar-lib.js" />
     <script url="#{melior}/obchod.html" name="bestiar-style.js" />
     <script url="#{melior}/obchod.html" name="bestiar.js" />
-    
+
+    <!-- Nastaveni -->
+    <script url="#{melior}/main.html" name="bestiar-style.js" />
     <script url="#{melior}/main.html" name="nastaveni.js" />
 
     <!-- Post processing -->
