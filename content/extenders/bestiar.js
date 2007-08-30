@@ -282,7 +282,7 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-// Aktivni jmena jednotek
+// Aktivni jmena jednotek a id
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Bestiar - Jednotky"; },
 
@@ -299,11 +299,23 @@ pageExtenders.add(PageExtender.create({
         page.bestiar.table.data.each(function(row) {
                 var td = row.columns["jmeno"];
                 var jmeno = row.data["jmeno"];
+                var id = parseInt(td.textContent.match(/(?:.*?\s+\[\s+(\d+)\s+\])?/)[1]);
                 
                 var link = MaPlus.Tooltips.createActiveUnit(page, jmeno);
-                link.innerHTML = td.innerHTML;
+                link.innerHTML = '<span>' + jmeno + '</span>';
+                
                 td.innerHTML = '<span>&nbsp;</span>';
                 td.appendChild(link);
+                
+                if (!isNaN(id)) {
+                	link = MaPlus.Tooltips.createActiveId(page, id);
+                    link.innerHTML = '<span class="bestiarBid">' + id + '</span>';
+                    
+                	var spanId = Element.create("span", ' [ ', {class: "bestiarBid"});
+                	spanId.appendChild(link);
+                	spanId.appendChild(document.createTextNode(' ] '));
+                	td.appendChild(spanId);
+                }
             });
     }
 }));

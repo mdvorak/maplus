@@ -92,18 +92,18 @@ BestiarSloupce.pridej("jmeno", "Jednotka", "Jednotka", true, true, true);
 BestiarSloupce.pridej("barva", "", "Barva", true, true, true);
 BestiarSloupce.pridej("pocet", "Počet", "Počet", true, true, false);
 BestiarSloupce.pridej("zkusenost", "Zkušenost", "Zkušenost", true, true, false);
+BestiarSloupce.pridej("ini", "Ini", "Iniciativa", false, true, false);
 BestiarSloupce.pridej("silaJednotky", "Síla J.", "Síla J.", true, true, false);
 BestiarSloupce.pridej("typKratce", "Ini", "Typ/Druh/Phb", false, false, false);
 BestiarSloupce.pridej("druh", "Druh", "Druh", true, true, false);
 BestiarSloupce.pridej("typ", "Typ", "Typ", true, true, false);
 BestiarSloupce.pridej("phb", "Phb", "Pohyblivost", false, true, false);
-BestiarSloupce.pridej("ini", "Ini", "Iniciativa", false, true, false);
 BestiarSloupce.pridej("silaStacku", "Síla", "Síla stacku", false, true, false);
 BestiarSloupce.pridej("maxSilaStacku", "Max síla", "Max síla stacku", false, false, false);
-BestiarSloupce.pridej("cenaZaSilu", "Cena", "Cena za 1 síly", false, true, false);
 BestiarSloupce.pridej("zlataTU", "zl/TU", "Zlata/TU", false, false, false);
 BestiarSloupce.pridej("manyTU", "mn/TU", "Many/TU", false, false, false);
 BestiarSloupce.pridej("popTU", "pop/TU", "Populace/TU", false, false, false);
+BestiarSloupce.pridej("cenaZaSilu", "Cena", "Cena za 1 síly", false, true, false);
 BestiarSloupce.pridej("cas", "Čas prodeje", "Čas prodeje", true, true, true);
 BestiarSloupce.pridej("nabidka", "Nabídka", "Nabídka", true, true, true);
 
@@ -134,7 +134,7 @@ var BestiarColumnStyle = {
         if (!isNaN(data.cas))
             td.innerHTML = '<span>&nbsp;' + formatTime(data.cas) + '&nbsp;</span>';
         else
-            td.innerHTML = '<span>&nbsp;Žádná nabídka&nbsp;</span>';
+            td.innerHTML = '<span>&nbsp;---&nbsp;</span>';
     },
     phb: function(td, data) {
         td.innerHTML = '<span>' + data.phb + '</span>';
@@ -149,6 +149,7 @@ var BestiarColumnStyle = {
         html += '<span class="' + typClass + '">' + data.typ[0] + '</span>';
         if (data.typ != "Str.")
             html += '<span class="phb' + data.phb + '">' + data.phb + '</span>';
+        html += '<span>&nbsp;</span>';
         
         td.innerHTML = html;
         td.setAttribute("align", "left");

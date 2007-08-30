@@ -66,6 +66,11 @@ a.idlink
     text-decoration: none;
 }
 
+.bestiarBid
+{
+    color: #603030;
+}
+
 /* Druh a typ */
 .druhPoz { color: green; }
 .druhLet { color: lightblue; }
