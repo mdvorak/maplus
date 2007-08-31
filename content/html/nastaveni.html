@@ -56,7 +56,7 @@ td.nadpis
 			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
 			
 			<td colspan="2">
-				<span class="small dark">(Počet tahů které můžete odehrát ani by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
+				<span class="small dark">(Počet tahů které můžete odehrát aniž by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
 			</td>
 		</tr>
 		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
@@ -120,13 +120,31 @@ td.nadpis
 		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
 		<tr>
-			<td colspan="2"><span>Vybrané sloupce</span></td>
+			<td colspan="2">
+			    <span>Vybrané sloupce</span>
+			    <br />
+			    <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;" />
+			</td>
 			
 			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-		</tr>
-		<tr>
-			<td colspan="2">
-			    <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;" />
+			
+			<td colspan="2" style="vertical-align: top;">
+			    <table>
+                    <colgroup>
+                        <col width="140" />
+                        <col width="100" />
+                    </colgroup>
+	                <tbody>
+	                    <tr>
+	                        <td><span>Barvy</span></td>
+			                <td>
+				                <input type="checkbox"
+					                onload="this.checked = this.config.getAukce().getBoolean('barvy', true);"
+					                onsave="this.config.getAukce().setPref('barvy', this.checked);" />
+			                </td>
+			            </tr>
+	                </tbody>
+	            </table>
 			</td>
         </tr>
 		<tr>
