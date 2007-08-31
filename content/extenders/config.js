@@ -40,6 +40,10 @@ PlusConfig.prototype = {
         return this.getBoolean("enabled", true); 
     },
     
+    getBarevnyText: function() {
+        return this.getBoolean('barevnyText', true);
+    },
+    
     getRegent: function() {
         if (!this._regent) {
             this._regent = this.getPrefNode("regent", true);

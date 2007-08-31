@@ -263,7 +263,7 @@ pageExtenders.add(PageExtender.create({
         if (!page.bestiar || !page.bestiar.table)
             return false;    
        
-       return page.config.getAukce().getBoolean("barvy", true);
+       return page.config.getBarevnyText();
     },
     
     process: function(page, context) {
