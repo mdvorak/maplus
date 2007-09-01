@@ -298,6 +298,7 @@ pageExtenders.add(PageExtender.create({
             if (td == null)
                 continue;
         
+            td.style.width = "30px";
             td.innerHTML = "";
             
             // Kopiruj popis
@@ -463,7 +464,8 @@ pageExtenders.add(PageExtender.create({
                 ++aktivni;
         }
         
-        if (rozdil > 600 || aktivni == 0) { // 10 min
+        // Stop timer pokud jiz neni zadny stack aktivni
+        if (aktivni == 0) {
             clearInterval(context.timer);
         }
     }
