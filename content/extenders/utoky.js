@@ -228,6 +228,8 @@ pageExtenders.add(PageExtender.create({
         if (!page.tableRozdane || !page.tableBranene)
             return false;
             
+        context.barvy = page.config.getBarevnyText();
+        
         context.vsechnyUtoky = $A(page.tableRozdane.utoky).concat($A(page.tableBranene.utoky));
         return context.vsechnyUtoky.length > 0;
     },
@@ -237,7 +239,9 @@ pageExtenders.add(PageExtender.create({
                 var tr = utok.row;
         
                 // Obarvy uroven
-                tr.cells.uroven.style.color = Color.fromRange(utok.uroven, 125, 50, Color.Pickers.redGreen);
+                if (context.barvy) {
+                    tr.cells.uroven.style.color = Color.fromRange(utok.uroven, 125, 50, Color.Pickers.redGreen);
+                }
                 
                 // Linky
                 var link = MaPlus.Tooltips.createActiveId(page, utok.id);

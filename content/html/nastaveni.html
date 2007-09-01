@@ -42,25 +42,16 @@ td.nadpis
 			
 			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
 			
-			<td><span>Limit tahů bez potvrzení</span></td>
+			<td><span>Barevné texty</span></td>
 			<td>
-				<input type="text" style="width: 50;"
-					onload="this.value = this.config.getNumber('maxTahu', MAX_TAHU_DEFAULT);"
-					onsave="this.config.setPref('maxTahu', Number(this.value));" />
+				<input type="checkbox"
+					onload="this.checked = this.config.getBarevnyText();"
+					onsave="this.config.setPref('barevnyText', this.checked);" />
 			</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			
-			<td colspan="2">
-				<span class="small dark">(Počet tahů které můžete odehrát ani by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
-			</td>
-		</tr>
+        </tr>
 		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
+        
+
 		<tr>
 			<td><span>Zobrazit kalkulačku</span></td>
 			<td>
@@ -78,7 +69,27 @@ td.nadpis
 					onsave="this.config.getPrefNode('poznamky', true).setPref('zobrazit', this.checked);" />
 			</td>
 		</tr>
-		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
+		<tr>
+			<td><span>Limit tahů bez potvrzení</span></td>
+			<td>
+				<input type="text" style="width: 50;"
+					onload="this.value = this.config.getNumber('maxTahu', MAX_TAHU_DEFAULT);"
+					onsave="this.config.setPref('maxTahu', parseInt(this.value));" />
+			</td>
+		</tr>
+		<tr>
+            <td colspan="2">
+				<span class="small dark">(Počet tahů které můžete odehrát aniž by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
+			</td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+			
+			<td></td>
+			<td></td>
+		</tr>
+		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
 		<!-- TODO -->
 		
@@ -120,13 +131,24 @@ td.nadpis
 		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
 		<tr>
-			<td colspan="2"><span>Vybrané sloupce</span></td>
+			<td colspan="2">
+			    <span>Vybrané sloupce</span>
+			    <br />
+			    <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;" />
+			</td>
 			
 			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-		</tr>
-		<tr>
-			<td colspan="2">
-			    <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;" />
+			
+			<td colspan="2" style="vertical-align: top;">
+			    <table>
+                    <colgroup>
+                        <col width="140" />
+                        <col width="100" />
+                    </colgroup>
+	                <tbody>
+                        <!-- TODO -->
+	                </tbody>
+	            </table>
 			</td>
         </tr>
 		<tr>

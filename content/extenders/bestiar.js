@@ -263,7 +263,7 @@ pageExtenders.add(PageExtender.create({
         if (!page.bestiar || !page.bestiar.table)
             return false;    
        
-       return true;
+       return page.config.getBarevnyText();
     },
     
     process: function(page, context) {
