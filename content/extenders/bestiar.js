@@ -78,7 +78,7 @@ pageExtenders.add(PageExtender.create({
             row.columns = this._createColumnsMap(row.element, BestiarSloupce.puvodni);
 
             // Puvodni text
-            row.description = row.element.textContent; 
+            row.description = row.element.textContent.replace(/\n|\s+$/g, ""); 
 
             // Analyzuj data
             row.data = new Hash();
@@ -130,10 +130,10 @@ pageExtenders.add(PageExtender.create({
         
         if (zobrazitSloupce.length > 0) {
             BestiarSloupce.getAll().each(function(s) {
-        		    if (sloupce.indexOf(s.jmeno) >= 0)
+        		    if (sloupce.indexOf(s.jmeno) > -1)
         			    return; // continue
             			
-        		    if (s.povinny || zobrazitSloupce.indexOf(s.jmeno) >= 0)
+        		    if (s.povinny || zobrazitSloupce.indexOf(s.jmeno) > -1)
         			    sloupce.push(s.jmeno);
         	    });
         }
@@ -167,9 +167,7 @@ pageExtenders.add(PageExtender.create({
        
         var sloupce = page.bestiar.sloupce;
         
-        // Pokud neni nic nastaveno, nic nemen (4 jsou povinne)
-        if (sloupce.length <= 4)
-            return false;
+        console.debug("Zobrazene sloupce: %o", sloupce);
         
         // Skryte puvodni sloupce
         var skryteSloupce = new Array();
@@ -179,14 +177,7 @@ pageExtenders.add(PageExtender.create({
             });
         
         context.skryteSloupce = skryteSloupce;
-        
-        // Vytvor seznam chybejicich sloupcu
-        var chybejiciSloupce = new Array();
-        BestiarSloupce.getAll().each(function(s) {
-                if (sloupce.indexOf(s.jmeno) < 0)
-                    chybejiciSloupce.push(s.jmeno);
-            });
-        context.chybejiciSloupce = chybejiciSloupce;
+        console.debug("Skryte sloupce: %o", skryteSloupce);
         
         return true;
     },
@@ -216,7 +207,7 @@ pageExtenders.add(PageExtender.create({
                     var td = Element.create("td", text);
                     table.header.element.appendChild(td);
                     
-                    td.name = s;
+                    td.setAttribute("name", s);
                     table.header.columns[s] = td;
                 }
                 // Prejmenuj stare (preskoc smazane)
@@ -233,7 +224,7 @@ pageExtenders.add(PageExtender.create({
                             var td = Element.create("td", '<span>' + hodnota + '&nbsp;</span>', {align: "right"});
                             row.element.appendChild(td);
                                 
-                            td.name = s;
+                            td.setAttribute("name", s);
                             row.columns[s] = td;
                             
                             // Tohle je sice trosku osklivy ale funkcni ;)
@@ -254,6 +245,93 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Rozsireni
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Rozsireni"; },
+
+    analyze: function(page, context) {
+        // Bestiar
+        if (!page.bestiar || !page.bestiar.table || !page.bestiar.sloupce)
+            return false;    
+       
+        if (page.bestiar.sloupce.indexOf("rozsireni") < 0)
+            return false;
+            
+        var sloupce = page.bestiar.sloupce;
+
+        // Vytvor seznam chybejicich sloupcu
+        var chybejiciSloupce = new Array();
+        BestiarSloupce.getAll().each(function(s) {
+                if (sloupce.indexOf(s.jmeno) < 0)
+                    chybejiciSloupce.push(s.jmeno);
+            });
+        context.chybejiciSloupce = chybejiciSloupce;
+        console.debug("Chybejici sloupce: %o", chybejiciSloupce);
+        
+        // Vytvor tooltip pouze pokud nejaka informace chyby
+        if (context.chybejiciSloupce.length > 0 
+                && context.chybejiciSloupce.without("typKratce").length > 0
+                && context.chybejiciSloupce.without("typ", "druh", "phb").length > 0) {
+            // Vytvor template pro chybejici sloupce
+            var html = '<table cellspacing="0" cellpadding="0" border="0">';
+            html += '<tr><td colspan="2"><span><b>#{jmeno}</b></span></td></tr>';
+            chybejiciSloupce.each(function(s) {
+                    var nazev = BestiarSloupce.getData(s).nazev;
+                    html += '<tr><td><span>' + nazev + '&nbsp;&nbsp;</span></td>';
+                    html += '<td><span>#{' + s + '}</span></td></tr>';
+                });
+            html += '</table>';
+            console.debug("Chybejici sloupce template:\n", html);
+            
+            context.chybejiciTemplate = new Template(html);
+        }
+        
+        return true;
+    },
+    
+    process: function(page, context) {
+        // Zpracuj tabulku
+        for (var i = 0; i < page.bestiar.table.data.length; i++) {
+            var row = page.bestiar.table.data[i];
+        
+            var td = row.columns["rozsireni"];
+            if (td == null)
+                continue;
+        
+            td.innerHTML = "";
+            
+            // Kopiruj popis
+            var copy = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/copy.png" />', {href: "javascript://"});
+            copy.setAttribute("title", "Zkopíruj popis stacku do schránky");
+            Event.observe(copy, 'click', function() { Clipboard.copyText(row.description); });
+            td.appendChild(copy);
+            
+            // Zobraz chybejici sloupce
+            if (context.chybejiciTemplate != null) {
+                var chybejici = this._createRozsireneTooltip(context.chybejiciTemplate, i, row.data);
+                td.appendChild(Element.create("span", "&nbsp;"));
+                td.appendChild(chybejici);
+            }
+        }
+    },
+    
+    _createRozsireneTooltip: function(template, index, data) {
+        var link = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/questionmark.png" />', {href: "javascript://"});
+        link.setAttribute("title", "Zobrazí skryté informace o stacku.");
+        
+        var tooltipName = "missing_" + index
+        if (!Tooltip.isRegistered(tooltipName)) {
+            Tooltip.register(tooltipName, function() {
+                    var html = template.evaluate(data); 
+                    return Tooltip.create(html, "tooltip", false); 
+                });
+        }
+     
+        Tooltip.attach(link, tooltipName);
+        return link; 
+    }
+}));
+
 // Styl
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Bestiar - Styl"; },
@@ -261,7 +339,7 @@ pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         // Bestiar
         if (!page.bestiar || !page.bestiar.table)
-            return false;    
+            return false;
        
        return page.config.getBarevnyText();
     },

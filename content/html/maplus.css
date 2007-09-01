@@ -66,6 +66,13 @@ a.idlink
     text-decoration: none;
 }
 
+img.link
+{
+	border-width: 0px;
+	padding-top: 1px;
+	vertical-align: middle;
+}
+
 .bestiarBid
 {
     color: #603030;

@@ -54,6 +54,8 @@ var MaPlus = {
 };
 
 var Clipboard = {
+    MAX_TEXT_LENGTH: 128,
+
     _helper: Components.classes["@mozilla.org/widget/clipboardhelper;1"].getService(Components.interfaces.nsIClipboardHelper),
     
     copyId_PROXY: Marshal.BY_VALUE,
@@ -62,6 +64,17 @@ var Clipboard = {
             throw new ArgumentException("id", id, "Not a number.");
         
         this._helper.copyString(id);
+    },
+    
+    copyText_PROXY: Marshal.BY_VALUE,
+    copyText: function(text) {
+        if (text == null)
+            throw new ArgumentNullException("text");
+        text = String(text);
+        if (text.length > this.MAX_TEXT_LENGTH)
+            throw new ArgumentException("text", text, "Text cannot be longer than " + this.MAX_TEXT_LENGTH);
+        
+        this._helper.copyString(text);
     }
 };
 
