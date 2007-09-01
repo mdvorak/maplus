@@ -38,8 +38,6 @@ const TIMERS_DISABLED = true;
 
 const MAX_TAHU_DEFAULT = 30;
 
-const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
-
 const JMENA_PRESVEDCENI = new Hash();
 JMENA_PRESVEDCENI["D"] = "Dobré";
 JMENA_PRESVEDCENI["N"] = "Neutrální";

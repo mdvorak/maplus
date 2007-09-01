@@ -398,6 +398,78 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Odpocet casu
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Odpocet"; },
+
+    analyze: function(page, context) {
+        // Bestiar
+        if (!page.bestiar || !page.bestiar.table)
+            return false;
+       
+        // Sestav list bunek s casem
+        var list = new Array();
+           
+        page.bestiar.table.data.each(function(row) {
+                if (isNaN(row.data.cas))
+                    return;
+                    
+                list.push({cell: row.columns["cas"], time: row.data.cas});
+            });
+       
+       context.list = list;
+       return context.list.length > 0;
+    },
+    
+    process: function(page, context) {
+        // Start timer
+        var _this = this;
+        context.timer = setInterval(function() { _this._updateTime(context); }, 1000);
+    },
+    
+    _updateTime: function(context) {
+        var casZobrazeni = new Date(document.lastModified);
+        var aktualniCas = new Date();
+        var rozdil = (aktualniCas.getTime() - casZobrazeni.getTime()) / 1000;
+        var aktivni = 0;
+
+        for (var i = 0; i < context.list.length; i++) {
+            var td = context.list[i].cell;
+            var pocatecniCas = context.list[i].time;
+            
+            var first = false;
+            var spanAktualni = context.list[i].aktualni;
+            
+            if (spanAktualni == null) {
+                td.innerHTML = '';
+                // Aktualni
+                spanAktualni = Element.create("span");
+                td.appendChild(spanAktualni);
+                // Puvodni
+                td.appendChild(Element.create("span", '&nbsp;(' + formatTime(pocatecniCas) + ')&nbsp;', {style: "color: gray;"}));
+                
+                context.list[i].aktualni = spanAktualni;
+                first = true;
+            }
+        
+        
+            var cas = Math.max(0, pocatecniCas - rozdil);
+            spanAktualni.innerHTML = '&nbsp;' + formatTime(cas);
+
+            if (parseInt(rozdil) % 5 == 0 || first) // Neupdatuj barvy zbytecne kazdou vterinu
+                spanAktualni.style.color = Color.fromRange(cas, 60, 180, Color.Pickers.redGreen);
+                
+            if (cas > 0)
+                ++aktivni;
+        }
+        
+        if (rozdil > 600 || aktivni == 0) { // 10 min
+            clearInterval(context.timer);
+        }
+    }
+}));
+
+
 
 
 
