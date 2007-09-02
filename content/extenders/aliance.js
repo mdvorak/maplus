@@ -100,7 +100,8 @@ pageExtenders.add(PageExtender.create({
         var aliance = MaData.najdiAlianci(jmenoAliance);
         var presvedceni = (aliance && aliance.presvedceni != "") ? aliance.presvedceni : null;
         
-        // Pak ji nastav clenum
+        // Pak ji nastav clenum (a zrus tem co uz tam nejsou)
+        var clenovePuvodni = MaData.clenoveAliance(jmenoAliance);
         context.idClenu = new Array();
         
         for (var i = 1; i < tableClenove.rows.length - 2; i++) {
@@ -112,6 +113,7 @@ pageExtenders.add(PageExtender.create({
             
             if (!isNaN(id)) {
                 MaData.aktualizujProvincii(id, regent, provincie, null, presvedceni, jmenoAliance);
+                clenovePuvodni = clenovePuvodni.without(id);
                 
                 // Pro aktivni id
                 context.idClenu.push({ 
@@ -120,6 +122,11 @@ pageExtenders.add(PageExtender.create({
                     });
             }
         }
+        
+        // Zrus ji provinciim ktere uz tam nejsou
+        clenovePuvodni.each(function(id) {
+                MaData.aktualizujProvincii(id, null, null, null, null, ZADNA_ALIANCE);
+            });
             
         return (context.idClenu.length > 0);
     },

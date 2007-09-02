@@ -105,6 +105,26 @@ var MaData = {
         provi.setAttribute("update", new Date());
     },
     
+    // Vraci array id
+    clenoveAliance_PROXY: Marshal.BY_VALUE,
+    clenoveAliance: function(jmenoAliance) {
+        if (jmenoAliance == null)
+            return new Array();
+    
+        this._ensureDataAreLoaded();
+    
+        var list = new Array();
+    
+        var provincie = this.seznamProvincii.evalPrefNodeList('provincie[aliance = "' + jmenoAliance + '"]');
+        provincie.each(function(provi) {
+                var id = parseInt(provi.getAttribute("id"));
+                if (!isNaN(id))
+                    list.push(id);
+            });
+            
+        return list;
+    },
+    
     najdiAlianci_PROXY: Marshal.BY_VALUE,
     najdiAlianci: function(jmeno) {
         if (jmeno == null || jmeno == ZADNA_ALIANCE)

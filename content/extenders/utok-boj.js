@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const PERSISTENT_FIELDS_WARNING = "Pozn: Pokud je checkbox vedle pole zatržen, hodnota bude uložena a použita při dalších zobrazeních.";
+var PERSISTENT_FIELDS_WARNING = "Pozn: Pokud je checkbox vedle pole zatržen, hodnota bude uložena a použita při dalších zobrazeních.";
 
 // Utok
 pageExtenders.add(PageExtender.create({
@@ -125,7 +125,7 @@ pageExtenders.add(PageExtender.create({
         
         var elements = new Array();
         elements = $XL('.//input[@name and @type = "text"]', tableNastaveni).concat(elements);
-        elements = $XL('.//select[@name]', tableNastaveni).concat(elements);
+        elements = $XL('.//textarea[@name]', tableNastaveni).concat(elements);
         
         context.elements = elements;
         context.config = page.config.getPrefNode("nastaveni", true).getPrefNode("boj", true);
