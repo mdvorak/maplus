@@ -50,15 +50,7 @@ PlusConfig.prototype = {
         }
         return this._regent;
     },
-    
-    getNastaveni: function() {
-        if (!this._nastaveni) {
-            this._nastaveni = this.getPrefNode("nastaveni", true);
-            Object.extend(this._nastaveni, PlusConfig.Nastaveni.prototype);
-        }
-        return this._nastaveni;
-    },
-    
+        
     getMenu: function() {
         if (!this._menu) {
             this._menu = this.getPrefNode("menu", true);
@@ -74,23 +66,6 @@ PlusConfig.prototype = {
     }
 };
  
-PlusConfig.Nastaveni = new Object();
-PlusConfig.Nastaveni.prototype = {
-    getUtok: function() {
-        if (!this._utok) {
-            this._utok = this.getPrefNode("utok", true);
-        }
-        return this._utok;
-    },
-    
-    getBoj: function() {
-        if (!this._boj) {
-            this._boj= this.getPrefNode("boj", true);
-        }
-        return this._boj;
-    }
-};
-
 Object.extend(PlusConfig, {
     EXTENSION: ".xml",
     

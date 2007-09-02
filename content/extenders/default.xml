@@ -30,11 +30,13 @@
     <script url="#{melior}/setup.html" name="spehove.js" />
     <script url="#{melior}/banka.html" name="banka.js" />
     <script url="#{melior}/status.html" name="hospodarstvi.js" />
-    <script url="#{melior}/main.html" name="utoky.js" />
+    <script url="#{melior}/main.html" name="vypis.js" />
     <script url="#{melior}/obchod.html" name="bestiar-lib.js" />
     <script url="#{melior}/obchod.html" name="bestiar-style.js" />
     <script url="#{melior}/obchod.html" name="bestiar.js" />
-
+    <script url="#{melior}/utok.html" name="utok-boj.js" />
+    <script url="#{melior}/boj.html" name="utok-boj.js" />
+    
     <!-- Nastaveni -->
     <script url="#{melior}/main.html" name="bestiar-style.js" />
     <script url="#{melior}/main.html" name="nastaveni.js" />

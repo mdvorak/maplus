@@ -45,16 +45,16 @@ ExtenderCollection.prototype = {
     },
     
     _analyzeUrl: function(url) {
-        if (!url) throw new ArgumentNullException("url");
+        if (url == null) throw new ArgumentNullException("url");
 
         var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?](.+))?$/);
-        if (!m) return null;
+        if (m == null) return null;
         
         var site = m[1];
         var path = (m[2] != null) ? m[2] : "DEFAULT";
         var args = new Hash();
         
-        if (m[3]) {
+        if (m[3] != null) {
             $A(m[3].match(/[^&=]+=[^&=]+/g)).each(function(a) {
                 var pair = a.split("=");
                 args[pair[0]] = pair[1];
@@ -70,7 +70,7 @@ ExtenderCollection.prototype = {
     },
     
     add: function(url, extender) {
-        if (!extender) throw new ArgumentNullException("extender");
+        if (extender == null) throw new ArgumentNullException("extender");
         
         // Clear cache
         this._cache.remove();
@@ -85,17 +85,17 @@ ExtenderCollection.prototype = {
         }
         
         var analyzedUrl = this._analyzeUrl(url);
-        if (!analyzedUrl)
+        if (analyzedUrl == null)
             throw new ArgumentException("url", url, "Invalid url format.");
     
         var site = this._siteMap[analyzedUrl.site];
-        if (!site) {
+        if (site == null) {
             site = new Hash();
             this._siteMap[analyzedUrl.site] = site;
         }
         
         var extenders = site[analyzedUrl.path];
-        if (!extenders) {
+        if (extenders == null) {
             extenders = new Array();
             site[analyzedUrl.path] = extenders;
         }
@@ -106,14 +106,14 @@ ExtenderCollection.prototype = {
     
     getList: function(url) {
         var analyzedUrl = this._analyzeUrl(url);
-        if (!analyzedUrl)
+        if (analyzedUrl == null)
             return null;
         
         var extenders = this._cache[analyzedUrl.address];
         
-        if (!extenders) {  
+        if (extenders == null) {  
             var site = this._siteMap[analyzedUrl.site];
-            if (site) {
+            if (site != null) {
                 // We need to sort extenders
                 var tmpList = new Array();
                 
@@ -159,16 +159,16 @@ var WebExtender = {
     _unloadHandlers: new Array(),
     
     registerExtender: function(url, extender) {
-        if (!url) throw new ArgumentNullException("url");
-        if (!extender) throw new ArgumentNullException("extender");
+        if (url == null) throw new ArgumentNullException("url");
+        if (extender == null) throw new ArgumentNullException("extender");
         
         this._extenders.add(url, extender);
         return extender;
     },
     
     registerCallback: function(url, callback) {
-        if (!url) throw new ArgumentNullException("url");
-        if (!callback) throw new ArgumentNullException("callback");
+        if (url == null) throw new ArgumentNullException("url");
+        if (callback == null) throw new ArgumentNullException("callback");
     
         var extender = PageExtender.create({
                 process: function(page) {
@@ -179,7 +179,7 @@ var WebExtender = {
     },
     
     registerUnloadHandler: function(callback) {
-        if (!callback) return;
+        if (callback == null) return;
     
         this._unloadHandlers.push(callback);
     },
@@ -249,9 +249,9 @@ window.addEventListener("load", function(e) { WebExtender._init(e); }, false);
 /*** Script class ***/
 var Script = Object.extend(Script || {}, {
     executeFile: function(doc, src, type) {
-        if (!doc) throw new ArgumentNullException("doc");
-        if (!src) throw new ArgumentNullException("src");
-        if (!type) type = "text/javascript";
+        if (doc == null) throw new ArgumentNullException("doc");
+        if (src == null) throw new ArgumentNullException("src");
+        if (type == null) type = "text/javascript";
         
         var e = doc.createElement("script");
         e.setAttribute("type", type);
@@ -261,9 +261,9 @@ var Script = Object.extend(Script || {}, {
     },
 
     execute: function(doc, code, type) {
-        if (!doc) throw new ArgumentNullException("doc");
-        if (!code) throw new ArgumentNullException("code");
-        if (!type) type = "text/javascript";
+        if (doc == null) throw new ArgumentNullException("doc");
+        if (code == null) throw new ArgumentNullException("code");
+        if (type == null) type = "text/javascript";
         
         var e = doc.createElement("script");
         e.setAttribute("type", type);
@@ -274,8 +274,8 @@ var Script = Object.extend(Script || {}, {
     
     // This will execute function in the dom of doc
     executeJavascriptFunction: function(doc, func) {
-        if (!doc) throw new ArgumentNullException("doc");
-        if (!func) throw new ArgumentNullException("func");
+        if (doc == null) throw new ArgumentNullException("doc");
+        if (func == null) throw new ArgumentNullException("func");
         
         this.execute(doc, "(" + func.toString() + ")();", "text/javascript");
     }
@@ -284,7 +284,7 @@ var Script = Object.extend(Script || {}, {
 /*** FileIO class ***/
 var FileIO = {
     loadText: function(url) {
-        if (!url) throw new ArgumentNullException("url");
+        if (url == null) throw new ArgumentNullException("url");
         
         var req = new XMLHttpRequest();
         req.open("GET", url, false); 
@@ -294,14 +294,14 @@ var FileIO = {
     },
     
     loadTextFile: function(file) {
-        if (!file) throw new ArgumentNullException("file");
+        if (file == null) throw new ArgumentNullException("file");
         
         var url = this._getFileUrl(file);
         return this.loadText(url);
     },
 
     loadXml: function(url) {
-        if (!url) throw new ArgumentNullException("url");
+        if (url == null) throw new ArgumentNullException("url");
     
         var req = new XMLHttpRequest();
         req.open("GET", url, false); 
@@ -311,15 +311,15 @@ var FileIO = {
     },
 
     loadXmlFile: function(file) {
-        if (!file) throw new ArgumentNullException("file");
+        if (file == null) throw new ArgumentNullException("file");
         
         var url = this._getFileUrl(file);
         return this.loadXml(url);
     },
 
     saveXmlFile: function(file, dom) {
-        if (!file) throw new ArgumentNullException("file");
-        if (!dom) throw new ArgumentNullException("dom");
+        if (file == null) throw new ArgumentNullException("file");
+        if (dom == null) throw new ArgumentNullException("dom");
         
         var serializer = new XMLSerializer();
         var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
@@ -331,7 +331,7 @@ var FileIO = {
     },
     
     _getFileUrl: function(file) {
-        if (!file) throw new ArgumentNullException("file");
+        if (file == null) throw new ArgumentNullException("file");
         
         var ios = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
         var fileHandler = ios.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
@@ -397,7 +397,7 @@ Marshal.ObjectCollection.prototype = {
         
         if (objectName == null) {
             var marshalObjects = doc._marshalObjects;
-            if (!marshalObjects) {
+            if (marshalObjects == null) {
                 marshalObjects = new Hash();
                 doc._marshalObjects = marshalObjects;
             }
@@ -450,7 +450,7 @@ Object.extend(Marshal, {
     
     // Callback must be function(document, objectName) which must throw exception when call is invalid
     registerCallValidator: function(callback) {
-        if (!callback) 
+        if (callback == null) 
             throw new ArgumentNullException("callback");
         if (typeof callback != "function")
             throw new ArgumentException("callback", callback, "Argument is not a function.");
@@ -459,7 +459,7 @@ Object.extend(Marshal, {
     },
     
     registerUrlCallValidator: function(pattern) {
-        if (!pattern)
+        if (pattern == null)
             throw new ArgumentNullException("pattern");
             
         this.registerCallValidator(function(doc) {
@@ -484,7 +484,7 @@ Object.extend(Marshal, {
             var resultName = elem.getAttribute("resultName");
             var argsStr = elem.getAttribute("arguments");
             
-            if (!objectName)
+            if (objectName == null)
                 throw new MarshalException("Missing object name.", objectName, methodName);
             if (!/^[\w_$]+$/.test(methodName))
                 throw new MarshalException("Invalid method name.", objectName, methodName);
@@ -492,11 +492,11 @@ Object.extend(Marshal, {
             this._validateCall(elem.ownerDocument, objectName);
             
             var obj = this._objects.getObject(elem.ownerDocument, objectName, false);
-            if (!obj)
+            if (obj == null)
                 throw new MarshalException("Object is not registered.", objectName, methodName);
             
             var method = obj[methodName];
-            if (!method || typeof method != "function")
+            if (method == null || typeof method != "function")
                 throw new MarshalException("Method not found.", objectName, methodName);
                 
             var methodType = this._getMethodType(obj, methodName);
@@ -505,7 +505,7 @@ Object.extend(Marshal, {
             
             // Create argument array
             var args = new Array();
-            if (argsStr && !argsStr.empty()) {
+            if (argsStr != null && !argsStr.empty()) {
                 var objects = this._objects;
             
                 var transportArgs = argsStr.evalJSON();
@@ -520,7 +520,7 @@ Object.extend(Marshal, {
             // Call method
             var retval = method.apply(obj, args);
             
-            if (retval) {
+            if (retval != null) {
                 // Process result
                 switch (methodType) {
                     case Marshal.BY_VALUE:
@@ -576,7 +576,7 @@ Object.extend(Marshal, {
             var elem = event.originalTarget;
             var objectName = elem.getAttribute("objectName");
             
-            if (!objectName)
+            if (objectName == null)
                 throw new MarshalException("Missing object name.");
                 
             this._validateCall(elem.ownerDocument, objectName);
@@ -592,9 +592,8 @@ Object.extend(Marshal, {
     },
     
     _validateCall: function(doc, objectName) {
-        if (this._validators.length == 0)
-            throw new InvalidOperationException("This call is not enabled by the host security.");
-            
+        // No validators means disabled validation
+         
         this._validators.each(function(v) {
                 v.call(null, doc, objectName);
             });
@@ -647,10 +646,10 @@ Object.extend(Marshal, {
 /*** ExtenderManager class ***/
 var ExtenderManager = {    
     load: function(definitionUrl) {
-        if (!definitionUrl) throw new ArgumentNullException("definitionUrl");
+        if (definitionUrl == null) throw new ArgumentNullException("definitionUrl");
         
         var definition = FileIO.loadXml(definitionUrl);
-        if (definition) {
+        if (definition != null) {
             var data = {
                 location: definitionUrl.replace(/\/[^\/]+$/, "/"),
                 aliases: new Hash()
@@ -660,7 +659,7 @@ var ExtenderManager = {
             var aliasesDef = XPath.evalList('/webExtender/urls/alias', definition);
             aliasesDef.each(function(a) {
                     var name = a.getAttribute("name");
-                    if (!name || !/^[\w._-~]+$/.test(name))
+                    if (name == null || !/^[\w._-~]+$/.test(name))
                         throw String.format("Invalid or missing alias name ('{0}')", name);
                         
                     data.aliases[name] = a.textContent; 
@@ -672,10 +671,10 @@ var ExtenderManager = {
                     var url = new Template(def.getAttribute("url")).evaluate(data.aliases);
                     var parser = ExtenderManager.Extenders[def.tagName];
                     
-                    if (!url || url.empty())
+                    if (url == null || url.empty())
                         throw "url not set.";
                     
-                    if (!parser || typeof parser != "function")
+                    if (parser == null || typeof parser != "function")
                         throw String.format("Unsupported extender type ('{0}').", def.tagName);
                     
                     var extender = parser(def, data);
@@ -709,7 +708,7 @@ ExtenderManager.Extenders = {
         var name = def.getAttribute("name");
         var type = def.getAttribute("type");
         
-        if (!name || !new RegExp("^[\\w./_~-]+$").test(name))
+        if (name == null || !new RegExp("^[\\w./_~-]+$").test(name))
             throw new Exception(String.format("Invalid script name ('{0}').", name));
         
         var src = data.location + name;

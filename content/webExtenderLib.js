@@ -42,7 +42,7 @@ Object.extend(Function, {
 
 Object.extend(Class, {
     _createMethodWithBase: function(__owner, base /*, method */) {
-        // Redeclaring method is nescessary because it automaticly takes local variable base.
+        // Redeclaring method is nescessary because then it automaticly takes local variable base.
         var __method = eval("(" + arguments[2] + ")");
         // Return new method called in the context of object instance
         return function() {
@@ -51,12 +51,12 @@ Object.extend(Class, {
     },
     
     inherit: function(baseClass) {
-        if (!baseClass)
+        if (baseClass == null)
             throw "baseClass is null.";
             
         var cls = function() {
             // Object is not completed - it's prototype is created right now
-            if (!arguments.callee.__baseClass)
+            if (arguments.callee.__baseClass == null)
                 return;
         
             // Create base object
@@ -87,7 +87,7 @@ Object.extend(Class, {
 // Helper class
 Class.BaseObject = function(owner, clazz) {
     var base = null;
-    if (clazz.__baseClass) {
+    if (clazz.__baseClass != null) {
         base = new Class.BaseObject(owner, clazz.__baseClass);
     }
 
@@ -95,7 +95,7 @@ Class.BaseObject = function(owner, clazz) {
         var v = clazz.prototype[p];
         
         if (typeof v == "function") {
-            if (base)
+            if (base != null)
                 this[p] = Class._createMethodWithBase(owner, base, v);
             else
                 this[p] = Function.bind(owner, v);
@@ -132,15 +132,16 @@ Object.extend(Object, {
 
 Object.extend(String, {
     format: function(str, args) {
-        if (!str) return null;
+        if (str == null) return null;
         
         for (var i = 1; i < arguments.length; i++) {
-            var val = arguments[i] ? arguments[i] : "";
+            var val = arguments[i] != null ? arguments[i] : "";
             str = str.replace("{" + String(i - 1) + "}", val);
         }
         
+        // Kontrola zdali existuje neprirazeny vyraz
         var m = str.match(/\{(\d+)\}/);
-        if (m) throw "Argument index (" + m[1] + ") is out of range.";
+        if (m != null) throw "Argument index (" + m[1] + ") is out of range.";
         
         return str;
     },
@@ -177,13 +178,13 @@ Object.extend(String, {
 
 Object.extend(Element, {
     create: function(tagName, innerHtml, attributes, doc) {
-        if (!tagName)
+        if (tagName == null)
             throw new ArgumentNullException("tagName");
     
-        if (!doc) doc = document;
+        if (doc == null) doc = document;
         var e = doc.createElement(tagName);
         
-        if (attributes) {
+        if (attributes != null) {
             $H(attributes).each(function(attr) {
                     e.setAttribute(attr[0], attr[1] || "");
                 });
@@ -212,7 +213,7 @@ Exception.prototype = {
     getDescription: function() {
         var str = this.getType();
         
-        if (this.message)
+        if (this.message != null)
             str += ": " + this.message;
             
         return str;
@@ -221,7 +222,7 @@ Exception.prototype = {
     toString: function() {
         var str = this.getDescription();
         
-        if (this.innerException)
+        if (this.innerException != null)
             str += "\n>>" + this.innerException.toString().replace(/\n/g, "\n>>");
             
         return str;
@@ -230,7 +231,7 @@ Exception.prototype = {
 
 Object.extend(Exception, {
     getExceptionType: function(ex) {
-        return (ex && ex.getType) ? ex.getType() : null;
+        return (ex != null && ex.getType != null) ? ex.getType() : null;
     }
 });
 
@@ -252,7 +253,7 @@ Object.extend(ArgumentException.prototype, {
     getDescription: function() {
         var str = base.getDescription();
         
-        if (this.name)
+        if (this.name != null)
             str += String.format("\nargument name='{0}' value='{1}'", this.name, String(this.value));
     }
 });
@@ -300,7 +301,7 @@ Object.extend(XPathException.prototype, {
     getDescription: function() {
         var str = base.getDescription();
         
-        if (this.expression)
+        if (this.expression != null)
             str += "\nexpression: '" + this.expression + "'";
 
         return str;
@@ -312,14 +313,14 @@ var XPath = {
     evaluate: function(xpath, context, resultType, noLog) {
         var retval;
         try {
-            if (!xpath) return null;
-            if (!resultType) resultType = XPathResult.ANY_TYPE;
-            if (!context) 
+            if (xpath == null) return null;
+            if (resultType == null) resultType = XPathResult.ANY_TYPE;
+            if (context == null) 
                 context = document;
             else
                 context = $(context);
             
-            var doc = context.ownerDocument ? context.ownerDocument : context;
+            var doc = (context.ownerDocument != null) ? context.ownerDocument : context;
             retval = doc.evaluate(xpath, context, null, resultType, null);
             return retval;
         }
@@ -339,7 +340,7 @@ var XPath = {
             var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE, true);
             retval = new Array();
             
-            if (result) {
+            if (result != null) {
                 for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
                     retval.push($(i));
                 }
@@ -361,7 +362,7 @@ var XPath = {
         var retval;
         try {
             var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE, true);
-            retval = result ? $(result.iterateNext()) : null;
+            retval = (result != null) ? $(result.iterateNext()) : null;
             return retval;
         }
         catch (ex) {
@@ -378,7 +379,7 @@ var XPath = {
         var retval;
         try {
             var result = this.evaluate(xpath, context, XPathResult.STRING_TYPE, true);
-            retval = result ? result.stringValue : null;
+            retval = (result != null) ? result.stringValue : null;
             return retval;
         }
         catch (ex) {
@@ -395,7 +396,7 @@ var XPath = {
         var retval;
         try {
             var result = this.evaluate(xpath, context, XPathResult.NUMBER_TYPE, true);
-            retval = result ? result.numberValue : null;
+            retval = (result != null) ? result.numberValue : null;
             return retval;
         }
         catch (ex) {
@@ -503,7 +504,7 @@ PageExtenderCollection.prototype = {
     },
 
     add: function(extender) {
-        if (!extender) return;
+        if (extender == null) return;
         
         this._extenders.push(extender);
             
@@ -600,10 +601,10 @@ var ScriptExtender = PageExtender.createClass({
     initialize: function(src, type) {
         base.initialize();
     
-        if (!src)
+        if (src == null)
             throw new ArgumentNullException("src");
         this._src = src;
-        this._type = (type ? type : this.DEFAULT_TYPE);
+        this._type = (type != null ? type : this.DEFAULT_TYPE);
     },
     
     getName: function() {
@@ -622,7 +623,7 @@ var StyleExtender = PageExtender.createClass({
     initialize: function(src) {
         base.initialize();
         
-        if (!src)
+        if (src == null)
             throw new ArgumentNullException("src");
         this._src = src;
     },

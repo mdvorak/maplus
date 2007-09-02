@@ -48,7 +48,7 @@ var XmlConfig = {
     },
 
     extendNode: function(node) {
-        if (!node || node._configNodeInitialized)
+        if (node == null || node._configNodeInitialized)
             return node;
 
         Object.extend(node, XmlConfigNode.prototype);
@@ -58,10 +58,10 @@ var XmlConfig = {
     },
     
     load: function(path, rootName, initCallback) {
-        if (!path) 
+        if (path == null) 
             throw "path is null.";
     
-        if (!rootName)
+        if (rootName == null)
             rootName = XmlConfig.DEFAULT_ROOT_NAME;
     
         var root = null;
@@ -70,7 +70,7 @@ var XmlConfig = {
             var doc = FileIO.loadXmlFile(path);
             
             root = XPath.evalSingle(rootName, doc);
-            if (!root)
+            if (root == null)
                 dump(String.format("Root node '{0}' not found in the file '{1}'.", rootName, path));
             
             XmlConfig.extendNode(root);
@@ -79,12 +79,12 @@ var XmlConfig = {
             dump(String.format("Error loading file '{0}':\n{1}", path, e));
         }
     
-        if (!root) {
+        if (root == null) {
             // File not found, create new dom
             root = XmlConfig.createEmpty(rootName);
         }
         
-        if (initCallback)
+        if (initCallback != null)
             initCallback(root);
             
         return root;
@@ -92,7 +92,7 @@ var XmlConfig = {
     
     save: function(path, rootNode) {
         try {
-            if (rootNode && rootNode.ownerDocument)
+            if (rootNode != null && rootNode.ownerDocument)
                 FileIO.saveXmlFile(path, rootNode.ownerDocument);
         }
         catch (e) {
@@ -133,10 +133,10 @@ XmlConfigNode.prototype = {
         
         var elem = this.ownerDocument.evaluate(name, this, null, XPathResult.ANY_TYPE, null).iterateNext();
 
-        if (!elem && create) {
+        if (elem == null && create) {
             elem = this.addPref(name);
         }
-        else if (elem) {
+        else if (elem != null) {
             XmlConfig.extendNode(elem);
         }
         
@@ -146,15 +146,15 @@ XmlConfigNode.prototype = {
     getPref_PROXY: Marshal.BY_VALUE,
     getPref: function(name, defaultValue) {
         // Use this when no name where specified
-        var elem = (name ? this.getPrefNode(name) : this);
-        return elem ? elem.textContent : defaultValue;
+        var elem = (name != null ? this.getPrefNode(name) : this);
+        return elem  != null ? elem.textContent : defaultValue;
     },
     
     setPref_PROXY: Marshal.BY_VALUE,
     setPref: function(name, value) {
         // Use this when no name where specified
         var elem = (name ? this.getPrefNode(name) : this);
-        if (!elem)
+        if (elem == null)
             elem = this.addPref(name);
         elem.textContent = (value != null ? value : ""); // Lepsi prazdny string nez undefined
         return value;
@@ -208,7 +208,7 @@ XmlConfigNode.XPath.prototype = {
     evalPrefNode_PROXY: Marshal.BY_REF,
     evalPrefNode: function(xpath) {
         var elem = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
-        if (elem) {
+        if (elem != null) {
             XmlConfig.extendNode(elem);
         }
         return elem;
@@ -219,7 +219,7 @@ XmlConfigNode.XPath.prototype = {
         var result = document.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
         retval = new Array();
         
-        if (result) {
+        if (result != null) {
             for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
                 retval.push(XmlConfig.extendNode(i));
             }
@@ -231,14 +231,14 @@ XmlConfigNode.XPath.prototype = {
     getPrefByName_PROXY: Marshal.BY_VALUE,
     getPrefByName: function(tagName, name, defaultValue) {
         var elem = this.evalPrefNode(tagName + '[@name = "' + name + '"]');
-        return elem ? elem.textContent : defaultValue;
+        return (elem != null) ? elem.textContent : defaultValue;
     },
     
     setPrefByName_PROXY: Marshal.BY_VALUE,
     setPrefByName: function(tagName, name, value) {
         var elem = this.evalPrefNode(tagName + '[@name = "' + name + '"]');
-        if (value) {
-            if (!elem) {
+        if (value != null) {
+            if (elem == null) {
                 elem = this.addPref(tagName, value);
                 elem.setAttribute("name", name);
             }
@@ -246,7 +246,7 @@ XmlConfigNode.XPath.prototype = {
                 elem.textContent = value;
             }
         }
-        else if (elem) {
+        else if (elem != null) {
             this.removeChild(elem);
         }
         return value;
@@ -297,7 +297,7 @@ var XmlConfigManager = Class.create();
 
 XmlConfigManager.prototype = {
     initialize: function(directory, rootName, initCallback) {
-        if (!rootName)
+        if (rootName == null)
             rootName = XmlConfig.DEFAULT_ROOT_NAME;
             
         this._cache = new Hash();
@@ -325,15 +325,15 @@ XmlConfigManager.prototype = {
         name = String(name);
         var config = this._cache[name];
         
-        if (!config && !dontCreate) {
-            if (this._directory) {
+        if (config == null && !dontCreate) {
+            if (this._directory != null) {
                 var path = this.getConfigPath(name);
                 config = XmlConfig.load(path, this._rootName, this._initCallback);
             }
             else {
                 config = XmlConfig.createEmpty(this._rootName);
                 
-                if (this._initCallback)
+                if (this._initCallback != null)
                     this._initCallback(config);
             }
                 
@@ -348,7 +348,7 @@ XmlConfigManager.prototype = {
         name = String(name);
         var config = this._cache[name];
         
-        if (config) {
+        if (config != null) {
             var path = this.getConfigPath(name);
             XmlConfig.save(path, config);
         }

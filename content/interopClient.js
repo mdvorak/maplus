@@ -39,15 +39,15 @@ var Marshal = {
     _proxyCache: new Hash(),
     
     callMethod: function(objectName, methodName, args) {
-        if (!objectName)
+        if (objectName == null)
             throw new ArgumentNullException("objectName");
-        if (!methodName)
+        if (methodName == null)
             throw new ArgumentNullException("methodName");
-        if (args && !(args instanceof Array))
+        if (args != null && !(args instanceof Array))
             throw new ArgumentException("args", args, "Arguments must be an array.");
         
         var transportArgs = new Array();
-        if (args) {
+        if (args != null) {
             for (var i = 0; i < args.length; i++) {
                 if (this.isProxy(args[i]))
                     transportArgs.push({ reference: args[i].__proxy });
@@ -70,29 +70,29 @@ var Marshal = {
             this._debug("%o", elem);
             
             // Exception
-            if (elem.getAttribute("exception")) {
+            if (elem.getAttribute("exception") != null) {
                 var ex = elem.getAttribute("exception").evalJSON();
                 this._debug("Exception=%o", ex);
                 throw new RemoteException(objectName, methodName, ex);
             }
             // Simple type
-            else if (elem.getAttribute("retval")) {
+            else if (elem.getAttribute("retval") != null) {
                 var retval = elem.getAttribute("retval").evalJSON();
                 this._debug("Return value=%o", retval);
                 return retval;
             }
             // Single object reference
-            else if (elem.getAttribute("reference")) {
+            else if (elem.getAttribute("reference") != null) {
                 // Create proxy object
                 var reference = elem.getAttribute("reference").evalJSON();
                 
-                if (!reference.objectId)
+                if (reference.objectId == null)
                     throw new MarshalException("Unable to find returned reference id.", objectName, methodName);
-                if (!reference.proxyDefinition)
+                if (reference.proxyDefinition == null)
                     throw new MarshalException("Unable to find returned reference proxy definition.", objectName, methodName);
 
                 var proxy = this._proxyCache[reference.objectId];
-                if (!proxy) {
+                if (proxy == null) {
                     proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition);
                     this._proxyCache[reference.objectId] = proxy;
                 }
@@ -101,7 +101,7 @@ var Marshal = {
                 return proxy;
             }
             // Object reference list
-            else if (elem.getAttribute("list")) {
+            else if (elem.getAttribute("list") != null) {
                 var list = elem.getAttribute("list").evalJSON();
                 var proxies = new Array();
                 
@@ -109,13 +109,13 @@ var Marshal = {
                 for (var i = 0; i < list.length; i++) {
                     var reference = list[i];
                     
-                    if (!reference.objectId)
+                    if (reference.objectId == null)
                         throw new MarshalException("Unable to find returned reference id.", objectName, methodName);
-                    if (!reference.proxyDefinition)
+                    if (reference.proxyDefinition == null)
                         throw new MarshalException("Unable to find returned reference proxy definition.", objectName, methodName);
 
                     var proxy = this._proxyCache[reference.objectId];
-                    if (!proxy) {
+                    if (proxy == null) {
                         proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition);
                         this._proxyCache[reference.objectId] = proxy;
                     }
@@ -139,12 +139,12 @@ var Marshal = {
     },
     
     getObjectProxy: function(objectName) {
-        if (!objectName)
+        if (objectName == null)
             throw new ArgumentNullException("objectName");
   
         var proxy = this._proxyCache[objectName];
         
-        if (!proxy) {
+        if (proxy == null) {
             var elem = document.createElement("marshal");
             document.body.appendChild(elem);
             
@@ -154,13 +154,13 @@ var Marshal = {
                 elem.setAttribute("objectName", objectName);
                 Event.dispatch(elem, "MarshalGetProxyDefinition", true);
                 
-                if (elem.getAttribute("exception")) {
+                if (elem.getAttribute("exception") != null) {
                     var ex = elem.getAttribute("exception").evalJSON();
                     throw new RemoteException(objectName, null, ex);
                 }
                 
                 var defJSON = elem.getAttribute("proxyDefinition");
-                if (!defJSON || defJSON.empty())
+                if (defJSON == null || defJSON.empty())
                     throw new MarshalException("Unable to get proxy definition.", objectName);
                 
                 var def = defJSON.evalJSON();
@@ -186,9 +186,9 @@ var Marshal = {
     },
     
     _createProxyFromDefinition: function(objectName, def) {
-        if (!objectName)
+        if (objectName == null)
             throw new ArgumentNullException("objectName");
-        if (!def)
+        if (def == null)
             throw new ArgumentNullException("def");
     
         objectName = objectName.toString();
@@ -207,6 +207,7 @@ var Marshal = {
         return proxy;
     },
     
+    // TODO: Do it better
     _debug: function() {
         if (MARSHAL_DEBUG >= 2)
             console.debug.apply(console, arguments);
@@ -235,7 +236,7 @@ RemoteExceptionWrapper.prototype = {
         
         var str = "";
         for (var i in remoteException) {
-            if (str) str += "\n";
+            if (str != "") str += "\n";
             str += i + ": " + remoteException[i];
         }
         
