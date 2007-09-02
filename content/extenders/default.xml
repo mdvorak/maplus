@@ -36,6 +36,7 @@
     <script url="#{melior}/obchod.html" name="bestiar.js" />
     <script url="#{melior}/utok.html" name="utok-boj.js" />
     <script url="#{melior}/boj.html" name="utok-boj.js" />
+    <script url="#{melior}/posta.html" name="posta.js" />
     
     <!-- Nastaveni -->
     <script url="#{melior}/main.html" name="bestiar-style.js" />

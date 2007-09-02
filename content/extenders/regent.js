@@ -57,6 +57,9 @@ pageExtenders.add(PageExtender.create({
             barva: BARVY_POVOLANI[m[1]]
         };
         
+        if (!isNaN(page.regent.id) && page.regent.id != page.id)
+            console.error("Id z analyzy stranky (%d) a regenta (%d) se nerovnaji!", page.id, page.regent.id);
+        
         // Uloz do nastaveni
         /*
         var cfg = page.config.getRegent();
