@@ -34,8 +34,6 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const TIMERS_DISABLED = true;
-
 const MAX_TAHU_DEFAULT = 30;
 
 const JMENA_PRESVEDCENI = new Hash();

@@ -407,6 +407,8 @@ pageExtenders.add(PageExtender.create({
         // Bestiar
         if (!page.bestiar || !page.bestiar.table)
             return false;
+        if (TIMERS_DISABLED)
+            return false;
        
         // Sestav list bunek s casem
         var list = new Array();
