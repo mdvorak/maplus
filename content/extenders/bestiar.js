@@ -419,6 +419,7 @@ pageExtenders.add(PageExtender.create({
             });
        
        context.list = list;
+       context.barvy = page.config.getBarevnyText();
        return context.list.length > 0;
     },
     
@@ -457,7 +458,7 @@ pageExtenders.add(PageExtender.create({
             var cas = Math.max(0, pocatecniCas - rozdil);
             spanAktualni.innerHTML = '&nbsp;' + formatTime(cas);
 
-            if (parseInt(rozdil) % 5 == 0 || first) // Neupdatuj barvy zbytecne kazdou vterinu
+            if (context.barvy && (parseInt(rozdil) % 5 == 0 || first)) // Neupdatuj barvy zbytecne kazdou vterinu
                 spanAktualni.style.color = Color.fromRange(cas, 60, 180, Color.Pickers.redGreen);
                 
             if (cas > 0)

@@ -51,6 +51,7 @@
   <script src="jednotky.js" />
   <script src="bestiar.js" />
   <script src="madata.js" />
+  <script src="datacache.js" />
 
   <!-- Extenders -->
   <script src="default.js" />
