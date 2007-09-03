@@ -76,15 +76,15 @@ pageExtenders.add(PageExtender.create({
     
         // Klaves. zkratky
         Event.observe(controls.textareaZprava, 'keypress', function(event) {
-                if (event.keyCode == Event.KEY_ESC)
-                    this.value = '';
-                else if (event.ctrlKey && event.keyCode == Event.KEY_RETURN)
-                    this.form.submit();                    
-            });
+            if (event.keyCode == Event.KEY_ESC)
+                this.value = '';
+            else if (event.ctrlKey && event.keyCode == Event.KEY_RETURN)
+                this.form.submit();                    
+        });
         
         new Insertion.Bottom(controls.form, '<br/><span class="small" style="color: gray;">Pozn.: Esc - vymaže napsaný text, Ctrl+Enter - odešle zprávu</span>');
         
-        // Odpovedet vsem
+        // Osetreni "Odpovedet vsem"
         if (page.arguments["posta"] == "posta_v_ally" && page.arguments["odpoved"] != null) {
             var odpoved = DataCache.retrieve("posta_" + page.arguments["odpoved"]);
         
@@ -113,6 +113,11 @@ pageExtenders.add(PageExtender.create({
             if (controls.inputPodpis != null)
                 controls.inputPodpis.checked = false;
         }
+        
+        // Odstraneni newline na konci textu pri odeslani
+        Event.observe(controls.form, "submit", function() {
+            controls.textareaZprava.value = controls.textareaZprava.value.replace(/\n{2,}$/, "");
+        });
     }
 }));
 
@@ -172,6 +177,7 @@ pageExtenders.add(PageExtender.create({
 }));
 
 
+// Zpravy - uprava linku v hlavicce
 pageExtenders.add(PageExtender.create({
     POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:pošta v rámci aliance (.*))?$"),
 
@@ -239,7 +245,21 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Aktivni linky
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Posta - Aktivni url"; },
 
+    analyze: function(page, context) {
+        if (page.posta == null || page.posta.zpravy == null)
+            return false;
+
+        // TODO
+        return false;
+    },
+    
+    process: function(page, context) {
+    }
+}));
 
 
 
