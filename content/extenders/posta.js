@@ -1,4 +1,4 @@
-Ôªø/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -36,7 +36,7 @@
 
 var Posta = {
     ODDELOVAC: "____________",
-    LINK_CONFIRM_TEXT: "Tento odkaz m≈Ø≈æe v√©st na str√°nku s nebezpeƒçn√Ωm obsahem. Opravdu chcete pokraƒçovat?"
+    LINK_CONFIRM_TEXT: "Tento odkaz m˘ûe vÈst na str·nku s nebezpeËn˝m obsahem. Opravdu chcete pokraËovat?"
 }
 
 // Psani nove zpravy
@@ -82,7 +82,7 @@ pageExtenders.add(PageExtender.create({
                 this.form.submit();                    
         });
         
-        new Insertion.Bottom(controls.form, '<br/><span class="small" style="color: gray;">Pozn.: Esc - vyma≈æe napsan√Ω text, Ctrl+Enter - ode≈°le zpr√°vu</span>');
+        new Insertion.Bottom(controls.form, '<br/><span class="small" style="color: gray;">Pozn.: Esc - vymaûe napsan˝ text, Ctrl+Enter - odeöle zpr·vu</span>');
         
         // Osetreni "Odpovedet vsem"
         if (page.arguments["posta"] == "posta_v_ally" && page.arguments["odpoved"] != null) {
@@ -140,8 +140,8 @@ pageExtenders.add(PageExtender.create({
             var trHeader = zprava.element.rows[0];
             
             zprava.linkOd = $X('td[1]//a', trHeader);
-            zprava.linkOdpovedet = $X('td//a[. = "Odpovƒõdƒõt"]', trHeader);
-            zprava.linkPredat = $X('td//a[. = "P≈ôedat"]', trHeader);
+            zprava.linkOdpovedet = $X('td//a[. = "OdpovÏdÏt"]', trHeader);
+            zprava.linkPredat = $X('td//a[. = "P¯edat"]', trHeader);
             zprava.fontCas = $X('td[2]/font[2]', trHeader);
             zprava.fontText = $X('tbody/tr[2]/td/p/font', zprava.element);
             
@@ -158,7 +158,8 @@ pageExtenders.add(PageExtender.create({
         }
         
         page.posta = {
-            zpravy: zpravy
+            zpravy: zpravy,
+            config: page.config.getPrefNode("posta", true)
         };
         
         return true;
@@ -179,7 +180,7 @@ pageExtenders.add(PageExtender.create({
 
 // Zpravy - uprava linku v hlavicce
 pageExtenders.add(PageExtender.create({
-    POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:po≈°ta v r√°mci aliance (.*))?$"),
+    POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:poöta v r·mci aliance (.*))?$"),
 
     getName: function() { return "Posta - Linky"; },
 
@@ -210,7 +211,7 @@ pageExtenders.add(PageExtender.create({
                 
                 if (data.aliance != null) {           
                     // Vytvor link
-                    var linkOdpovedetVsem = Element.create("a", "Odpovƒõdƒõt v≈°em");
+                    var linkOdpovedetVsem = Element.create("a", "OdpovÏdÏt vöem");
                     linkOdpovedetVsem.href = MaPlus.buildUrl(page, "posta.html", { posta: "posta_v_ally", odpoved: zprava.id });
                     linkOdpovedetVsem.href += psal;
                     
@@ -259,7 +260,7 @@ pageExtenders.add(PageExtender.create({
         if (page.posta == null || page.posta.zpravy == null)
             return false;
 
-        return page.config.getPrefNode("posta", true).getBoolean("linky", true);
+        return page.posta.config.getBoolean("linky", true);
     },
     
     process: function(page, context) {
@@ -281,7 +282,7 @@ pageExtenders.add(PageExtender.create({
     	if (page.posta == null || page.posta.zpravy == null)
             return false;
             
-        if (!page.config.getPrefNode("posta", true).getBoolean("roztahovani", true))
+        if (!page.posta.config.getBoolean("roztahovani", true))
         	return false;
     
     	// Vytvor seznam zprav ktere jsou siroke a mohou potencionalne roztahovat stranku
@@ -314,21 +315,108 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-
-
-
-
-
-
-
+// Zkraceni dlouhych zprav
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Posta - "; },
+    getName: function() { return "Posta - Zkraceni"; },
 
     analyze: function(page, context) {
+        if (page.posta == null || page.posta.zpravy == null)
+            return false;
+        
+        context.maxRadku = page.posta.config.getNumber("maxRadku", MAX_RADKU_DEFAULT);
+        if (!(context.maxRadku > 0))
+            return false;
     	
+    	context.zobrazRadku = Math.max(context.maxRadku - 5, 1);
+    	context.dlouheZpravy = new Array();
     	
+    	// Najdi zpravy s velkym poctem radku
+    	page.posta.zpravy.each(function(zprava) {
+    		// Preskoc nove zpravy od posla
+    		if (zprava.typ == "posel" && page.arguments["posta"] == "nova")
+    			return; // continue
+    	
+    		var html = zprava.fontText.innerHTML;
+    	
+    	    // Zjisti pocet radku
+    	    var radku = 0;
+    	    var zlomIndex = -1;  
+    	    
+    	    var r = /<br\/?>/g;
+    	    var m;
+    	    
+    	    while (radku < context.maxRadku && (m = r.exec(html)) != null) {
+    	    	++radku;
+    	    	if (radku > context.zobrazRadku && zlomIndex < 0)
+    	    		zlomIndex = r.lastIndex;
+    	    }
+    	    
+    	    if (zlomIndex > 0 && radku >= context.maxRadku) {
+     	    	context.dlouheZpravy.push({
+    	    		zprava: zprava,
+    	    		zlomIndex: zlomIndex
+    	    	});
+    	    	
+    	    	console.log("Zprava %d je dlouha.", zprava.id);
+    	    }
+    	});
+    	
+    	return context.dlouheZpravy.length > 0;
     },
     
     process: function(page, context) {
+    	context.dlouheZpravy.each(function(i) {
+    		var zprava = i.zprava;
+    		var zlomIndex = i.zlomIndex;
+    		var html = zprava.fontText.innerHTML;
+    		
+    		// Pozn: u posla se najde vetsinou zlom nekde uvnitr <font>, cimz se
+    		// rozesere html, nicmene FF to zvladne a udela zlom az ten tag skonci
+    		// (coz muze byt o dost niz, ale opravit to by byl dost horor takze na to zatim kaslu)
+    		
+    		// TODO: Prochazet to nikoliv podle html ale podle child nodu a az u tech zkoumat innerHTML
+    		
+    		// Link v hlavicce
+    		var linkHeaderRozbalit = Element.create("a", "Rozbalit", {href: "javascript://"});
+			
+    		// Telo zpravy
+    		var divZacatek = Element.create("div", html.substring(0, zlomIndex));
+    		var divZbytek = Element.create("div", html.substring(zlomIndex));
+    		divZbytek.style.display = "none";
+    		
+    		// Link Rozbalit pod zpravou
+    		var divRozbalit = Element.create("div", '<br/>...........&nbsp;&nbsp;');
+    		var linkRozbalit = Element.create("a", '<i style="color: yellow;">Zobrazit celou zpr·vu</i></a>', {href: "javascript://"});
+    		divRozbalit.appendChild(linkRozbalit);
+    		
+    		// Eventy
+    		var toggle = function(event) {
+    			if (divZbytek.style.display == "none") {
+    				// Zobrazit
+    				divZbytek.style.display = "";
+    				divRozbalit.style.display = "none";
+    				linkHeaderRozbalit.innerHTML = "Sbalit";
+    			}
+    			else {
+    				// Skryt
+    				divZbytek.style.display = "none";
+    				divRozbalit.style.display = "";
+    				linkHeaderRozbalit.innerHTML = "Rozbalit";
+    			}
+    		};
+    		
+    		Event.observe(linkHeaderRozbalit, 'click', toggle);
+    		Event.observe(linkRozbalit, 'click', toggle);
+    		
+    		// Zobraz
+    		zprava.fontText.innerHTML = "";
+    		zprava.fontText.appendChild(divZacatek);
+    		zprava.fontText.appendChild(divZbytek);
+    		zprava.fontText.appendChild(divRozbalit);
+    		
+    		var header = zprava.linkPredat.parentNode;
+			header.insertBefore(document.createTextNode(" "), header.firstChild);
+			header.insertBefore(linkHeaderRozbalit, header.firstChild);
+    	});
     }
 }));

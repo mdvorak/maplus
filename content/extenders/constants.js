@@ -35,6 +35,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 const MAX_TAHU_DEFAULT = 30;
+const MAX_RADKU_DEFAULT = 30;
 
 const JMENA_PRESVEDCENI = new Hash();
 JMENA_PRESVEDCENI["D"] = "Dobré";
