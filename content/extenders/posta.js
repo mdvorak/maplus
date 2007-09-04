@@ -142,18 +142,17 @@ pageExtenders.add(PageExtender.create({
             zprava.linkOd = $X('td[1]//a', trHeader);
             zprava.linkOdpovedet = $X('td//a[. = "Odpovědět"]', trHeader);
             zprava.linkPredat = $X('td//a[. = "Předat"]', trHeader);
-            zprava.tdText = zprava.element.rows[1].cells[0];
+            zprava.fontCas = $X('td[2]/font[2]', trHeader);
+            zprava.fontText = $X('tbody/tr[2]/td/p/font', zprava.element);
             
             zprava.typ = trHeader.className.match(/(?:_([a-zA-Z]+))?$/)[1];
             zprava.od = (zprava.linkOd != null) ? zprava.linkOd.textContent : null;
             zprava.psal = trHeader.cells[0].textContent.replace(/\s+\(/g, " (");
             zprava.id = parseInt(zprava.linkPredat.href.match(/\bpredat=(\d+)\b/)[1]);
-       
-            var casText = XPath.evalString('td[2]/font[2]', trHeader);
-            zprava.cas = this._parseDate(casText);
-            zprava.text = zprava.tdText.innerHTML.replace(/<br\/?>/g, "\n").stripTags();
+            zprava.cas = this._parseDate(zprava.fontCas.textContent);
+            zprava.text = zprava.fontText.innerHTML.replace(/<br\/?>/g, "\n").stripTags();
              
-            console.info("Zprava %d: od=%d typ=%s delka=%d", zprava.id, zprava.od, zprava.typ, zprava.text.length);
+            console.info("Zprava %d: od=%d typ=%s delka=%d cas=%s", zprava.id, zprava.od, zprava.typ, zprava.text.length, zprava.cas.toLocaleString());
             
             zpravy.push(zprava);
         }
@@ -171,7 +170,8 @@ pageExtenders.add(PageExtender.create({
         if (text == null)
             return null;
         
-        text = text.replace(/^\s*(\d{1,2})[.]\s*(\d{1,2})[.]\s*/, "$2/$1/");
+        text = text.replace(/^\s*(\d{1,2})[.]\s*(\d{1,2})[.]/, "$2/$1/"); // Nova
+        text = text.replace(/-(\d{1,2})-(\d{1,2})/, "/$1/$2").replace(/^\s+/, ""); // Stara
         return new Date(Date.parse(text));
     }
 }));
@@ -241,6 +241,12 @@ pageExtenders.add(PageExtender.create({
                 zprava.linkOd.parentNode.replaceChild(aktivniId, zprava.linkOd);
                 zprava.linkOd = aktivniId;
             }
+            
+            // Oprav datum ve stare poste
+            if (page.arguments["posta"] != "nova") {
+            	var c = zprava.cas;
+            	zprava.fontCas.innerHTML = String.format("&nbsp;&nbsp;{0}.{1}.{2} {3}:{4}:{5}", c.getDate(), c.getMonth(), c.getFullYear(), c.getHours().toPaddedString(2), c.getMinutes().toPaddedString(2), c.getSeconds().toPaddedString(2));
+            }
         });
     }
 }));
@@ -253,14 +259,60 @@ pageExtenders.add(PageExtender.create({
         if (page.posta == null || page.posta.zpravy == null)
             return false;
 
-        // TODO
-        return false;
+        return page.config.getPrefNode("posta", true).getBoolean("linky", true);
     },
     
     process: function(page, context) {
+        page.posta.zpravy.each(function(zprava) {
+            if (zprava.typ == "posel")
+                return;
+            
+            var newHTML = zprava.fontText.innerHTML.replace(/http(?:s?):\/\/\S+?(?=\s|$|<)/g, '<a href="$&" target="_blank" onclick="return confirm(\'' + Posta.LINK_CONFIRM_TEXT + '\');">$&</a>');
+            zprava.fontText.innerHTML = newHTML;
+        });
     }
 }));
 
+// Roztahovani posty
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Posta - Roztahovani zprav"; },
+
+    analyze: function(page, context) {
+    	if (page.posta == null || page.posta.zpravy == null)
+            return false;
+            
+        if (!page.config.getPrefNode("posta", true).getBoolean("roztahovani", true))
+        	return false;
+    
+    	// Vytvor seznam zprav ktere jsou siroke a mohou potencionalne roztahovat stranku
+    	context.sirokeZpravy = new Array();
+    	
+    	page.posta.zpravy.each(function(zprava) {
+    		zprava.jeSiroka = (zprava.fontText.offsetWidth > window.innerWidth * 0.81);
+    		if (zprava.jeSiroka)
+    			context.sirokeZpravy.push(zprava);
+    	});
+    	
+    	return context.sirokeZpravy.length > 0;
+    },
+    
+    process: function(page, context) {
+    	// Nastav vsem scroll
+    	context.sirokeZpravy.each(function(zprava) {
+    		var newHTML = '<div style="overflow-x: scroll;">' + zprava.fontText.innerHTML + '</div>'
+    		zprava.fontText.innerHTML = newHTML;
+    		zprava.divText = zprava.fontText.firstChild;
+    	});
+    	
+    	// Pak auto
+    	context.sirokeZpravy.each(function(zprava) {
+    		zprava.divText.style.overflowX = 'auto';
+    	});
+    	
+    	// Dodatek: Tenhle postup donuti FF prekreslit dane elementy, a zobrazi scrollbary pouze
+    	// u opravdu sirokych zprav
+    }
+}));
 
 
 
@@ -273,6 +325,8 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Posta - "; },
 
     analyze: function(page, context) {
+    	
+    	
     },
     
     process: function(page, context) {
