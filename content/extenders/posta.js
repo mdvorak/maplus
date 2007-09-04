@@ -1,4 +1,4 @@
-/* ***** BEGIN LICENSE BLOCK *****
+Ôªø/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -36,7 +36,8 @@
 
 var Posta = {
     ODDELOVAC: "____________",
-    LINK_CONFIRM_TEXT: "Tento odkaz m˘ûe vÈst na str·nku s nebezpeËn˝m obsahem. Opravdu chcete pokraËovat?"
+    LINK_CONFIRM_TEXT: "Tento odkaz m≈Ø≈æe v√©st na str√°nku s nebezpeƒçn√Ωm obsahem. Opravdu chcete pokraƒçovat?",
+    DULEZITOST_REGEX: /^:\W*(\w+)\W*\s*/
 }
 
 // Psani nove zpravy
@@ -82,7 +83,7 @@ pageExtenders.add(PageExtender.create({
                 this.form.submit();                    
         });
         
-        new Insertion.Bottom(controls.form, '<br/><span class="small" style="color: gray;">Pozn.: Esc - vymaûe napsan˝ text, Ctrl+Enter - odeöle zpr·vu</span>');
+        new Insertion.Bottom(controls.form, '<br/><span class="small" style="color: gray;">Pozn.: Esc - vyma≈æe napsan√Ω text, Ctrl+Enter - ode≈°le zpr√°vu</span>');
         
         // Osetreni "Odpovedet vsem"
         if (page.arguments["posta"] == "posta_v_ally" && page.arguments["odpoved"] != null) {
@@ -118,6 +119,11 @@ pageExtenders.add(PageExtender.create({
         Event.observe(controls.form, "submit", function() {
             controls.textareaZprava.value = controls.textareaZprava.value.replace(/\n{2,}$/, "");
         });
+        
+        // Focus
+        controls.textareaZprava.selectionStart = 0;
+        controls.textareaZprava.selectionEnd = 0;
+        controls.textareaZprava.focus();
     }
 }));
 
@@ -139,9 +145,10 @@ pageExtenders.add(PageExtender.create({
             // Zjisti informace o zprave
             var trHeader = zprava.element.rows[0];
             
+            zprava.trHeader = trHeader;
             zprava.linkOd = $X('td[1]//a', trHeader);
-            zprava.linkOdpovedet = $X('td//a[. = "OdpovÏdÏt"]', trHeader);
-            zprava.linkPredat = $X('td//a[. = "P¯edat"]', trHeader);
+            zprava.linkOdpovedet = $X('td//a[. = "Odpovƒõdƒõt"]', trHeader);
+            zprava.linkPredat = $X('td//a[. = "P≈ôedat"]', trHeader);
             zprava.fontCas = $X('td[2]/font[2]', trHeader);
             zprava.fontText = $X('tbody/tr[2]/td/p/font', zprava.element);
             
@@ -151,8 +158,13 @@ pageExtenders.add(PageExtender.create({
             zprava.id = parseInt(zprava.linkPredat.href.match(/\bpredat=(\d+)\b/)[1]);
             zprava.cas = this._parseDate(zprava.fontCas.textContent);
             zprava.text = zprava.fontText.innerHTML.replace(/<br\/?>/g, "\n").stripTags();
+            
+            var m = zprava.text.match(Posta.DULEZITOST_REGEX);
+			if (m != null) {		
+			    zprava.dulezitost = m[1].toLowerCase();
+			}
              
-            console.info("Zprava %d: od=%d typ=%s delka=%d cas=%s", zprava.id, zprava.od, zprava.typ, zprava.text.length, zprava.cas.toLocaleString());
+            console.info("Zprava %d: od=%d typ=%s dulezitost=%s, delka=%d cas=%s", zprava.id, zprava.od, zprava.typ, zprava.dulezitost, zprava.text.length, zprava.cas.toLocaleString());
             
             zpravy.push(zprava);
         }
@@ -180,7 +192,7 @@ pageExtenders.add(PageExtender.create({
 
 // Zpravy - uprava linku v hlavicce
 pageExtenders.add(PageExtender.create({
-    POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:poöta v r·mci aliance (.*))?$"),
+    POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:po≈°ta v r√°mci aliance (.*))?$"),
 
     getName: function() { return "Posta - Linky"; },
 
@@ -202,6 +214,10 @@ pageExtenders.add(PageExtender.create({
             if (zprava.typ == "verejna" || zprava.typ == "tajna") {
                 // Data
                 var jmenoAliance = zprava.text.match(_this.POSTA_V_RAMCI_ALIANCE_REGEX)[1];
+                if (!jmenoAliance) {
+	                console.log("text:\n", zprava.text);
+                }
+                
                 var aliance = MaData.najdiAlianci(jmenoAliance);
                 
                 var data = {
@@ -211,7 +227,7 @@ pageExtenders.add(PageExtender.create({
                 
                 if (data.aliance != null) {           
                     // Vytvor link
-                    var linkOdpovedetVsem = Element.create("a", "OdpovÏdÏt vöem");
+                    var linkOdpovedetVsem = Element.create("a", "Odpovƒõdƒõt v≈°em");
                     linkOdpovedetVsem.href = MaPlus.buildUrl(page, "posta.html", { posta: "posta_v_ally", odpoved: zprava.id });
                     linkOdpovedetVsem.href += psal;
                     
@@ -315,9 +331,63 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-// Zkraceni dlouhych zprav
+// Dulezitost zpravy
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Posta - Zkraceni"; },
+    getName: function() { return "Posta - Dulezitost zpravy"; },
+
+    analyze: function(page, context) {
+    	if (page.posta == null || page.posta.zpravy == null)
+            return false;
+            
+		return true;
+    },
+    
+    process: function(page, context) {
+		page.posta.zpravy.each(function(zprava) {
+			if (zprava.dulezitost != null) {
+				switch (zprava.dulezitost) {
+					case "dulezite":
+						
+						break;
+
+					case "spam":
+						// TODO
+						break;
+
+					case "bestiar":
+						// TODO
+						break;
+				
+					default:
+						console.log("Neznama dulezitost zpravy %d: %s", zprava.id, zprava.dulezitost);
+						return;
+				}
+				
+				// Najdi textovy element ktery obsahuje dulezitost
+				var textNode = zprava.fontText;
+				while (textNode != null && textNode.nodeType != 3)
+				    textNode = textNode.firstChild;
+				
+				// Odstran popisek dulezitosti
+				if (textNode != null) {
+                    textNode.nodeValue = textNode.nodeValue.replace(Posta.DULEZITOST_REGEX, "");
+                    
+                    // Odstran prebytecne newline
+                    if (textNode.nodeValue == "") {
+                        var parent = textNode.parentNode;
+                        parent.removeChild(textNode);
+                        while (parent.firstChild != null && parent.firstChild.tagName == "BR")
+                            parent.removeChild(parent.firstChild);
+                    }
+                }
+			}
+		});
+    }
+}));
+
+// Sbaleni dlouhych zprav
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Posta - Sbaleni"; },
 
     analyze: function(page, context) {
         if (page.posta == null || page.posta.zpravy == null)
@@ -361,6 +431,30 @@ pageExtenders.add(PageExtender.create({
     	    }
     	});
     	
+    	// Najdi spravy s dulezitosti SPAM ktere uz vyprseli
+    	var maxStariSpamu = page.posta.config.getNumber("maxStariSpamu", 30*60); // default=30min
+
+    	if (maxStariSpamu > 0) {
+    	    var aktualniCas = new Date();
+        	
+    	    page.posta.zpravy.each(function(zprava) {
+                var stari = (aktualniCas.getTime() - zprava.cas.getTime()) / 1000;
+    	        
+                if (zprava.dulezitost == "spam" && stari > maxStariSpamu) {
+    		        var r = /<br\/?>/g;
+    		        
+    		        if (r.exec(zprava.fontText.innerHTML) != null) {
+    		            context.dlouheZpravy.push({
+    	    		        zprava: zprava,
+    	    		        zlomIndex: r.lastIndex
+    	    	        });
+    		        }
+    		    
+    		        console.log("Zprava %d je prosly spam (stari %ds)", zprava.id, stari);
+    		    }
+    	    });
+    	}
+    	
     	return context.dlouheZpravy.length > 0;
     },
     
@@ -385,8 +479,8 @@ pageExtenders.add(PageExtender.create({
     		divZbytek.style.display = "none";
     		
     		// Link Rozbalit pod zpravou
-    		var divRozbalit = Element.create("div", '<br/>...........&nbsp;&nbsp;');
-    		var linkRozbalit = Element.create("a", '<i style="color: yellow;">Zobrazit celou zpr·vu</i></a>', {href: "javascript://"});
+    		var divRozbalit = Element.create("div", '...........&nbsp;&nbsp;');
+    		var linkRozbalit = Element.create("a", '<i style="color: yellow;">Zobrazit celou zpr√°vu</i></a>', {href: "javascript://"});
     		divRozbalit.appendChild(linkRozbalit);
     		
     		// Eventy
@@ -420,3 +514,4 @@ pageExtenders.add(PageExtender.create({
     	});
     }
 }));
+
