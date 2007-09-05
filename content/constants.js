@@ -46,6 +46,6 @@ const MARSHAL_DEBUG = 1; // 0=None, 1=Basic, 2=Verbose
 const XPATH_DEBUG = 1;
 
 // Custom constants
-const TIMERS_DISABLED = true;
+const TIMERS_DISABLED = false;
 
 const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";

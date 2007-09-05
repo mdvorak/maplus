@@ -89,7 +89,6 @@ td.nadpis
 			<td></td>
 			<td></td>
 		</tr>
-		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
 		<!-- TODO -->
 		
@@ -236,6 +235,66 @@ td.nadpis
 	    </script>
 		
 		<!-- TODO -->
+		
+		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		<tr>
+		    <td colspan="5" class="nadpis">
+		        <span><b>Pošta</b></span>
+		    </td>
+		</tr>
+		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
+		<tr>
+			<td><span>Odkazy v textu</span></td>
+			<td>
+				<input type="checkbox"
+					onload="this.checked = this.config.getPrefNode('posta', true).getBoolean('linky', true);"
+					onsave="this.config.getPrefNode('posta', true).setPref('linky', this.checked);" />
+			</td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+			
+			<td><span>Scrollovat široké zprávy</span></td>
+			<td>
+				<input type="checkbox"
+					onload="this.checked = this.config.getPrefNode('posta', true).getBoolean('roztahovani', true);"
+					onsave="this.config.getPrefNode('posta', true).setPref('roztahovani', this.checked);" />
+			</td>
+		</tr>
+		<tr>
+            <td colspan="2"></td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+			
+			<td colspan="2"><span class="small dark">(Zabrání "roztahování" pošty)</span></td>
+		</tr>
+		
+		<tr>
+			<td><span>Max řádků dlouhé zprávy</span></td>
+			<td>
+				<input type="text" style="width: 50;"
+					onload="this.value = this.config.getPrefNode('posta', true).getNumber('maxRadku', MAX_RADKU_DEFAULT);"
+					onsave="this.config.getPrefNode('posta', true).setPref('maxRadku', this.value);" />
+			</td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+			  
+			<td><span>Maximální stáří spamu (minuty)</span></td>
+			<td>
+				<input type="checkbox"
+					onload="this.checked = this.config.getPrefNode('posta', true).getNumber('maxStariSpamu', 30);"
+					onsave="this.config.getPrefNode('posta', true).setPref('maxStariSpamu', parseInt(this.value) * 60);" />
+			</td>
+		</tr>
+		<tr>
+            <td colspan="2"><span class="small dark">(0 pro vypnutí)</span></td>
+			
+			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+			
+			<td colspan="2"><span class="small dark">(Zprávy označené jako spam starší než daný čas budou vždy sbaleny)</span></td>
+		</tr>
+		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+		
 		
 		<tr><td colspan="20"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		

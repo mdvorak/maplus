@@ -105,6 +105,9 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Armada - Propustit"; },
 
     analyze: function(page, context) {
+        if (!page.config.getBoolean("propustitPotvrzeni", false))
+            return false;
+    
         context.propustit = $X('//input[@type="submit" and contains(@value, "Propustit")]', page.content);
         if (!context.propustit)
             return false;
