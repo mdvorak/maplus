@@ -281,7 +281,7 @@ pageExtenders.add(PageExtender.create({
                     html += '<td><span>#{' + s + '}</span></td></tr>';
                 });
             html += '</table>';
-            console.debug("Chybejici sloupce template:\n", html);
+            // console.debug("Chybejici sloupce template:\n", html);
             
             context.chybejiciTemplate = new Template(html);
         }
@@ -290,6 +290,11 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
+        // Bugfix (lokalni promenna se prepisuje)
+        var copyDescriptionFactory = function(description) {
+            return function() { Clipboard.copyText(description); };
+        };
+    
         // Zpracuj tabulku
         for (var i = 0; i < page.bestiar.table.data.length; i++) {
             var row = page.bestiar.table.data[i];
@@ -304,19 +309,19 @@ pageExtenders.add(PageExtender.create({
             // Kopiruj popis
             var copy = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/copy.png" />', {href: "javascript://"});
             copy.setAttribute("title", "Zkopíruj popis stacku do schránky");
-            Event.observe(copy, 'click', function() { Clipboard.copyText(row.description); });
+            Event.observe(copy, 'click', copyDescriptionFactory(row.description));
             td.appendChild(copy);
             
             // Zobraz chybejici sloupce
             if (context.chybejiciTemplate != null) {
-                var chybejici = this._createRozsireneTooltip(context.chybejiciTemplate, i, row.data);
+                var chybejici = this._createMissingTooltip(context.chybejiciTemplate, i, row.data);
                 td.appendChild(Element.create("span", "&nbsp;"));
                 td.appendChild(chybejici);
             }
         }
     },
     
-    _createRozsireneTooltip: function(template, index, data) {
+    _createMissingTooltip: function(template, index, data) {
         var link = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/questionmark.png" />', {href: "javascript://"});
         link.setAttribute("title", "Zobrazí skryté informace o stacku.");
         
