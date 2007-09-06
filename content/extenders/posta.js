@@ -162,6 +162,7 @@ pageExtenders.add(PageExtender.create({
             var m = zprava.text.match(Posta.DULEZITOST_REGEX);
 			if (m != null) {		
 			    zprava.dulezitost = m[1].toLowerCase();
+			    zprava.text = zprava.text.replace(Posta.DULEZITOST_REGEX, "").replace(/^\s*?\n/, "");
 			}
              
             console.info("Zprava %d: od=%d typ=%s dulezitost=%s, delka=%d cas=%s", zprava.id, zprava.od, zprava.typ, zprava.dulezitost, zprava.text.length, zprava.cas.toLocaleString());
@@ -331,7 +332,7 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-// Dulezitost zpravy
+// Dulezitost zpravy (odstrani text dulezitosti ze zpravy a upravi hlavicku)
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Posta - Dulezitost zpravy"; },
 
