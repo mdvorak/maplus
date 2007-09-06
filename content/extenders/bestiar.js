@@ -393,11 +393,11 @@ pageExtenders.add(PageExtender.create({
                 
                 if (!isNaN(id)) {
                 	link = MaPlus.Tooltips.createActiveId(page, id);
-                    link.innerHTML = '<span class="bestiarBid">' + id + '</span>';
+                    link.innerHTML = '<span class="bestiarBid">[ ' + id + ' ]</span>';
                     
-                	var spanId = Element.create("span", ' [ ', {class: "bestiarBid"});
+                	var spanId = Element.create("span", ' ');
                 	spanId.appendChild(link);
-                	spanId.appendChild(document.createTextNode(' ] '));
+                	spanId.appendChild(document.createTextNode(' '));
                 	td.appendChild(spanId);
                 }
             });

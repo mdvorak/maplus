@@ -1,4 +1,4 @@
-Ôªø/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -45,7 +45,7 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         context.list.each(function(e) {
-                Event.observe(e, 'blur', function() { this.value = this.value.replace(/^\\s+|\\s+$/g, ''); }, false);
+                Event.observe(e, 'blur', function() { this.value = this.value.replace(/^\s+|\s+$/g, ""); });
             });
     }
 }));
@@ -65,7 +65,7 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         var maxTahu = page.config.getNumber("maxTahu", MAX_TAHU_DEFAULT);
-        var zprava = "Opravdu chcete odehr√°t v√≠ce jak " + maxTahu + " tah≈Ø?";
+        var zprava = "Opravdu chcete odehr·t vÌce jak " + maxTahu + " tah˘?";
         
         context.fields.each(function(e) {
                 context.buttons.each(function(i) {
@@ -82,7 +82,7 @@ pageExtenders.add(PageExtender.create({
             var cekat = $X('//a[starts-with(@href, "wait.html")]');
             var objevovat = $X('//a[starts-with(@href, "explore.html")]');
             
-            var zprava2 = "Je mo≈æn√©, ≈æe odehrajete v√≠ce jak " + maxTahu + " tah≈Ø, chcete pokraƒçovat?";
+            var zprava2 = "Je moûnÈ, ûe odehrajete vÌce jak " + maxTahu + " tah˘, chcete pokraËovat?";
             
             if (cekat) {
                 cekat.onclick = function() { return confirm(zprava2); };
