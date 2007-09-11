@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is WebExtender.
+ * The Original Code is Melior Annis Plus.
  *
  * The Initial Developer of the Original Code is
  * Michal Dvorak.
@@ -33,10 +33,17 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
-var Chrome = Marshal.getObjectProxy("Chrome");
 
-var MaData = Marshal.getObjectProxy("MaData");
-var Jednotky = Marshal.getObjectProxy("Jednotky");
-var Clipboard = Marshal.getObjectProxy("Clipboard");
-var DataCache = Marshal.getObjectProxy("DataCache");
+const EXTENSION_NAME = "maplus";
+const EXTENSION_ID = "maplus@michal.dvorak";
+const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
+
+const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
+const CHROME_CONTENT_URL = CHROME_URL + "content/";
+
+// Debugging
+const MARSHAL_DEBUG = 1; // 0=None, 1=Basic, 2=Verbose
+const XPATH_DEBUG = 1;
+
+// Custom constants
+const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";

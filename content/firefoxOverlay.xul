@@ -38,21 +38,7 @@
 <overlay id="maplus-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   
-  <!-- WebExtender implementation -->
-  <script src="prototype.js" />
-  <script src="webExtenderLib.js" />
-  <script src="constants.js" />
-  <script src="webExtender.js" />
-  <script src="xmlConfig.js" />
-
-  <!-- MaPlus backend -->
-  <script src="maplus.js" />
-  <script src="config.js" />
-  <script src="jednotky.js" />
-  <script src="bestiar.js" />
-  <script src="madata.js" />
-  <script src="datacache.js" />
-
-  <!-- Extenders -->
-  <script src="default.js" />
+  <!-- DO NOT MODIFY THIS UNLESS YOU WHAT YOU ARE DOING! -->
+  <!-- Use /content/services.xml instead. -->
+  <script src="launcher.js" />
 </overlay>

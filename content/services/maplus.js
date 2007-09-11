@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -34,31 +34,48 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const CONFIG_ROOT_NAME = "prefs";
+// Volani sou platna pouze z domeny MA
+Marshal.registerUrlCallValidator("^" + MELIOR_ANNIS_URL);
 
-XmlConfigNode.XPath.useExtension();
-XmlConfigNode.Extended.useExtension();
+var MaPlus = {
+    getDataDirectory: function() {
+        var path = Components.classes["@mozilla.org/file/directory_service;1"]
+                         .getService(Components.interfaces.nsIProperties)
+                         .get("ProfD", Components.interfaces.nsIFile);
+                         
+        path.append(EXTENSION_NAME);
 
-var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME);
-var localConfigManager = new XmlConfigManager(null, CONFIG_ROOT_NAME);
-
-var plusConfigAutosave = PageExtender.create({
-    SAVE_INTERVAL: 100,
-    
-    _hits: 0,
-    
-    analyze: function(page, context) {
-        if (++this._hits > this.SAVE_INTERVAL) {
-            this._hits = 0;
-            configManager.saveAll();
+        if(!path.exists() || !path.isDirectory()) {
+           path.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0664);
         }
         
-        return false;
+        return path;
     }
-});
+};
 
-// Register
-Marshal.registerObject("configManager", configManager);
-Marshal.registerObject("localConfigManager", localConfigManager);
-WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
-WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });
+var Clipboard = {
+    MAX_TEXT_LENGTH: 128,
+
+    _helper: Components.classes["@mozilla.org/widget/clipboardhelper;1"].getService(Components.interfaces.nsIClipboardHelper),
+    
+    copyId_PROXY: Marshal.BY_VALUE,
+    copyId: function(id) {
+        if (isNaN(parseInt(id)))
+            throw new ArgumentException("id", id, "Not a number.");
+        
+        this._helper.copyString(id);
+    },
+    
+    copyText_PROXY: Marshal.BY_VALUE,
+    copyText: function(text) {
+        if (text == null)
+            throw new ArgumentNullException("text");
+        text = String(text);
+        if (text.length > this.MAX_TEXT_LENGTH)
+            throw new ArgumentException("text", text, "Text cannot be longer than " + this.MAX_TEXT_LENGTH);
+        
+        this._helper.copyString(text);
+    }
+};
+
+Marshal.registerObject("Clipboard", Clipboard);

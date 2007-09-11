@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -33,49 +33,50 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
-
-// Volani sou platna pouze z domeny MA
-Marshal.registerUrlCallValidator("^" + MELIOR_ANNIS_URL);
-
-var MaPlus = {
-    getDataDirectory: function() {
-        var path = Components.classes["@mozilla.org/file/directory_service;1"]
-                         .getService(Components.interfaces.nsIProperties)
-                         .get("ProfD", Components.interfaces.nsIFile);
-                         
-        path.append(EXTENSION_NAME);
-
-        if(!path.exists() || !path.isDirectory()) {
-           path.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0664);
-        }
-        
-        return path;
-    }
-};
-
-var Clipboard = {
-    MAX_TEXT_LENGTH: 128,
-
-    _helper: Components.classes["@mozilla.org/widget/clipboardhelper;1"].getService(Components.interfaces.nsIClipboardHelper),
+ 
+ var DataCache = {
+    _lastUid: 0,
+    _data: new Hash(),
     
-    copyId_PROXY: Marshal.BY_VALUE,
-    copyId: function(id) {
-        if (isNaN(parseInt(id)))
-            throw new ArgumentException("id", id, "Not a number.");
-        
-        this._helper.copyString(id);
+    generateUid_PROXY: Marshal.BY_VALUE,
+    generateUid: function() {
+        var uid;
+        do {
+            uid = "gen_" + (++this._lastUid);
+        } while (this._data[uid] != null)
+        return uid;
     },
     
-    copyText_PROXY: Marshal.BY_VALUE,
-    copyText: function(text) {
-        if (text == null)
-            throw new ArgumentNullException("text");
-        text = String(text);
-        if (text.length > this.MAX_TEXT_LENGTH)
-            throw new ArgumentException("text", text, "Text cannot be longer than " + this.MAX_TEXT_LENGTH);
+    store_PROXY: Marshal.BY_VALUE,
+    store: function(uid, data, overwrite) {
+        if (uid == null)
+            uid = this.generateUid();
+        else
+            uid = String(uid);
+            
+        if (!overwrite && this._data[uid] != null)
+            throw new ArgumentException("uid", uid, "This identifier is already registered.");
         
-        this._helper.copyString(text);
+        this._data[uid] = data;
+        return uid;
+    },
+    
+    retrieve_PROXY: Marshal.BY_VALUE,
+    retrieve: function(uid, doNotRemove) {
+        if (uid == null)
+            return null;
+            
+        uid = String(uid);
+        var data = this._data[uid];
+        
+        // Remove record
+        if (!doNotRemove)
+            delete this._data[uid];
+            
+        return data;
     }
-};
-
-Marshal.registerObject("Clipboard", Clipboard);
+ }
+ 
+ // Register for proxy
+ Marshal.registerObject("DataCache", DataCache);
+ 

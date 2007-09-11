@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<files>
+  <!-- System files. It is not recommended to modify this list. -->
+  <script src="libraries/prototype.js" />
+  <script src="libraries/constants.js" />
+  <script src="libraries/webExtenderLib.js" />
+  <script src="includes/interopClient.js" />
+  
+  <!-- Custom libraries -->
+  <script src="includes/tooltip.js" />
+  <script src="includes/maplus-lib.js" />
+
+  <!--
+  Note:
+  Here should go files that will be included into page
+  only when other extender exists. Code in these files
+  should NOT do anything itself.
+  Only extension-wide libraries should be listed here.
+  Everyting else should be as extenders themselves.
+  -->
+</files>

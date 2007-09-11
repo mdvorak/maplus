@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -450,7 +450,6 @@ var PageExtender = Class.create();
 
 PageExtender.prototype = {
     initialize: function() {
-        this.supporting = false;
     },
     
     getName: function() {
@@ -503,12 +502,12 @@ PageExtenderCollection.prototype = {
         return this._significantSize > 0;
     },
 
-    add: function(extender) {
+    add: function(extender, library) {
         if (extender == null) return;
         
         this._extenders.push(extender);
-            
-        if (!extender.supporting)
+        
+        if (!library)
             this._significantSize++;
     },
     
@@ -597,14 +596,16 @@ PageExtenderCollection.prototype = {
 
 var ScriptExtender = PageExtender.createClass({
     DEFAULT_TYPE: "text/javascript",
+    DEFAULT_CHARSET: "UTF-8",
 
-    initialize: function(src, type) {
+    initialize: function(src, type, charset) {
         base.initialize();
     
         if (src == null)
             throw new ArgumentNullException("src");
         this._src = src;
         this._type = (type != null ? type : this.DEFAULT_TYPE);
+        this._charset = (charset != null) ? charset : this.DEFAULT_CHARSET;
     },
     
     getName: function() {
@@ -615,6 +616,7 @@ var ScriptExtender = PageExtender.createClass({
         var e = page.document.createElement("script");
         e.setAttribute("type", this._type);
         e.setAttribute("src", this._src);
+        e.setAttribute("charset", this._charset);
         page.document.body.appendChild(e);
     }
 });
@@ -681,9 +683,9 @@ const _FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","di
 
 if (!window.console || !console.firebug) {
     // Dummy object
-    window.console = new Object();
+    var console = new Object();
     
     _FIREBUG_METHODS.each(function(p) {
-            window.console[p] = function() { };
+            console[p] = function() { };
         });
 }

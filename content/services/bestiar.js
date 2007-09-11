@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -34,18 +34,44 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const EXTENSION_NAME = "maplus";
-const EXTENSION_ID = "maplus@michal.dvorak";
-const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
+var BestiarFiltry = {
+    _load: function() {
+        try {
+            this.data = FileIO.loadXml(CHROME_CONTENT_URL + "data/bestiar.xml");
+        }
+        catch (e) {
+            dump("Nepodarilo se nacist filtry bestiare:\n" + e);
+        }
+    },
+    
+    getRules_PROXY: Marshal.BY_VALUE,
+    getRules: function(name, type) {
+        if (!this.data)
+            this._load();
+        if (!this.data)
+            return null;
+    
+        var path = '/aukce/rulelist';
+        if (name) path += '[@name = "' + name + '"]';
+        path += '/rule';
+        if (type) path += '[@type = "' + type + '"]';
+        
+        var rules = this.data.evaluate(path, this.data, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        var i;
+        var arr = new Array();
+        
+        while((i = rules.iterateNext()) != null) {
+            var rule = {
+                name: name,
+                type: i.getAttribute("type"),
+                condition: i.getAttribute("condition"),
+                title: i.textContent
+            };
+            arr.push(rule);
+        }
+        
+        return arr;
+    }
+};
 
-const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
-const CHROME_CONTENT_URL = CHROME_URL + "content/";
-
-// Debugging
-const MARSHAL_DEBUG = 1; // 0=None, 1=Basic, 2=Verbose
-const XPATH_DEBUG = 1;
-
-// Custom constants
-const TIMERS_DISABLED = false;
-
-const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
+Marshal.registerObject("BestiarFiltry", BestiarFiltry);

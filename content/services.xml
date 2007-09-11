@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<files>
+  <!-- System files. Don't modify. -->
+  <script src="libraries/prototype.js" />
+  <script src="libraries/constants.js" />
+  <script src="libraries/webExtenderLib.js" />
+  <script src="services/webExtender.js" />
+  <script src="services/xmlConfig.js" />
+
+  <!-- Custom services -->
+  <script src="services/maplus.js" />
+  <script src="services/config.js" />
+  <script src="services/datacache.js" />
+  <script src="services/jednotky.js" />
+  <script src="services/madata.js" />
+  <script src="services/bestiar.js" />
+  
+  <script src="services/default.js" />
+  
+  <!--
+  Note:
+  To this file place only scripts that needs
+  to exist outside page boundaries.
+  
+  If you need some function that needs elevated
+  priviledges, create safe service here and publish
+  it using Marshal class, instead of handling page
+  here directly.
+  -->
+</files>

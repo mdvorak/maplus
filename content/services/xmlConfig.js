@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -216,7 +216,7 @@ XmlConfigNode.XPath.prototype = {
 
     evalPrefNodeList_PROXY: Marshal.BY_REF_ARRAY,
     evalPrefNodeList: function(xpath) {
-        var result = document.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        var result = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
         retval = new Array();
         
         if (result != null) {

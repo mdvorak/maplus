@@ -5,13 +5,11 @@
     <alias name="chrome">chrome://maplus/content</alias>
   </urls>
   <extenders>
-    <script url="#{melior}/*" name="interop.js" />
+    <script url="#{melior}/*" name="interop.js" library="true" />
 
     <!-- Obecne -->
-    <script url="#{melior}/*" name="constants.js" />
-    <script url="#{melior}/*" name="tooltip.js" />
-    <script url="#{melior}/*" name="lib.js" />
-    
+    <script url="#{melior}/*" name="constants.js" library="true" />
+
     <style url="#{melior}/*" src="#{chrome}/html/maplus.css" />
     <script url="#{melior}/*" name="analyza.js" />
     <script url="#{melior}/*" name="config.js" />
@@ -20,7 +18,7 @@
     <script url="#{melior}/*" name="regent.js" />
     <script url="#{melior}/*" name="obecne.js" />
     <script url="#{melior}/*" name="menu.js" />
-    
+
     <!-- Specificke -->
     <script url="#{melior}/magie.html" name="magie.js" />
     <script url="#{melior}/aliance.html" name="aliance.js" />
@@ -37,7 +35,7 @@
     <script url="#{melior}/utok.html" name="utok-boj.js" />
     <script url="#{melior}/boj.html" name="utok-boj.js" />
     <script url="#{melior}/posta.html" name="posta.js" />
-    
+
     <!-- Nastaveni -->
     <script url="#{melior}/main.html" name="bestiar-style.js" />
     <script url="#{melior}/main.html" name="nastaveni.js" />

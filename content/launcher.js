@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Melior Annis Plus.
+ * The Original Code is WebExtender.
  *
  * The Initial Developer of the Original Code is
  * Michal Dvorak.
@@ -33,50 +33,15 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
- var DataCache = {
-    _lastUid: 0,
-    _data: new Hash(),
-    
-    generateUid_PROXY: Marshal.BY_VALUE,
-    generateUid: function() {
-        var uid;
-        do {
-            uid = "gen_" + (++this._lastUid);
-        } while (this._data[uid] != null)
-        return uid;
-    },
-    
-    store_PROXY: Marshal.BY_VALUE,
-    store: function(uid, data, overwrite) {
-        if (uid == null)
-            uid = this.generateUid();
-        else
-            uid = String(uid);
-            
-        if (!overwrite && this._data[uid] != null)
-            throw new ArgumentException("uid", uid, "This identifier is already registered.");
-        
-        this._data[uid] = data;
-        return uid;
-    },
-    
-    retrieve_PROXY: Marshal.BY_VALUE,
-    retrieve: function(uid, doNotRemove) {
-        if (uid == null)
-            return null;
-            
-        uid = String(uid);
-        var data = this._data[uid];
-        
-        // Remove record
-        if (!doNotRemove)
-            delete this._data[uid];
-            
-        return data;
-    }
- }
- 
- // Register for proxy
- Marshal.registerObject("DataCache", DataCache);
- 
+
+window.addEventListener("load", function(e) {
+    // Create and initialize extension private space in the XPCOM
+    var privateSpace = Components.classes["@michal.dvorak/privatespace_maplus;1"].createInstance();
+    privateSpace.wrappedJSObject.initialize(window);    
+}, false);
+
+/*
+Note: 
+Using XPCOM for private JS name space is a kind of hack, 
+however it should work without problems.
+*/

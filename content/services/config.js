@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -34,48 +34,31 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-var BestiarFiltry = {
-    _load: function() {
-        try {
-            var req = new XMLHttpRequest();
-            req.open("GET", CHROME_CONTENT_URL + "data/bestiar.xml", false); 
-            req.send(null);
+const CONFIG_ROOT_NAME = "prefs";
 
-            this.data = req.responseXML;
-        }
-        catch (e) {
-            dump("Nepodarilo se nacist filtry bestiare:\n" + e);
-        }
-    },
+XmlConfigNode.XPath.useExtension();
+XmlConfigNode.Extended.useExtension();
+
+var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME);
+var localConfigManager = new XmlConfigManager(null, CONFIG_ROOT_NAME);
+
+var plusConfigAutosave = PageExtender.create({
+    SAVE_INTERVAL: 100,
     
-    getRules_PROXY: Marshal.BY_VALUE,
-    getRules: function(name, type) {
-        if (!this.data)
-            this._load();
-        if (!this.data)
-            return null;
+    _hits: 0,
     
-        var path = '/aukce/rulelist';
-        if (name) path += '[@name = "' + name + '"]';
-        path += '/rule';
-        if (type) path += '[@type = "' + type + '"]';
-        
-        var rules = this.data.evaluate(path, this.data, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-        var i;
-        var arr = new Array();
-        
-        while((i = rules.iterateNext()) != null) {
-            var rule = {
-                name: name,
-                type: i.getAttribute("type"),
-                condition: i.getAttribute("condition"),
-                title: i.textContent
-            };
-            arr.push(rule);
+    analyze: function(page, context) {
+        if (++this._hits > this.SAVE_INTERVAL) {
+            this._hits = 0;
+            configManager.saveAll();
         }
         
-        return arr;
+        return false;
     }
-};
+});
 
-Marshal.registerObject("BestiarFiltry", BestiarFiltry);
+// Register
+Marshal.registerObject("configManager", configManager);
+Marshal.registerObject("localConfigManager", localConfigManager);
+WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
+WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });

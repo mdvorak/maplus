@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -34,5 +34,9 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-// Load extenders
+/*
+ * NOTE: Usually you won't need to modify this file.
+ */
+
+// Load default extenders
 ExtenderManager.load(CHROME_CONTENT_URL + "extenders/default.xml");

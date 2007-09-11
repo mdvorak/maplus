@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -42,6 +42,7 @@ ExtenderCollection.prototype = {
         this._generic = new Array();
         this._siteMap = new Hash();
         this._cache = new Hash();
+        this._validSites = new Array();
     },
     
     _analyzeUrl: function(url) {
@@ -60,7 +61,7 @@ ExtenderCollection.prototype = {
                 args[pair[0]] = pair[1];
             });
         }
-                
+     
         return {
             site: site,
             path: path,
@@ -69,7 +70,7 @@ ExtenderCollection.prototype = {
         };
     },
     
-    add: function(url, extender) {
+    add: function(url, extender, asLibrary) {
         if (extender == null) throw new ArgumentNullException("extender");
         
         // Clear cache
@@ -77,10 +78,12 @@ ExtenderCollection.prototype = {
         
         // Because generic extenders are in different list, we needs to track the real order
         extender._ExtenderCollection_position = this._position++;
+        extender._ExtenderCollection_library = asLibrary;
         
         // Special case - generic extender
         if (url == "*") {
             this._generic.push(extender);
+            this._validSites = null;
             return extender;
         }
         
@@ -88,6 +91,12 @@ ExtenderCollection.prototype = {
         if (analyzedUrl == null)
             throw new ArgumentException("url", url, "Invalid url format.");
     
+        // Speed optimization
+        if (this._validSites != null && this._validSites.indexOf(analyzedUrl.site) < 0) {
+            this._validSites.push(analyzedUrl.site);
+        }
+    
+        // Add extender to the collection
         var site = this._siteMap[analyzedUrl.site];
         if (site == null) {
             site = new Hash();
@@ -107,6 +116,10 @@ ExtenderCollection.prototype = {
     getList: function(url) {
         var analyzedUrl = this._analyzeUrl(url);
         if (analyzedUrl == null)
+            return null;
+        
+        // Speed optimization
+        if (this._validSites != null && this._validSites.indexOf(analyzedUrl.site) < 0)
             return null;
         
         var extenders = this._cache[analyzedUrl.address];
@@ -143,7 +156,7 @@ ExtenderCollection.prototype = {
                 
                 // Create collection
                 extenders = new PageExtenderCollection();
-                tmpList.each(function(e) { extenders.add(e); });
+                tmpList.each(function(e) { extenders.add(e, e._ExtenderCollection_library); });
                     
                 this._cache[analyzedUrl.address] = extenders;
             }
@@ -158,11 +171,11 @@ var WebExtender = {
     _extenders: new ExtenderCollection(),
     _unloadHandlers: new Array(),
     
-    registerExtender: function(url, extender) {
+    registerExtender: function(url, extender, asLibrary) {
         if (url == null) throw new ArgumentNullException("url");
         if (extender == null) throw new ArgumentNullException("extender");
         
-        this._extenders.add(url, extender);
+        this._extenders.add(url, extender, asLibrary);
         return extender;
     },
     
@@ -192,14 +205,13 @@ var WebExtender = {
     },
      
     /** Object implementation **/
-    
-    _init: function() {
+    init: function(win) {
         var _this = this;
     
-        var appcontent = document.getElementById("appcontent");        
+        var appcontent = win.document.getElementById("appcontent");        
         appcontent.addEventListener("load", function(event) { _this._onPageLoad(event); }, true);
         
-        window.addEventListener("unload", function() { _this._onUnload(); }, false);
+        win.addEventListener("unload", function() { _this._onUnload(); }, false);
         
         this._init = null;
     },
@@ -213,7 +225,10 @@ var WebExtender = {
     _onPageLoad: function(event) {
         var doc = event.originalTarget;
 
-        if (doc && doc.nodeName == "#document" && doc.location.href.search("http://") == 0) {
+        if (doc && doc.nodeName == "#document" 
+                && doc.location 
+                && doc.location.href 
+                && doc.location.href.search("http://") == 0) {
             this._callExtenders(doc);
         } 
     },
@@ -242,42 +257,44 @@ var WebExtender = {
     }
 };
 
-// Initialize WebExtender after browser has been loaded.
-window.addEventListener("load", function(e) { WebExtender._init(e); }, false);
-
-
 /*** Script class ***/
 var Script = Object.extend(Script || {}, {
-    executeFile: function(doc, src, type) {
+    DEFAULT_CHARSET: "UTF-8",
+
+    executeFile: function(doc, src, type, charset) {
         if (doc == null) throw new ArgumentNullException("doc");
         if (src == null) throw new ArgumentNullException("src");
         if (type == null) type = "text/javascript";
+        if (charset == null) charset = Script.DEFAULT_CHARSET;
         
         var e = doc.createElement("script");
         e.setAttribute("type", type);
         e.setAttribute("src", src);
+        e.setAttribute("charset", charset);
         
         doc.body.appendChild(e);
     },
 
-    execute: function(doc, code, type) {
+    execute: function(doc, code, type, charset) {
         if (doc == null) throw new ArgumentNullException("doc");
         if (code == null) throw new ArgumentNullException("code");
         if (type == null) type = "text/javascript";
+        if (charset == null) charset = Script.DEFAULT_CHARSET;
         
         var e = doc.createElement("script");
         e.setAttribute("type", type);
+        e.setAttribute("charset", charset);
         e.innerHTML = code;
         
         doc.body.appendChild(e);
     },
     
     // This will execute function in the dom of doc
-    executeJavascriptFunction: function(doc, func) {
+    executeJavascriptFunction: function(doc, func, charset) {
         if (doc == null) throw new ArgumentNullException("doc");
         if (func == null) throw new ArgumentNullException("func");
         
-        this.execute(doc, "(" + func.toString() + ")();", "text/javascript");
+        this.execute(doc, "(" + func.toString() + ")();", "text/javascript", charset);
     }
 });
 
@@ -286,7 +303,9 @@ var FileIO = {
     loadText: function(url) {
         if (url == null) throw new ArgumentNullException("url");
         
-        var req = new XMLHttpRequest();
+        var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+                            .createInstance()
+                            .QueryInterface(Components.interfaces.nsIXMLHttpRequest);
         req.open("GET", url, false); 
         req.send(null);
         
@@ -303,7 +322,9 @@ var FileIO = {
     loadXml: function(url) {
         if (url == null) throw new ArgumentNullException("url");
     
-        var req = new XMLHttpRequest();
+        var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+                            .createInstance()
+                            .QueryInterface(Components.interfaces.nsIXMLHttpRequest);
         req.open("GET", url, false); 
         req.send(null);
         
@@ -644,7 +665,18 @@ Object.extend(Marshal, {
 
 
 /*** ExtenderManager class ***/
-var ExtenderManager = {    
+var ExtenderManager = {
+    _libraries: new Array(),
+
+    include: function(url) {
+        if (url == null)
+            throw new ArgumentNullException("url");
+        if (url.search(CHROME_CONTENT_URL) != 0)
+            throw new ArgumentException("url", url, "Url must be within this extension content.");
+            
+        this._libraries.push(url);
+    },
+
     load: function(definitionUrl) {
         if (definitionUrl == null) throw new ArgumentNullException("definitionUrl");
         
@@ -671,6 +703,9 @@ var ExtenderManager = {
                     var url = new Template(def.getAttribute("url")).evaluate(data.aliases);
                     var parser = ExtenderManager.Extenders[def.tagName];
                     
+                    var libraryAttr = String(def.getAttribute("library"));
+                    var library = (libraryAttr.toLowerCase() == "true" || parseInt(libraryAttr) > 0);
+                    
                     if (url == null || url.empty())
                         throw "url not set.";
                     
@@ -678,19 +713,19 @@ var ExtenderManager = {
                         throw String.format("Unsupported extender type ('{0}').", def.tagName);
                     
                     var extender = parser(def, data);
-                    WebExtender.registerExtender(url, extender);
+                    WebExtender.registerExtender(url, extender, library);
                 });
         }
     },
     
     // Called directly by WebExtender
     initPage: function(page) {
-        Script.executeFile(page.document, CHROME_CONTENT_URL + "prototype.js");
-        Script.executeFile(page.document, CHROME_CONTENT_URL + "webExtenderLib.js");
-        Script.executeFile(page.document, CHROME_CONTENT_URL + "constants.js");
+        for (var i = 0; i < this._libraries.length; i++) {
+            var src = this._libraries[i];
+            Script.executeFile(page.document, src);
+        }
         
         Marshal.initPage(page);
-    
         Script.execute(page.document, "var pageExtenders = new PageExtenderCollection();");
     },
     
@@ -707,12 +742,13 @@ ExtenderManager.Extenders = {
     script: function(def, data) {
         var name = def.getAttribute("name");
         var type = def.getAttribute("type");
+        var charset = def.getAttribute("charset");
         
         if (name == null || !new RegExp("^[\\w./_~-]+$").test(name))
             throw new Exception(String.format("Invalid script name ('{0}').", name));
         
         var src = data.location + name;
-        var extender = new ScriptExtender(src, "text/javascript");
+        var extender = new ScriptExtender(src, "text/javascript", charset);
         return extender;
     },
     
