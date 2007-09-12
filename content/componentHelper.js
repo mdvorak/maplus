@@ -49,10 +49,23 @@ const navigator = { userAgent: "Gecko" }
 const nsIDOMXPathResult = Components.interfaces.nsIDOMXPathResult;
 const XPathResult = nsIDOMXPathResult;
 
-// Reads given xml file and returns list of files urls.
-function loadJSListDefinition(definitionUrl, scriptsUrl) {
-    if (scriptsUrl[scriptsUrl.length - 1] != '/')
+
+/**
+ * Loads list of script urls from specified xml file. Base path scriptsUrl is optional.
+ *
+ * Examples:
+ * loadFileListDefinition("chrome://myextension/content/files.xml", "chrome://myextension/content/");
+ * loadFileListDefinition("chrome://myextension/content/otherFiles.xml", "chrome://myextension/content/other");
+ * loadFileListDefinition("chrome://myextension/content/otherFiles.xml");
+ */
+function loadFileListDefinition(definitionUrl, scriptsUrl) {
+    if (definitionUrl == null || definitionUrl.length == 0)
+        throw "definitionUrl is null";
+
+    if (scriptsUrl != null && scriptsUrl[scriptsUrl.length - 1] != '/')
         scriptsUrl += '/';
+    if (scriptsUrl == null)
+        scriptsUrl = "";
 
     // Load services xml
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
@@ -78,21 +91,4 @@ function loadJSListDefinition(definitionUrl, scriptsUrl) {
     }
     
     return result;
-}
-
-/**
- * Examples:
- * loadJSfromDefinition("chrome://myextension/content/files.xml", "chrome://myextension/content/");
- * loadJSfromDefinition("chrome://myextension/content/otherFiles.xml", "chrome://myextension/content/other");
- */
-function loadJSfromDefinition(definitionUrl, scriptsUrl) {
-    var scripts = loadJSListDefinition(definitionUrl, scriptsUrl);
-    
-    var jssubscriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
-                                      .getService(Components.interfaces.mozIJSSubScriptLoader);
-                                      
-    for (var i = 0; i < scripts.length; i++) {
-        // Load script
-        jssubscriptLoader.loadSubScript(scripts[i]);
-    }
 }

@@ -257,6 +257,20 @@ var WebExtender = {
     }
 };
 
+/*** DocumentHelper class ***/
+var DocumentHelper = {
+    createDocument: function(namespaceURI, qualifiedName, doctype) {
+        if (namespaceURI == null) namespaceURI = "";
+        if (qualifiedName == null) qualifiedName = "";
+    
+        var doc = Components.classes["@mozilla.org/xul/xul-document;1"]
+                            .createInstance()
+                            .implementation
+                            .createDocument(namespaceURI, qualifiedName, doctype);
+        return doc;
+    }
+};
+
 /*** Script class ***/
 var Script = Object.extend(Script || {}, {
     DEFAULT_CHARSET: "UTF-8",

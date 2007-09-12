@@ -60,16 +60,16 @@ PrivateSpace.prototype = {
         // setup in XPCOM environment
         jssubscriptLoader.loadSubScript(CONTENT_URL + "componentHelper.js");
          
-        // document.implementation is used to create empty documents, so set implementation to the dummy
-        document.implementation = win.document.implementation;
-                  
         // Load services from definition (method defined in componentHelper.js)
-        loadJSfromDefinition(CONTENT_URL + "services.xml", CONTENT_URL);
+        var services = loadFileListDefinition(CONTENT_URL + "services.xml", CONTENT_URL);
+        for (var i = 0; i < services.length; i++) {
+            jssubscriptLoader.loadSubScript(services[i]);
+        }
         
         // Must be loaded by services.xml
         WebExtender.init(win);
         
-        var libraries = loadJSListDefinition(CONTENT_URL + "includes.xml", CONTENT_URL);
+        var libraries = loadFileListDefinition(CONTENT_URL + "includes.xml", CONTENT_URL);
         for (var i = 0; i < libraries.length; i++) {
             ExtenderManager.include(libraries[i]);
         }

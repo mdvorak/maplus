@@ -39,7 +39,7 @@ var XmlConfig = {
     DEFAULT_ROOT_NAME: "config",
  
     createEmpty: function(rootName) {
-        var doc = document.implementation.createDocument("", "", null);
+        var doc = DocumentHelper.createDocument();
         var root = doc.createElement(rootName);
         doc.appendChild(root);
         
