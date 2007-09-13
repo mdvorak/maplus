@@ -53,7 +53,9 @@ function formatTime(totalSeconds) {
 /*** Implementace pravidel ***/
 var Rules = {
     sort: function(__rules) {
-        if (!__rules) return null;
+        if (__rules == null) return null;
+        var window = null;
+        var document = null;
         
         return function(row1, row2) {
             var stack1 = row1.stack;
@@ -76,7 +78,9 @@ var Rules = {
     },
 
     filter: function(__rules) {
-        if (!__rules) return null;
+        if (__rules == null) return null;
+        var window = null;
+        var document = null;
         
         return function(row) {
             var stack = row.stack;
@@ -93,7 +97,40 @@ var Rules = {
             
             return true;
         };
-    }
+    },
+    
+    Application: {
+    	sort: function(table, rule) {
+    	    // Default
+	        if (rule == null)
+	            rule = Rules.sort([DEFAULT_SORT_CONDITION]);
+		    
+	        TableHelper.sort(table, rule);
+		},
+		
+		filter: function(table, rule) {
+            // Default
+	        if (rule == null)
+	            rule = function(row) { return true; }
+		    
+	        TableHelper.filter(table, rule);
+		}
+    },
+    
+    apply: function(table, rule, type) {
+    	if (table == null)
+    		throw new ArgumentNullException("table");
+		if (rule != null && typeof rule != "function")
+			throw new ArgumentException("rule", rule, "Rule must be a function.");
+		if (type == null)
+			throw new ArgumentException("type", type, "Missing rule type.");
+
+		var application = Rules.Application[type];
+		if (application == null)
+			throw new ArgumentException("type", type, "Rule type application not found.");
+			
+		application.call(null, table, rule);
+	}
 };
 
 /*** Konfigurace ***/
@@ -106,12 +143,12 @@ PlusConfig.Aukce.prototype = {
         if (type == null) throw new ArgumentNullException("type");
     
         var f = this.evalPrefNode('filter[@name = "' + name + '" and @type = "' + type + '"]');
-        if (f) {
+        if (f != null) {
             f.setPref(null, condition);
         }
         else {
             var first = this.getFirstChild();
-            (first ? this.insertPref : this.addPref)("filter", condition, first);
+            f = (first ? this.insertPref : this.addPref)("filter", condition, first);
             
             f.setAttribute("name", name);
             f.setAttribute("type", type);
@@ -157,13 +194,16 @@ PlusConfig.Aukce.prototype = {
             throw new ArgumentException("type", type, "Rule type not found.");
         
         var rules = this.createRuleSet(type);
-        return factory.call(null, rules);
+        if (rules.length > 0)
+	        return factory.call(null, rules);
+		else
+			return null;
     },
 
     hasRules: function(type) {
         var path = 'filter';
         if (type) path += '[@type = "' + type + '"]';
-        var count = this.evalPrefNodeList('count(' + path + ')').length;
+        var count = this.evalPrefNodeList(path).length;
         return count > 0;
     }
 };

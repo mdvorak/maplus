@@ -39,6 +39,9 @@ const TIMERS_DISABLED = false;
 const MAX_TAHU_DEFAULT = 30;
 const MAX_RADKU_DEFAULT = 30;
 
+const DEFAULT_SORT_CONDITION = "stack1.silaJednotky - stack2.silaJednotky";
+const DEFAULT_SORT_NAME = "silaJednotky";
+
 const JMENA_PRESVEDCENI = new Hash();
 JMENA_PRESVEDCENI["D"] = "Dobré";
 JMENA_PRESVEDCENI["N"] = "Neutrální";

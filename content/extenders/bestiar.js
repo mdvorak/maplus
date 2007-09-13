@@ -482,9 +482,6 @@ pageExtenders.add(PageExtender.create({
 
 // Razeni a filtrovani
 pageExtenders.add(PageExtender.create({
-    DEFAULT_SORT_CONDITION: "stack1.silaJednotky - stack2.silaJednotky",
-    DEFAULT_SORT_NAME: "silaJednotky",
-
     getName: function() { return "Bestiar - Filtry"; },
 
     analyze: function(page, context) {
@@ -539,11 +536,12 @@ pageExtenders.add(PageExtender.create({
             }
         });
     
+    	// Zpracovani hlavicky
     	var createRulesTooltipHtml = this._createRulesTooltipHtml;
     
         context.headers.each(function(h) {
             // Vytvor tooltip
-            var linkTooltip = createRulesTooltipHtml(context.config, h);
+            var linkTooltip = createRulesTooltipHtml(page.bestiar.table.element, context.config, h);
             
             // Uprav hlavicku
             var b = $X('span/b', h.cell);
@@ -555,7 +553,7 @@ pageExtenders.add(PageExtender.create({
         });
     },
     
-    _createRulesTooltipHtml: function(config, header) {
+    _createRulesTooltipHtml: function(table, config, header) {
         var link = Element.create("a", header.title, {href: "javascript://"});
         
         var tooltipName = "header_" + header.name;
@@ -579,7 +577,7 @@ pageExtenders.add(PageExtender.create({
                             if (r.condition != "") {
                                 // Vychozi razeni vloz na zacatek retezce
                                 if (r.type == "sort" && !config.hasRules("sort")) {
-                                    config.setRule(this.DEFAULT_SORT_NAME, "sort", this.DEFAULT_SORT_CONDITION);
+                                    config.setRule(DEFAULT_SORT_NAME, "sort", DEFAULT_SORT_CONDITION);
                                 }
                                 
                                 config.setRule(r.name, r.type, r.condition);
@@ -589,7 +587,8 @@ pageExtenders.add(PageExtender.create({
                             }
                             
                             // Updatuj tabulku
-                            // TODO
+                            var rule = config.createRule(r.type);
+                            Rules.apply(table, rule, r.type);
                         });
                         
                         // Mezera
