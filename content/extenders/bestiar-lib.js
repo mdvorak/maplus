@@ -50,19 +50,10 @@ function formatTime(totalSeconds) {
     return m + ":" + (s < 10 ? "0" + s : s)
 }
 
-
-
-
-
-
-// NEFINALNI
-
-
-
 /*** Implementace pravidel ***/
 var Rules = {
-    sort: function(rules) {
-        if (!rules) return null;
+    sort: function(__rules) {
+        if (!__rules) return null;
         
         return function(row1, row2) {
             var stack1 = row1.stack;
@@ -75,17 +66,17 @@ var Rules = {
             else if (stack2 == null)
                 return 1;
          
-            for (var i = 0; i < rules.length; i++) {
-                if (!rules[i]) continue;
+            for (var i = 0; i < __rules.length; i++) {
+                if (!__rules[i]) continue;
                 
-                var r = eval(rules[i]);
+                var r = eval(__rules[i]);
                 if (r != null && r != 0) return r;
             }
         };
     },
 
-    filter: function(rules) {
-        if (!rules) return null;
+    filter: function(__rules) {
+        if (!__rules) return null;
         
         return function(row) {
             var stack = row.stack;
@@ -93,10 +84,10 @@ var Rules = {
             if (stack == null)
                 return true;
 
-            for (var i = 0; i < rules.length; i++) {
-                if (!rules[i]) continue;
+            for (var i = 0; i < __rules.length; i++) {
+                if (!__rules[i]) continue;
                 
-                var r = eval(rules[i]);
+                var r = eval(__rules[i]);
                 if (!r) return false;
             }
             
@@ -159,6 +150,15 @@ PlusConfig.Aukce.prototype = {
         
         return rules;
     },
+    
+    createRule: function(type) {
+        var factory = Rules[type];
+        if (factory == null)
+            throw new ArgumentException("type", type, "Rule type not found.");
+        
+        var rules = this.createRuleSet(type);
+        return factory.call(null, rules);
+    },
 
     hasRules: function(type) {
         var path = 'filter';
@@ -168,3 +168,12 @@ PlusConfig.Aukce.prototype = {
     }
 };
 
+PlusConfig.Aukce.extend = function(element) {
+    if (!element || element._PlusConfig_Aukce_extended)
+        return element;
+
+    Object.extend(element, PlusConfig.Aukce.prototype);
+
+    element._PlusConfig_Aukce_extended = true;
+    return element;
+}

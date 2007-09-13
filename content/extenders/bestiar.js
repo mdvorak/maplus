@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -308,7 +308,7 @@ pageExtenders.add(PageExtender.create({
             
             // Kopiruj popis
             var copy = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/copy.png" />', {href: "javascript://"});
-            copy.setAttribute("title", "Zkopíruj popis stacku do schránky");
+            copy.setAttribute("title", "Zkopíruje popis stacku do schránky");
             Event.observe(copy, 'click', copyDescriptionFactory(row.description));
             td.appendChild(copy);
             
@@ -325,7 +325,7 @@ pageExtenders.add(PageExtender.create({
         var link = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/questionmark.png" />', {href: "javascript://"});
         link.setAttribute("title", "Zobrazí skryté informace o stacku.");
         
-        var tooltipName = "missing_" + index
+        var tooltipName = "missing_" + index;
         if (!Tooltip.isRegistered(tooltipName)) {
             Tooltip.register(tooltipName, function() {
                     var html = template.evaluate(data); 
@@ -393,9 +393,9 @@ pageExtenders.add(PageExtender.create({
                 
                 if (!isNaN(id)) {
                 	link = MaPlus.Tooltips.createActiveId(page, id);
-                    link.innerHTML = '<span class="bestiarBid">[ ' + id + ' ]</span>';
+                    link.innerHTML = '<span class="bestiarBid">[&nbsp;' + id + '&nbsp;]</span>';
                     
-                	var spanId = Element.create("span", ' ');
+                	var spanId = Element.create("span", '&nbsp;');
                 	spanId.appendChild(link);
                 	spanId.appendChild(document.createTextNode(' '));
                 	td.appendChild(spanId);
@@ -480,32 +480,127 @@ pageExtenders.add(PageExtender.create({
 }));
 
 
-
-
-
-
-
-
-
 // Razeni a filtrovani
 pageExtenders.add(PageExtender.create({
+    DEFAULT_SORT_CONDITION: "stack1.silaJednotky - stack2.silaJednotky",
+    DEFAULT_SORT_NAME: "silaJednotky",
+
     getName: function() { return "Bestiar - Filtry"; },
 
     analyze: function(page, context) {
         // Bestiar
-        if (page.arguments["obchod"] != "jedn_new")
+        if (!page.bestiar || !page.bestiar.table)
+            return false;
+        if (!page.config.getAukce().getBoolean("filtrovani", true))
             return false;
             
         // Konfigurace
-        context.config = page.config.getAukce().getPrefNode("filtry", true);
-        Object.extend(context.config, PlusConfig.Aukce.prototype);           
+        context.config = PlusConfig.Aukce.extend(page.config.getAukce().getPrefNode("filtry", true));
 
-        // TODO
-        
         return true;
     },
 
     process: function(page, context) {
-        // TODO
+        // Vytvor seznam hlavicek (hlavicky se upravujou az v process takze to musi byt tady)
+        context.headers = new Array();        
+        var header = page.bestiar.table.header;
+        
+        header.columns.values().each(function(td) {
+            var name = td.getAttribute("name");
+            if (name == null)
+                return; // continue;
+            
+            // Get available rules for this column
+            var rules = BestiarFiltry.getRules(name);
+            
+            if (rules != null && rules.length > 0) {
+                // Najdi jestli sloupec podporuje filtrovani
+                var filterable = false;
+                for (var i = 0; i < rules.length; i++) {
+                    if (rules[i].type == "filter") {
+                        filterable = true;
+                        break;
+                    }
+                }
+                
+                // Vloz moznost vypnuti filtru
+                if (filterable) {
+                    rules.push({ name: name, type: "filter", condition: "", title: "Vše" });
+                }
+                
+                // Vloz do seznamu
+                context.headers.push({
+                    cell: td,
+                    name: name,
+                    rules: rules,
+                    filterable: filterable,
+                    title: BestiarSloupce.getData(name).nazev
+                });
+            }
+        });
+    
+    	var createRulesTooltipHtml = this._createRulesTooltipHtml;
+    
+        context.headers.each(function(h) {
+            // Vytvor tooltip
+            var linkTooltip = createRulesTooltipHtml(context.config, h);
+            
+            // Uprav hlavicku
+            var b = $X('span/b', h.cell);
+            b.innerHTML = '';
+            
+            new Insertion.Top(b, '&nbsp;');
+            b.appendChild(linkTooltip);
+            new Insertion.Bottom(b, '&nbsp;');
+        });
+    },
+    
+    _createRulesTooltipHtml: function(config, header) {
+        var link = Element.create("a", header.title, {href: "javascript://"});
+        
+        var tooltipName = "header_" + header.name;
+        if (!Tooltip.isRegistered(tooltipName)) {
+        	// Registruj tooltip
+            Tooltip.register(tooltipName, function() {
+        			var tooltip = Tooltip.create('<span><b>' + header.title + '&nbsp;&nbsp;&nbsp;</b></span>', "tooltip", true); 
+                    var span = tooltip.appendChild(Element.create("span"));
+                    
+                    // Pridej pravidla
+                    header.rules.each(function(r) {
+                    	// Newline
+                        span.appendChild(Element.create("br"));
+                        
+                        // Link pravidla
+                        var filter = span.appendChild(Element.create("a", r.title));
+                        
+                        // Event handler pravidla
+                        Event.observe(filter, 'click', function() {
+                        	// Uloz pravidlo
+                            if (r.condition != "") {
+                                // Vychozi razeni vloz na zacatek retezce
+                                if (r.type == "sort" && !config.hasRules("sort")) {
+                                    config.setRule(this.DEFAULT_SORT_NAME, "sort", this.DEFAULT_SORT_CONDITION);
+                                }
+                                
+                                config.setRule(r.name, r.type, r.condition);
+                            }
+                            else {
+                                config.removeRule(r.name, r.type);
+                            }
+                            
+                            // Updatuj tabulku
+                            // TODO
+                        });
+                        
+                        // Mezera
+                        new Insertion.Bottom(span, "&nbsp;&nbsp;");
+                    });
+                    
+                    return tooltip;
+                });
+        }
+     
+        Tooltip.attach(link, tooltipName);
+        return link; 
     }
 }));
