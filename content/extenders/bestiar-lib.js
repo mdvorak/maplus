@@ -52,12 +52,23 @@ function formatTime(totalSeconds) {
 
 /*** Implementace pravidel ***/
 var Rules = {
-    sort: function(__rules) {
-        if (__rules == null) return null;
+    sort: function(/* table, arguments */) {
+        if (arguments[0] == null)
+    		throw new ArgumentNullException("table");
+    
+        var __rules = arguments[1];
+        
+        // For (a little) better security
         var window = null;
         var document = null;
         
-        return function(row1, row2) {
+        if (__rules == null || __rules.length == 0) {
+            // Default
+            __rules = [DEFAULT_SORT_CONDITION];
+        }
+        
+        // Create callback function
+        var callback = function(row1, row2) {
             var stack1 = row1.stack;
             var stack2 = row2.stack;
             
@@ -75,62 +86,49 @@ var Rules = {
                 if (r != null && r != 0) return r;
             }
         };
+        
+        // Perform actual sorting
+        TableHelper.sort(table, callback);
     },
 
-    filter: function(__rules) {
-        if (__rules == null) return null;
+    filter: function(/* table, arguments */) {
+        if (arguments[0] == null)
+    		throw new ArgumentNullException("table");
+    
+        var __rules = arguments[1];
+    
+        // For (a little) better security
         var window = null;
         var document = null;
         
-        return function(row) {
-            var stack = row.stack;
-            
-            if (stack == null)
-                return true;
-
-            for (var i = 0; i < __rules.length; i++) {
-                if (!__rules[i]) continue;
+        var callback;
+        
+        if (__rules != null && __rules.length > 0) {
+            // Create callback function
+            callback = function(row) {
+                var stack = row.stack;
                 
-                var r = eval(__rules[i]);
-                if (!r) return false;
-            }
-            
-            return true;
-        };
-    },
-    
-    Application: {
-    	sort: function(table, rule) {
-    	    // Default
-	        if (rule == null)
-	            rule = Rules.sort([DEFAULT_SORT_CONDITION]);
-		    
-	        TableHelper.sort(table, rule);
-		},
-		
-		filter: function(table, rule) {
-            // Default
-	        if (rule == null)
-	            rule = function(row) { return true; }
-		    
-	        TableHelper.filter(table, rule);
-		}
-    },
-    
-    apply: function(table, rule, type) {
-    	if (table == null)
-    		throw new ArgumentNullException("table");
-		if (rule != null && typeof rule != "function")
-			throw new ArgumentException("rule", rule, "Rule must be a function.");
-		if (type == null)
-			throw new ArgumentException("type", type, "Missing rule type.");
+                if (stack == null)
+                    return true;
 
-		var application = Rules.Application[type];
-		if (application == null)
-			throw new ArgumentException("type", type, "Rule type application not found.");
-			
-		application.call(null, table, rule);
-	}
+                for (var i = 0; i < __rules.length; i++) {
+                    if (!__rules[i]) continue;
+                    
+                    var r = eval(__rules[i]);
+                    if (!r) return false;
+                }
+                
+                return true;
+            };
+        }
+        else {
+            // Default
+            callback = function(row) { return true; };
+        }
+        
+        // Perform actual filtering
+	    TableHelper.filter(arguments[0], callback);
+    }
 };
 
 /*** Konfigurace ***/
@@ -188,18 +186,6 @@ PlusConfig.Aukce.prototype = {
         return rules;
     },
     
-    createRule: function(type) {
-        var factory = Rules[type];
-        if (factory == null)
-            throw new ArgumentException("type", type, "Rule type not found.");
-        
-        var rules = this.createRuleSet(type);
-        if (rules.length > 0)
-	        return factory.call(null, rules);
-		else
-			return null;
-    },
-
     hasRules: function(type) {
         var path = 'filter';
         if (type) path += '[@type = "' + type + '"]';

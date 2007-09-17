@@ -587,8 +587,8 @@ pageExtenders.add(PageExtender.create({
                             }
                             
                             // Updatuj tabulku
-                            var rule = config.createRule(r.type);
-                            Rules.apply(table, rule, r.type);
+                            var rules = config.createRuleSet(r.type);
+                            Rules[r.type](table, rules);
                         });
                         
                         // Mezera
