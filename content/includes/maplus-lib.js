@@ -269,69 +269,6 @@ MaPlus.Tooltips = {
     }
 };
 
-/** TableHelper class **/
-
-var TableHelper = {
-    filter: function(table, callback) {
-        if (table == null) throw new ArgumentNullException("table");
-        if (callback == null) throw new ArgumentNullException("callback");
-        if (!String.equals(table.tagName, "table", true))
-            throw new ArgumentException("table", table, "Argument must be a table element.");
-    
-        for (var i = 0; i < table.rows.length; i++) {
-            var show = callback(table.rows[i], i);
-            table.rows[i].style.display = show ? '' : 'none';
-        }
-    },
-
-    sort: function(table, callback) {
-        if (table == null) throw new ArgumentNullException("table");
-        if (callback == null) throw new ArgumentNullException("callback");
-        if (!String.equals(table.tagName, "table", true))
-            throw new ArgumentException("table", table, "Argument must be a table element.");
-    
-        if (table.rows.length == 0)
-            return;
-            
-        var tbody = table.rows[0].parentNode;
-
-        var sortArr = new Array();
-
-        for (var i = 0; i < table.rows.length; i++) {
-            if (table.rows[i] != table.sortRow)
-                sortArr.push(table.rows[i]);
-        }
-        
-        sortArr.sort(callback);
-        
-        if(!table.sortRow) {
-            table.sortRow = table.ownerDocument.createElement("tr");
-            table.sortRow.style.display = 'none';
-        }
-        if (table.sortRow != table.rows[0]) {
-            tbody.insertBefore(table.sortRow, table.rows[0]);
-        }
-        
-        for (var i = 0; i < sortArr.length; i++) {
-            tbody.insertBefore(sortArr[i], table.sortRow);
-        }
-    },
-
-    thinBorders: function(table) {
-        // Zestihli okraje
-        $XL('tbody/tr/td', table).each(function(e) { 
-                e.style.borderRight = "0px";
-                e.style.borderBottom = "0px";
-            });
-        $XL('tbody/tr[1]/td', table).each(function(e) { 
-                e.style.borderTop = "0px";
-            });
-        $XL('tbody/tr/td[1]', table).each(function(e) { 
-                e.style.borderLeft = "0px";
-            });
-    }
-};
-
 /** ElementDataStore class **/
 
 // FF ztraci JS objekty naveseny na elementy pri manipulaci s nima
@@ -360,5 +297,68 @@ var ElementDataStore = {
         }
         
         return data;
+    }
+};
+
+/** TableHelper class **/
+
+var TableHelper = {
+    filter: function(table, callback) {
+        if (table == null) throw new ArgumentNullException("table");
+        if (callback == null) throw new ArgumentNullException("callback");
+        if (!String.equals(table.tagName, "table", true))
+            throw new ArgumentException("table", table, "Argument must be a table element.");
+    
+        for (var i = 0; i < table.rows.length; i++) {
+            var show = callback(table.rows[i], i);
+            table.rows[i].style.display = show ? '' : 'none';
+        }
+    },
+
+    sort: function(table, callback) {
+        if (table == null) throw new ArgumentNullException("table");
+        if (callback == null) throw new ArgumentNullException("callback");
+        if (!String.equals(table.tagName, "table", true))
+            throw new ArgumentException("table", table, "Argument must be a table element.");
+    
+        if (table.rows.length == 0)
+            return;
+            
+        var data = ElementDataStore.get(table);
+        var tbody = table.tbodies[0];
+        var sortArr = new Array();
+
+        for (var i = 0; i < table.rows.length; i++) {
+            if (table.rows[i] != table.sortRow)
+                sortArr.push(data.rows[i]);
+        }
+        
+        sortArr.sort(callback);
+        
+        if(data.sortRow == null) {
+            data.sortRow = table.ownerDocument.createElement("tr");
+            data.sortRow.style.display = 'none';
+        }
+        if (data.sortRow != table.rows[0]) {
+            tbody.insertBefore(data.sortRow, table.rows[0]);
+        }
+        
+        for (var i = 0; i < sortArr.length; i++) {
+            tbody.insertBefore(sortArr[i], data.sortRow);
+        }
+    },
+
+    thinBorders: function(table) {
+        // Zestihli okraje (urceno primo pro tabulky MA s tlustejma okrajema)
+        $XL('tbody/tr/td', table).each(function(e) { 
+                e.style.borderRight = "0px";
+                e.style.borderBottom = "0px";
+            });
+        $XL('tbody/tr[1]/td', table).each(function(e) { 
+                e.style.borderTop = "0px";
+            });
+        $XL('tbody/tr/td[1]', table).each(function(e) { 
+                e.style.borderLeft = "0px";
+            });
     }
 };
