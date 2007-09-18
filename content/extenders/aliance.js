@@ -83,7 +83,7 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         var tableClenove = XPath.evalSingle('table[2]', page.content);
-        if (!tableClenove)
+        if (tableClenove == null)
             return false;
         
         var jmenoAliance = XPath.evalString('font/i', page.content);
@@ -152,13 +152,13 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         var tableAliance = $X('font[2]/table', page.content);
-        if (!tableAliance)
+        if (tableAliance == null)
             return false;
         
         for (var i = 2; i < tableAliance.rows.length - 1; i++) {
             var tr = tableAliance.rows[i];
             var aVypis = $X('td[1]/font/a', tr);
-            if (!aVypis)
+            if (aVypis == null)
                 continue;
             
             var id = aVypis.getAttribute("href");
@@ -186,9 +186,57 @@ pageExtenders.add(PageExtender.create({
         if (!typStranky || typStranky.search("nastavit_") != 0)
             return false;
         
-        return false;
+        return true;
     },
     
     process: function(page, context) {
     }
 }));
+
+
+
+
+
+
+
+
+
+/*
+
+    if (typStranky && typStranky.search("nastavit_") == 0) {
+        // Hromadne zpravy
+        var clenoveRows = page.evaluate('table[2]/tbody/tr[position() > 1 and count(td) >= 7]', page.content);
+        var jeKomu = false;
+        
+        for (var i in clenoveRows) {
+            var id = parseInt(page.evaluateSingle('td[3]/font', clenoveRows[i]).textContent);
+            if (isNaN(id))
+                continue;
+            
+            var jmenoCell = page.evaluateSingle('td[4]', clenoveRows[i]);
+            page.addElement(jmenoCell, "span", '<input name="napsatHromadna" playerid="' + id + '" type="checkbox" style="margin-top: 0px; margin-bottom: 1px" />', jmenoCell.firstChild, [["size", "2"]]);
+            jeKomu = true;
+        }
+
+        if (jeKomu) {
+            var napsatOznacenym = "var komu = '';";
+            napsatOznacenym += "var checks = document.getElementsByName('napsatHromadna');";
+            napsatOznacenym += "for (var i =0; i < checks.length; i++) {";
+            napsatOznacenym += "  if (checks[i].checked)";
+            napsatOznacenym += "    komu += Number(checks[i].getAttribute('playerid')) + ',';";
+            napsatOznacenym += "}";
+            napsatOznacenym += "komu = komu.replace(/,$/, '');";
+            napsatOznacenym += "if (komu.length > 0) {";
+            napsatOznacenym += "  this.setAttribute('onclick', '');";
+            napsatOznacenym += "  document.location.href = '" + buildUrl(page, "posta.html", "posta=napsat&komu=") + "' + komu;";
+            napsatOznacenym += "}";
+            
+            var napsat = '<td colspan="3"></td><td colspan="4">';
+            napsat += '<a href="javascript://" onclick="' + napsatOznacenym + '"><font size="2">Napsat označeným</font></a></td>';
+            
+            var link = page.addElement(clenoveRows[0].parentNode, "tr", "", clenoveRows[clenoveRows.length - 1].nextSibling);
+            link.innerHTML = napsat;
+        }
+    }
+    
+    */

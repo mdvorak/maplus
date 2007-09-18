@@ -451,7 +451,8 @@ var PageExtender = Class.create();
 PageExtender.prototype = {
     initialize: function() {
     },
-    
+        
+    // Override this for better debugging
     getName: function() {
         return "(anonymous)";
     },
@@ -460,6 +461,7 @@ PageExtender.prototype = {
         return true;
     },
     
+    // Set process to null if extender does only analyzes
     process: function(page, context) {
     }
 };
