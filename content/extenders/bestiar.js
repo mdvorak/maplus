@@ -500,6 +500,7 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         // Vytvor seznam hlavicek (hlavicky se upravujou az v process takze to musi byt tady)
         context.headers = new Array();        
+        var table = page.bestiar.table.element;
         var header = page.bestiar.table.header;
         
         header.columns.values().each(function(td) {
@@ -541,7 +542,7 @@ pageExtenders.add(PageExtender.create({
     
         context.headers.each(function(h) {
             // Vytvor tooltip
-            var linkTooltip = createRulesTooltipHtml(page.bestiar.table.element, context.config, h);
+            var linkTooltip = createRulesTooltipHtml(table, context.config, h);
             
             // Uprav hlavicku
             var b = $X('span/b', h.cell);
@@ -551,6 +552,28 @@ pageExtenders.add(PageExtender.create({
             b.appendChild(linkTooltip);
             new Insertion.Bottom(b, '&nbsp;');
         });
+        
+        // Link "Zrus filtrovani" nad tabulkou
+        var tdNastaveniFiltru = $X('.//font/table/tbody/tr[2]/td[1 and contains(font, "Prosím")]', page.content);
+        tdNastaveniFiltru.innerHTML = '';
+        
+        var linkZrusFiltry = Element.create("a", '<span>Zruš filtrování a řazení</span>');
+        Event.observe(linkZrusFiltry, 'click', function(event) {
+            context.config.clearRules();
+            // Reset tabulky
+            for (let i in Rules) {
+                Rules[i](table, null);
+            }
+        });
+        
+        tdNastaveniFiltru.appendChild(linkZrusFiltry);
+        tdNastaveniFiltru.appendChild(Element.create("br"));
+        
+        // Aplikuj aktualni filtry
+        for (let i in Rules) {
+            if (typeof Rules[i] == "function" && context.config.hasRules(i))
+                Rules.filter(table, context.config.getRules(i));
+        }
     },
     
     _createRulesTooltipHtml: function(table, config, header) {

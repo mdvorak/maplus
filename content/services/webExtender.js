@@ -301,14 +301,6 @@ var Script = Object.extend(Script || {}, {
         e.innerHTML = code;
         
         doc.body.appendChild(e);
-    },
-    
-    // This will execute function in the dom of doc
-    executeJavascriptFunction: function(doc, func, charset) {
-        if (doc == null) throw new ArgumentNullException("doc");
-        if (func == null) throw new ArgumentNullException("func");
-        
-        this.execute(doc, "(" + func.toString() + ")();", "text/javascript", charset);
     }
 });
 
@@ -745,10 +737,10 @@ var ExtenderManager = {
     
     // Called directly by WebExtender
     finalizePage: function(page) {
-        Script.executeJavascriptFunction(page.document, function() {
+        Script.execute(page.document, "(" + function() {
                 var page = new Page();
                 pageExtenders.run(page);
-            });
+            } + ")();" );
     }
 }
 
@@ -762,7 +754,7 @@ ExtenderManager.Extenders = {
             throw new Exception(String.format("Invalid script name ('{0}').", name));
         
         var src = data.location + name;
-        var extender = new ScriptExtender(src, "text/javascript", charset);
+        var extender = new ScriptExtender(src, type, charset);
         return extender;
     },
     

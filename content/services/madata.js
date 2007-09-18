@@ -40,6 +40,14 @@ var MaData = {
         path.append("data.xml");
         this.data = XmlConfig.load(path, "data");
         
+        // Zkontroluj vek
+        this.vek = this.data.getPref("vek");
+        if (this.vek != AGE_NAME) {
+            // Pokud vek nesouhlasi, smazej ulozena data
+            this.data = XmlConfig.createEmpty("data");
+            this.data.setPref("vek", AGE_NAME);
+        }
+        
         this.seznamProvincii = this.data.getPrefNode("seznamProvincii", true);
         this.seznamAlianci = this.data.getPrefNode("seznamAlianci", true);
     },

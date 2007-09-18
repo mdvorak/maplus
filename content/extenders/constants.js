@@ -71,11 +71,6 @@ JMENA_BAREV["S"] = "Šedá";
 JMENA_BAREV["F"] = "Fialová";
 JMENA_BAREV["N"] = "Neutrální";
 
-const PREHLED_TOP = "Absolutní pořadí podle síly - Nejlepších 20";
-const PREHLED_UMISTENI = "Relativní pořadí podle síly - Okolních 30";
-const PREHLED_MOZNE_UTOKY = "Možné cíle - 30 nejslabších";
-const PREHLED_PODLE_SLAVY = "Absolutní pořadí podle slávy - Nejlepších 30";
-const PREHLED_PODLE_POZEMKU = "Podle pozemků";
 
 // Bestiar
 var BESTIAR_PUVODNI_SLOUPCE = ["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", "druh", "typ", "cas", "nabidka"];

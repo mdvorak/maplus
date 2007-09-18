@@ -186,7 +186,7 @@ Object.extend(Element, {
         
         if (attributes != null) {
             $H(attributes).each(function(attr) {
-                    e.setAttribute(attr[0], attr[1] || "");
+                    e.setAttribute(attr[0], (attr[1] != null) ? attr[1] : "");
                 });
         }
         

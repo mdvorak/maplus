@@ -335,7 +335,7 @@ var TableHelper = {
         
         sortArr.sort(callback);
         
-        if(data.sortRow == null) {
+        if (data.sortRow == null) {
             data.sortRow = table.ownerDocument.createElement("tr");
             data.sortRow.style.display = 'none';
         }
