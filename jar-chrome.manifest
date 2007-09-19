@@ -1,0 +1,3 @@
+content	maplus	jar:chrome/maplus.jar!/content/
+skin	maplus	classic/1.0	jar:chrome/maplus.jar!/skin/
+overlay	chrome://browser/content/browser.xul	chrome://maplus/content/firefoxOverlay.xul
