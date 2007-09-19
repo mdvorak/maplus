@@ -75,7 +75,7 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         // Nacteni ulozenych alianci (musi byt v process protoze behem analyzy se teprv zjistuji id alianci)
         var seznam = page.config.getRegent().getPrefNode("aliance", true).evalPrefNodeList("id");
-        if (!seznam)
+        if (seznam == null)
             return false;
             
         context.aliance = new Array();
@@ -177,5 +177,49 @@ pageExtenders.add(PageExtender.create({
             {
                 cfg.setPref("text", e.target.value);
             });
+    }
+}));
+
+// Vlastni linky
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Menu - Vlastni linky"; },
+
+    analyze: function(page, context) {
+        var seznam = page.config.getMenu().getPrefNode('linky', true).evalPrefNodeList('url[link and text]');
+        if (seznam.length == 0)
+            return false;
+        
+        // Vytvor seznam odkazu
+        context.list = new Array();
+        
+        seznam.each(function(i) {
+            var link = i.getPref("link");
+            if (link == null || link.length == 0)
+                return; // continue;
+            
+            var externi = i.getAttribute("externi");
+            if (!String.equals(externi, "true", true) && !(parseInt(externi) > 0)) {
+                link += "&id=" + page.id + "&code=" + page.code;
+                if (page.ftc) link += "&ftc=" + page.ftc;
+            }
+
+            var text = i.getPref("text");
+            context.list.push({url: link, text: text});
+        });
+        
+        return true;
+    },
+    
+    process: function(page, context) {
+        var spanCustomMenu = Element.create("span");
+        
+        context.list.each(function(i) {
+            var link = Element.create("a", i.text, {href: i.url});
+            page.rightMenu.appendChild(Element.create("br"));
+            spanCustomMenu.appendChild(link);
+        });
+        
+        page.rightMenu.appendChild(Element.create("br"));
+        page.rightMenu.appendChild(spanCustomMenu);
     }
 }));

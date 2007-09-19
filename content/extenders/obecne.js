@@ -40,13 +40,69 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         context.list = $XL('//input[@type = "text" and @name = "koho"]');
+        
+        var mojeAliance = page.config.
+        
+        context.rozsireni = page.config.getBoolean("rozireniKoho", true);
+        if (page.name == "prehled.html")
+            context.rozsireni = false;
+            
         return context.list.length > 0;
     },
     
     process: function(page, context) {
+        var naplnSeznam = this._naplnSeznam;
+    
         context.list.each(function(e) {
-                Event.observe(e, 'blur', function() { this.value = this.value.replace(/^\s+|\s+$/g, ""); });
+            Event.observe(e, 'blur', function() { this.value = this.value.replace(/^\s+|\s+$/g, ""); });
+            
+            if (context.rozsireni) {
+                var select = Element.create("select", null, {style: "width: 20px"});
+                
+                // Prvne 'plnici' handler
+                Event.observe(select, 'click', function(event) {
+                    naplnSeznam(select);
+                    Event.stopObserving(select, 'click', arguments.callee);
+                });
+                
+                // Pak selected handler
+                Event.observe(select, 'change', function(event) {
+                    e.value = select.selectedItem.value;
+                    e.focus();
+                });
+            }
+        });
+    },
+    
+    _naplnSeznam: function(select) {
+        var vsichni = new Array();
+        
+        // Nacteni ulozenych alianci
+        var mojeAliance = page.config.getRegent().getPrefNode("aliance", true).evalPrefNodeList("id");
+            
+        $A(mojeAliance).each(function(i) {
+            var idAliance = i.getNumber();
+            if (isNaN(idAliance))
+                return; // continue;
+            
+            var clenove = MaData.clenoveAliance(null, idAliance);
+            clenove.each(function(id) {
+                var popis = String(id);
+                
+                var provincie = MaData.najdiProvincii(id);
+                if (provincie)
+                    provincie += " " + provincie.regent + ", " + provincie.provincie;
+                
+                vsichni.push({id: id, popis: popis});
             });
+        });
+        
+        // Napln select
+        select.options.length = vsichni.length;
+        for (var i = 0; i < vsichni.length; i++) {
+            select.options[i].value = vsichni[i].id;
+            select.options[i].text = vsichni[i].popis;
+        }
     }
 }));
 
@@ -68,14 +124,14 @@ pageExtenders.add(PageExtender.create({
         var zprava = "Opravdu chcete odehrát více jak " + maxTahu + " tahù?";
         
         context.fields.each(function(e) {
-                context.buttons.each(function(i) {
-                        // Prasacky ale funkcni reseni (bohuzel '//' neuznava kontext :-( )
-                        if (i.form == e.form) {
-                            i.onclick = function() { return (parseInt(e.value) < maxTahu) || confirm(zprava); };
-                            i.setAttribute("plus", true); // Debug
-                        }
-                    });
+            context.buttons.each(function(i) {
+                // Prasacky ale funkcni reseni (bohuzel '//' neuznava kontext :-( )
+                if (i.form == e.form) {
+                    i.onclick = function() { return (parseInt(e.value) < maxTahu) || confirm(zprava); };
+                    i.setAttribute("plus", true); // Debug
+                }
             });
+        });
             
         // Pridej kontrolu i na objevovat
         if (context.fields.length > 0 && parseInt(context.fields[0].value) > maxTahu) {

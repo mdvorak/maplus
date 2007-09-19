@@ -42,7 +42,7 @@
     <script url="#{melior}/main.html" name="nastaveni.js" />
 
     <!-- Post processing -->
-    <script url="#{melior}/*" name="postprocessing.js" />
+    <script url="#{melior}/*" name="safelinks.js" />
     <script url="#{melior}/*" name="theme.js" />
   </extenders>
 </webExtender>

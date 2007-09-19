@@ -115,15 +115,24 @@ var MaData = {
     
     // Vraci array id
     clenoveAliance_PROXY: Marshal.BY_VALUE,
-    clenoveAliance: function(jmenoAliance) {
+    clenoveAliance: function(jmenoAliance, idAliance) {
+        // Najdi jmeno aliance podle id pokud je k dispozici
+        if (jmenoAliance == null && idAliance != null) {
+            var aliance = this.najdiAlianci(null, idAliance);
+            if (aliance != null)
+                jmenoAliance = aliance.jmeno;
+        }
+    
+        // Pokud neni zname jmeno aliance, vrat prazdnou array
         if (jmenoAliance == null)
             return new Array();
     
         this._ensureDataAreLoaded();
     
+        // Vytvor seznam clenu
         var list = new Array();
-    
         var provincie = this.seznamProvincii.evalPrefNodeList('provincie[aliance = "' + jmenoAliance + '"]');
+        
         provincie.each(function(provi) {
                 var id = parseInt(provi.getAttribute("id"));
                 if (!isNaN(id))
@@ -134,13 +143,17 @@ var MaData = {
     },
     
     najdiAlianci_PROXY: Marshal.BY_VALUE,
-    najdiAlianci: function(jmeno) {
+    najdiAlianci: function(jmeno, id) {
         if (jmeno == null || jmeno == ZADNA_ALIANCE)
             return null;
     
         this._ensureDataAreLoaded();
     
-        var ali = this.seznamAlianci.evalPrefNode('aliance[jmeno = "' + jmeno + '"]');
+        var ali;
+        if (jmenoAliance != null)
+            ali = this.seznamAlianci.evalPrefNode('aliance[jmeno = "' + jmeno + '"]');
+        else
+            ali = this.seznamAlianci.evalPrefNode('aliance[@id = "' + id + '"]');
         
         if (ali) {
             return {
