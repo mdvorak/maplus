@@ -42,7 +42,7 @@ const PREHLED_PODLE_POZEMKU = "Podle pozemků";
 
 
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Prehled - "; },
+    getName: function() { return "Prehled"; },
 
     analyze: function(page, context) {
         context.table = $X('table[1]', page.content);
@@ -138,6 +138,15 @@ pageExtenders.add(PageExtender.create({
             
             var tdInfo = Element.create("td", infoHtml, {align: "center", style: "white-space: nowrap;"});
             tr.appendChild(tdInfo);
+            
+            // Aktivni id
+            var linkId = MaPlus.Tooltips.createActiveId(page, data.id);
+            
+            cells[2].innerHTML = '';
+            var spanId = cells[2].appendChild(Element.create("span"));
+            new Insertion.Top(spanId, "&nbsp;&nbsp;");
+            spanId.appendChild(linkId);
+            new Insertion.Bottom(spanId, "&nbsp;&nbsp;");
         }
         
         // Oprav okraje

@@ -214,10 +214,16 @@ pageExtenders.add(PageExtender.create({
             var span = Element.create("span");
             var check = span.appendChild(Element.create("input", null, {type: "checkbox", style: "margin-top: 0px; margin-bottom: 1px"}));
             
+            // Napsat checkbox
             checks.push({element: check, id: row.id});
             
             var tdJmeno = row.element.cells[4];
             tdJmeno.insertBefore(span, tdJmeno.firstChild); // Vloz pred jmeno
+            
+            // Aktivni id
+            var idLink = MaPlus.Tooltips.createActiveId(page, row.id);
+            row.link.parentNode.replaceChild(idLink, row.link);
+            row.link = idLink;
         });
         
         // Novy radek
