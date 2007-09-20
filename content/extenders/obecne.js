@@ -39,13 +39,11 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Kontrola - ID"; },
 
     analyze: function(page, context) {
-        context.list = $XL('//input[@type = "text" and @name = "koho"]');
-        
-        var mojeAliance = page.config.
+        context.list = $XL('//input[@type = "text" and (@name = "koho" or @name = "komu")]');
         
         context.rozsireni = page.config.getBoolean("rozireniKoho", true);
-        if (page.name == "prehled.html")
-            context.rozsireni = false;
+        //if (page.name == "prehled.html")
+        //    context.rozsireni = false;
             
         return context.list.length > 0;
     },
@@ -57,24 +55,26 @@ pageExtenders.add(PageExtender.create({
             Event.observe(e, 'blur', function() { this.value = this.value.replace(/^\s+|\s+$/g, ""); });
             
             if (context.rozsireni) {
-                var select = Element.create("select", null, {style: "width: 20px"});
+                var select = Element.create("select", null, {style: "width: 22px; text-align: left;"});
                 
                 // Prvne 'plnici' handler
                 Event.observe(select, 'click', function(event) {
-                    naplnSeznam(select);
+                    naplnSeznam(page, select);
                     Event.stopObserving(select, 'click', arguments.callee);
                 });
                 
                 // Pak selected handler
                 Event.observe(select, 'change', function(event) {
-                    e.value = select.selectedItem.value;
+                    e.value = select.value;
                     e.focus();
                 });
+                
+                e.parentNode.insertBefore(select, e.nextSibling);
             }
         });
     },
     
-    _naplnSeznam: function(select) {
+    _naplnSeznam: function(page, select) {
         var vsichni = new Array();
         
         // Nacteni ulozenych alianci
@@ -90,8 +90,8 @@ pageExtenders.add(PageExtender.create({
                 var popis = String(id);
                 
                 var provincie = MaData.najdiProvincii(id);
-                if (provincie)
-                    provincie += " " + provincie.regent + ", " + provincie.provincie;
+                if (provincie != null)
+                    popis += " " + provincie.regent + ", " + provincie.provincie;
                 
                 vsichni.push({id: id, popis: popis});
             });

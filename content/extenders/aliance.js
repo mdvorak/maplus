@@ -196,7 +196,7 @@ pageExtenders.add(PageExtender.create({
             if (isNaN(id))
                 return; // continue;
 
-            context.clenove.push({element: tr, id: id, link: link);
+            context.clenove.push({element: tr, id: id, link: link});
         });
         
         if (context.clenove.length == 0)
@@ -210,7 +210,7 @@ pageExtenders.add(PageExtender.create({
         var checks = new Array();
     
         // Pridej checkboxy k jednotlivym clenum
-        context.clenove.each(function(row)         
+        context.clenove.each(function(row) {     
             var span = Element.create("span");
             var check = span.appendChild(Element.create("input", null, {type: "checkbox", style: "margin-top: 0px; margin-bottom: 1px"}));
             
@@ -228,9 +228,9 @@ pageExtenders.add(PageExtender.create({
         
         // Novy radek
         var tr = context.tbody.appendChild(Element.create("tr"));
-        tr.appendChild(Element.create("td", null, {colspan: 3});
+        tr.appendChild(Element.create("td", null, {colspan: 3}));
         
-        var spanNapsat = tr.appendChild(Element.create("td", null, {colspan: 4})
+        var spanNapsat = tr.appendChild(Element.create("td", null, {colspan: 4}))
                            .appendChild(Element.create("span"));
         
         // Pridej Napsat vsem checkbox
@@ -249,7 +249,7 @@ pageExtenders.add(PageExtender.create({
             checks.each(function(i) {
                 if (i.element.checked)
                     ids.push(i.id);
-            }
+            });
             
             // Redirect
             document.location.href = MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: ids.join(",")});

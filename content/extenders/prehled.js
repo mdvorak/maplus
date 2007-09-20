@@ -60,6 +60,9 @@ pageExtenders.add(PageExtender.create({
             var tr = context.table.rows[i];
             var cells = tr.cells;
             
+            if (cells.length < 10)
+                continue;
+            
             var data = ElementDataStore.get(tr);
             data.id = parseInt(cells[2].textContent);
             
@@ -69,7 +72,7 @@ pageExtenders.add(PageExtender.create({
             }
             
             // Analyzuj data
-            switch (typ) {
+            switch (context.typ) {
                 case PREHLED_UMISTENI:
                 case PREHLED_TOP:
                 case PREHLED_PODLE_POZEMKU:
@@ -134,7 +137,7 @@ pageExtenders.add(PageExtender.create({
             
             // Pridej Info link
             var infoUrl = MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: data.id});
-            var infoHtml = '<a href="' + infoUrl + '"><img src="' + CHROME_CONTENT_URL + '/html/img/info.png" alt="" style="border-width: 0px; padding-top: 1px;" /></a>';
+            var infoHtml = '<a href="' + infoUrl + '"><img src="' + CHROME_CONTENT_URL + 'html/img/info.png" alt="" style="border-width: 0px; padding-top: 1px;" /></a>';
             
             var tdInfo = Element.create("td", infoHtml, {align: "center", style: "white-space: nowrap;"});
             tr.appendChild(tdInfo);

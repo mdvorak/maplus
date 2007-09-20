@@ -144,21 +144,21 @@ var MaData = {
     
     najdiAlianci_PROXY: Marshal.BY_VALUE,
     najdiAlianci: function(jmeno, id) {
-        if (jmeno == null || jmeno == ZADNA_ALIANCE)
+        if (id == null && (jmeno == null || jmeno == ZADNA_ALIANCE))
             return null;
     
         this._ensureDataAreLoaded();
     
         var ali;
-        if (jmenoAliance != null)
+        if (jmeno != null)
             ali = this.seznamAlianci.evalPrefNode('aliance[jmeno = "' + jmeno + '"]');
         else
             ali = this.seznamAlianci.evalPrefNode('aliance[@id = "' + id + '"]');
         
         if (ali) {
             return {
-                id: ali.getPref("id"),
-                jmeno: jmeno,
+                id: ali.getAttribute("id"),
+                jmeno: ali.getPref("jmeno"),
                 presvedceni: ali.getPref("presvedceni"),
                 update: new Date(ali.getAttribute("update"))
             };
@@ -176,11 +176,9 @@ var MaData = {
             
         zacatekJmena = zacatekJmena.replace(/[.]{2,3}$/, "");
         
-        var mozneAliance = XPath.evalList('aliance[starts-with(jmeno, "' + zacatekJmena + '")]', this.seznamAlianci);
-        if (mozneAliance.length == 1) {
-            initPrefNode(mozneAliance[0]);
+        var mozneAliance = this.seznamAlianci.evalPrefNodeList('aliance[starts-with(jmeno, "' + zacatekJmena + '")]');
+        if (mozneAliance.length == 1)
             return mozneAliance[0].getPref("jmeno");
-        }
         else
             return null;
     },
@@ -199,7 +197,7 @@ var MaData = {
             ali.setPref("jmeno", jmeno);
         }
         
-        if (id && !isNaN(id)) ali.setPref("id", id);
+        if (id && !isNaN(id)) ali.setAttribute("id", id);
         if (presvedceni && presvedceni != "") ali.setPref("presvedceni", presvedceni);
         
         ali.setAttribute("update", new Date());
