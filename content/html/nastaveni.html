@@ -282,20 +282,22 @@ td.nadpis
 			</td>
 			
 			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			  
+			<!--
 			<td><span>Maximální stáří spamu (minuty)</span></td>
 			<td>
 				<input type="checkbox"
 					onload="this.checked = this.config.getPrefNode('posta', true).getNumber('maxStariSpamu', 30);"
 					onsave="this.config.getPrefNode('posta', true).setPref('maxStariSpamu', parseInt(this.value) * 60);" />
 			</td>
+			-->
 		</tr>
 		<tr>
             <td colspan="2"><span class="small dark">(0 pro vypnutí)</span></td>
 			
 			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			
+			<!-- 
 			<td colspan="2"><span class="small dark">(Zprávy označené jako spam starší než daný čas budou vždy sbaleny)</span></td>
+			-->
 		</tr>
 		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
