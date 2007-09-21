@@ -285,8 +285,21 @@ pageExtenders.add(PageExtender.create({
             if (zprava.typ == "posel")
                 return;
             
-            var newHTML = zprava.fontText.innerHTML.replace(/http(?:s?):\/\/\S+?(?=\s|$|<)/g, '<a href="$&" target="_blank" onclick="return confirm(\'' + Posta.LINK_CONFIRM_TEXT + '\');">$&</a>');
+            var newHTML = zprava.fontText.innerHTML;
+            
+            // Linky
+            newHTML = newHTML.replace(/http(?:s?):\/\/\S+?(?=\s|$|<)/g, '<a href="$&" target="_blank" onclick="return confirm(\'' + Posta.LINK_CONFIRM_TEXT + '\');">$&</a>');
+            // Aktivni id ve zpravach (TODO jen od posla?)
+            newHTML = newHTML.replace(/\((\d{4,6})\)/g, '(<a href="#" playerid="$1">$1</a>)');
+            
+            // Update html
             zprava.fontText.innerHTML = newHTML;
+            
+            // Pridej handler linkum
+            $XL('.//a[@playerid]', zprava.fontText).each(function(link) {
+                var id = parseInt(link.getAttribute("playerid"));
+                MaPlus.Tooltips.createActiveId(page, id, link);
+            });
         });
     }
 }));

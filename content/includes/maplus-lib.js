@@ -152,12 +152,14 @@ var SafeLink = {
 /*** MaPlus.Tooltips ***/
 
 MaPlus.Tooltips = {
-    createActiveId: function(page, id) {
-        // Vytvoreni linku
-        var link = document.createElement("a");
-        link.className = "idLink";
-        link.href = "javascript://";
-        link.innerHTML = id;
+    createActiveId: function(page, id, /* optional */ link) {
+        // Vytvoreni linku (pokud neexistuje)
+        if (link == null) {
+            link = document.createElement("a");
+            link.className = "idLink";
+            link.href = "javascript://";
+            link.innerHTML = id;
+        }
             
         var tooltipName = "id_" + id;
         
@@ -170,16 +172,18 @@ MaPlus.Tooltips = {
         return link;
     },
     
-    createActiveUnit: function(page, jmeno) {
+    createActiveUnit: function(page, jmeno, /* optional */ link) {
         var jednotka = Jednotky.vyhledej(jmeno);
         if (!jednotka)
             return null;
             
-        // Vytvoreni linku
-        var link = document.createElement("a");
-        link.className = "idLink";
-        link.href = "javascript://";
-        link.innerHTML = jmeno;
+        // Vytvoreni linku (pokud neexistuje)
+        if (link == null) {
+            link = document.createElement("a");
+            link.className = "idLink";
+            link.href = "javascript://";
+            link.innerHTML = jmeno;
+        }
             
         var tooltipName = "jednotka_" + jmeno;
         
@@ -201,7 +205,7 @@ MaPlus.Tooltips = {
         html += '  <td colspan="2"><span><b>' + id + '</b>&nbsp;</span>';
         html += '  <a href="javascript://"><sup><span class="small">(zkopírovat)</span></sup></a></td>';
         html += '</tr>';
-        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: id}) + '"><span>Vyslat špehy</span></a></td></tr>';
+        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: (id == page.id ? "0" : "") + id}) + '"><span>Vyslat špehy</span></a></td></tr>';
         html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: id}) + '"><span>Napsat zprávu</span></a></td></tr>';
 
         // Dalsi info

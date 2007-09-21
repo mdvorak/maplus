@@ -40,7 +40,7 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         // Tohle je vyjimka: aby se neprovadela zbytecne analyza pro vsechny extendery
-        // a pritom se vzdy zobrazilo menu, je jeho zobrani uz v analyze, kde je taky
+        // a pritom se vzdy zobrazilo menu, je jeho zobrazeni uz v analyze, kde je taky
         // vyhozena vyjimka AbortException pokud je plus zakazano.
     
         context.html = Chrome.loadText("html/maplus.html");
@@ -71,13 +71,18 @@ pageExtenders.add(PageExtender.create({
         link.updateText(enabled);
         
         var aNastaveni = $X('.//a[@id = "plus_nastaveni"]', div);
-        if (!aNastaveni) 
+        if (aNastaveni == null) 
             throw new Exception(String.format("Unable to find 'plus_nastaveni' link."));
         aNastaveni.href = MaPlus.buildUrl(page, "main.html", { plus: "nastaveni" });
         
         // Stop execution
         if (!enabled)
             throw new AbortException("MaPlus is disabled.");
+        
+        // Zobraz upozorneni na vypis seznamu alianci
+        if (MaData.getStariSeznamuAlianci() > MAX_STARI_SEZNAMU_ALIANCI) {
+            MaPlusMenu.zobrazUpozorneni('Prosím navštivte seznam aliancí.');
+        }
             
         return true;
     },

@@ -73,6 +73,43 @@ pageExtenders.add(PageExtender.create({
     process: null
 }));
 
+// Analyza seznamu alianci
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Aliance - Seznam"; },
+
+    analyze: function(page, context) {
+        var typStranky = page.arguments["aliance"];
+        if (typStranky != "vypis_alianci")
+            return false;
+        
+        var tableAliance = $X('font[2]/table', page.content);
+        if (tableAliance == null)
+            return false;
+        
+        for (var i = 2; i < tableAliance.rows.length - 1; i++) {
+            var tr = tableAliance.rows[i];
+            var aVypis = $X('td[1]/font/a', tr);
+            if (aVypis == null)
+                continue;
+            
+            var id = aVypis.getAttribute("href");
+            if (id) id = id.match(/&aliance=vypis_clenu_v_ally_(\d+)\b/);
+            if (id) id = parseInt(id[1]);
+            
+            if (id && !isNaN(id)) {
+                var jmeno = tr.cells[1].textContent.replace(/\s+$/, "");
+                var presvedceni = tr.cells[4].textContent.replace(/\s/g, "")[0];
+                
+                MaData.aktualizujAlianci(jmeno, id, presvedceni);
+            }
+        }
+        
+        MaData.seznamAlianciUpdatovan();
+    },
+    
+    process: null
+}));
+
 // Analyza clenu aliance + aktivni id
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Aliance - Clenove"; },
@@ -125,8 +162,8 @@ pageExtenders.add(PageExtender.create({
         
         // Zrus ji provinciim ktere uz tam nejsou
         clenovePuvodni.each(function(id) {
-                MaData.aktualizujProvincii(id, null, null, null, null, ZADNA_ALIANCE);
-            });
+            MaData.aktualizujProvincii(id, null, null, null, null, ZADNA_ALIANCE);
+        });
             
         return (context.idClenu.length > 0);
     },
@@ -134,58 +171,121 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         // Aktivni id
         context.idClenu.each(function(i) {
-                var a = MaPlus.Tooltips.createActiveId(page, i.id)
-                
-                i.element.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;";
-                i.element.insertBefore(a, i.element.firstChild);
-            });
+            var a = MaPlus.Tooltips.createActiveId(page, i.id)
+            
+            i.element.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;";
+            i.element.insertBefore(a, i.element.firstChild);
+        });
     }
 }));
 
-// Analyza seznamu alianci
+// Analyza clenu vypisu moji aliance
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Aliance - Seznam"; },
+    getName: function() { return "Aliance - Vypisu moji aliance"; },
 
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
-        if (typStranky != "vypis_alianci")
+        if (!typStranky || typStranky.search("vypsat_") != 0)
             return false;
         
-        var tableAliance = $X('font[2]/table', page.content);
-        if (tableAliance == null)
+        var table = $X('font[3]/table', page.content);
+        if (table == null)
             return false;
         
-        for (var i = 2; i < tableAliance.rows.length - 1; i++) {
-            var tr = tableAliance.rows[i];
-            var aVypis = $X('td[1]/font/a', tr);
-            if (aVypis == null)
-                continue;
-            
-            var id = aVypis.getAttribute("href");
-            if (id) id = id.match(/&aliance=vypis_clenu_v_ally_(\d+)\b/);
-            if (id) id = parseInt(id[1]);
-            
-            if (id && !isNaN(id)) {
-                var jmeno = tr.cells[1].textContent.replace(/\s+$/, "");
-                var presvedceni = tr.cells[4].textContent.replace(/\s/g, "")[0];
-                
-                MaData.aktualizujAlianci(jmeno, id, presvedceni);
-            }
+        // Analyza
+        var jmenoAliance = XPath.evalString('font[1]', page.content);
+        var idAliance = parseInt(typStranky.match(/(?:vypsat_(\d+))?/)[1]);
+        
+        if (jmenoAliance == null || jmenoAliance.blank())
+            return false;
+        
+        // Uloz id aliance
+        if (!isNaN(idAliance)) {
+            MaData.aktualizujAlianci(jmenoAliance, idAliance, null);
         }
+        
+        // Zkus ziskat svoje presvedceni
+        var presvedceni = null;
+        var provincie = MaData.najdiProvincii(page.id);
+        if (provincie != null) {
+            presvedceni = provincie.presvedceni;
+        }
+        
+        // Projdi cleny
+        var clenovePuvodni = MaData.clenoveAliance(jmenoAliance);
+        context.idClenu = new Array();
+        
+        for (var i = 0; i < table.rows.length; i++) {
+            var tr = table.rows[i];
+            
+            var id = parseInt(tr.cells[0].textContent);
+            var regent = tr.cells[1].textContent.replace(/\s+$/, "");
+            var provincie = tr.cells[2].textContent.replace(/\s+$/, "");
+            
+            if (isNaN(id))
+                continue;
+                
+            clenovePuvodni = clenovePuvodni.without(id);
+            MaData.aktualizujProvincii(id, regent, provincie, null, presvedceni, jmenoAliance);
+            
+            // Pro aktivni id
+            context.idClenu.push({ element: tr.cells[0], id: id});
+        }
+        
+        // Zrus ji provinciim ktere uz tam nejsou
+        clenovePuvodni.each(function(id) {
+            MaData.aktualizujProvincii(id, null, null, null, null, ZADNA_ALIANCE);
+        });
+        
+        context.table = table;
+        return true;
     },
     
-    process: null
+    process: function(page, context) {
+        // Aktivni id
+        context.idClenu.each(function(i) {
+            var a = MaPlus.Tooltips.createActiveId(page, i.id)
+            a.innerHTML = '<span>' + i.id + '</span>';
+            
+            i.element.innerHTML = "<span>&nbsp;&nbsp;</span>";
+            i.element.insertBefore(a, i.element.firstChild);
+        });
+    }
 }));
 
+// TODO rozdelit tohle na Hromadne zpravy a analyzu samotnou
 // Hromadne zpravy - Nastaveni aliance
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Aliance - Hromadne zpravy"; },
+    getName: function() { return "Aliance - Nastaveni"; },
 
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
         if (!typStranky || typStranky.search("nastavit_") != 0)
             return false;
         
+        // Zjisit jaka aliance to je
+        var jmenoAliance = null;
+        var presvedceni = null;
+        var idAliance = parseInt(typStranky.match(/(?:nastavit_(\d+))?/)[1]);
+        
+        if (!isNaN(idAliance)) {
+            var aliance = MaData.najdiAlianci(null, idAliance);
+            
+            if (aliance) {
+                jmenoAliance = aliance.jmeno;
+                presvedceni = aliance.presvedceni;
+                
+                // Zkuz najit presvedceni pokud ho nema aliance
+                if (presvedceni == null) {
+                    var provincie = MaData.najdiProvincii(page.id);
+                    if (provincie != null)
+                        presvedceni = provincie.presvedceni;
+                }
+            }
+        }
+        
+        // Analyza
+        var clenovePuvodni = MaData.clenoveAliance(jmenoAliance);
         context.clenove = new Array();
         
         // Vytvor seznam radku se clenama
@@ -197,12 +297,27 @@ pageExtenders.add(PageExtender.create({
                 return; // continue;
 
             context.clenove.push({element: tr, id: id, link: link});
+            
+            // Analyza radku
+            var regent = tr.cells[3].textContent.replace(/\s+$/, "");
+            var provincie = tr.cells[4].textContent.replace(/\s+$/, "");
+            var povolani = tr.cells[5].textContent.replace(/\s+$/, "");
+            
+            clenovePuvodni = clenovePuvodni.without(id);
+            MaData.aktualizujProvincii(id, regent, provincie, null, presvedceni, jmenoAliance);
         });
         
+        // Zrus ji provinciim ktere uz tam nejsou
+        clenovePuvodni.each(function(id) {
+            MaData.aktualizujProvincii(id, null, null, null, null, ZADNA_ALIANCE);
+        });
+        
+        // Nepokracuj pokud nenalezeny zadni clenove
         if (context.clenove.length == 0)
             return false;
         
         context.tbody = context.clenove[0].element.parentNode;
+        context.trComment = $X('table[2]/tbody/tr[last() - 1]', page.content);
         return true;
     },
     
@@ -210,24 +325,23 @@ pageExtenders.add(PageExtender.create({
         var checks = new Array();
     
         // Pridej checkboxy k jednotlivym clenum
-        context.clenove.each(function(row) {     
-            var span = Element.create("span");
-            var check = span.appendChild(Element.create("input", null, {type: "checkbox", style: "margin-top: 0px; margin-bottom: 1px"}));
-            
+        context.clenove.each(function(row) {
+            var fontId = row.link.parentNode;
+            var tdJmeno = row.element.cells[3];
+        
             // Napsat checkbox
+            var check = Element.create("input", null, {type: "checkbox", style: "margin-top: 0px; margin-bottom: 1px"});
+            tdJmeno.insertBefore(check, tdJmeno.firstChild);
             checks.push({element: check, id: row.id});
-            
-            var tdJmeno = row.element.cells[4];
-            tdJmeno.insertBefore(span, tdJmeno.firstChild); // Vloz pred jmeno
             
             // Aktivni id
             var idLink = MaPlus.Tooltips.createActiveId(page, row.id);
-            row.link.parentNode.replaceChild(idLink, row.link);
+            fontId.replaceChild(idLink, row.link);
             row.link = idLink;
         });
         
         // Novy radek
-        var tr = context.tbody.appendChild(Element.create("tr"));
+        var tr = context.tbody.insertBefore(Element.create("tr"), context.trComment);
         tr.appendChild(Element.create("td", null, {colspan: 3}));
         
         var spanNapsat = tr.appendChild(Element.create("td", null, {colspan: 4}))

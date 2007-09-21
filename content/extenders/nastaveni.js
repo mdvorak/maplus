@@ -48,76 +48,80 @@ pageExtenders.add(PageExtender.create({
         return true;
     },
 
-    process: function(page, context) {
-        page.content.innerHTML = context.html.stripScripts();
+    process: function(page, context) {        
+        // Na konci html se vyvola funkce window.initNastaveni(); kde se provede vlastni inicializace
+        window.initNastaveni = function() {
+            window.initNastaveni = null;
         
-        context.html.evalScripts();
-
-        // Vyhledej vsechny konfiguracni elementy
-        var list = $XL('.//*[@onload and @onsave]', page.content);
-        var inputLoad = $X('.//input[@id="plus_loadConfig" and @type="button"]', page.content);
-        var inputSave = $X('.//input[@id="plus_saveConfig" and @type="button"]', page.content);
-        var spanZprava = $X('.//span[@id="plus_nastaveniZprava"]', page.content);
-        
-        if (!inputLoad || !inputSave || !spanZprava)
-            throw new Exception("Nepodarilo se najit nektery dulezity prvek.");
-        
-        // Inicializuj vsechny konfiguracni elementy
-        list.each(function(e) {
-				e.config = page.config;
-				e.onload = new Function(e.getAttribute("onload"));
-				e.onsave = new Function(e.getAttribute("onsave"));
-			});
-	
-		// Load a save funkce ktere nactou/ulozi vsechny elementy
-		var load = function() {
-		        try {
-		            console.group("Nacita se nastaveni do ovladacich prvku..");
-				    list.each(function(e) { e.onload(); });
-		            console.info("Nacitani dokonceno");
+            // Vyhledej vsechny konfiguracni elementy
+            var list = $XL('.//*[@onload and @onsave]', page.content);
+            var inputLoad = $X('.//input[@id="plus_loadConfig" and @type="button"]', page.content);
+            var inputSave = $X('.//input[@id="plus_saveConfig" and @type="button"]', page.content);
+            var spanZprava = $X('.//span[@id="plus_nastaveniZprava"]', page.content);
+            
+            if (!inputLoad || !inputSave || !spanZprava)
+                throw new Exception("Nepodarilo se najit nektery dulezity prvek.");
+            
+            // Inicializuj vsechny konfiguracni elementy
+            list.each(function(e) {
+			    e.config = page.config;
+			    e.onload = new Function(e.getAttribute("onload"));
+			    e.onsave = new Function(e.getAttribute("onsave"));
+		    });
+    	
+		    // Load a save funkce ktere nactou/ulozi vsechny elementy
+		    var load = function() {
+	            try {
+	                console.group("Nacita se nastaveni do ovladacich prvku..");
+			        list.each(function(e) { e.onload(); });
+	                console.info("Nacitani dokonceno");
                 }
                 finally {   
                     console.groupEnd();
-		        }
-			};
-			
-		var save = function() {
-		        try {
-		            console.group("Uklada se nastaveni..");
-				    list.each(function(e) { e.onsave(); });
-				    page.config.save();
-				    console.info("Ulozeni probehlo uspesne.");
-				}
+	            }
+		    };
+    			
+		    var save = function() {
+	            try {
+	                console.group("Uklada se nastaveni..");
+			        list.each(function(e) { e.onsave(); });
+			        page.config.save();
+			        console.info("Ulozeni probehlo uspesne.");
+			    }
                 finally {   
                     console.groupEnd();
-		        }
-			};
-			
-			
-		// Nacti aktualni hodnoty
-		load();
-		
-		const NOTICE_TIMEOUT = 5000;
-		
-		// Nastav funkce tlacitkum
-		inputLoad.onclick = function(event) {
-		        spanZprava.update(""); 
-		        load();
-		        spanZprava.update("Nastavení načteno.");
-		        
-		        var tracker = new Object();
-		        spanZprava.tracker = tracker;
-		        setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update(""); }, NOTICE_TIMEOUT);
+	            }
 		    };
-		    
-		inputSave.onclick = function(event) {
-		        spanZprava.update(""); 
-		        save();
-		        spanZprava.update("Nastavení uloženo.");
+    			
+    			
+		    // Nacti aktualni hodnoty
+		    load();
+    		
+		    const NOTICE_TIMEOUT = 5000;
+    		
+		    // Nastav funkce tlacitkum
+		    inputLoad.onclick = function(event) {
+	            spanZprava.update(""); 
+	            load();
+	            spanZprava.update("Nastavení načteno.");
 		        
-		        var tracker = new Object();
-		        spanZprava.tracker = tracker;
-		        setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update(""); }, NOTICE_TIMEOUT);
-		    };
+	            var tracker = new Object();
+	            spanZprava.tracker = tracker;
+	            setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update(""); }, NOTICE_TIMEOUT);
+	        };
+    		    
+		    inputSave.onclick = function(event) {
+	            spanZprava.update(""); 
+	            save();
+	            spanZprava.update("Nastavení uloženo.");
+		        
+	            var tracker = new Object();
+	            spanZprava.tracker = tracker;
+	            setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update(""); }, NOTICE_TIMEOUT);
+	        };
+        };
+        
+        // Zobraz html (cimz se spusti i vyse definovana funkce)
+        page.content.update(context.html);
     }
 }));

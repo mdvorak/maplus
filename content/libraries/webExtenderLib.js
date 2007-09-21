@@ -427,7 +427,7 @@ Page.prototype = {
         if (doc == null) doc = document;
     
         this.document = $(doc);
-        this.url = this.document.location.href;
+        this.url = this.document.location.href.replace(/#.*$/, "");
         this.name = this.url.match(/\/([\w.]+?)([?].+?)?$/)[1];
         
         // Analyze url encoded arguments

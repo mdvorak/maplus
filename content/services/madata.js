@@ -201,6 +201,25 @@ var MaData = {
         if (presvedceni && presvedceni != "") ali.setPref("presvedceni", presvedceni);
         
         ali.setAttribute("update", new Date());
+    },
+    
+    seznamAlianciUpdatovan_PROXY: Marshal.BY_VALUE,
+    seznamAlianciUpdatovan: function() {
+        this._ensureDataAreLoaded();
+            
+        this.seznamAlianci.setAttribute("update", new Date().getTime());
+    },
+    
+    getStariSeznamuAlianci_PROXY: Marshal.BY_VALUE,
+    getStariSeznamuAlianci: function() {
+        this._ensureDataAreLoaded();
+    
+        var s = this.seznamAlianci.getAttribute("update");
+        if (s == null || s.blank())
+            return Number.MAX_VALUE;
+            
+        var stari = new Date().getTime() - parseInt(s);
+        return isNaN(stari) ? Number.MAX_VALUE : stari;
     }
 };
 

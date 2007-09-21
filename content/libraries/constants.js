@@ -50,3 +50,4 @@ const AGE_NAME = "5.5";
 
 // Custom constants
 const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
+

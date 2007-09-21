@@ -119,6 +119,10 @@ td.nadpis
 		</tr>
 		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
 		
+		<!-- Vlastni linky -->
+		
+		<tr><td><input type="hidden" onsave="this.config.getMenu();" /></td></tr>
+		
 		<!-- TODO -->
 		
 		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
@@ -307,3 +311,25 @@ td.nadpis
 		</tr>
 	</tbody>
 </table>
+
+<!-- Vytvoreni noveho linku -->
+<div style="display: none; position: absolute; border: gray solid;">
+    <span>
+        Typ linku:
+        <br />
+        Melior Annis&nbsp;<input type="radio" name="typNovehoLinku" onclick="$('plus_linkMA').style.display = 'block'; $('plus_linkExterni').style.display = 'none';" checked="checked" />
+        <br />
+        Externí&nbsp;<input type="radio" name="typNovehoLinku" onclick="$('plus_linkMA').style.display = 'none'; $('plus_linkExterni').style.display = 'block';" />
+    </span>
+    <div id="plus_linkMA">
+    </div>
+    <div id="plus_linkExterni" style="display: none;">
+        <span>Url:&nbsp;</span><input type="text" style="width: 450px;" />
+    </div>
+</div>
+
+<!-- Inicializuj obrazovku -->
+<script type="text/javascript">
+// Metoda definovana v /content/extenders/nastaveni.js
+window.initNastaveni();
+</script>
