@@ -42,21 +42,34 @@ pageExtenders.add(PageExtender.create({
         var typStranky = page.arguments["aliance"];
 
         if (!typStranky) {
-            var nastavit = $XL('.//a[starts-with(@href, "aliance.html") and font = "Nastavit"]', page.content);
+            var table = $X('table[2]', page.content);
             
-            if (nastavit.length > 0) {
+            if (table != null) {
                 var aliConfig = page.config.getRegent().getPrefNode("aliance", true);
                 var aliance = new Array();
                 aliConfig.clearChildNodes();
-                
-                nastavit.each(function(a) {
-                        var m = a.href.match(/&aliance=nastavit_(\d+)/);
-                        if (m && m[1]) {
-                            aliConfig.addPref("id", m[1]);
-                            aliance.push(Number(m[1]));
-                        }
-                    });
+            
+                for (var i = 0; i < table.rows.length; i++) {
+                    var tr = table.rows[i];
+                    var nastavit = $X('a[starts-with(@href, "aliance.html") and font = "Nastavit"]', tr.cells[3]);
                     
+                    var m = nastavit.href.match(/&aliance=nastavit_(\d+)/);
+                    var id = (m != null) ? m[1] : null;
+                    
+                    // Id nenalezeno, tohle by sice nemelo nastat ale..
+                    if (id == null)
+                        continue;
+                    
+                    var jmeno = tr.cells[0].textContent.replace(/\s+$/, "");
+                    var presvedceni = tr.cells[2].textContent[0];
+                    
+                    aliConfig.addPref("id", m[1]);
+                    aliance.push(Number(m[1]));
+                    
+                    // Aktualizuj alianci
+                    MaData.aktualizujAlianci(jmeno, id, presvedceni);
+                }
+                
                 console.debug("Jsem clenem alianci: %o", aliance);
             }
             else {
