@@ -49,18 +49,21 @@ pageExtenders.add(PageExtender.create({
         if (context.table == null)
             return false;
         // Kontrola jestli tabulka obsahuje nejake zaznamy
-        if (context.table.rows.length < 4)
+        if (context.table.rows.length < 5)
             return false;
 
         context.typ = XPath.evalString('tbody/tr[1]/td[2]/font/b', context.table);
         context.columns = context.table.rows[2].cells.length;
+        // Tohle sice nastane akorat na zacatku veku ale proc to tak nechat :)
+        if (context.columns == 1 && context.table.rows.length >= 5)
+            context.columns = context.table.rows[3].cells.length;
         
         // Analyza radku
         for (var i = 2; i < context.table.rows.length - 1; i++) {
             var tr = context.table.rows[i];
             var cells = tr.cells;
             
-            if (cells.length < 10)
+            if (cells.length < 8)
                 continue;
             
             var data = ElementDataStore.get(tr);
@@ -119,6 +122,7 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         // Pridej info sloupec do hlavicky
         context.table.rows[1].appendChild(Element.create("td", "&nbsp;"));
+        context.columns++;
     
         // Zpracuj radky
         for (var i = 2; i < context.table.rows.length - 1; i++) {

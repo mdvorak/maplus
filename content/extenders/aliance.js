@@ -181,7 +181,7 @@ pageExtenders.add(PageExtender.create({
 
 // Analyza clenu vypisu moji aliance
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Aliance - Vypisu moji aliance"; },
+    getName: function() { return "Aliance - Vypis aliance"; },
 
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
@@ -204,6 +204,13 @@ pageExtenders.add(PageExtender.create({
             MaData.aktualizujAlianci(jmenoAliance, idAliance, null);
         }
         
+        // Ignoruj tajnou
+        var tajna = MaData.najdiAlianci(jmenoAliance).tajna;
+        if (tajna) {
+            jmenoAliance = null;
+            idAliance = null;
+        }
+        
         // Zkus ziskat svoje presvedceni
         var presvedceni = null;
         var provincie = MaData.najdiProvincii(page.id);
@@ -224,7 +231,7 @@ pageExtenders.add(PageExtender.create({
             
             if (isNaN(id))
                 continue;
-                
+            
             clenovePuvodni = clenovePuvodni.without(id);
             MaData.aktualizujProvincii(id, regent, provincie, null, presvedceni, jmenoAliance);
             
@@ -271,16 +278,17 @@ pageExtenders.add(PageExtender.create({
         if (!isNaN(idAliance)) {
             var aliance = MaData.najdiAlianci(null, idAliance);
             
-            if (aliance) {
+            // Ignoruj tajnou
+            if (aliance && !aliance.tajna) {
                 jmenoAliance = aliance.jmeno;
                 presvedceni = aliance.presvedceni;
-                
-                // Zkuz najit presvedceni pokud ho nema aliance
-                if (presvedceni == null) {
-                    var provincie = MaData.najdiProvincii(page.id);
-                    if (provincie != null)
-                        presvedceni = provincie.presvedceni;
-                }
+            }
+            
+            // Zkuz najit presvedceni pokud ho nema aliance
+            if (presvedceni == null) {
+                var provincie = MaData.najdiProvincii(page.id);
+                if (provincie != null)
+                    presvedceni = provincie.presvedceni;
             }
         }
         

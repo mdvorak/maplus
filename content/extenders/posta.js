@@ -37,6 +37,7 @@
 var Posta = {
     ODDELOVAC: "____________",
     LINK_CONFIRM_TEXT: "Tento odkaz může vést na stránku s nebezpečným obsahem. Opravdu chcete pokračovat?",
+    POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:pošta v rámci aliance (.*))?$"),
     DULEZITOST_REGEX: /^:\W*(\w+)\W*\s*/
 }
 
@@ -138,6 +139,8 @@ pageExtenders.add(PageExtender.create({
         var tableZpravyList = $XL('form/table[@bgcolor = "#202020"]', page.content);
         var zpravy = new Array();
         
+        var tajnaOznacena = false;
+        
         // Analyzuj jednotlive zpravy
         for (var i = 0; i < tableZpravyList.length; i++) {
             var zprava = ElementDataStore.get(tableZpravyList[i]);
@@ -168,6 +171,15 @@ pageExtenders.add(PageExtender.create({
             console.info("Zprava %d: od=%d typ=%s dulezitost=%s, delka=%d cas=%s", zprava.id, zprava.od, zprava.typ, zprava.dulezitost, zprava.text.length, zprava.cas.toLocaleString());
             
             zpravy.push(zprava);
+            
+            // Oznac alianci jako tajnou
+            if (!tajnaOznacena && zprava.typ == "tajna") {
+                var jmenoAliance = zprava.text.match(Posta.POSTA_V_RAMCI_ALIANCE_REGEX)[1];
+                if (jmenoAliance != null) {
+                    MaData.aktualizujAlianci(jmenoAliance, null, null, true);
+                }
+                tajnaOznacena = true;
+            }
         }
         
         page.posta = {
@@ -214,16 +226,16 @@ pageExtenders.add(PageExtender.create({
             // Odpovedet vsem
             if (zprava.typ == "verejna" || zprava.typ == "tajna") {
                 // Data
-                var jmenoAliance = zprava.text.match(_this.POSTA_V_RAMCI_ALIANCE_REGEX)[1];
+                var jmenoAliance = zprava.text.match(Posta.POSTA_V_RAMCI_ALIANCE_REGEX)[1];
                 if (!jmenoAliance) {
-	                console.log("text:\n", zprava.text);
+	                // console.debug("text:\n", zprava.text);
                 }
                 
                 var aliance = MaData.najdiAlianci(jmenoAliance);
                 
                 var data = {
                     aliance: (aliance != null) ? aliance.id : null,
-                    text: zprava.text.replace(_this.POSTA_V_RAMCI_ALIANCE_REGEX, "")
+                    text: zprava.text.replace(Posta.POSTA_V_RAMCI_ALIANCE_REGEX, "")
                 };
                 
                 if (data.aliance != null) {           

@@ -160,6 +160,7 @@ var MaData = {
                 id: ali.getAttribute("id"),
                 jmeno: ali.getPref("jmeno"),
                 presvedceni: ali.getPref("presvedceni"),
+                tajna: ali.getBoolean("tajna"),
                 update: new Date(ali.getAttribute("update"))
             };
         }
@@ -176,7 +177,7 @@ var MaData = {
             
         zacatekJmena = zacatekJmena.replace(/[.]{2,3}$/, "");
         
-        var mozneAliance = this.seznamAlianci.evalPrefNodeList('aliance[starts-with(jmeno, "' + zacatekJmena + '")]');
+        var mozneAliance = this.seznamAlianci.evalPrefNodeList('aliance[starts-with(jmeno, "' + escape(zacatekJmena) + '")]');
         if (mozneAliance.length == 1)
             return mozneAliance[0].getPref("jmeno");
         else
@@ -184,7 +185,7 @@ var MaData = {
     },
     
     aktualizujAlianci_PROXY: Marshal.BY_VALUE,
-    aktualizujAlianci: function(jmeno, id, presvedceni) {
+    aktualizujAlianci: function(jmeno, id, presvedceni, tajna) {
         if (jmeno == null || jmeno == ZADNA_ALIANCE)
             return;
             
@@ -199,6 +200,7 @@ var MaData = {
         
         if (id && !isNaN(id)) ali.setAttribute("id", id);
         if (presvedceni && presvedceni != "") ali.setPref("presvedceni", presvedceni);
+        if (tajna != null) ali.setPref("tajna", !!tajna);
         
         ali.setAttribute("update", new Date());
     },
