@@ -312,7 +312,7 @@ pageExtenders.add(PageExtender.create({
             var povolani = tr.cells[5].textContent.replace(/\s+$/, "");
             
             clenovePuvodni = clenovePuvodni.without(id);
-            MaData.aktualizujProvincii(id, regent, provincie, null, presvedceni, jmenoAliance);
+            MaData.aktualizujProvincii(id, regent, provincie, povolani, presvedceni, jmenoAliance);
         });
         
         // Zrus ji provinciim ktere uz tam nejsou
