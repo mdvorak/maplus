@@ -33,8 +33,6 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
-$X('//iframe[@src = "http://spir.hit.gemius.pl/gemiusaudience.html"]').parentNode.innerHTML = '';
 
 var MaPlus = {
     buildUrl: function(page, pageName, args) {

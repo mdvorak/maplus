@@ -375,10 +375,10 @@ pageExtenders.add(PageExtender.create({
             checks.each(function(i) { i.element.checked = v; });
         });
         
-        spanNapsat.appendChild(document.createTextNode(" "));
+        spanNapsat.appendChild(document.createTextNode("\xA0"));
         
         // Pridej Napsat oznacenym link
-        var linkNapsatOznacenym = spanNapsat.appendChild(Element.create("a", '<span>Napsat označeným</span>', {href: "#"}));
+        var linkNapsatOznacenym = spanNapsat.appendChild(Element.create("a", '<span>Napsat označeným</span>', {href: "javascript://"}));
         Event.observe(linkNapsatOznacenym, 'click', function(event) {
             var ids = new Array();
             checks.each(function(i) {

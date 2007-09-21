@@ -251,7 +251,7 @@ pageExtenders.add(PageExtender.create({
                     
                     // Zobraz link
                     var root = zprava.linkPredat.parentNode;
-                    root.insertBefore(document.createTextNode(" "), root.firstChild);
+                    root.insertBefore(document.createTextNode("\xA0\xA0"), root.firstChild);
                     root.insertBefore(linkOdpovedetVsem, root.firstChild);
                     zprava.linkOdpovedetVsem = linkOdpovedetVsem;
                 }
@@ -302,7 +302,7 @@ pageExtenders.add(PageExtender.create({
             // Linky
             newHTML = newHTML.replace(/http(?:s?):\/\/\S+?(?=\s|$|<)/g, '<a href="$&" target="_blank" onclick="return confirm(\'' + Posta.LINK_CONFIRM_TEXT + '\');">$&</a>');
             // Aktivni id ve zpravach (TODO jen od posla?)
-            newHTML = newHTML.replace(/\((\d{4,6})\)/g, '(<a href="#" playerid="$1">$1</a>)');
+            newHTML = newHTML.replace(/\((\d{4,6})\)/g, '(<a href="javascript://" playerid="$1">$1</a>)');
             
             // Update html
             zprava.fontText.innerHTML = newHTML;
@@ -535,7 +535,7 @@ pageExtenders.add(PageExtender.create({
     		zprava.fontText.appendChild(divRozbalit);
     		
     		var header = zprava.linkPredat.parentNode;
-			header.insertBefore(document.createTextNode(" "), header.firstChild);
+			header.insertBefore(document.createTextNode("\xA0"), header.firstChild);
 			header.insertBefore(linkHeaderRozbalit, header.firstChild);
     	});
     }

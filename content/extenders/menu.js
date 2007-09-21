@@ -111,7 +111,7 @@ pageExtenders.add(PageExtender.create({
         var insertionPoint = context.alianceLink.nextSibling;
         
         elems.each(function(e) {
-                parent.insertBefore(document.createTextNode(" "), insertionPoint);
+                parent.insertBefore(document.createTextNode("\xA0"), insertionPoint);
                 parent.insertBefore(e, insertionPoint);
             });
     },

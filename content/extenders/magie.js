@@ -102,7 +102,7 @@ pageExtenders.add(PageExtender.create({
         context.naProvincii.each(function(e) {
                 var m = e.innerHTML.match(/^\((\d+)\)(.*)/);
                 var id = (m ? parseInt(m[1]) : null);
-                var provincie = (m ? m[2].replace(/&nbsp;/g, " ") : null);
+                var provincie = (m ? m[2].replace(/&nbsp;/g, "\xA0") : null);
                 
                 if (id && !isNaN(id)) {
                     e.innerHTML = "";
