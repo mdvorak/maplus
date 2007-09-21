@@ -42,7 +42,7 @@ const MAX_RADKU_DEFAULT = 30;
 const DEFAULT_SORT_CONDITION = "stack1.silaJednotky - stack2.silaJednotky";
 const DEFAULT_SORT_NAME = "silaJednotky";
 
-const MAX_STARI_SEZNAMU_ALIANCI = 14*24*60*60*1000;
+const MAX_STARI_SEZNAMU_ALIANCI = 14*24*60*60*1000; // 14 dni
 
 const JMENA_PRESVEDCENI = new Hash();
 JMENA_PRESVEDCENI["D"] = "Dobré";

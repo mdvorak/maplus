@@ -91,11 +91,14 @@ pageExtenders.add(PageExtender.create({
                 
                 var provincie = MaData.najdiProvincii(id);
                 if (provincie != null)
-                    popis += " " + provincie.regent + ", " + provincie.provincie;
+                    popis += "\xA0\xA0" + provincie.regent + ", " + provincie.provincie;
                 
-                vsichni.push({id: id, popis: popis});
+                vsichni.push({id: id, popis: popis, provincie: provincie});
             });
         });
+        
+        // Seradit
+        vsichni.sort(function(a, b) { return Object.compare(a.provincie.regent, b.provincie.regent); });
         
         // Napln select
         select.options.length = vsichni.length;

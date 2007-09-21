@@ -548,9 +548,9 @@ pageExtenders.add(PageExtender.create({
             var b = $X('span/b', h.cell);
             b.innerHTML = '';
             
-            new Insertion.Top(b, '&nbsp;');
+            b.appendChild(document.createTextNode("\xA0"));
             b.appendChild(linkTooltip);
-            new Insertion.Bottom(b, '&nbsp;');
+            b.appendChild(document.createTextNode("\xA0"));
         });
         
         // Link "Zrus filtrovani" nad tabulkou
@@ -615,7 +615,7 @@ pageExtenders.add(PageExtender.create({
                         });
                         
                         // Mezera
-                        new Insertion.Bottom(span, "&nbsp;&nbsp;");
+                        span.appendChild(document.createTextNode("\xA0\xA0"));
                     });
                     
                     return tooltip;

@@ -201,7 +201,7 @@ pageExtenders.add(PageExtender.create({
                 if (link) {
                     var font = r.cells.jmeno.firstChild;
                     font.replaceChild(link, font.firstChild);
-                    new Insertion.Top(font, "&nbsp;");
+                    font.insertBefore(document.createTextNode("\xA0"), font.firstChild);
                 }
             });
     }

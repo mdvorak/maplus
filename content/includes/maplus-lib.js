@@ -34,6 +34,8 @@
  * 
  * ***** END LICENSE BLOCK ***** */
  
+$X('//iframe[@src = "http://spir.hit.gemius.pl/gemiusaudience.html"]').parentNode.innerHTML = '';
+
 var MaPlus = {
     buildUrl: function(page, pageName, args) {
         if (!page || !pageName)

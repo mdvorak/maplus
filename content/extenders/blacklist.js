@@ -90,7 +90,7 @@ pageExtenders.add(PageExtender.create({
         var span = document.createElement("span");
         span.innerHTML = "(";
         span.appendChild(link);
-        new Insertion.After(link, ")&nbsp;&nbsp;");
+        span.appendChild(document.createTextNode(")\xA0\xA0"));
         
         td.innerHTML = "";
         td.appendChild(span);

@@ -202,7 +202,7 @@ var WebExtender = {
         var _this = this;
     
         var appcontent = win.document.getElementById("appcontent");        
-        appcontent.addEventListener("load", function(event) { _this._onPageLoad(event); }, true);
+        appcontent.addEventListener("DOMContentLoaded", function(event) { _this._onPageLoad(event); }, true);
         
         win.addEventListener("unload", function() { _this._onUnload(); }, false);
         

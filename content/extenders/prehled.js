@@ -151,9 +151,9 @@ pageExtenders.add(PageExtender.create({
             
             cells[2].innerHTML = '';
             var spanId = cells[2].appendChild(Element.create("span"));
-            new Insertion.Top(spanId, "&nbsp;&nbsp;");
+            spanId.appendChild(document.createTextNode("\xA0\xA0"));
             spanId.appendChild(linkId);
-            new Insertion.Bottom(spanId, "&nbsp;&nbsp;");
+            spanId.appendChild(document.createTextNode("\xA0\xA0"));
         }
         
         // Oprav okraje
