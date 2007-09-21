@@ -88,25 +88,26 @@ var BestiarSloupce = {
 	}
 };
 
-BestiarSloupce.pridej("jmeno", "Jednotka", "Jednotka", true, true, true);
-BestiarSloupce.pridej("barva", "", "Barva", true, true, true);
-BestiarSloupce.pridej("pocet", "Počet", "Počet", true, true, false);
-BestiarSloupce.pridej("zkusenost", "Zkušenost", "Zkušenost", true, true, false);
-BestiarSloupce.pridej("ini", "Ini", "Iniciativa", false, true, false);
-BestiarSloupce.pridej("silaJednotky", "Síla J.", "Síla J.", true, true, false);
-BestiarSloupce.pridej("typKratce", "Typ", "Typ/Druh/Phb", false, false, false);
-BestiarSloupce.pridej("druh", "Druh", "Druh", true, true, false);
-BestiarSloupce.pridej("typ", "Typ", "Typ", true, true, false);
-BestiarSloupce.pridej("phb", "Phb", "Pohyblivost", false, true, false);
-BestiarSloupce.pridej("silaStacku", "Síla", "Síla stacku", false, true, false);
-BestiarSloupce.pridej("maxSilaStacku", "Max síla", "Max síla stacku", false, false, false);
-BestiarSloupce.pridej("zlataTU", "zl/TU", "Zlata/TU", false, false, false);
-BestiarSloupce.pridej("manyTU", "mn/TU", "Many/TU", false, false, false);
-BestiarSloupce.pridej("popTU", "pop/TU", "Populace/TU", false, false, false);
-BestiarSloupce.pridej("cenaZaSilu", "Cena", "Cena za 1 síly", false, true, false);
-BestiarSloupce.pridej("cas", "Čas prodeje", "Čas prodeje", true, true, true);
-BestiarSloupce.pridej("nabidka", "Nabídka", "Nabídka", true, true, true);
-BestiarSloupce.pridej("rozsireni", "", "Rozšíření", false, true, false);
+//                    jmeno             nazev           popis               puvod, vychoz,povinny
+BestiarSloupce.pridej("jmeno",          "Jednotka",     "Jednotka",         true,  true,  true);
+BestiarSloupce.pridej("barva",          "",             "Barva",            true,  true,  true);
+BestiarSloupce.pridej("pocet",          "Počet",        "Počet",            true,  true,  false);
+BestiarSloupce.pridej("zkusenost",      "Zkušenost",    "Zkušenost",        true,  true,  false);
+BestiarSloupce.pridej("ini",            "Ini",          "Iniciativa",       false, true,  false);
+BestiarSloupce.pridej("silaJednotky",   "Síla J.",      "Síla J.",          true,  true,  false);
+BestiarSloupce.pridej("typKratce",      "Typ",          "Typ/Druh/Phb",     false, false, false);
+BestiarSloupce.pridej("druh",           "Druh",         "Druh",             true,  true,  false);
+BestiarSloupce.pridej("typ",            "Typ",          "Typ",              true,  true,  false);
+BestiarSloupce.pridej("phb",            "Phb",          "Pohyblivost",      false, true,  false);
+BestiarSloupce.pridej("silaStacku",     "Síla",         "Síla stacku",      false, true,  false);
+BestiarSloupce.pridej("maxSilaStacku",  "Max síla",     "Max síla stacku",  false, false, false);
+BestiarSloupce.pridej("zlataTU",        "zl/TU",        "Zlata/TU",         false, false, false);
+BestiarSloupce.pridej("manyTU",         "mn/TU",        "Many/TU",          false, false, false);
+BestiarSloupce.pridej("popTU",          "pop/TU",       "Populace/TU",      false, false, false);
+BestiarSloupce.pridej("cenaZaSilu",     "Cena",         "Cena za 1 síly",   false, true,  false);
+BestiarSloupce.pridej("cas",            "Čas prodeje",  "Čas prodeje",      true,  true,  true);
+BestiarSloupce.pridej("nabidka",        "Nabídka",      "Nabídka",          true,  true,  true);
+BestiarSloupce.pridej("rozsireni",      "",             "Rozšíření",        false, true,  false);
 
 
 /** Styl jednotlivych sloupcu **/

@@ -72,32 +72,3 @@ JMENA_BAREV["C"] = "Černá";
 JMENA_BAREV["S"] = "Šedá";
 JMENA_BAREV["F"] = "Fialová";
 JMENA_BAREV["N"] = "Neutrální";
-
-
-// Bestiar
-var BESTIAR_PUVODNI_SLOUPCE = ["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", "druh", "typ", "cas", "nabidka"];
-
-var BESTIAR_NAZVY_SLOUPCU = new Hash();
-// Puvodni
-BESTIAR_NAZVY_SLOUPCU["jmeno"] = "Jednotka";
-BESTIAR_NAZVY_SLOUPCU["barva"] = "";
-BESTIAR_NAZVY_SLOUPCU["pocet"] = "Počet";
-BESTIAR_NAZVY_SLOUPCU["zkusenost"] = "Zkušenost";
-BESTIAR_NAZVY_SLOUPCU["silaJednotky"] = "Síla J.";
-BESTIAR_NAZVY_SLOUPCU["druh"] = "Druh";
-BESTIAR_NAZVY_SLOUPCU["typ"] = "Typ";
-BESTIAR_NAZVY_SLOUPCU["cas"] = "Čas prodeje";
-BESTIAR_NAZVY_SLOUPCU["nabidka"] = "Nabídka";
-// Nove
-BESTIAR_NAZVY_SLOUPCU["typKratce"] = "Povaha";
-BESTIAR_NAZVY_SLOUPCU["phb"] = "Phb";
-BESTIAR_NAZVY_SLOUPCU["ini"] = "Ini";
-BESTIAR_NAZVY_SLOUPCU["maxSilaStacku"] = "Max síla";
-BESTIAR_NAZVY_SLOUPCU["silaStacku"] = "Síla";
-BESTIAR_NAZVY_SLOUPCU["cenaZaSilu"] = "Za 1 síly";
-BESTIAR_NAZVY_SLOUPCU["zlataTU"] = "zl/TU";
-BESTIAR_NAZVY_SLOUPCU["manyTU"] = "mn/TU";
-BESTIAR_NAZVY_SLOUPCU["popTU"] = "pop/TU";
-
-// Vychozi poradi sloupcu
-var BESTIAR_PORADI_SLOUPCU = ["jmeno", "barva", "pocet", "zkusenost", "silaJednotky", "ini", "typKratce", "druh", "typ", "phb", "maxSilaStacku", "silaStacku", "cenaZaSilu", "zlataTU", "manyTU", "popTU", "cas", "nabidka"];
