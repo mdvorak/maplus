@@ -312,9 +312,7 @@ XmlConfigManager.prototype = {
          if (!this._directory)
             throw "Invalid operation. Directory not set.";
     
-        var path = Components.classes["@mozilla.org/file/local;1"]
-                             .createInstance(Components.interfaces.nsILocalFile);
-        
+        var path = FileIO.createFileObject();        
         path.initWithFile(this._directory);
         path.append(name);
         return path;

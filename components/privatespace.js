@@ -46,6 +46,8 @@ function PrivateSpace() {
   this.wrappedJSObject = this;
 }
 
+var alert = function() { }
+
 // This is the implementation of your component.
 PrivateSpace.prototype = {
     initialize: function(win)
@@ -53,6 +55,8 @@ PrivateSpace.prototype = {
         if (this._initialized)
             return;
 
+        alert = function() { win.alert.apply(win, arguments); };
+        
         var jssubscriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
                                           .getService(Components.interfaces.mozIJSSubScriptLoader);
 

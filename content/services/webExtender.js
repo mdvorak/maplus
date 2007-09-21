@@ -197,13 +197,6 @@ var WebExtender = {
         this._unloadHandlers.push(callback);
     },
  
-    getDirectory: function() {
-        return Components.classes["@mozilla.org/extensions/manager;1"]
-                    .getService(Components.interfaces.nsIExtensionManager)
-                    .getInstallLocation(EXTENSION_ID)
-                    .getItemLocation(EXTENSION_ID);
-    },
-     
     /** Object implementation **/
     init: function(win) {
         var _this = this;
@@ -257,20 +250,6 @@ var WebExtender = {
     }
 };
 
-/*** DocumentHelper class ***/
-var DocumentHelper = {
-    createDocument: function(namespaceURI, qualifiedName, doctype) {
-        if (namespaceURI == null) namespaceURI = "";
-        if (qualifiedName == null) qualifiedName = "";
-    
-        var doc = Components.classes["@mozilla.org/xul/xul-document;1"]
-                            .createInstance()
-                            .implementation
-                            .createDocument(namespaceURI, qualifiedName, doctype);
-        return doc;
-    }
-};
-
 /*** Script class ***/
 var Script = Object.extend(Script || {}, {
     DEFAULT_CHARSET: "UTF-8",
@@ -303,71 +282,6 @@ var Script = Object.extend(Script || {}, {
         doc.body.appendChild(e);
     }
 });
-
-/*** FileIO class ***/
-var FileIO = {
-    loadText: function(url) {
-        if (url == null) throw new ArgumentNullException("url");
-        
-        var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-                            .createInstance()
-                            .QueryInterface(Components.interfaces.nsIXMLHttpRequest);
-        req.open("GET", url, false); 
-        req.send(null);
-        
-        return req.responseText;
-    },
-    
-    loadTextFile: function(file) {
-        if (file == null) throw new ArgumentNullException("file");
-        
-        var url = this._getFileUrl(file);
-        return this.loadText(url);
-    },
-
-    loadXml: function(url) {
-        if (url == null) throw new ArgumentNullException("url");
-    
-        var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-                            .createInstance()
-                            .QueryInterface(Components.interfaces.nsIXMLHttpRequest);
-        req.open("GET", url, false); 
-        req.send(null);
-        
-        return req.responseXML;
-    },
-
-    loadXmlFile: function(file) {
-        if (file == null) throw new ArgumentNullException("file");
-        
-        var url = this._getFileUrl(file);
-        return this.loadXml(url);
-    },
-
-    saveXmlFile: function(file, dom) {
-        if (file == null) throw new ArgumentNullException("file");
-        if (dom == null) throw new ArgumentNullException("dom");
-        
-        var serializer = new XMLSerializer();
-        var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
-                       .createInstance(Components.interfaces.nsIFileOutputStream);
-                       
-        foStream.init(file, 0x02 | 0x08 | 0x20, 0664, 0);   // write, create, truncate
-        serializer.serializeToStream(dom, foStream, ""); 
-        foStream.close();
-    },
-    
-    _getFileUrl: function(file) {
-        if (file == null) throw new ArgumentNullException("file");
-        
-        var ios = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
-        var fileHandler = ios.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
-        var url = fileHandler.getURLSpecFromFile(file);
-        
-        return url;
-    }
-};
-
 
 /*** Marshal server component class ***/
 var Marshal = new Object();
@@ -740,7 +654,7 @@ var ExtenderManager = {
         Script.execute(page.document, "(" + function() {
                 var page = new Page();
                 pageExtenders.run(page);
-            } + ")();" );
+            } + ")();");
     }
 }
 
@@ -752,7 +666,7 @@ ExtenderManager.Extenders = {
         
         if (name == null || !new RegExp("^[\\w./_~-]+$").test(name))
             throw new Exception(String.format("Invalid script name ('{0}').", name));
-        
+
         var src = data.location + name;
         var extender = new ScriptExtender(src, type, charset);
         return extender;

@@ -4,6 +4,7 @@
   <script src="libraries/prototype.js" />
   <script src="libraries/constants.js" />
   <script src="libraries/webExtenderLib.js" />
+  <script src="services/mozilla.js" />
   <script src="services/webExtender.js" />
   <script src="services/xmlConfig.js" />
 
