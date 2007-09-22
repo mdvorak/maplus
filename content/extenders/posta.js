@@ -162,12 +162,14 @@ pageExtenders.add(PageExtender.create({
             zprava.cas = this._parseDate(zprava.fontCas.textContent);
             zprava.text = zprava.fontText.innerHTML.replace(/<br\/?>/g, "\n").stripTags();
             
-            var m = zprava.text.match(Posta.DULEZITOST_REGEX);
-			if (m != null) {		
-			    zprava.dulezitost = m[1].toLowerCase();
-			    zprava.text = zprava.text.replace(Posta.DULEZITOST_REGEX, "").replace(/^\s*?\n/, "");
-			}
-             
+            if (zprava.typ != "posel") {
+                var m = zprava.text.match(Posta.DULEZITOST_REGEX);
+			    if (m != null) {		
+			        zprava.dulezitost = m[1].toLowerCase();
+			        zprava.text = zprava.text.replace(Posta.DULEZITOST_REGEX, "").replace(/^\s*?\n/, "");
+			    }
+            }
+            
             console.info("Zprava %d: od=%d typ=%s dulezitost=%s, delka=%d cas=%s", zprava.id, zprava.od, zprava.typ, zprava.dulezitost, zprava.text.length, zprava.cas.toLocaleString());
             
             zpravy.push(zprava);
@@ -293,19 +295,43 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
+        var linkRegex = /http(?:s?):\/\/\S+?(?=\s|$|<)/g;
+        var idRegex = /\((\d{4,6})\)/g;
+        
+        var found = false;
+        var linkReplacer = function(str) {
+            found = true;
+            return '<a href="' + str + '" target="_blank" onclick="return confirm(\'' + Posta.LINK_CONFIRM_TEXT + '\');">' + str + '</a>';
+        };
+        var idReplacer = function(str, p1) {
+            found = true;
+            return '(<a href="javascript://" playerid="' + p1 + '">' + p1 + '</a>)'
+        };
+    
         page.posta.zpravy.each(function(zprava) {
             if (zprava.typ == "posel")
                 return;
             
-            var newHTML = zprava.fontText.innerHTML;
+            for (var i = 0; i < zprava.fontText.childNodes.length; i++) {
+                var element = zprava.fontText.childNodes[i];
+                
+                // Analyzuj pouze text
+                if (element.nodeType != 3)
+                    continue;
+                
+                found = false;
+                var text = element.nodeValue;
+                
+                // Linky
+                text = text.replace(linkRegex, linkReplacer);
+                // Aktivni id ve zpravach (TODO jen od posla?)
+                text = text.replace(idRegex, idReplacer);
             
-            // Linky
-            newHTML = newHTML.replace(/http(?:s?):\/\/\S+?(?=\s|$|<)/g, '<a href="$&" target="_blank" onclick="return confirm(\'' + Posta.LINK_CONFIRM_TEXT + '\');">$&</a>');
-            // Aktivni id ve zpravach (TODO jen od posla?)
-            newHTML = newHTML.replace(/\((\d{4,6})\)/g, '(<a href="javascript://" playerid="$1">$1</a>)');
-            
-            // Update html
-            zprava.fontText.innerHTML = newHTML;
+                if (found) {
+                    var span = Element.create("span", text);
+                    element.parentNode.replaceChild(span, element);
+                }
+            }
             
             // Pridej handler linkum
             $XL('.//a[@playerid]', zprava.fontText).each(function(link) {
@@ -342,9 +368,13 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
     	// Nastav vsem scroll
     	context.sirokeZpravy.each(function(zprava) {
-    		var newHTML = '<div style="overflow-x: scroll;">' + zprava.fontText.innerHTML + '</div>'
-    		zprava.fontText.innerHTML = newHTML;
-    		zprava.divText = zprava.fontText.firstChild;
+    	    var container = zprava.fontText.parentNode;
+    	    var div = Element.create("div", null, {style: "overflow-x: scroll;"});
+    	    
+    	    div.appendChild(zprava.fontText);
+    	    container.appendChild(div);
+    	    
+    		zprava.divText = div;
     	});
     	
     	// Pak auto
@@ -432,47 +462,55 @@ pageExtenders.add(PageExtender.create({
     		if (zprava.typ == "posel" && page.arguments["posta"] == "nova")
     			return; // continue
     	
-    		var html = zprava.fontText.innerHTML;
-    	
-    	    // Zjisti pocet radku
     	    var radku = 0;
-    	    var zlomIndex = -1;  
-    	    
-    	    var r = /<br\/?>/g;
-    	    var m;
-    	    
-    	    while (radku < context.maxRadku && (m = r.exec(html)) != null) {
-    	    	++radku;
-    	    	if (radku > context.zobrazRadku && zlomIndex < 0)
-    	    		zlomIndex = r.lastIndex;
+    	    var zlom = null;
+    	
+    	    for (var i = 0; i < zprava.fontText.childNodes.length; i++) {
+    	        var element = zprava.fontText.childNodes[i];
+    	        
+    	        // Pripocti radky
+    	        if (String.equals(element.tagName, "br", true))
+    	            radku++;
+    	        else if (element.firstChild != null)
+    	            radku += XPath.evalNumber('count(.//br)', element);
+    	        
+    	        // Oznac zlomovy element
+    	        if (zlom == null && radku > context.zobrazRadku)
+                    zlom = element;
+    	        
+    	        // Nepokracuj v analyze pokud je zprava dlouha
+    	        if (radku > context.maxRadku)
+    	            break;
     	    }
-    	    
-    	    if (zlomIndex > 0 && radku >= context.maxRadku) {
+    	
+    	
+    	    if (zlom != null && radku > context.maxRadku) {
      	    	context.dlouheZpravy.push({
     	    		zprava: zprava,
-    	    		zlomIndex: zlomIndex
+    	    		zlom: zlom
     	    	});
     	    	
     	    	console.log("Zprava %d je dlouha.", zprava.id);
     	    }
     	});
     	
-    	// Najdi spravy s dulezitosti SPAM ktere uz vyprseli
-    	var maxStariSpamu = page.posta.config.getNumber("maxStariSpamu", 30*60); // default=30min
+    	// Najdi zpravy s dulezitosti SPAM ktere uz vyprseli
+    	var maxStariSpamu = page.posta.config.getNumber("maxStariSpamu", 30*60) * 1000; // default=30min
 
     	if (maxStariSpamu > 0) {
-    	    var aktualniCas = new Date();
+    	    var aktualniCas = new Date().getTime();
         	
     	    page.posta.zpravy.each(function(zprava) {
-                var stari = (aktualniCas.getTime() - zprava.cas.getTime()) / 1000;
-    	        
+    	        var stari = (aktualniCas - zprava.cas.getTime());
+    	        // Zjisti jestli zprava je prosly spam
                 if (zprava.dulezitost == "spam" && stari > maxStariSpamu) {
-    		        var r = /<br\/?>/g;
-    		        
-    		        if (r.exec(zprava.fontText.innerHTML) != null) {
+                    // Najdi zlom
+                    var zlom = $X('br[1]', zprava.fontText);
+                    
+    		        if (zlom != null) {
     		            context.dlouheZpravy.push({
     	    		        zprava: zprava,
-    	    		        zlomIndex: r.lastIndex
+    	    		        zlom: zlom
     	    	        });
     		        }
     		    
@@ -487,22 +525,16 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
     	context.dlouheZpravy.each(function(i) {
     		var zprava = i.zprava;
-    		var zlomIndex = i.zlomIndex;
-    		var html = zprava.fontText.innerHTML;
-    		
-    		// Pozn: u posla se najde vetsinou zlom nekde uvnitr <font>, cimz se
-    		// rozesere html, nicmene FF to zvladne a udela zlom az ten tag skonci
-    		// (coz muze byt o dost niz, ale opravit to by byl dost horor takze na to zatim kaslu)
-    		
-    		// TODO: Prochazet to nikoliv podle html ale podle child nodu a az u tech zkoumat innerHTML
+    		var zlom = i.zlom;
     		
     		// Link v hlavicce
     		var linkHeaderRozbalit = Element.create("a", "Rozbalit", {href: "javascript://"});
 			
-    		// Telo zpravy
-    		var divZacatek = Element.create("div", html.substring(0, zlomIndex));
-    		var divZbytek = Element.create("div", html.substring(zlomIndex));
-    		divZbytek.style.display = "none";
+    		// Rozdel telo zpravy
+    		var divZbytek = Element.create("div", null, {style: "display: none;"});
+    		while(zlom.nextSibling) {
+    		    divZbytek.appendChild(zlom.nextSibling);
+    		}    		
     		
     		// Link Rozbalit pod zpravou
     		var divRozbalit = Element.create("div", '...........&nbsp;&nbsp;');
@@ -529,8 +561,6 @@ pageExtenders.add(PageExtender.create({
     		Event.observe(linkRozbalit, 'click', toggle);
     		
     		// Zobraz
-    		zprava.fontText.innerHTML = "";
-    		zprava.fontText.appendChild(divZacatek);
     		zprava.fontText.appendChild(divZbytek);
     		zprava.fontText.appendChild(divRozbalit);
     		

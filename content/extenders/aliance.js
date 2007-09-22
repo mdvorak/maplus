@@ -42,16 +42,20 @@ pageExtenders.add(PageExtender.create({
         var typStranky = page.arguments["aliance"];
 
         if (!typStranky) {
+            // Proved analyzu
             var table = $X('table[2]', page.content);
             
             if (table != null) {
                 var aliConfig = page.config.getRegent().getPrefNode("aliance", true);
                 var aliance = new Array();
-                aliConfig.clearChildNodes();
             
                 for (var i = 0; i < table.rows.length; i++) {
                     var tr = table.rows[i];
                     var nastavit = $X('a[starts-with(@href, "aliance.html") and font = "Nastavit"]', tr.cells[3]);
+                    
+                    // Pokud v nejakym radku neni link nastavit sme na spatne obrazovce! (nastane pri nabidce paktu napr)
+                    if (nastavit == null)
+                        return false;
                     
                     var m = nastavit.href.match(/&aliance=nastavit_(\d+)/);
                     var id = (m != null) ? m[1] : null;
@@ -63,7 +67,6 @@ pageExtenders.add(PageExtender.create({
                     var jmeno = tr.cells[0].textContent.replace(/\s+$/, "");
                     var presvedceni = tr.cells[2].textContent[0];
                     
-                    aliConfig.addPref("id", m[1]);
                     aliance.push(Number(m[1]));
                     
                     // Aktualizuj alianci
@@ -71,6 +74,10 @@ pageExtenders.add(PageExtender.create({
                 }
                 
                 console.debug("Jsem clenem alianci: %o", aliance);
+                aliConfig.clearChildNodes();
+                aliance.each(function(id) {
+                    aliConfig.addPref("id", id);
+                });
             }
             else {
                 var nejsemClenem = $X('font[starts-with(., "Momentálně") and contains(., "nejste")]', page.content);

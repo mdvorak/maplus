@@ -53,8 +53,8 @@ pageExtenders.add(PageExtender.create({
     },
     
     analyze: function(page, context) {
-        // Bestiar
-        if (page.arguments["obchod"] != "jedn_new")
+        // Bestiar (mysli i na POST)
+        if (page.arguments["obchod"] != null && page.arguments["obchod"] != "jedn_new")
             return false;
 
         var tableData = $X('.//table[tbody/tr/td[contains(font/b, "prodeje")]]', page.content);
