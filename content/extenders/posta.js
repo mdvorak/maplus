@@ -159,7 +159,7 @@ pageExtenders.add(PageExtender.create({
             zprava.typ = trHeader.className.match(/(?:_([a-zA-Z]+))?$/)[1];
             zprava.od = (zprava.linkOd != null) ? zprava.linkOd.textContent : null;
             zprava.psal = trHeader.cells[0].textContent.replace(/\s+\(/g, " (");
-            zprava.id = parseInt(zprava.linkPredat.href.match(/\bpredat=(\d+)\b/)[1]);
+            zprava.id = (zprava.linkPredat != null) ? parseInt(zprava.linkPredat.href.match(/\bpredat=(\d+)\b/)[1]) : null;
             zprava.cas = this._parseDate(zprava.fontCas.textContent);
             zprava.text = zprava.fontText.innerHTML.replace(/<br\/?>/g, "\n").stripTags();
             
@@ -221,7 +221,9 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         var _this = this;
-    
+        
+        var alianceCache = new Hash();
+
         // Uprava linku
         page.posta.zpravy.each(function(zprava) {
             var psal = "&psal=" + escape(zprava.psal);
@@ -234,7 +236,11 @@ pageExtenders.add(PageExtender.create({
 	                // console.debug("text:\n", zprava.text);
                 }
                 
-                var aliance = MaData.najdiAlianci(jmenoAliance);
+                var aliance = alianceCache[jmenoAliance];
+                if (aliance == null) {
+                    aliance = MaData.najdiAlianci(jmenoAliance);
+                    alianceCache[jmenoAliance] = aliance;
+                }
                 
                 var data = {
                     aliance: (aliance != null) ? aliance.id : null,
@@ -266,7 +272,8 @@ pageExtenders.add(PageExtender.create({
             // Psal
             if (zprava.linkOdpovedet != null)
                 zprava.linkOdpovedet.href += psal;
-            zprava.linkPredat.href += psal;
+            if (zprava.linkPredat != null)
+                zprava.linkPredat.href += psal;
             
             // Aktivni id
             if (zprava.linkOd != null && zprava.od != null) {
@@ -297,21 +304,26 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         var linkRegex = /http(?:s?):\/\/\S+?(?=\s|$|<)/g;
-        var idRegex = /\((\d{4,6})\)/g;
+        var idRegex = /\((\d{4,6})\)|ID\s?(\d{4,6})/g;
         
         var found = false;
         var linkReplacer = function(str) {
             found = true;
             return '<a href="' + str + '" target="_blank" onclick="return confirm(\'' + Posta.LINK_CONFIRM_TEXT + '\');">' + str + '</a>';
         };
-        var idReplacer = function(str, p1) {
+        var idReplacer = function(str, p1, p2) {
             found = true;
-            return '(<a href="javascript://" playerid="' + p1 + '">' + p1 + '</a>)'
+            if (p1.length > 0)
+                return '(<a href="javascript://" playerid="' + p1 + '">' + p1 + '</a>)'
+            else 
+                return 'ID <a href="javascript://" playerid="' + p2 + '">' + p2 + '</a>'
         };
     
         page.posta.zpravy.each(function(zprava) {
             if (zprava.typ == "posel")
                 return;
+            
+            var test = false;
             
             for (var i = 0; i < zprava.fontText.childNodes.length; i++) {
                 var element = zprava.fontText.childNodes[i];
@@ -325,20 +337,23 @@ pageExtenders.add(PageExtender.create({
                 
                 // Linky
                 text = text.replace(linkRegex, linkReplacer);
-                // Aktivni id ve zpravach (TODO jen od posla?)
+                // Aktivni id ve zpravach 
                 text = text.replace(idRegex, idReplacer);
             
                 if (found) {
                     var span = Element.create("span", text);
                     element.parentNode.replaceChild(span, element);
+                    test = true;
                 }
             }
             
-            // Pridej handler linkum
-            $XL('.//a[@playerid]', zprava.fontText).each(function(link) {
-                var id = parseInt(link.getAttribute("playerid"));
-                MaPlus.Tooltips.createActiveId(page, id, link);
-            });
+            if (test) {
+                // Pridej handler linkum
+                $XL('.//a[@playerid]', zprava.fontText).each(function(link) {
+                    var id = parseInt(link.getAttribute("playerid"));
+                    MaPlus.Tooltips.createActiveId(page, id, link);
+                });
+            }
         });
     }
 }));

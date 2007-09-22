@@ -87,8 +87,10 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         // Analyzuj  
-        page.provincie = {
+        var p = {
             zlato: parseInt(XPath.evalString('tbody/tr[td[1] = "Zlato:"]/td[2]', table)),
+            mana: Number.NaN,
+            maxMana: Number.NaN,
             populace: parseInt(XPath.evalString('tbody/tr[td[1] = "Populace:"]/td[2]', table)),
             rozloha: parseInt(XPath.evalString('tbody/tr[td[1] = "Rozloha:"]/td[2]', table)),
             volnych: parseInt(XPath.evalString('tbody/tr[td[1] = "Volných:"]/td[2]', table)),
@@ -102,13 +104,21 @@ pageExtenders.add(PageExtender.create({
         if (manaStr != null) {
             var m = manaStr.match(/^\s*(\d+)\s+\((\d+)%\)\s*$/);
             if (m != null) {
-                page.provincie.mana = parseInt(m[1]);
-                page.provincie.maxMana = Math.floor(100 * page.provincie.mana / parseInt(m[2]));
-                
-                console.debug("Mana: %d, Max Many: %d", page.provincie.mana, page.provincie.maxMana);
+                p.mana = parseInt(m[1]);
+                p.maxMana = Math.floor(100 * p.mana / parseInt(m[2]));
             }
         }
         
+        // Zmen vsechny NaN na 0
+        for (var i in p) {
+            if (isNaN(p[i]))
+                p[i] = 0;
+        }
+        
+        page.provincie = p;
+        
+        // Debug hlaska
+        console.info("Provincie zlato=%d, mana=%d/%d, populace=%d, rozloha=%d/%d, sila=%d, prot=%o", p.zlato, p.mana, p.maxMana, p.populace, p.volnych, p.rozloha, p.sila, p.protV > 0);
         return true;
     },
     

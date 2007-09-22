@@ -134,28 +134,31 @@ pageExtenders.add(PageExtender.create({
         context.posledniBojMinuty = null;
         
         page.tableRozdane.utoky.each(function(utok) {
-                if (utok.cas < 24*60)
-                    context.utokuZaPosledniDen++;
-                if (utok.typ.search("nevráceno") > -1)
-                    context.nevracenoPrv++;
-                if (context.posledniBojMinuty == null || utok.cas < context.posledniBojMinuty)
-                    context.posledniBojMinuty = utok.cas;
-            });
+            if (utok.cas < 24*60)
+                context.utokuZaPosledniDen++;
+            if (utok.typ.search("nevráceno") > -1)
+                context.nevracenoPrv++;
+            if (context.posledniBojMinuty == null || utok.cas < context.posledniBojMinuty)
+                context.posledniBojMinuty = utok.cas;
+        });
         
         context.nevracenoCsek = 0;
         context.prvDoProtu = 3;
         
         page.tableBranene.utoky.each(function(utok) {
-                if (utok.typ.search("nevráceno") > -1)
-                    context.nevracenoCsek++; 
-                if (utok.typ.search("prvoútok") > -1 
-                        && utok.status == "prošel" 
-                        && (context.posledniBojMinuty == null || utok.cas < context.posledniBojMinuty))
-                    context.prvDoProtu--;
-            });
-            
-        // TODO nejsem uz v protu?
-        context.prvDoProtu = Math.max(0, context.prvDoProtu);
+            if (utok.typ.search("nevráceno") > -1)
+                context.nevracenoCsek++; 
+            if (utok.typ.search("prvoútok") > -1 
+                    && utok.status == "prošel" 
+                    && (context.posledniBojMinuty == null || utok.cas < context.posledniBojMinuty))
+                context.prvDoProtu--;
+        });
+        
+        // Nejsem uz v protu?
+        if (page.provincie.protV > 0)
+            context.prvDoProtu = 0;
+        else
+            context.prvDoProtu = Math.max(0, context.prvDoProtu);
         
         return true;
     },
@@ -236,28 +239,28 @@ pageExtenders.add(PageExtender.create({
 
     process: function(page, context) {
         context.vsechnyUtoky.each(function(utok) {
-                var tr = utok.row;
-        
-                // Obarvy uroven
-                if (context.barvy) {
-                    tr.cells.uroven.style.color = Color.fromRange(utok.uroven, 125, 50, Color.Pickers.redGreen);
-                }
-                
-                // Linky
-                var link = MaPlus.Tooltips.createActiveId(page, utok.id);
-                tr.cells.id.innerHTML = "<span></span>";
-                tr.cells.id.valign = "middle";
-                tr.cells.id.firstChild.appendChild(link);
+            var tr = utok.row;
+    
+            // Obarvy uroven
+            if (context.barvy) {
+                tr.cells.uroven.style.color = Color.fromRange(utok.uroven, 125, 50, Color.Pickers.redGreen);
+            }
+            
+            // Linky
+            var link = MaPlus.Tooltips.createActiveId(page, utok.id);
+            tr.cells.id.innerHTML = "<span></span>";
+            tr.cells.id.valign = "middle";
+            tr.cells.id.firstChild.appendChild(link);
 
-                // Nahrad v typu newline mezerou 
-                tr.cells.typ.innerHTML = tr.cells.typ.innerHTML.replace('<br>', ' ');
-                
-                // Tooltip kdy vyprsi utok
-                var casUtoku = new Date().getTime() - utok.cas * 60 * 1000;
-                var vyprsi = new Date(casUtoku + 72 * 3600 * 1000);
-                vyprsi.setSeconds(0, 0);
-                
-                tr.cells.cas.setAttribute("title", "Vyprší: " + vyprsi.toLocaleString().replace(/:00$/, ""));
-            });
+            // Nahrad v typu newline mezerou 
+            tr.cells.typ.innerHTML = tr.cells.typ.innerHTML.replace('<br>', ' ');
+            
+            // Tooltip kdy vyprsi utok
+            var casUtoku = new Date().getTime() - utok.cas * 60 * 1000;
+            var vyprsi = new Date(casUtoku + 72 * 3600 * 1000);
+            vyprsi.setSeconds(0, 0);
+            
+            tr.cells.cas.setAttribute("title", "Vyprší: " + vyprsi.toLocaleString().replace(/:00$/, ""));
+        });
     }
 }));
