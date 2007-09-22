@@ -36,6 +36,7 @@
     <script url="#{melior}/boj.html" name="utok-boj.js" />
     <script url="#{melior}/posta.html" name="posta.js" />
     <script url="#{melior}/prehled.html" name="prehled.js" />
+    <script url="#{melior}/budovy.html" name="stavet.js" />
 
     <!-- Nastaveni -->
     <script url="#{melior}/main.html" name="bestiar-style.js" />

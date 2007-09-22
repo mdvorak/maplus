@@ -154,6 +154,7 @@ pageExtenders.add(PageExtender.create({
             zprava.linkPredat = $X('td//a[. = "Předat"]', trHeader);
             zprava.fontCas = $X('td[2]/font[2]', trHeader);
             zprava.fontText = $X('tbody/tr[2]/td/p/font', zprava.element);
+            // TODO input oznacit
             
             zprava.typ = trHeader.className.match(/(?:_([a-zA-Z]+))?$/)[1];
             zprava.od = (zprava.linkOd != null) ? zprava.linkOd.textContent : null;
@@ -568,6 +569,8 @@ pageExtenders.add(PageExtender.create({
 			header.insertBefore(document.createTextNode("\xA0"), header.firstChild);
 			header.insertBefore(linkHeaderRozbalit, header.firstChild);
     	});
+    	
+    	// TODO Sbalit vse
     }
 }));
 

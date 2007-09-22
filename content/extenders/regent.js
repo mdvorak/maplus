@@ -76,3 +76,41 @@ pageExtenders.add(PageExtender.create({
     
     process: null
 }));
+
+
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Analyza - Provincie"; },
+
+    analyze: function(page, context) {
+        var table = $X('table[tbody/tr[1]/td[1] = "Zlato:"]', page.leftMenu);
+        if (table == null)
+            return false;
+        
+        // Analyzuj  
+        page.provincie = {
+            zlato: parseInt(XPath.evalString('tbody/tr[td[1] = "Zlato:"]/td[2]', table)),
+            populace: parseInt(XPath.evalString('tbody/tr[td[1] = "Populace:"]/td[2]', table)),
+            rozloha: parseInt(XPath.evalString('tbody/tr[td[1] = "Rozloha:"]/td[2]', table)),
+            volnych: parseInt(XPath.evalString('tbody/tr[td[1] = "Volných:"]/td[2]', table)),
+            zbyva: parseInt(XPath.evalString('tbody/tr[td[1] = "zbývá:"]/td[2]', table)),
+            sila: parseInt(XPath.evalString('tbody/tr[td[1] = "Síla\xA0P.:"]/td[2]', table)),
+            protV: parseInt(XPath.evalString('tbody/tr[td[1] = "Prot.\xA0V:"]/td[2]', table)),
+            protM: parseInt(XPath.evalString('tbody/tr[td[1] = "Prot.\xA0M:"]/td[2]', table))
+        };
+        
+        var manaStr = XPath.evalString('tbody/tr[td[1] = "Mana:"]/td[2]', table);
+        if (manaStr != null) {
+            var m = manaStr.match(/^\s*(\d+)\s+\((\d+)%\)\s*$/);
+            if (m != null) {
+                page.provincie.mana = parseInt(m[1]);
+                page.provincie.maxMana = Math.floor(100 * page.provincie.mana / parseInt(m[2]));
+                
+                console.debug("Mana: %d, Max Many: %d", page.provincie.mana, page.provincie.maxMana);
+            }
+        }
+        
+        return true;
+    },
+    
+    process: null
+}));
