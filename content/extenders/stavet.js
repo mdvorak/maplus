@@ -43,8 +43,8 @@ pageExtenders.add(PageExtender.create({
             
         var table = $X('table[1]', page.content);
         var form = $X('.//form[@action = "stavet.html"]', page.content);
-        var selectBudova = $X('select[@name = "budova"]', form);
-        var inputKolik = $X('input[@name = "kolik"]', form);
+        var selectBudova = $X('.//select[@name = "budova"]', form);
+        var inputKolik = $X('.//input[@name = "kolik"]', form);
         
         if (table == null || selectBudova == null || inputKolik == null)
             return;
@@ -118,9 +118,9 @@ pageExtenders.add(PageExtender.create({
         context.inputKolik = inputKolik;
         
         if (page.config.getBoolean("obrazky", true)) {
-            context.plusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plus.png" class="link" />';
-            context.plusplusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plusplus.png" class="link" />';
-            context.vseText = '<img src="' + CHROME_CONTENT_URL + 'html/img/vse.png" class="link" />';
+            context.plusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plus.png" class="link" alt="" />';
+            context.plusplusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plusplus.png" class="link" alt="" />';
+            context.vseText = '<img src="' + CHROME_CONTENT_URL + 'html/img/vse.png" class="link" alt="" />';
         }
         else {
             context.plusText = "+";

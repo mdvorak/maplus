@@ -39,11 +39,12 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Bezpecne linky"; },
 
     analyze: function(page, context) {
-        context.list = $XL('//a[@href != "javascript://" and not(@onclick)]');    
-        return context.list.length > 0;
+        // Vyhledani je az v process aby se zahrnuly veskere upravy stranky
+        return true;
     },
     
     process: function(page, context) {
-        context.list.each(function(e) { SafeLink.initLink(e); });
+        var list = $XL('//a[@href != "javascript://" and not(@onclick)]');    
+        var list.each(function(e) { SafeLink.initLink(e); });
     }
 }));

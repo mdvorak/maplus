@@ -290,16 +290,11 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        // Bugfix (lokalni promenna se prepisuje)
-        var copyDescriptionFactory = function(description) {
-            return function() { Clipboard.copyText(description); };
-        };
-    
         // Zpracuj tabulku
-        for (var i = 0; i < page.bestiar.table.data.length; i++) {
-            var row = page.bestiar.table.data[i];
+        for (let i = 0; i < page.bestiar.table.data.length; i++) {
+            let row = page.bestiar.table.data[i];
         
-            var td = row.columns["rozsireni"];
+            let td = row.columns["rozsireni"];
             if (td == null)
                 continue;
         
@@ -307,14 +302,14 @@ pageExtenders.add(PageExtender.create({
             td.innerHTML = "";
             
             // Kopiruj popis
-            var copy = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/copy.png" />', {href: "javascript://"});
+            let copy = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/copy.png" alt="" />', {href: "javascript://"});
             copy.setAttribute("title", "Zkopíruje popis stacku do schránky");
-            Event.observe(copy, 'click', copyDescriptionFactory(row.description));
+            Event.observe(copy, 'click', function() { Clipboard.copyText(row.description); });
             td.appendChild(copy);
             
             // Zobraz chybejici sloupce
             if (context.chybejiciTemplate != null) {
-                var chybejici = this._createMissingTooltip(context.chybejiciTemplate, i, row.data);
+                let chybejici = this._createMissingTooltip(context.chybejiciTemplate, i, row.data);
                 td.appendChild(Element.create("span", "&nbsp;"));
                 td.appendChild(chybejici);
             }
@@ -322,7 +317,7 @@ pageExtenders.add(PageExtender.create({
     },
     
     _createMissingTooltip: function(template, index, data) {
-        var link = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/questionmark.png" />', {href: "javascript://"});
+        var link = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/questionmark.png" alt="" />', {href: "javascript://"});
         link.setAttribute("title", "Zobrazí skryté informace o stacku.");
         
         var tooltipName = "missing_" + index;
