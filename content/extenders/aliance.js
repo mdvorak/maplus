@@ -78,6 +78,25 @@ pageExtenders.add(PageExtender.create({
                 aliance.each(function(id) {
                     aliConfig.addPref("id", id);
                 });
+                
+                // Uloz jejich typ pokud se da odvodit a neni jiz znam
+                if (aliance.length == 2) {
+                    var a1 = MaData.najdiAlianci(null, aliance[0]);
+                    var a2 = MaData.najdiAlianci(null, aliance[1]);
+                    
+                    if (a1.typ == "tajna" && a2.typ != "verejna") {
+                        MaData.aktualizujAlianci(a2.jmeno, null, null, "verejna");
+                    }
+                    else if (a1.typ == "verejna" && a2.typ != "tajna") {
+                        MaData.aktualizujAlianci(a2.jmeno, null, null, "tajna");
+                    }
+                    else if (a2.typ == "tajna" && a1.typ != "verejna") {
+                        MaData.aktualizujAlianci(a1.jmeno, null, null, "verejna");
+                    }
+                    else if (a2.typ == "verejna" && a1.typ != "tajna") {
+                        MaData.aktualizujAlianci(a1.jmeno, null, null, "tajna");
+                    }
+                }
             }
             else {
                 var nejsemClenem = $X('font[starts-with(., "Momentálně") and contains(., "nejste")]', page.content);
@@ -88,6 +107,8 @@ pageExtenders.add(PageExtender.create({
                 }
             }
         }
+        
+        return true;
     },
     
     process: null
