@@ -51,7 +51,7 @@
     </tr>
     <tr>
         <td>
-            <span id="plus_upozorneni" class="small" style="color: Red;"></span>
+            <span id="plus_upozorneni" class="small"></span>
         </td>
     </tr>
 </table>
@@ -84,7 +84,7 @@ var MaPlusMenu = {
             return;
     
         var span = $('plus_upozorneni');
-        span.appendChild(Element.create("span", text, {class: "small"}));
+        span.appendChild(Element.create("span", text, {class: "maplusUpozorneni"}));
         span.appendChild(Element.create("br"));
     }
 };

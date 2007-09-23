@@ -79,6 +79,12 @@ img.link
     color: #603030;
 }
 
+.maplusUpozorneni 
+{
+	font-size: x-small;
+	color: red;
+}
+
 /* Druh a typ */
 .druhPoz { color: green; }
 .druhLet { color: lightblue; }

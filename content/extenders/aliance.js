@@ -151,7 +151,7 @@ pageExtenders.add(PageExtender.create({
             return false;
             
         // Prvne aktualizuj samotnou ali
-        MaData.aktualizujAlianci(jmenoAliance, idAliance, null);
+        MaData.aktualizujAlianci(jmenoAliance, idAliance, null, "verejna");
         
         // Zjisti presvedceni
         var aliance = MaData.najdiAlianci(jmenoAliance);
@@ -218,19 +218,21 @@ pageExtenders.add(PageExtender.create({
         
         if (jmenoAliance == null || jmenoAliance.blank())
             return false;
-        
-        // Uloz id aliance
-        if (!isNaN(idAliance)) {
-            MaData.aktualizujAlianci(jmenoAliance, idAliance, null);
-        }
-        
-        // Ignoruj tajnou
-        var tajna = MaData.najdiAlianci(jmenoAliance).tajna;
-        if (tajna) {
-            jmenoAliance = null;
+            
+        if (isNaN(idAliance))
             idAliance = null;
+        
+        // Pouze tajna aliance ma vice nez 25 clenu
+        var typAliance = null;
+        if (table.rows.length > MAX_CLENU_VEREJNE_ALIANCE) {
+            typAliance = "tajna";
         }
         
+        // Uloz id nebo typ aliance
+        if (typAliance != null || idAliance != null) {
+            MaData.aktualizujAlianci(jmenoAliance, idAliance, null, typAliance);
+        }
+ 
         // Zkus ziskat svoje presvedceni
         var presvedceni = null;
         var provincie = MaData.najdiProvincii(page.id);
@@ -241,7 +243,7 @@ pageExtenders.add(PageExtender.create({
         // Projdi cleny
         var clenovePuvodni = MaData.clenoveAliance(jmenoAliance);
         context.idClenu = new Array();
-        
+
         for (var i = 0; i < table.rows.length; i++) {
             var tr = table.rows[i];
             
@@ -280,15 +282,18 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-// TODO rozdelit tohle na Hromadne zpravy a analyzu samotnou
-// Hromadne zpravy - Nastaveni aliance
+
+// Analyza clenu - Nastaveni aliance
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Aliance - Nastaveni"; },
+    getName: function() { return "Aliance - Analyza Nastaveni"; },
 
     analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
         if (!typStranky || typStranky.search("nastavit_") != 0)
             return false;
+            
+        // Seznam radku se clenama
+        var rows = $XL('table[2]/tbody/tr[position() > 1 and count(td) >= 7]', page.content);
         
         // Zjisit jaka aliance to je
         var jmenoAliance = null;
@@ -298,35 +303,34 @@ pageExtenders.add(PageExtender.create({
         if (!isNaN(idAliance)) {
             var aliance = MaData.najdiAlianci(null, idAliance);
             
-            // Ignoruj tajnou
-            if (aliance && !aliance.tajna) {
+            if (aliance != null && aliance.typ != "tajna") {
+                // Pokud je pocet clenu vetsi nez max u verejky, oznac ji jako tajnou
+                if (rows.length > MAX_CLENU_VEREJNE_ALIANCE) {
+                    aliance.typ = "tajna";
+                    MaData.aktualizujAlianci(aliance.jmenoAliance, null, null, aliance.typ);
+                }
+            }
+            
+            if (aliance != null) {
+                // Pokud je aliance tajna bude automaticky jako tajna nastavena
                 jmenoAliance = aliance.jmeno;
                 presvedceni = aliance.presvedceni;
             }
-            
-            // Zkuz najit presvedceni pokud ho nema aliance
-            if (presvedceni == null) {
-                var provincie = MaData.najdiProvincii(page.id);
-                if (provincie != null)
-                    presvedceni = provincie.presvedceni;
+            else {
+                idAliance = null;
             }
         }
         
         // Analyza
         var clenovePuvodni = MaData.clenoveAliance(jmenoAliance);
-        context.clenove = new Array();
         
         // Vytvor seznam radku se clenama
-        var rows = $XL('table[2]/tbody/tr[position() > 1 and count(td) >= 7]', page.content);
         rows.each(function(tr) {
             var link = $X('td[3]/font/a', tr);
             var id = parseInt(link.textContent);
             if (isNaN(id))
                 return; // continue;
 
-            context.clenove.push({element: tr, id: id, link: link});
-            
-            // Analyza radku
             var regent = tr.cells[3].textContent.replace(/\s+$/, "");
             var provincie = tr.cells[4].textContent.replace(/\s+$/, "");
             var povolani = tr.cells[5].textContent.replace(/\s+$/, "");
@@ -340,6 +344,36 @@ pageExtenders.add(PageExtender.create({
             MaData.aktualizujProvincii(id, null, null, null, null, ZADNA_ALIANCE);
         });
         
+        return true;
+    },
+    
+    process: null
+}));
+
+
+// Hromadne zpravy - Nastaveni aliance
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Aliance - Hromadne Zpravy"; },
+
+    analyze: function(page, context) {
+        var typStranky = page.arguments["aliance"];
+        if (!typStranky || typStranky.search("nastavit_") != 0)
+            return false;
+        
+        
+        // Vytvor seznam radku se clenama
+        context.clenove = new Array();
+        var rows = $XL('table[2]/tbody/tr[position() > 1 and count(td) >= 7]', page.content);
+        
+        rows.each(function(tr) {
+            var link = $X('td[3]/font/a', tr);
+            var id = parseInt(link.textContent);
+            if (isNaN(id))
+                return; // continue;
+
+            context.clenove.push({element: tr, id: id, link: link});
+        });
+
         // Nepokracuj pokud nenalezeny zadni clenove
         if (context.clenove.length == 0)
             return false;

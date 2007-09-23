@@ -193,12 +193,12 @@ pageExtenders.add(PageExtender.create({
             Event.observe(linkPlusPlus, "click", function() { vybratCallback(5 * multiplier); });
             
             pridejSloupec(data.element, linkPlus).style.width = 15;
-            pridejSloupec(data.element, linkPlusPlus).style.width = 27;
+            pridejSloupec(data.element, linkPlusPlus).style.width = 15;
             
             // Vse
             var linkVse = Element.create("a", context.vseText, {href: "javascript://"});
             Event.observe(linkVse, "click", function() { vybratCallback(Number.POSITIVE_INFINITY); });
-            pridejSloupec(data.element, linkVse).style.width = 14;
+            pridejSloupec(data.element, linkVse).style.width = 15;
             
             pridejSloupec(data.element, Element.create("span", "\xA0(" + data.pocet + ")", {class: "small"}));
         }

@@ -108,7 +108,21 @@ var MaData = {
         if (provincie && provincie != "") provi.setPref("provincie", provincie);
         if (povolani && povolani != "") provi.setPref("povolani", povolani);
         if (presvedceni && presvedceni != "") provi.setPref("presvedceni", presvedceni);
-        if (aliance && aliance != "") provi.setPref("aliance", (aliance != ZADNA_ALIANCE) ? aliance : null);
+        
+        if (aliance != null && aliance.length > 0) {
+            if (aliance == ZADNA_ALIANCE)
+                aliance = null;
+        
+            // Zjisti jestli je aliance tajna
+            var tajna = false;
+            if (aliance != null)
+                tajna = (this.seznamAlianci.evalPrefNode('aliance[jmeno = "' + aliance + '" and typ = "tajna"]') != null);
+            
+            if (!tajna)
+                provi.setPref("aliance", aliance);
+            else
+                provi.setPref("tajna", aliance);
+        }
         
         provi.setAttribute("update", new Date());
     },
@@ -131,7 +145,7 @@ var MaData = {
     
         // Vytvor seznam clenu
         var list = new Array();
-        var provincie = this.seznamProvincii.evalPrefNodeList('provincie[aliance = "' + jmenoAliance + '"]');
+        var provincie = this.seznamProvincii.evalPrefNodeList('provincie[aliance = "' + jmenoAliance + '" or tajna= "' + jmenoAliance + '"]');
         
         provincie.each(function(provi) {
                 var id = parseInt(provi.getAttribute("id"));
@@ -160,7 +174,7 @@ var MaData = {
                 id: ali.getAttribute("id"),
                 jmeno: ali.getPref("jmeno"),
                 presvedceni: ali.getPref("presvedceni"),
-                tajna: ali.getBoolean("tajna"),
+                typ: ali.getPref("typ"),
                 update: new Date(ali.getAttribute("update"))
             };
         }
@@ -185,7 +199,7 @@ var MaData = {
     },
     
     aktualizujAlianci_PROXY: Marshal.BY_VALUE,
-    aktualizujAlianci: function(jmeno, id, presvedceni, tajna) {
+    aktualizujAlianci: function(jmeno, id, presvedceni, typ) {
         if (jmeno == null || jmeno == ZADNA_ALIANCE)
             return;
             
@@ -200,11 +214,12 @@ var MaData = {
         
         if (id && !isNaN(id)) ali.setAttribute("id", id);
         if (presvedceni && presvedceni != "") ali.setPref("presvedceni", presvedceni);
-        if (tajna != null) ali.setPref("tajna", !!tajna);
+        if (typ != null) ali.setPref("typ", typ);
         
         ali.setAttribute("update", new Date());
     },
     
+    // Pro moznost upozorneni ze je seznam zastaraly
     seznamAlianciUpdatovan_PROXY: Marshal.BY_VALUE,
     seznamAlianciUpdatovan: function() {
         this._ensureDataAreLoaded();

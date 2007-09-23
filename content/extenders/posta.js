@@ -140,6 +140,7 @@ pageExtenders.add(PageExtender.create({
         var zpravy = new Array();
         
         var tajnaOznacena = false;
+        var verejnaOznacena = false;
         
         // Analyzuj jednotlive zpravy
         for (var i = 0; i < tableZpravyList.length; i++) {
@@ -175,13 +176,20 @@ pageExtenders.add(PageExtender.create({
             
             zpravy.push(zprava);
             
-            // Oznac alianci jako tajnou
+            // Uloz typ aliance
             if (!tajnaOznacena && zprava.typ == "tajna") {
                 var jmenoAliance = zprava.text.match(Posta.POSTA_V_RAMCI_ALIANCE_REGEX)[1];
                 if (jmenoAliance != null) {
-                    MaData.aktualizujAlianci(jmenoAliance, null, null, true);
+                    MaData.aktualizujAlianci(jmenoAliance, null, null, "tajna");
                 }
                 tajnaOznacena = true;
+            }
+            if (!verejnaOznacena && zprava.typ == "verejna") {
+                var jmenoAliance = zprava.text.match(Posta.POSTA_V_RAMCI_ALIANCE_REGEX)[1];
+                if (jmenoAliance != null) {
+                    MaData.aktualizujAlianci(jmenoAliance, null, null, "verejna");
+                }
+                verejnaOznacena = true;
             }
         }
         

@@ -75,36 +75,49 @@ pageExtenders.add(PageExtender.create({
     },
     
     _naplnSeznam: function(page, select) {
-        var vsichni = new Array();
-        
-        // Nacteni ulozenych alianci
-        var mojeAliance = page.config.getRegent().getPrefNode("aliance", true).evalPrefNodeList("id");
+        console.group("Vytvareni seznamu spolualiancniku");
+        try {
+            var vsichni = new Array();
             
-        $A(mojeAliance).each(function(i) {
-            var idAliance = i.getNumber();
-            if (isNaN(idAliance))
-                return; // continue;
+            // Nacteni ulozenych alianci
+            var mojeAliance = page.config.getRegent().getPrefNode("aliance", true).evalPrefNodeList("id");
+            var ids = new Array();
             
-            var clenove = MaData.clenoveAliance(null, idAliance);
-            clenove.each(function(id) {
-                var popis = String(id);
+            $A(mojeAliance).each(function(i) {
+                var idAliance = i.getNumber();
+                if (isNaN(idAliance))
+                    return; // continue;
                 
-                var provincie = MaData.najdiProvincii(id);
-                if (provincie != null)
-                    popis += "\xA0\xA0" + provincie.regent + ", " + provincie.provincie;
+                var clenove = MaData.clenoveAliance(null, idAliance);
+                clenove.each(function(id) {
+                    if (ids.indexOf(id) > -1)
+                        return; // continue;
+                    ids.push(id);
                 
-                vsichni.push({id: id, popis: popis, provincie: provincie});
+                    var popis = String(id);
+                    
+                    var provincie = MaData.najdiProvincii(id);
+                    if (provincie != null)
+                        popis += "\xA0\xA0" + provincie.regent + ", " + provincie.provincie;
+                    
+                    vsichni.push({id: id, popis: popis, provincie: provincie});
+                });
             });
-        });
-        
-        // Seradit
-        vsichni.sort(function(a, b) { return Object.compare(a.provincie.regent, b.provincie.regent); });
-        
-        // Napln select
-        select.options.length = vsichni.length;
-        for (var i = 0; i < vsichni.length; i++) {
-            select.options[i].value = vsichni[i].id;
-            select.options[i].text = vsichni[i].popis;
+            
+            // Seradit
+            vsichni.sort(function(a, b) { return Object.compare(a.provincie.regent, b.provincie.regent); });
+            
+            // Napln select
+            select.options.length = vsichni.length;
+            for (var i = 0; i < vsichni.length; i++) {
+                select.options[i].value = vsichni[i].id;
+                select.options[i].text = vsichni[i].popis;
+            }
+            
+            console.log("Dokonceno (%d)", vsichni.length);
+        }
+        finally {
+            console.groupEnd();
         }
     }
 }));

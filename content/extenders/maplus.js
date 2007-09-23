@@ -79,11 +79,11 @@ pageExtenders.add(PageExtender.create({
         if (!enabled)
             throw new AbortException("MaPlus is disabled.");
         
+        // Zobraz upozorneni na vypis seznamu alianci
         if (page.name != "aliance.html" && page.arguments["aliance"] != "vypis_alianci") {
-            // Zobraz upozorneni na vypis seznamu alianci
             if (MaData.getStariSeznamuAlianci() > MAX_STARI_SEZNAMU_ALIANCI) {
                 // TODO styl
-                MaPlusMenu.zobrazUpozorneni('Prosím navštivte <a href="' + MaPlus.buildUrl(page, "aliance.html", {aliance: "vypis_alianci"}) + '"><span class="small" style="color: red;">výpis aliancí</span></a>.');
+                MaPlusMenu.zobrazUpozorneni('Prosím navštivte <a href="' + MaPlus.buildUrl(page, "aliance.html", {aliance: "vypis_alianci"}) + '" class="maplusUpozorneni">výpis aliancí</a>.');
             }
         }
 

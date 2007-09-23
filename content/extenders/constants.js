@@ -44,6 +44,8 @@ const DEFAULT_SORT_NAME = "silaJednotky";
 
 const MAX_STARI_SEZNAMU_ALIANCI = 14*24*60*60*1000; // 14 dni
 
+const MAX_CLENU_VEREJNE_ALIANCE = 25;
+
 const JMENA_PRESVEDCENI = new Hash();
 JMENA_PRESVEDCENI["D"] = "Dobré";
 JMENA_PRESVEDCENI["N"] = "Neutrální";
