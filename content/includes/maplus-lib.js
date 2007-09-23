@@ -34,6 +34,18 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+Object.extend(Boolean, {
+    parse: function(str) {
+        if (str == null)
+            return false;
+        
+        if (String.equals(str, "true", true))
+            return true;
+        var n = parseInt(str);
+        return !isNaN(n) && (n != 0);
+    }
+});
+
 var MaPlus = {
     buildUrl: function(page, pageName, args) {
         if (!page || !pageName)
@@ -52,7 +64,6 @@ var MaPlus = {
 };
 
 /*** Colors ***/
-
 var Color = {
     fromRange: function(value, min, max, colorPicker) {
         if (isNaN(value) || isNaN(min) || isNaN(max))

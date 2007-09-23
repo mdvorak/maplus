@@ -129,7 +129,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Menu - Kalkulacka"; },
 
     analyze: function(page, context) {
-        context.kalkulacka = page.config.getPrefNode("kalkulacka", true);
+        context.kalkulacka = page.config.getMenu().getPrefNode("kalkulacka", true);
         if (!context.kalkulacka.getBoolean("zobrazit", true))
             return false;
     
@@ -157,7 +157,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Menu - Poznamky"; },
 
     analyze: function(page, context) {
-        context.poznamky = page.config.getPrefNode("poznamky", true);
+        context.poznamky = page.config.getMenu().getPrefNode("poznamky", true);
         if (!context.poznamky.getBoolean("zobrazit", true))
             return false;
     
@@ -185,7 +185,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Menu - Vlastni linky"; },
 
     analyze: function(page, context) {
-        var seznam = page.config.getMenu().getPrefNode('linky', true).evalPrefNodeList('url[link and text]');
+        var seznam = page.config.getMenu().getPrefNode('linky', true).evalPrefNodeList('url[text]');
         if (seznam.length == 0)
             return false;
         
@@ -194,17 +194,19 @@ pageExtenders.add(PageExtender.create({
         
         seznam.each(function(i) {
             var link = i.getPref("link");
-            if (link == null || link.length == 0)
-                return; // continue;
+            var text = i.getPref("text");
+            var externi = Boolean.parse(i.getAttribute("externi"));
+            var newWindow = Boolean.parse(i.getAttribute("newWindow"));
             
-            var externi = i.getAttribute("externi");
-            if (!String.equals(externi, "true", true) && !(parseInt(externi) > 0)) {
+            if (link != null && link.blank())
+                link = null;
+            
+            if (link != null && !externi) {
                 link += "&id=" + page.id + "&code=" + page.code;
                 if (page.ftc) link += "&ftc=" + page.ftc;
             }
 
-            var text = i.getPref("text");
-            context.list.push({url: link, text: text});
+            context.list.push({url: link, text: text, newWindow: newWindow});
         });
         
         return true;
@@ -214,12 +216,21 @@ pageExtenders.add(PageExtender.create({
         var spanCustomMenu = Element.create("span");
         
         context.list.each(function(i) {
-            var link = Element.create("a", i.text, {href: i.url});
-            page.rightMenu.appendChild(Element.create("br"));
-            spanCustomMenu.appendChild(link);
+            var element = null;
+            
+            if (i.url != null) {
+                element = Element.create("a", i.text, {href: i.url});
+                if (i.newWindow)
+                    element.setAttribute("target", "_blank");
+            }
+            else {
+                element = document.createTextNode(i.text.length > 0 && i.text != "-" ? i.text : '\xA0');
+            }
+            
+            spanCustomMenu.appendChild(Element.create("br"));
+            spanCustomMenu.appendChild(element);
         });
         
-        page.rightMenu.appendChild(Element.create("br"));
         page.rightMenu.appendChild(spanCustomMenu);
     }
 }));

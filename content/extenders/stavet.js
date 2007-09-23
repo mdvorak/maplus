@@ -117,7 +117,7 @@ pageExtenders.add(PageExtender.create({
         context.selectBudova = selectBudova;
         context.inputKolik = inputKolik;
         
-        if (page.config.getBoolean("obrazky", true)) {
+        if (page.config.getBarevnyText()) {
             context.plusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plus.png" class="link" alt="" />';
             context.plusplusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plusplus.png" class="link" alt="" />';
             context.vseText = '<img src="' + CHROME_CONTENT_URL + 'html/img/vse.png" class="link" alt="" />';
