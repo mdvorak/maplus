@@ -39,7 +39,8 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Obrana - Tabulka"; },
 
     analyze: function(page, context) {
-        page.tableObrana = $X('form/font/table/tbody/tr[9]/td/table', page.content);
+        page.tableObrana = $X('form/font/table/tbody/tr/td/table[tbody/tr[td = "* u ID paktáře znamená, že má do obrany nastaven můj pakt."]]', page.content);
+        return (page.tableObrana != null);
     },
     
     process: null
@@ -109,7 +110,7 @@ pageExtenders.add(PageExtender.create({
 
     process: function(page, context) {
         context.jednotky.each(function(i) {
-                var link = MaPlus.Tooltips.createActiveUnit(i.textContent);
+                var link = MaPlus.Tooltips.createActiveUnit(page, i.textContent);
                 
                 if (link) {
                     i.replaceChild(link, i.firstChild);

@@ -34,7 +34,7 @@
   - the terms of any one of the MPL, the GPL or the LGPL.
   - 
   - ***** END LICENSE BLOCK ***** -->
-<jednotky zmeneno="1.9.2007">
+<jednotky vek="5.6">
   <jednotka>
     <jmeno>Kobold</jmeno>
     <pwr>0.56</pwr>
@@ -416,7 +416,7 @@
     <ini>1</ini>
     <realIni>25</realIni>
     <zlataTU>2.22</zlataTU>
-    <manyTU>5.595</manyTU>
+    <manyTU>4.95</manyTU>
     <popTU>0</popTU>
   </jednotka>
   <jednotka>
@@ -666,7 +666,7 @@
     <typ>Boj.</typ>
     <druh>Let.</druh>
     <phb>1</phb>
-    <dmg>-3</dmg>
+    <dmg>-2</dmg>
     <brn>1</brn>
     <zvt>0</zvt>
     <ini>-1</ini>
@@ -793,15 +793,15 @@
     <barva>C</barva>
     <typ>Boj.</typ>
     <druh>Let.</druh>
-    <phb>2</phb>
-    <dmg>3</dmg>
-    <brn>-1</brn>
-    <zvt>-2</zvt>
+    <phb>3</phb>
+    <dmg>2</dmg>
+    <brn>0</brn>
+    <zvt>-1</zvt>
     <ini>-2</ini>
     <realIni>14</realIni>
     <zlataTU>0.225</zlataTU>
     <manyTU>0.225</manyTU>
-    <popTU>2.250</popTU>
+    <popTU>0.225</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Upír</jmeno>
@@ -810,7 +810,7 @@
     <typ>Boj.</typ>
     <druh>Let.</druh>
     <phb>1</phb>
-    <dmg>0</dmg>
+    <dmg>-2</dmg>
     <brn>1</brn>
     <zvt>0</zvt>
     <ini>-1</ini>
@@ -912,7 +912,7 @@
     <ini>-4</ini>
     <realIni>8</realIni>
     <zlataTU>0.000</zlataTU>
-    <manyTU>0.000</manyTU>
+    <manyTU>0.045</manyTU>
     <popTU>0.000</popTU>
   </jednotka>
   <jednotka>
@@ -1119,7 +1119,7 @@
     <zvt>-2</zvt>
     <ini>0</ini>
     <realIni>22</realIni>
-    <zlataTU>1.65</zlataTU>
+    <zlataTU>1.35</zlataTU>
     <manyTU>1.95</manyTU>
     <popTU>0</popTU>
   </jednotka>
@@ -1376,7 +1376,7 @@
     <ini>3</ini>
     <realIni>32</realIni>
     <zlataTU>0.63</zlataTU>
-    <manyTU>0.96</manyTU>
+    <manyTU>1.2</manyTU>
     <popTU>0.045</popTU>
   </jednotka>
   <jednotka>
@@ -1391,7 +1391,7 @@
     <zvt>1</zvt>
     <ini>2</ini>
     <realIni>28</realIni>
-    <zlataTU>0.855</zlataTU>
+    <zlataTU>0.93</zlataTU>
     <manyTU>1.875</manyTU>
     <popTU>0.075</popTU>
   </jednotka>
@@ -1418,7 +1418,7 @@
     <typ>Str.</typ>
     <druh>Poz.</druh>
     <phb>1</phb>
-    <dmg>1</dmg>
+    <dmg>2</dmg>
     <brn>-2</brn>
     <zvt>-4</zvt>
     <ini>5</ini>
@@ -1562,7 +1562,7 @@
     <typ>Boj.</typ>
     <druh>Poz.</druh>
     <phb>1</phb>
-    <dmg>-3</dmg>
+    <dmg>-2</dmg>
     <brn>3</brn>
     <zvt>2</zvt>
     <ini>0</ini>
@@ -1583,7 +1583,7 @@
     <zvt>1</zvt>
     <ini>1</ini>
     <realIni>26</realIni>
-    <zlataTU>8.25</zlataTU>
+    <zlataTU>10.05</zlataTU>
     <manyTU>10.35</manyTU>
     <popTU>0</popTU>
   </jednotka>
