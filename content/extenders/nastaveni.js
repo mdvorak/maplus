@@ -122,6 +122,8 @@ pageExtenders.add(PageExtender.create({
         };
         
         // Zobraz html (cimz se spusti i vyse definovana funkce)
-        page.content.update(context.html);
+        var div = Element.create("div", context.html);
+        page.content.innerHTML = '';
+        page.content.appendChild(div);
     }
 }));

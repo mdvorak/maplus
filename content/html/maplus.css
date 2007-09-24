@@ -114,3 +114,27 @@ img.link
 .attr-3 { background-color: #502020; }
 .attr-4 { background-color: #602020; }
 .attr-5 { background-color: #702020; }
+
+/* Nastaveni */
+.tabHeader
+{
+    border-color: #2A2A2A;
+    border-style: solid;
+    border-top-width: 0px;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 2px;
+    font-weight: bold;
+}
+
+.tabInactive
+{
+    color: lightgray;
+    text-decoration: none;
+}
+
+.tabActive
+{
+    color: white;
+    text-decoration: none;
+}

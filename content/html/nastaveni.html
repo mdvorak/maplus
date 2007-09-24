@@ -5,103 +5,16 @@ td.nadpis
     border-bottom-color: #2A2A2A;
     border-bottom-style: solid;
 }
-
-.tabHeader
-{
-    border-color: #2A2A2A;
-    border-style: solid;
-    border-top-width: 0px;
-    border-left-width: 0px;
-    border-right-width: 0px;
-    border-bottom-width: 1px;
-    font-weight: bold;
-}
-
-.tabInactive
-{
-    color: lightgray;
-    text-decoration: none;
-}
-
-.tabActive
-{
-    color: white;
-    text-decoration: none;
-}
 </style>
+<script type="text/javascript" src="chrome://maplus/content/html/tabmanager.js"></script>
 
-<!-------- Tab management -------->
-<div>
-    <table>
-        <tr id="plus_nastaveniHeader"></tr>
-        <tr><td colspan="20" style="border-top-width: 1px; border-color: #2A2A2A;">&nbsp;</td></tr>
-    </table>
-</div>
-<div id="plus_nastaveniBody">
-</div>
+<!-- Vytvoreni containeru pro taby -->
+<div id="plus_nastaveniContainer" style="text-align: left;"></div>
 <script type="text/javascript">
-window.TabManager = {
-    _divHeader: $('plus_nastaveniHeader'),
-    _divBody: $('plus_nastaveniBody'),
-    
-    _tabs: new Array(),
-    
-    addTab: function(title, body) {
-        body = $(body);
-        if (body == null) {
-            console.error("Body for tab %o not found.", title);
-            return;
-        }
-        
-        var tabs = this._tabs;
-        
-        // Create header
-        var td = Element.create("td", null, {class: "tabHeader"});
-        var header = Element.create("a", '<span>' + title + '</span>', {href: "javascript://", class: "tabInactive"});
-        td.appendChild(header);
-        
-        if (tabs.length > 0) {
-            td.style.borderLeftWidth = "1px";
-            header.className = "tabInactive";
-            body.style.display = "none";
-        }
-        else {
-            header.className = "tabActive";
-            body.style.display = "";
-            header.setAttribute("active", true);
-        }
-        
-        // Tab change handler
-        Event.observe(header, 'click', function() {
-            if (header.getAttribute("active") == "true")
-                return;
-        
-            // Reset status
-            tabs.each(function(t) {
-                t.header.className = "tabInactive";
-                t.header.setAttribute("active", false);
-                t.body.style.display = "none";
-            });
-            
-            header.className = "tabActive";
-            body.style.display = "";
-            header.setAttribute("active", true);
-            console.debug("Switched to tab '%s'", title);
-        });
-
-        tabs.push({
-            title: title,
-            header: header,
-            body: body
-        });
-    
-        this._divHeader.appendChild(td);
-        this._divBody.appendChild(body);
-    },
-};
+window.nastaveniManager = new TabManager('plus_nastaveniContainer');
 </script>
 
-<!-------- Definice tabu -------->
+<!-- Definice tabu -->
 <span id="plus_testTab1" style="display: none;">
     Test tab 1
 </span>
@@ -109,12 +22,14 @@ window.TabManager = {
     Test tab 2
 </span>
 
-
-
 <script type="text/javascript">
-TabManager.addTab("Test 1", "plus_testTab1");
-TabManager.addTab("Test 2", "plus_testTab2");
+nastaveniManager.addTab("Test 1", "plus_testTab1");
+nastaveniManager.addTab("Test 2", "plus_testTab2");
 </script>
+
+
+
+
 
 <!-- Starej kod -->
 <table>
@@ -446,3 +361,5 @@ TabManager.addTab("Test 2", "plus_testTab2");
 // Metoda definovana v /content/extenders/nastaveni.js
 window.initNastaveni();
 </script>
+
+

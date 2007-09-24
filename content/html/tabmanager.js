@@ -40,43 +40,51 @@ TabManager.prototype = {
     initialize: function(container) {
     	container = $(container);
     	if (container == null)
-    		throw new ArgumentNulLException("container");
+    		throw new ArgumentNullException("container");
     		
     	this.container = container;
     	
-    	// Create header elements
+    	// Root table
+    	var tableRoot = Element.create("table");
+    	var tbodyRoot = tableRoot.appendChild(Element.create("tbody"));
+    	
+    	// Create header element
+    	var tdHeaderRoot = tbodyRoot.appendChild(Element.create("tr")).appendChild(Element.create("td"));
+    	
     	var tableHeader = Element.create("table", null, {cellpadding: 0, cellspacing: 0});
     	var tbodyHeader = tableHeader.appendChild(Element.create("tbody"));
-    	var trHeader = tbodyHeader.appendChild(Element.create("tr"));
     	
-    	// Create body elements
-    	var divBody = Element.create("div");
+    	var headerContainer = tbodyHeader.appendChild(Element.create("tr"));
     	
-    	// Add elements to the container
-    	container.appendChild(tableHeader);
-    	container.appendChild(divBody);
+    	tdHeaderRoot.appendChild(tableHeader);
     	
-    	this.header = trHeader;
-    	this.body = divBody;
-    	this.rows = new Array();    	
+    	// Create body element
+    	var bodyContainer = tbodyRoot.appendChild(Element.create("tr")).appendChild(Element.create("td"));
+    	
+    	// Add table to the container
+    	container.appendChild(tableRoot);
+    	
+    	this.headerContainer = headerContainer;
+    	this.bodyContainer = bodyContainer;
+    	this.tabs = new Array();    	
     },
     
     addTab: function(title, body) {
+       if (title == null)
+            throw new ArgumentNulLException("title");
         body = $(body);
-        if (body == null) {
-            console.error("Body for tab %o not found.", title);
-            return;
-        }
+        if (body == null)
+            throw new ArgumentNulLException("body");
         
-        var tabs = this._tabs;
+        var tabs = this.tabs;
         
         // Create header
         var td = Element.create("td", null, {class: "tabHeader"});
-        var header = Element.create("a", '<span>' + title + '</span>', {href: "javascript://", class: "tabInactive"});
+        var header = Element.create("a", '<span>\xA0' + title + '\xA0</span>', {href: "javascript://", class: "tabInactive"});
         td.appendChild(header);
         
         if (tabs.length > 0) {
-            td.style.borderLeftWidth = "1px";
+            td.style.borderLeftWidth = "2px";
             header.className = "tabInactive";
             body.style.display = "none";
         }
@@ -110,7 +118,7 @@ TabManager.prototype = {
             body: body
         });
     
-        this._divHeader.appendChild(td);
-        this._divBody.appendChild(body);
+        this.headerContainer.appendChild(td);
+        this.bodyContainer.appendChild(body);
     }
 };
