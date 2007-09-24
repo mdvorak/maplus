@@ -137,7 +137,7 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         var maxTahu = page.config.getNumber("maxTahu", MAX_TAHU_DEFAULT);
-        var zprava = "Opravdu chcete odehr·t vÌce jak " + maxTahu + " tah˘?";
+        var zprava = "Opravdu chcete odehr√°t v√≠ce jak " + maxTahu + " tah≈Ø?";
         
         context.fields.each(function(e) {
             context.buttons.each(function(i) {
@@ -154,14 +154,14 @@ pageExtenders.add(PageExtender.create({
             var cekat = $X('//a[starts-with(@href, "wait.html")]');
             var objevovat = $X('//a[starts-with(@href, "explore.html")]');
             
-            var zprava2 = "Je moûnÈ, ûe odehrajete vÌce jak " + maxTahu + " tah˘, chcete pokraËovat?";
+            var zprava2 = "Je mo≈æn√©, ≈æe odehrajete v√≠ce jak " + maxTahu + " tah≈Ø, chcete pokraƒçovat?";
             
             if (cekat) {
-                cekat.onclick = function() { return confirm(zprava2); };
+                Event.observe(cekat, 'click', function(event) { if (!confirm(zprava2)) Event.stop(event); });
                 cekat.setAttribute("plus", true); // Debug
             }
             if (objevovat) {
-                objevovat.onclick = function() { return confirm(zprava2); };
+                Event.observe(objevovat, 'click', function(event) { if (!confirm(zprava2)) Event.stop(event); });
                 objevovat.setAttribute("plus", true); // Debug
             }
         }
