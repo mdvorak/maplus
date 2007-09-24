@@ -69,8 +69,8 @@ var Rules = {
         
         // Create callback function
         var callback = function(row1, row2) {
-            var stack1 = row1.stack;
-            var stack2 = row2.stack;
+            var stack1 = row1.data;
+            var stack2 = row2.data;
             
             if (stack1 == stack2)
                 return 0;
@@ -80,7 +80,7 @@ var Rules = {
                 return 1;
          
             for (var i = 0; i < __rules.length; i++) {
-                if (!__rules[i]) continue;
+                if (__rules[i] == null) continue;
                 
                 var r = eval(__rules[i]);
                 if (r != null && r != 0) return r;
@@ -88,7 +88,7 @@ var Rules = {
         };
         
         // Perform actual sorting
-        TableHelper.sort(table, callback);
+        TableHelper.sort(arguments[0], callback);
     },
 
     filter: function(/* table, arguments */) {
@@ -106,15 +106,16 @@ var Rules = {
         if (__rules != null && __rules.length > 0) {
             // Create callback function
             callback = function(row) {
-                var stack = row.stack;
+                var stack = row.data;
                 
                 if (stack == null)
                     return true;
 
                 for (var i = 0; i < __rules.length; i++) {
-                    if (!__rules[i]) continue;
+                    if (__rules[i] == null) continue;
                     
                     var r = eval(__rules[i]);
+                    console.debug(__rules[i] + " = " + r);
                     if (!r) return false;
                 }
                 

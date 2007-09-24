@@ -146,6 +146,7 @@ pageExtenders.add(PageExtender.create({
         }
         
         MaData.seznamAlianciUpdatovan();
+        return true;
     },
     
     process: null

@@ -49,6 +49,7 @@ var Tooltip = {
         tooltip.style.position = 'absolute';
         tooltip.style.left = '0px';
         tooltip.style.top = '0px';
+        tooltip.style.padding = '1px';
 
         if (html) {
             if (typeof html == "string")

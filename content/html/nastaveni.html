@@ -1,19 +1,122 @@
 <style type="text/css">
 td.nadpis 
 {
-	border-bottom-width: 1px;
-	border-bottom-color: #2A2A2A;
-	border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #2A2A2A;
+    border-bottom-style: solid;
+}
+
+.tabHeader
+{
+    border-color: #2A2A2A;
+    border-style: solid;
+    border-top-width: 0px;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 1px;
+    font-weight: bold;
+}
+
+.tabInactive
+{
+    color: lightgray;
+    text-decoration: none;
+}
+
+.tabActive
+{
+    color: white;
+    text-decoration: none;
 }
 </style>
-<!-- Taby -->
+
+<!-------- Tab management -------->
 <div>
+    <table>
+        <tr id="plus_nastaveniHeader"></tr>
+        <tr><td colspan="20" style="border-top-width: 1px; border-color: #2A2A2A;">&nbsp;</td></tr>
+    </table>
 </div>
-<!-- Obsah -->
-<div>
+<div id="plus_nastaveniBody">
 </div>
+<script type="text/javascript">
+window.TabManager = {
+    _divHeader: $('plus_nastaveniHeader'),
+    _divBody: $('plus_nastaveniBody'),
+    
+    _tabs: new Array(),
+    
+    addTab: function(title, body) {
+        body = $(body);
+        if (body == null) {
+            console.error("Body for tab %o not found.", title);
+            return;
+        }
+        
+        var tabs = this._tabs;
+        
+        // Create header
+        var td = Element.create("td", null, {class: "tabHeader"});
+        var header = Element.create("a", '<span>' + title + '</span>', {href: "javascript://", class: "tabInactive"});
+        td.appendChild(header);
+        
+        if (tabs.length > 0) {
+            td.style.borderLeftWidth = "1px";
+            header.className = "tabInactive";
+            body.style.display = "none";
+        }
+        else {
+            header.className = "tabActive";
+            body.style.display = "";
+            header.setAttribute("active", true);
+        }
+        
+        // Tab change handler
+        Event.observe(header, 'click', function() {
+            if (header.getAttribute("active") == "true")
+                return;
+        
+            // Reset status
+            tabs.each(function(t) {
+                t.header.className = "tabInactive";
+                t.header.setAttribute("active", false);
+                t.body.style.display = "none";
+            });
+            
+            header.className = "tabActive";
+            body.style.display = "";
+            header.setAttribute("active", true);
+            console.debug("Switched to tab '%s'", title);
+        });
+
+        tabs.push({
+            title: title,
+            header: header,
+            body: body
+        });
+    
+        this._divHeader.appendChild(td);
+        this._divBody.appendChild(body);
+    },
+};
+</script>
+
+<!-------- Definice tabu -------->
+<span id="plus_testTab1" style="display: none;">
+    Test tab 1
+</span>
+<span id="plus_testTab2" style="display: none;">
+    Test tab 2
+</span>
 
 
+
+<script type="text/javascript">
+TabManager.addTab("Test 1", "plus_testTab1");
+TabManager.addTab("Test 2", "plus_testTab2");
+</script>
+
+<!-- Starej kod -->
 <table>
     <colgroup>
         <col width="140" />
@@ -22,304 +125,304 @@ td.nadpis
         <col width="140" />
         <col width="100" />
     </colgroup>
-	<tbody>
-		<tr>
-			<td colspan="5" align="center"><b>Melior Annis Plus - Nastavení</b></td>
-		</tr>
-		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
-		<tr>
-			<td colspan="5"><span class="small" style="color: gray;"><span id="plus_nastaveniZprava" class="small"></span>&nbsp;</span></td>
-		</tr>
-		
-		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		<tr>
-		    <td colspan="5" class="nadpis">
-		        <span><b>Obecné</b></span>
-		    </td>
-		</tr>
-		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
-		<tr>
-			<td><span>Temné barvy</span></td>
-			<td>
-				<input type="checkbox"
-					onload="this.checked = this.config.getBoolean('temneBarvy', true);"
-					onsave="this.config.setPref('temneBarvy', this.checked);" />
-			</td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			
-			<td><span>Barevné texty</span></td>
-			<td>
-				<input type="checkbox"
-					onload="this.checked = this.config.getBarevnyText();"
-					onsave="this.config.setPref('barevnyText', this.checked);" />
-			</td>
+    <tbody>
+        <tr>
+            <td colspan="5" align="center"><b>Melior Annis Plus - Nastavení</b></td>
         </tr>
-		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        
+        <tr>
+            <td colspan="5"><span class="small" style="color: gray;"><span id="plus_nastaveniZprava" class="small"></span>&nbsp;</span></td>
+        </tr>
+        
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        <tr>
+            <td colspan="5" class="nadpis">
+                <span><b>Obecné</b></span>
+            </td>
+        </tr>
+        <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        
+        <tr>
+            <td><span>Temné barvy</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getBoolean('temneBarvy', true);"
+                    onsave="this.config.setPref('temneBarvy', this.checked);" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+            
+            <td><span>Barevné texty</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getBarevnyText();"
+                    onsave="this.config.setPref('barevnyText', this.checked);" />
+            </td>
+        </tr>
+        <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
         
 
-		<tr>
-			<td><span>Zobrazit kalkulačku</span></td>
-			<td>
-				<input type="checkbox"
-					onload="this.checked = this.config.getPrefNode('kalkulacka', true).getBoolean('zobrazit', true);"
-					onsave="this.config.getPrefNode('kalkulacka', true).setPref('zobrazit', this.checked);" />
-			</td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			
-			<td><span>Zobrazit poznámky</span></td>
-			<td>
-				<input type="checkbox"
-					onload="this.checked = this.config.getPrefNode('poznamky', true).getBoolean('zobrazit', true);"
-					onsave="this.config.getPrefNode('poznamky', true).setPref('zobrazit', this.checked);" />
-			</td>
-		</tr>
-		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
-		<tr>
-			<td><span>Limit tahů bez potvrzení</span></td>
-			<td>
-				<input type="text" style="width: 50;"
-					onload="this.value = this.config.getNumber('maxTahu', MAX_TAHU_DEFAULT);"
-					onsave="this.config.setPref('maxTahu', parseInt(this.value));" />
-			</td>
-		</tr>
-		<tr>
+        <tr>
+            <td><span>Zobrazit kalkulačku</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('kalkulacka', true).getBoolean('zobrazit', true);"
+                    onsave="this.config.getPrefNode('kalkulacka', true).setPref('zobrazit', this.checked);" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+            
+            <td><span>Zobrazit poznámky</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('poznamky', true).getBoolean('zobrazit', true);"
+                    onsave="this.config.getPrefNode('poznamky', true).setPref('zobrazit', this.checked);" />
+            </td>
+        </tr>
+        <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        
+        <tr>
+            <td><span>Limit tahů bez potvrzení</span></td>
+            <td>
+                <input type="text" style="width: 50;"
+                    onload="this.value = this.config.getNumber('maxTahu', MAX_TAHU_DEFAULT);"
+                    onsave="this.config.setPref('maxTahu', parseInt(this.value));" />
+            </td>
+        </tr>
+        <tr>
             <td colspan="2">
-				<span class="small dark">(Počet tahů které můžete odehrát aniž by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
-			</td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			
-			<td></td>
-			<td></td>
-		</tr>
-		
-		<!-- TODO -->
-		
-		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		<tr>
-		    <td colspan="5" class="nadpis">
-		        <span><b>Menu</b></span>
-		    </td>
-		</tr>
-		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
-		<tr>
-			<td><span>Rozšíření aliance</span></td>
-			<td>
-				<input type="checkbox"
-					onload="this.checked = this.config.getMenu().getBoolean('aliance', true);"
-					onsave="this.config.getMenu().setPref('aliance', this.checked);" />
-			</td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			
-			<td><span>Výpis útoků 2</span></td>
-			<td>
-				<input type="checkbox"
-					onload="this.checked = this.config.getMenu().getBoolean('vypisUtoku', true);"
-					onsave="this.config.getMenu().setPref('vypisUtoku', this.checked);" />
-			</td>
-		</tr>
-		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
-		<!-- Vlastni linky -->
-		
-		<tr><td><input type="hidden" onsave="this.config.getMenu();" /></td></tr>
-		
-		<!-- TODO -->
-		
-		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		<tr>
-		    <td colspan="5" class="nadpis">
-		        <span><b>Bestiář</b></span>
-		    </td>
-		</tr>
-		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
-		<tr>
-			<td colspan="2">
-			    <span>Vybrané sloupce</span>
-			    <br />
-			    <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;" />
-			</td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			
-			<td colspan="2" style="vertical-align: top;">
-			    <table>
+                <span class="small dark">(Počet tahů které můžete odehrát aniž by bylo vyžadováno potvrzení. 0 pro vypnutí.)</span>
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+            
+            <td></td>
+            <td></td>
+        </tr>
+        
+        <!-- TODO -->
+        
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        <tr>
+            <td colspan="5" class="nadpis">
+                <span><b>Menu</b></span>
+            </td>
+        </tr>
+        <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        
+        <tr>
+            <td><span>Rozšíření aliance</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getMenu().getBoolean('aliance', true);"
+                    onsave="this.config.getMenu().setPref('aliance', this.checked);" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+            
+            <td><span>Výpis útoků 2</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getMenu().getBoolean('vypisUtoku', true);"
+                    onsave="this.config.getMenu().setPref('vypisUtoku', this.checked);" />
+            </td>
+        </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        
+        <!-- Vlastni linky -->
+        
+        <tr><td><input type="hidden" onsave="this.config.getMenu();" /></td></tr>
+        
+        <!-- TODO -->
+        
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        <tr>
+            <td colspan="5" class="nadpis">
+                <span><b>Bestiář</b></span>
+            </td>
+        </tr>
+        <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        
+        <tr>
+            <td colspan="2">
+                <span>Vybrané sloupce</span>
+                <br />
+                <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+            
+            <td colspan="2" style="vertical-align: top;">
+                <table>
                     <colgroup>
                         <col width="140" />
                         <col width="100" />
                     </colgroup>
-	                <tbody>
+                    <tbody>
                         <!-- TODO -->
-	                </tbody>
-	            </table>
-			</td>
+                    </tbody>
+                </table>
+            </td>
         </tr>
-		<tr>
-			<td colspan="2" style="text-align: justify;">
-			    <span class="small">
-			        <a id="plus_bestiarVychozi" href="javascript://">Výchozí</a>
-			        &nbsp;
-			        <a id="plus_bestiarKompletni" href="javascript://">Kompletní</a>
-			        &nbsp;
-			        <a id="plus_bestiarPuvodni" href="javascript://">Původní</a>
-			        &nbsp;
-			    </span>
-			</td>
+        <tr>
+            <td colspan="2" style="text-align: justify;">
+                <span class="small">
+                    <a id="plus_bestiarVychozi" href="javascript://">Výchozí</a>
+                    &nbsp;
+                    <a id="plus_bestiarKompletni" href="javascript://">Kompletní</a>
+                    &nbsp;
+                    <a id="plus_bestiarPuvodni" href="javascript://">Původní</a>
+                    &nbsp;
+                </span>
+            </td>
         </tr>
         <td colspan="2">
             <span class="small dark">(Pro výběr použijte Ctrl nebo Shift)</span>
         </td>
-		<script type="text/javascript">
-		    function bestiarInit() {
-		        var selectBestiarSloupce = $('plus_bestiarSloupce');
+        <script type="text/javascript">
+            function bestiarInit() {
+                var selectBestiarSloupce = $('plus_bestiarSloupce');
 
-		        // Pridej vsechny sloupce
-	            BestiarSloupce.nepovinne.each(function(s) {
-	                    var o = new Option(BestiarSloupce.getData(s).popis, s);
-	                    selectBestiarSloupce.options.add(o);
-	                });
-    			
-			    // onload
-			    selectBestiarSloupce.setAttribute("onload", "(" + function() {
-					    this.selectedIndex = -1;
-					    var selected = new Array();
-    					
-					    this.config.getAukce().evalPrefNodeList('sloupce/sloupec[@hidden != "true"]').each(
-							    function(n) { selected.push(n.getAttribute("jmeno")); }
-						    );
-						
-						// Pokud neni nic vybrano pouzij vychozi
-						if (selected.length == 0)
-						    selected = BestiarSloupce.vychozi;
-    						
-					    for (var i = this.options.length - 1; i >= 0; i--) {
-						    this.options[i].selected = selected.indexOf(this.options[i].value) >= 0;
-					    }
-				    } + ").call(this)");
-    				
-			    // onsave
-			    selectBestiarSloupce.setAttribute("onsave", "(" + function() {
-			            var sloupce = this.config.getAukce().getPrefNode("sloupce", true);
-			            sloupce.clearChildNodes();
-    			
-			            for (var i = 0; i < this.options.length; i++) {
-			                var o = this.options[i];
-			                var c = sloupce.addPref("sloupec");
-			                c.setAttribute("jmeno", o.value);
-			                c.setAttribute("hidden", !o.selected);
-			            }
-				    } + ").call(this)");
+                // Pridej vsechny sloupce
+                BestiarSloupce.nepovinne.each(function(s) {
+                        var o = new Option(BestiarSloupce.getData(s).popis, s);
+                        selectBestiarSloupce.options.add(o);
+                    });
+                
+                // onload
+                selectBestiarSloupce.setAttribute("onload", "(" + function() {
+                        this.selectedIndex = -1;
+                        var selected = new Array();
+                        
+                        this.config.getAukce().evalPrefNodeList('sloupce/sloupec[@hidden != "true"]').each(
+                                function(n) { selected.push(n.getAttribute("jmeno")); }
+                            );
+                        
+                        // Pokud neni nic vybrano pouzij vychozi
+                        if (selected.length == 0)
+                            selected = BestiarSloupce.vychozi;
+                            
+                        for (var i = this.options.length - 1; i >= 0; i--) {
+                            this.options[i].selected = selected.indexOf(this.options[i].value) >= 0;
+                        }
+                    } + ").call(this)");
+                    
+                // onsave
+                selectBestiarSloupce.setAttribute("onsave", "(" + function() {
+                        var sloupce = this.config.getAukce().getPrefNode("sloupce", true);
+                        sloupce.clearChildNodes();
+                
+                        for (var i = 0; i < this.options.length; i++) {
+                            var o = this.options[i];
+                            var c = sloupce.addPref("sloupec");
+                            c.setAttribute("jmeno", o.value);
+                            c.setAttribute("hidden", !o.selected);
+                        }
+                    } + ").call(this)");
             }
             
             bestiarInit();
             
             // Skupiny
             function bestairSloupceSkupina(callback) {
-	            var select = $('plus_bestiarSloupce');
-	            select.selectedIndex = -1;
-	            for (var i = 0; i < select.options.length; i++) {
-	                if (callback(select.options[i].value)) {
-	                    select.options[i].selected = true;
-	                }
-	            }
-	        }
-				
-		    // Vychozi
-		    Event.observe('plus_bestiarVychozi', 'click', function() {
-		            bestairSloupceSkupina(function(s) { return BestiarSloupce.jeVychozi(s); });
-		        });
-		    // Kompletni
-		    Event.observe('plus_bestiarKompletni', 'click', function() {
-		            bestairSloupceSkupina(function(s) { return (["typ", "druh", "phb"].indexOf(s) < 0); });
-		        });
-		    // Puvodni
-		    Event.observe('plus_bestiarPuvodni', 'click', function() {
-		            bestairSloupceSkupina(function(s) { return BestiarSloupce.jePuvodni(s); });
-		        });
-	    </script>
-		
-		<!-- TODO -->
-		
-		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		<tr>
-		    <td colspan="5" class="nadpis">
-		        <span><b>Pošta</b></span>
-		    </td>
-		</tr>
-		<tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
-		<tr>
-			<td><span>Odkazy v textu</span></td>
-			<td>
-				<input type="checkbox"
-					onload="this.checked = this.config.getPrefNode('posta', true).getBoolean('linky', true);"
-					onsave="this.config.getPrefNode('posta', true).setPref('linky', this.checked);" />
-			</td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			
-			<td><span>Scrollovat široké zprávy</span></td>
-			<td>
-				<input type="checkbox"
-					onload="this.checked = this.config.getPrefNode('posta', true).getBoolean('roztahovani', true);"
-					onsave="this.config.getPrefNode('posta', true).setPref('roztahovani', this.checked);" />
-			</td>
-		</tr>
-		<tr>
+                var select = $('plus_bestiarSloupce');
+                select.selectedIndex = -1;
+                for (var i = 0; i < select.options.length; i++) {
+                    if (callback(select.options[i].value)) {
+                        select.options[i].selected = true;
+                    }
+                }
+            }
+                
+            // Vychozi
+            Event.observe('plus_bestiarVychozi', 'click', function() {
+                    bestairSloupceSkupina(function(s) { return BestiarSloupce.jeVychozi(s); });
+                });
+            // Kompletni
+            Event.observe('plus_bestiarKompletni', 'click', function() {
+                    bestairSloupceSkupina(function(s) { return (["typ", "druh", "phb"].indexOf(s) < 0); });
+                });
+            // Puvodni
+            Event.observe('plus_bestiarPuvodni', 'click', function() {
+                    bestairSloupceSkupina(function(s) { return BestiarSloupce.jePuvodni(s); });
+                });
+        </script>
+        
+        <!-- TODO -->
+        
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        <tr>
+            <td colspan="5" class="nadpis">
+                <span><b>Pošta</b></span>
+            </td>
+        </tr>
+        <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        
+        <tr>
+            <td><span>Odkazy v textu</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('posta', true).getBoolean('linky', true);"
+                    onsave="this.config.getPrefNode('posta', true).setPref('linky', this.checked);" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+            
+            <td><span>Scrollovat široké zprávy</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('posta', true).getBoolean('roztahovani', true);"
+                    onsave="this.config.getPrefNode('posta', true).setPref('roztahovani', this.checked);" />
+            </td>
+        </tr>
+        <tr>
             <td colspan="2"></td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			
-			<td colspan="2"><span class="small dark">(Zabrání "roztahování" pošty)</span></td>
-		</tr>
-		
-		<tr>
-			<td><span>Max řádků dlouhé zprávy</span></td>
-			<td>
-				<input type="text" style="width: 50;"
-					onload="this.value = this.config.getPrefNode('posta', true).getNumber('maxRadku', MAX_RADKU_DEFAULT);"
-					onsave="this.config.getPrefNode('posta', true).setPref('maxRadku', this.value);" />
-			</td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			<!--
-			<td><span>Maximální stáří spamu (minuty)</span></td>
-			<td>
-				<input type="checkbox"
-					onload="this.checked = this.config.getPrefNode('posta', true).getNumber('maxStariSpamu', 30);"
-					onsave="this.config.getPrefNode('posta', true).setPref('maxStariSpamu', parseInt(this.value) * 60);" />
-			</td>
-			-->
-		</tr>
-		<tr>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+            
+            <td colspan="2"><span class="small dark">(Zabrání "roztahování" pošty)</span></td>
+        </tr>
+        
+        <tr>
+            <td><span>Max řádků dlouhé zprávy</span></td>
+            <td>
+                <input type="text" style="width: 50;"
+                    onload="this.value = this.config.getPrefNode('posta', true).getNumber('maxRadku', MAX_RADKU_DEFAULT);"
+                    onsave="this.config.getPrefNode('posta', true).setPref('maxRadku', this.value);" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+            <!--
+            <td><span>Maximální stáří spamu (minuty)</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('posta', true).getNumber('maxStariSpamu', 30);"
+                    onsave="this.config.getPrefNode('posta', true).setPref('maxStariSpamu', parseInt(this.value) * 60);" />
+            </td>
+            -->
+        </tr>
+        <tr>
             <td colspan="2"><span class="small dark">(0 pro vypnutí)</span></td>
-			
-			<td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
-			<!-- 
-			<td colspan="2"><span class="small dark">(Zprávy označené jako spam starší než daný čas budou vždy sbaleny)</span></td>
-			-->
-		</tr>
-		<tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
-		
-		<tr><td colspan="20"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
-		
-		<tr>
-		    <td colspan="5" align="center">
-		        <input id="plus_loadConfig" type="button" value="Zrušit" />
-		        &nbsp;
-		        <input id="plus_saveConfig" type="button" value="Uložit" />
-		    </td>
-		</tr>
-	</tbody>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" /></td>
+            <!-- 
+            <td colspan="2"><span class="small dark">(Zprávy označené jako spam starší než daný čas budou vždy sbaleny)</span></td>
+            -->
+        </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        
+        
+        <tr><td colspan="20"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" /></td></tr>
+        
+        <tr>
+            <td colspan="5" align="center">
+                <input id="plus_loadConfig" type="button" value="Zrušit" />
+                &nbsp;
+                <input id="plus_saveConfig" type="button" value="Uložit" />
+            </td>
+        </tr>
+    </tbody>
 </table>
 
 <!-- Vytvoreni noveho linku -->

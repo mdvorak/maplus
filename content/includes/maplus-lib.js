@@ -325,7 +325,8 @@ var TableHelper = {
             throw new ArgumentException("table", table, "Argument must be a table element.");
     
         for (var i = 0; i < table.rows.length; i++) {
-            var show = callback(table.rows[i], i);
+            var row = ElementDataStore.get(table.rows[i]);
+            var show = callback(row, i);
             table.rows[i].style.display = show ? '' : 'none';
         }
     },
@@ -340,12 +341,14 @@ var TableHelper = {
             return;
             
         var data = ElementDataStore.get(table);
-        var tbody = table.tbodies[0];
+        var tbody = table.tBodies[0];
         var sortArr = new Array();
 
         for (var i = 0; i < table.rows.length; i++) {
-            if (table.rows[i] != table.sortRow)
-                sortArr.push(data.rows[i]);
+            if (table.rows[i] != data.sortRow) {
+                var row = ElementDataStore.get(table.rows[i]);
+                sortArr.push(row);
+            }
         }
         
         sortArr.sort(callback);
@@ -359,7 +362,7 @@ var TableHelper = {
         }
         
         for (var i = 0; i < sortArr.length; i++) {
-            tbody.insertBefore(sortArr[i], data.sortRow);
+            tbody.insertBefore(sortArr[i].element, data.sortRow);
         }
     },
 

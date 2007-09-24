@@ -480,10 +480,12 @@ pageExtenders.add(PageExtender.create({
     	context.zobrazRadku = Math.max(context.maxRadku - 5, 1);
     	context.dlouheZpravy = new Array();
     	
+    	var nebalitZpravyOdPosla = page.posta.config.getBoolean("nebalitPosla", false);
+    	
     	// Najdi zpravy s velkym poctem radku
     	page.posta.zpravy.each(function(zprava) {
     		// Preskoc nove zpravy od posla
-    		if (zprava.typ == "posel" && page.arguments["posta"] == "nova")
+    		if (zprava.typ == "posel" && (nebalitZpravyOdPosla || page.arguments["posta"] == "nova"))
     			return; // continue
     	
     	    var radku = 0;

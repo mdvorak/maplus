@@ -298,7 +298,7 @@ pageExtenders.add(PageExtender.create({
             if (td == null)
                 continue;
         
-            td.style.width = "30px";
+            td.style.width = "32px";
             td.innerHTML = "";
             
             // Kopiruj popis
@@ -324,7 +324,9 @@ pageExtenders.add(PageExtender.create({
         if (!Tooltip.isRegistered(tooltipName)) {
             Tooltip.register(tooltipName, function() {
                     var html = template.evaluate(data); 
-                    return Tooltip.create(html, "tooltip", false); 
+                    var tooltip = Tooltip.create(html, "tooltip", false);
+                    tooltip.style.padding = '4px';
+                    return tooltip;
                 });
         }
      
@@ -552,9 +554,13 @@ pageExtenders.add(PageExtender.create({
         var tdNastaveniFiltru = $X('.//font/table/tbody/tr[2]/td[1 and contains(font, "Prosím")]', page.content);
         tdNastaveniFiltru.innerHTML = '';
         
-        var linkZrusFiltry = Element.create("a", '<span>Zruš filtrování a řazení</span>');
+        var spanFilterAktivovan = Element.create("span", '&nbsp;(filter aktivován)&nbsp;<br/>', {class: "small", style: "display: none; color: yellow;"});
+        spanFilterAktivovan.id = 'plus_filterAktivovan';
+        
+        var linkZrusFiltry = Element.create("a", '<span>Zruš filtrování a řazení</span>', {style: "text-decoration: underline;"});
         Event.observe(linkZrusFiltry, 'click', function(event) {
             context.config.clearRules();
+            $('plus_filterAktivovan').style.display = 'none';
             // Reset tabulky
             for (let i in Rules) {
                 Rules[i](table, null);
@@ -563,12 +569,17 @@ pageExtenders.add(PageExtender.create({
         
         tdNastaveniFiltru.appendChild(linkZrusFiltry);
         tdNastaveniFiltru.appendChild(Element.create("br"));
+        tdNastaveniFiltru.appendChild(spanFilterAktivovan);
+        tdNastaveniFiltru.appendChild(Element.create("br"));
         
         // Aplikuj aktualni filtry
         for (let i in Rules) {
             if (typeof Rules[i] == "function" && context.config.hasRules(i))
-                Rules.filter(table, context.config.getRules(i));
+                Rules[i](table, context.config.createRuleSet(i));
         }
+        
+        if (context.config.hasRules("filter"))
+            spanFilterAktivovan.style.display = '';
     },
     
     _createRulesTooltipHtml: function(table, config, header) {
@@ -579,6 +590,7 @@ pageExtenders.add(PageExtender.create({
         	// Registruj tooltip
             Tooltip.register(tooltipName, function() {
         			var tooltip = Tooltip.create('<span><b>' + header.title + '&nbsp;&nbsp;&nbsp;</b></span>', "tooltip", true); 
+        			tooltip.style.padding = '4px';
                     var span = tooltip.appendChild(Element.create("span"));
                     
                     // Pridej pravidla
@@ -607,6 +619,9 @@ pageExtenders.add(PageExtender.create({
                             // Updatuj tabulku
                             var rules = config.createRuleSet(r.type);
                             Rules[r.type](table, rules);
+                            
+                            if (r.type == "filter")
+                                $('plus_filterAktivovan').style.display = (rules.length > 0) ? '' : 'none';
                         });
                         
                         // Mezera
