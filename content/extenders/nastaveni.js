@@ -103,7 +103,7 @@ pageExtenders.add(PageExtender.create({
 		    inputLoad.onclick = function(event) {
 	            spanZprava.update("\xA0"); 
 	            load();
-	            spanZprava.update("Nastavení načteno.");
+	            spanZprava.update("Nastavení načteno");
 		        
 	            var tracker = new Object();
 	            spanZprava.tracker = tracker;
@@ -113,7 +113,7 @@ pageExtenders.add(PageExtender.create({
 		    inputSave.onclick = function(event) {
 	            spanZprava.update("\xA0"); 
 	            save();
-	            spanZprava.update("Nastavení uloženo.");
+	            spanZprava.update("Nastavení uloženo");
 		        
 	            var tracker = new Object();
 	            spanZprava.tracker = tracker;

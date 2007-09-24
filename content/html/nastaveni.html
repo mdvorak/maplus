@@ -159,6 +159,7 @@ nastaveniManager.addTab("Menu", "n_menu");
             
             <td colspan="2"><span class="small dark">(Zabrání "roztahování" pošty)</span></td>
         </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
         
         <tr>
             <td><span>Max řádků dlouhé zprávy</span></td>
@@ -169,17 +170,45 @@ nastaveniManager.addTab("Menu", "n_menu");
             </td>
             
             <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span>Nebalit zprávy od posla</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('posta', true).getNumber('nebalitPosla', false);"
+                    onsave="this.config.getPrefNode('posta', true).setPref('nebalitPosla', this.checked);" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><span class="small dark">(0 pro vypnutí)</span></td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td colspan="2"><span class="small dark"></span></td>
+        </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        
+         <tr>
+            <td><span></span></td>
+            <td>
+                <!--
+                <input type="text" style="width: 50;"
+                    onload="this.value = this.config.getPrefNode('posta', true).getNumber('maxRadku', MAX_RADKU_DEFAULT);"
+                    onsave="this.config.getPrefNode('posta', true).setPref('maxRadku', this.value);" />
+                -->
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
             <!--
             <td><span>Maximální stáří spamu (minuty)</span></td>
             <td>
-                <input type="checkbox"
-                    onload="this.checked = this.config.getPrefNode('posta', true).getNumber('maxStariSpamu', 30);"
+                <input type="text"
+                    onload="this.value = this.config.getPrefNode('posta', true).getNumber('maxStariSpamu', 30);"
                     onsave="this.config.getPrefNode('posta', true).setPref('maxStariSpamu', parseInt(this.value) * 60);" />
             </td>
             -->
         </tr>
         <tr>
-            <td colspan="2"><span class="small dark">(0 pro vypnutí)</span></td>
+            <td colspan="2"><span class="small dark"></span></td>
             
             <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
             <!-- 
@@ -203,11 +232,58 @@ nastaveniManager.addTab("Pošta", "n_posta");
         <col width="100" />
     </colgroup>
     <tbody>
+        <script type="text/javascript">
+        window.NastaveniBestiar = {
+            init: function(select) {
+                select = $(select);
+            
+                // Pridej vsechny sloupce
+                select.options.length = BestiarSloupce.nepovinne.length;
+                
+                for (var i = 0; i < BestiarSloupce.nepovinne.length; i++) {
+                    var data = BestiarSloupce.getData(BestiarSloupce.nepovinne[i]);
+                    select.options[i].value = data.jmeno;
+                    select.options[i].text = data.popis;
+                }
+            },
+        
+            onload: function(select, config) {
+                select.selectedIndex = -1;
+                var selected = new Array();
+                
+                config.getAukce().evalPrefNodeList('sloupce/sloupec[@hidden != "true"]').each(
+                    function(n) { selected.push(n.getAttribute("jmeno")); }
+                );
+                
+                // Pokud neni nic vybrano pouzij vychozi
+                if (selected.length == 0)
+                    selected = BestiarSloupce.vychozi;
+                    
+                for (var i = select.options.length - 1; i >= 0; i--) {
+                    select.options[i].selected = selected.indexOf(select.options[i].value) >= 0;
+                }
+            },
+            
+            onsave: function(select, config) {
+                var sloupce = config.getAukce().getPrefNode("sloupce", true);
+                sloupce.clearChildNodes();
+        
+                for (var i = 0; i < select.options.length; i++) {
+                    var o = select.options[i];
+                    var c = sloupce.addPref("sloupec");
+                    c.setAttribute("jmeno", o.value);
+                    c.setAttribute("hidden", !o.selected);
+                }
+            }
+        };
+        </script>
         <tr>
             <td colspan="2">
                 <span>Vybrané sloupce</span>
                 <br />
-                <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;" />
+                <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;"
+                    onload="NastaveniBestiar.onload(this, this.config);"
+                    onsave="NastaveniBestiar.onsave(this, this.config);" />
             </td>
             
             <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
@@ -240,49 +316,8 @@ nastaveniManager.addTab("Pošta", "n_posta");
             <span class="small dark">(Pro výběr použijte Ctrl nebo Shift)</span>
         </td>
         <script type="text/javascript">
-            function bestiarInit() {
-                var selectBestiarSloupce = $('plus_bestiarSloupce');
-
-                // Pridej vsechny sloupce
-                BestiarSloupce.nepovinne.each(function(s) {
-                        var o = new Option(BestiarSloupce.getData(s).popis, s);
-                        selectBestiarSloupce.options.add(o);
-                    });
-                
-                // onload
-                selectBestiarSloupce.setAttribute("onload", "(" + function() {
-                        this.selectedIndex = -1;
-                        var selected = new Array();
-                        
-                        this.config.getAukce().evalPrefNodeList('sloupce/sloupec[@hidden != "true"]').each(
-                                function(n) { selected.push(n.getAttribute("jmeno")); }
-                            );
-                        
-                        // Pokud neni nic vybrano pouzij vychozi
-                        if (selected.length == 0)
-                            selected = BestiarSloupce.vychozi;
-                            
-                        for (var i = this.options.length - 1; i >= 0; i--) {
-                            this.options[i].selected = selected.indexOf(this.options[i].value) >= 0;
-                        }
-                    } + ").call(this)");
-                    
-                // onsave
-                selectBestiarSloupce.setAttribute("onsave", "(" + function() {
-                        var sloupce = this.config.getAukce().getPrefNode("sloupce", true);
-                        sloupce.clearChildNodes();
-                
-                        for (var i = 0; i < this.options.length; i++) {
-                            var o = this.options[i];
-                            var c = sloupce.addPref("sloupec");
-                            c.setAttribute("jmeno", o.value);
-                            c.setAttribute("hidden", !o.selected);
-                        }
-                    } + ").call(this)");
-            }
-            
-            bestiarInit();
-            
+            NastaveniBestiar.init('plus_bestiarSloupce');
+        
             // Skupiny
             function bestairSloupceSkupina(callback) {
                 var select = $('plus_bestiarSloupce');
@@ -296,16 +331,16 @@ nastaveniManager.addTab("Pošta", "n_posta");
                 
             // Vychozi
             Event.observe('plus_bestiarVychozi', 'click', function() {
-                    bestairSloupceSkupina(function(s) { return BestiarSloupce.jeVychozi(s); });
-                });
+                bestairSloupceSkupina(function(s) { return BestiarSloupce.jeVychozi(s); });
+            });
             // Kompletni
             Event.observe('plus_bestiarKompletni', 'click', function() {
-                    bestairSloupceSkupina(function(s) { return (["typ", "druh", "phb"].indexOf(s) < 0); });
-                });
+                bestairSloupceSkupina(function(s) { return (["typ", "druh", "phb"].indexOf(s) < 0); });
+            });
             // Puvodni
             Event.observe('plus_bestiarPuvodni', 'click', function() {
-                    bestairSloupceSkupina(function(s) { return BestiarSloupce.jePuvodni(s); });
-                });
+                bestairSloupceSkupina(function(s) { return BestiarSloupce.jePuvodni(s); });
+            });
         </script>
     </tbody>
 </table>
@@ -316,7 +351,7 @@ nastaveniManager.addTab("Bestiář", "n_bestiar");
 <!-- Tlacitka -->
 <table style="text-align: center;">
     <tbody>
-        <tr><td><span id="plus_nastaveniZprava" class="small dark">&nbsp;</span></td></tr>
+        <tr><td><span id="plus_nastaveniZprava" class="small">&nbsp;</span></td></tr>
         <tr><td><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
         
         <tr>

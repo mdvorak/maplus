@@ -296,6 +296,12 @@ pageExtenders.add(PageExtender.create({
             	zprava.fontCas.innerHTML = String.format("&nbsp;&nbsp;{0}.{1}.{2} {3}:{4}:{5}", c.getDate(), c.getMonth(), c.getFullYear(), c.getHours().toPaddedString(2), c.getMinutes().toPaddedString(2), c.getSeconds().toPaddedString(2));
             }
         });
+        
+        // Oprav tlacitko Smazat oznacenou :)
+        var tdSo = $X('.//td[font/input[@type = "submit" and @name = "so"]]', page.content);
+        if (tdSo != null) {
+            tdSo.style.verticalAlign = 'top';
+        }
     }
 }));
 
