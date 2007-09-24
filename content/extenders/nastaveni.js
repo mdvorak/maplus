@@ -101,23 +101,23 @@ pageExtenders.add(PageExtender.create({
     		
 		    // Nastav funkce tlacitkum
 		    inputLoad.onclick = function(event) {
-	            spanZprava.update(""); 
+	            spanZprava.update("\xA0"); 
 	            load();
 	            spanZprava.update("Nastavení načteno.");
 		        
 	            var tracker = new Object();
 	            spanZprava.tracker = tracker;
-	            setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update(""); }, NOTICE_TIMEOUT);
+	            setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update("\xA0"); }, NOTICE_TIMEOUT);
 	        };
     		    
 		    inputSave.onclick = function(event) {
-	            spanZprava.update(""); 
+	            spanZprava.update("\xA0"); 
 	            save();
 	            spanZprava.update("Nastavení uloženo.");
 		        
 	            var tracker = new Object();
 	            spanZprava.tracker = tracker;
-	            setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update(""); }, NOTICE_TIMEOUT);
+	            setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update("\xA0"); }, NOTICE_TIMEOUT);
 	        };
         };
         

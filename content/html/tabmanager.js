@@ -55,9 +55,10 @@ TabManager.prototype = {
     	var tbodyHeader = tableHeader.appendChild(Element.create("tbody"));
     	
     	var headerContainer = tbodyHeader.appendChild(Element.create("tr"));
+    	tbodyHeader.appendChild(Element.create("tr")).appendChild(Element.create("td", "\xA0", {colspan: 10, style: "border-top: solid 2px gray;"}));
     	
     	tdHeaderRoot.appendChild(tableHeader);
-    	
+
     	// Create body element
     	var bodyContainer = tbodyRoot.appendChild(Element.create("tr")).appendChild(Element.create("td"));
     	
