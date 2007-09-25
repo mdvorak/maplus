@@ -318,34 +318,31 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         var linkRegex = /http(?:s?):\/\/\S+?(?=\s|$|<)/g;
-        var idRegex = /\((\d{4,6})\)|ID\s?(\d{4,6})/g;
+        var idRegex = /\((\d{4,6})\)|\b(ID|[FBMCZS])\s*(\d{4,6})\b/g;
         
         var found = false;
         var linkReplacer = function(str) {
             found = true;
             return '<a href="' + str + '" target="_blank" onclick="return confirm(\'' + Posta.LINK_CONFIRM_TEXT + '\');">' + str + '</a>';
         };
-        var idReplacer = function(str, p1, p2) {
+        var idReplacer = function(str, p1, p2, p3) {
             found = true;
             if (p1.length > 0)
                 return '(<a href="javascript://" playerid="' + p1 + '">' + p1 + '</a>)'
             else 
-                return 'ID <a href="javascript://" playerid="' + p2 + '">' + p2 + '</a>'
+                return p2 + ' <a href="javascript://" playerid="' + p3 + '">' + p3 + '</a>'
         };
     
         page.posta.zpravy.each(function(zprava) {
-            if (zprava.typ == "posel")
-                return;
-            
             var test = false;
             
-            for (var i = 0; i < zprava.fontText.childNodes.length; i++) {
-                var element = zprava.fontText.childNodes[i];
+            // Neloguj to
+            var snapshot = XPath.evaluate('.//text()', zprava.fontText, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, true);
+            
+            for (var i = 0; i < snapshot.snapshotLength; i++) {
+                var element = snapshot.snapshotItem(i);
                 
-                // Analyzuj pouze text
-                if (element.nodeType != 3)
-                    continue;
-                
+                // Mensi workaround (found se nasetuje replacerem)
                 found = false;
                 var text = element.nodeValue;
                 
@@ -355,8 +352,8 @@ pageExtenders.add(PageExtender.create({
                 text = text.replace(idRegex, idReplacer);
             
                 if (found) {
-                    var span = Element.create("span", text);
-                    element.parentNode.replaceChild(span, element);
+                    var font = Element.create("font", text);
+                    element.parentNode.replaceChild(font, element);
                     test = true;
                 }
             }

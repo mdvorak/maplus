@@ -35,7 +35,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Stavet - Rozsireni"; },
+    getName: function() { return "Stavet - Analyza"; },
 
     analyze: function(page, context) {
         if (page.arguments["akce"] != "stavet" || XPath.evalString('b[1]', page.content) != "Tyto stavby můžete nyní zadat stavitelům ke stavění")
@@ -43,10 +43,12 @@ pageExtenders.add(PageExtender.create({
             
         var table = $X('table[1]', page.content);
         var form = $X('.//form[@action = "stavet.html"]', page.content);
+        if (table == null || form == null)
+            return false;        
+        
         var selectBudova = $X('.//select[@name = "budova"]', form);
         var inputKolik = $X('.//input[@name = "kolik"]', form);
-        
-        if (table == null || selectBudova == null || inputKolik == null)
+        if (selectBudova == null || inputKolik == null)
             return;
         
         // Vytvor seznam budov ktere jsou k dispozici
@@ -109,14 +111,35 @@ pageExtenders.add(PageExtender.create({
                     data.pocet = Math.min(data.pocet, Math.floor(page.provincie.populace / data.pop));
             }
             
-            console.debug("%s: id=%d, pocet=%d", data.jmeno, data.id, data.pocet);
+            console.log("%s: id=%d, pocet=%d/%d, zlata=%d, many=%d, pop=%d, haru=%d, tahu=%d", data.jmeno, data.id, data.pocet, data.maxPocet, data.zlata, data.many, data.pop, data.haru, data.tahu);
         }
         
-        context.table = table;
-        context.form = form;
-        context.selectBudova = selectBudova;
-        context.inputKolik = inputKolik;
+        if (budovy.size() == 0)
+            return false;
         
+        page.stavet = {
+            table: table,
+            form: form,
+            selectBudova: selectBudova,
+            inputKolik: inputKolik,
+            budovy: budovy
+        };
+        
+        return true;
+    },
+    
+    process: null
+}));
+
+
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Stavet - Rozsireni"; },
+
+    analyze: function(page, context) {
+        if (page.stavet == null)
+            return false;
+ 
+        // TODO
         if (page.config.getBarevnyText()) {
             context.plusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plus.png" class="link" alt="" />';
             context.plusplusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plusplus.png" class="link" alt="" />';
@@ -128,16 +151,16 @@ pageExtenders.add(PageExtender.create({
             context.vseText = "*";
         }
         
-        return budovy.size() > 0;
+        return true;
     },
 
     process: function(page, context) {
         var pridejSloupec = this._pridejSloupec;
     
-        var table = context.table;
-        var form = context.form;
-        var selectBudova = context.selectBudova;
-        var inputKolik = context.inputKolik;
+        var table = page.stavet.table;
+        var form = page.stavet.form;
+        var selectBudova = page.stavet.selectBudova;
+        var inputKolik = page.stavet.inputKolik;
         
         const NOVYCH_SLOUPCU = 4;
         
