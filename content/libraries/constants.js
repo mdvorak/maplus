@@ -46,7 +46,8 @@ const MARSHAL_DEBUG = 1; // 0=None, 1=Basic, 2=Verbose
 const XPATH_DEBUG = 1;
 
 // Oznaceni veku
-const AGE_NAME = "5.5";
+const AGE_NAME = "5.6";
+const ADMIN_ID = 2131; // Vek 5.6
 
 // Custom constants
 const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";

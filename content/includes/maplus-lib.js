@@ -164,6 +164,10 @@ var SafeLink = {
 
 MaPlus.Tooltips = {
     createActiveId: function(page, id, /* optional */ link) {
+        id = parseInt(id);
+        if (isNaN(id))
+            return null;
+    
         // Vytvoreni linku (pokud neexistuje)
         if (link == null) {
             link = document.createElement("a");

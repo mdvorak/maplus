@@ -52,6 +52,13 @@ pageExtenders.add(PageExtender.create({
         // Na konci html se vyvola funkce window.initNastaveni(); kde se provede vlastni inicializace
         window.initNastaveni = function() {
             window.initNastaveni = null;
+            
+            // Zobraz id admina
+            var adminLink = MaPlus.Tooltips.createActiveId(page, ADMIN_ID);
+            if (adminLink != null) {
+                adminLink.className = "";
+                $('plus_mikeeId').appendChild(adminLink);
+            }
         
             // Vyhledej vsechny konfiguracni elementy
             var list = $XL('.//*[@onload and @onsave]', page.content);
