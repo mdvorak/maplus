@@ -162,35 +162,14 @@ pageExtenders.add(PageExtender.create({
         var selectBudova = page.stavet.selectBudova;
         var inputKolik = page.stavet.inputKolik;
         
-        const NOVYCH_SLOUPCU = 4;
-        
-        var columns = table.rows[2].cells.length + NOVYCH_SLOUPCU;
-    
-        // Pridej nove sloupce do hlavicky
-        table.rows[1].appendChild(Element.create("td", '<span>&nbsp;</span>', {colspan: NOVYCH_SLOUPCU}));
-    
         for (let i = 2; i < table.rows.length - 1; i++) {
             let data = ElementDataStore.get(table.rows[i]);
             
-            if (isNaN(data.id)) {
-                // Radky s popiskem
-                if (data.element.cells.length == 1) {
-                    data.element.cells[0].setAttribute("colspan", columns);
-                }
+            if (isNaN(data.id))
                 continue;
-            }
             
-            // Vybrat
-            var linkVybrat = Element.create("a", '<span>' + data.jmeno + '</span>', {href: "javascript://", class: "idlink"});
-            Event.observe(linkVybrat, "click", function() {
-                if (selectBudova.value != data.id) {
-                    selectBudova.value = data.id;
-                    inputKolik.value = 1;
-                }
-                inputKolik.select();
-            });
-            data.element.cells[0].innerHTML = '<span>&nbsp;&nbsp;</span>';
-            data.element.cells[0].insertBefore(linkVybrat, data.element.cells[0].firstChild);
+            data.element.cells[0].innerHTML = '';
+            var spanJmeno = data.element.cells[0].appendChild(Element.create("span"));
             
             // Pridat na poctu
             let multiplier = (data.maxPocet < Number.POSITIVE_INFINITY) ? 1 : 10;
@@ -198,7 +177,6 @@ pageExtenders.add(PageExtender.create({
             let vybratCallback = function(kolik) {
                 if (selectBudova.value != data.id) {
                     selectBudova.value = data.id;
-                    inputKolik.value = kolik;
                 }
                 else {
                     let pocet = parseInt(inputKolik.value);
@@ -206,28 +184,57 @@ pageExtenders.add(PageExtender.create({
                         kolik += pocet;
                 }
                 inputKolik.value = Math.min(kolik, data.pocet);
-                context.inputKolik.select();
+                inputKolik.select();
             };
             
-            var linkPlus = Element.create("a", context.plusText, {href: "javascript://"});
-            var linkPlusPlus = Element.create("a", context.plusplusText, {href: "javascript://"});
-            
-            Event.observe(linkPlus, "click", function() { vybratCallback(1 * multiplier); });
-            Event.observe(linkPlusPlus, "click", function() { vybratCallback(5 * multiplier); });
-            
-            pridejSloupec(data.element, linkPlus).style.width = 15;
-            pridejSloupec(data.element, linkPlusPlus).style.width = 15;
-            
+            // Vybrat
+            var linkVybrat = Element.create("a", '<span>' + data.jmeno + '</span>', {href: "javascript://", class: "idlink"});
+            Event.observe(linkVybrat, "click", function(event) {
+                Event.stop(event);
+                var kolik = (event.shiftKey ? 10 : 1);
+                if (event.ctrlKey) {
+            		// Stavet
+            		if (selectBudova.value == data.id) {
+            			form.submit();
+            		}
+            		else {
+	                    selectBudova.value = data.id;
+	                    inputKolik.value = kolik;
+	                    inputKolik.select();
+	                }
+            	}
+            	else {
+            		// Pridat pocet
+            		vybratCallback(kolik * multiplier);
+            	}
+            });
+            spanJmeno.appendChild(linkVybrat);
+            spanJmeno.appendChild(document.createTextNode('\xA0\xA0'));
+          
             // Vse
-            var linkVse = Element.create("a", context.vseText, {href: "javascript://"});
-            Event.observe(linkVse, "click", function() { vybratCallback(Number.POSITIVE_INFINITY); });
-            pridejSloupec(data.element, linkVse).style.width = 15;
+            var linkVse = Element.create("a", '(' + data.pocet + ')', {href: "javascript://"});
+            Event.observe(linkVse, "click", function(event) {
+                Event.stop(event);
+                vybratCallback(Number.POSITIVE_INFINITY);
+                
+                if (event.ctrlKey) {
+                    // Stavet
+                    form.submit();
+                }
+            });
             
-            pridejSloupec(data.element, Element.create("span", "\xA0(" + data.pocet + ")", {class: "small"}));
+            spanJmeno.appendChild(document.createTextNode('\xA0'));
+            spanJmeno.appendChild(linkVse);
+            spanJmeno.appendChild(document.createTextNode('\xA0\xA0'));
         }
         
-        table.rows[0].cells[1].setAttribute("colspan", columns - 2);
-        table.rows[table.rows.length - 1].cells[1].setAttribute("colspan", columns - 2);
+        // Popisek funkcnosti
+        var popisek = "První click na jméno budovy vybere budovu ze seznamu, každý další click zvýší počet stavěných budov."
+                    + "Shift+click zvýší počet 10x více. Ctrl+click započne stavbu budovy v požadovaném počtu. "
+                    + "<br/>"
+                    + "Číslo za jménem budovy je maximální počet budov které můžete postavit. Ctrl+click započne jejich stavbu. ";
+        var spanPopisek = Element.create("span", popisek, {class: "small"});
+        page.content.appendChild(spanPopisek);
     },
     
     _pridejSloupec: function(tr, innerElement) {

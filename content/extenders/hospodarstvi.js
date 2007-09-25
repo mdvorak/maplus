@@ -201,7 +201,8 @@ pageExtenders.add(PageExtender.create({
                 if (link) {
                     var font = r.cells.jmeno.firstChild;
                     font.replaceChild(link, font.firstChild);
-                    font.insertBefore(document.createTextNode("\xA0"), font.firstChild);
+                    // Pokud to tam je tak to nesezere savannah
+                    // font.insertBefore(document.createTextNode("\xA0"), font.firstChild);
                 }
             });
     }
