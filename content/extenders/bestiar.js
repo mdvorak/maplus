@@ -554,10 +554,9 @@ pageExtenders.add(PageExtender.create({
         var tdNastaveniFiltru = $X('.//font/table/tbody/tr[2]/td[1 and contains(font, "Prosím")]', page.content);
         tdNastaveniFiltru.innerHTML = '';
         
-        var spanFilterAktivovan = Element.create("span", '&nbsp;(filter aktivován)&nbsp;<br/>', {class: "small", style: "display: none; color: yellow;"});
-        spanFilterAktivovan.id = 'plus_filterAktivovan';
+        var spanFilterAktivovan = Element.create("span", '&nbsp;<span id="plus_filterAktivovan" class="small" style="display: none; color: yellow;">(filter aktivován)</span>&nbsp;', {class: "small"});
         
-        var linkZrusFiltry = Element.create("a", '<span>Zruš filtrování a řazení</span>', {style: "text-decoration: underline;"});
+        var linkZrusFiltry = Element.create("a", '<span>Zruš filtrování a řazení</span>', {href: "javascript://"});
         Event.observe(linkZrusFiltry, 'click', function(event) {
             context.config.clearRules();
             $('plus_filterAktivovan').style.display = 'none';

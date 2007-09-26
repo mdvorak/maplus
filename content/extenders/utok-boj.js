@@ -109,6 +109,55 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Uprava tabulky s podporama
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Utok - Podpory"; },
+
+    analyze: function(page, context) {
+        if (page.name != "utok.html")
+            return false;
+
+        context.table = $X('.//table/tbody[tr[1 and td = "Pomoc aliance"]]/tr[2]/td/font/table', page.content);
+        if (context.table == null)
+            return false;
+
+        // Vytvor seznam policek s id paktaru
+        context.paktari = new Array();
+
+        $XL('tbody/tr/td[1]/font', context.table).each(function(i) {
+            var id = parseInt(i.textContent);
+            if (!isNaN(id))
+                context.paktari.push({ id: id, element: i });
+        });
+
+        // Jednotky
+        context.jednotky = $XL('tbody/tr/td[3]/font', context.table);
+
+        return true;
+    },
+
+    process: function(page, context) {
+        // Aktivni id
+        context.paktari.each(function(i) {
+            var link = MaPlus.Tooltips.createActiveId(page, i.id);
+
+            i.element.replaceChild(link, i.element.firstChild);
+            new Insertion.After(link, '\xA0');
+        });
+
+        // Aktivni jednotky
+        context.jednotky.each(function(i) {
+            var link = MaPlus.Tooltips.createActiveUnit(page, i.textContent);
+
+            if (link)
+                i.replaceChild(link, i.firstChild);
+        });
+
+        // Okraje
+        TableHelper.thinBorders(context.table);
+    }
+}));
+
 // Boj
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Boj - Stale nastaveni"; },
