@@ -455,3 +455,39 @@ pageExtenders.add(PageExtender.create({
         });
     }
 }));
+
+
+// Cerpani
+pageExtenders.add(PageExtender.create({
+    CERPAT: 10000000,
+           
+    getName: function() { return "Aliance - Cerpani"; },
+
+    analyze: function(page, context) {
+        var typStranky = page.arguments["aliance"];
+        if (!typStranky || typStranky.search("cerpani_") != 0)
+            return false;
+        
+        context.form = $X('.//form[@action = "aliance.html"]', page.content);
+        context.inputKolik = $X('.//input[@name = "kolik"]', context.form);
+        context.fontSubmit = $X('.//font[input[@type = "submit"]]', context.form);
+        
+        if (context.form == null || context.inputKolik == null || context.fontSubmit == null)
+            return false;
+        
+        return true;
+    },
+    
+    process: function(page, context) {
+        var _this = this;
+        var btn = Element.create("input", null, {type: "button", value: "\xA0Čerpat maximum\xA0"});
+        
+        Event.observe(btn, 'click', function() {
+            context.inputKolik.value = _this.CERPAT;
+            context.form.submit();
+        });
+        
+        context.fontSubmit.appendChild(document.createTextNode('\xA0'));
+        context.fontSubmit.appendChild(btn);
+    }
+}));

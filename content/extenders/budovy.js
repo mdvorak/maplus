@@ -139,29 +139,16 @@ pageExtenders.add(PageExtender.create({
         if (page.stavet == null)
             return false;
  
-        // TODO
-        if (page.config.getBarevnyText()) {
-            context.plusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plus.png" class="link" alt="" />';
-            context.plusplusText = '<img src="' + CHROME_CONTENT_URL + 'html/img/plusplus.png" class="link" alt="" />';
-            context.vseText = '<img src="' + CHROME_CONTENT_URL + 'html/img/vse.png" class="link" alt="" />';
-        }
-        else {
-            context.plusText = "+";
-            context.plusplusText = "++";
-            context.vseText = "*";
-        }
-        
         return true;
     },
 
     process: function(page, context) {
-        var pridejSloupec = this._pridejSloupec;
-    
         var table = page.stavet.table;
         var form = page.stavet.form;
         var selectBudova = page.stavet.selectBudova;
         var inputKolik = page.stavet.inputKolik;
         
+        // Zpracuj jednotlive radky
         for (let i = 2; i < table.rows.length - 1; i++) {
             let data = ElementDataStore.get(table.rows[i]);
             
@@ -235,16 +222,5 @@ pageExtenders.add(PageExtender.create({
                     + "Číslo za jménem budovy je maximální počet budov které můžete postavit. Ctrl+click započne jejich stavbu. ";
         var spanPopisek = Element.create("span", popisek, {class: "small"});
         page.content.appendChild(spanPopisek);
-    },
-    
-    _pridejSloupec: function(tr, innerElement) {
-        var td = Element.create("td");
-        var span = Element.create("span");
-        
-        span.appendChild(innerElement);
-        td.appendChild(span);
-        tr.appendChild(td);
-        
-        return td;
     }
 }));
