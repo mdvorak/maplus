@@ -85,6 +85,15 @@ pageExtenders.add(PageExtender.create({
         
         // Obnov prepocitavani many
         window.count_sum = context.count_sum;
+        
+        // Tlacitko neukladat zmeny
+        var neukladat = Element.create("input", null, {value: "\xA0Neukládat Změny\xA0", type: "button"});
+        Event.observe(neukladat, 'click', function() {
+            var checks = $XL('.//div[@type = "checkbox" and @state = "' + Checkbox.STATE_CHECKED + '"]');
+            checks.each(function(i) { i.setState(Checkbox.STATE_UNKNOWN); });
+        });
+        
+        page.content.appendChild(neukladat);
     }
 }));
 
@@ -190,6 +199,15 @@ pageExtenders.add(PageExtender.create({
     
         // Inicializace poli
         PersistentElements.initializeList(context.elements, context.config);
+        
+        // Tlacitko neukladat zmeny
+        var neukladat = Element.create("input", null, {value: "\xA0Neukládat Změny\xA0", type: "button"});
+        Event.observe(neukladat, 'click', function() {
+            var checks = $XL('.//div[@type = "checkbox" and @state = "' + Checkbox.STATE_CHECKED + '"]');
+            checks.each(function(i) { i.setState(Checkbox.STATE_UNKNOWN); });
+        });
+        
+        page.content.appendChild(neukladat);
     }
 }));
 
@@ -200,13 +218,13 @@ var PersistentElements = {
         var value = config.getPrefByName("pole", name);
         
         // Create check element
-        var check = Element.create("input", null, {type: "checkbox"});
+        var check = Checkbox.create();
         
         // Set current value
         if (value != null) {
             console.debug("Setting field '%s' value to %o", name, value);
         
-            check.checked = true;
+            check.setChecked(true);
             element.value = value;
             element.style.borderColor = "green";
             element.style.borderWidth = "2px";
@@ -220,9 +238,9 @@ var PersistentElements = {
         }
         
         var changeCallback = function() {
-            if (check.checked)
+            if (check.getState() == Checkbox.STATE_CHECKED)
                 config.setPrefByName("pole", name, element.value);
-            else
+            else if (check.getState() == Checkbox.STATE_UNCHECKED)
                 config.setPrefByName("pole", name, null);
         };
         
