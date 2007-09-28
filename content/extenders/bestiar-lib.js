@@ -52,15 +52,17 @@ function formatTime(totalSeconds) {
 
 /*** Implementace pravidel ***/
 var Rules = {
-    sort: function(/* table, arguments */) {
+    sort: function(/* table, rules, regent, provincie */) {
         if (arguments[0] == null)
     		throw new ArgumentNullException("table");
     
         var __rules = arguments[1];
+        const regent = arguments[2];
+        const provincie = arguments[3];
         
-        // For (a little) better security
-        var window = null;
-        var document = null;
+        // For (only a little) better security
+        const window = null;
+        const document = null;
         
         if (__rules == null || __rules.length == 0) {
             // Default
@@ -69,8 +71,8 @@ var Rules = {
         
         // Create callback function
         var callback = function(row1, row2) {
-            var stack1 = row1.data;
-            var stack2 = row2.data;
+            const stack1 = row1.data;
+            const stack2 = row2.data;
             
             if (stack1 == stack2)
                 return 0;
@@ -91,22 +93,24 @@ var Rules = {
         TableHelper.sort(arguments[0], callback);
     },
 
-    filter: function(/* table, arguments */) {
+    filter: function(/* table, rules, regent, provincie */) {
         if (arguments[0] == null)
     		throw new ArgumentNullException("table");
     
         var __rules = arguments[1];
-    
-        // For (a little) better security
-        var window = null;
-        var document = null;
+        const regent = arguments[2];
+        const provincie = arguments[3];
         
+        // For (only a little) better security
+        const window = null;
+        const document = null;
+    
         var callback;
         
         if (__rules != null && __rules.length > 0) {
             // Create callback function
             callback = function(row) {
-                var stack = row.data;
+                const stack = row.data;
                 
                 if (stack == null)
                     return true;
@@ -115,7 +119,6 @@ var Rules = {
                     if (__rules[i] == null) continue;
                     
                     var r = eval(__rules[i]);
-                    console.debug(__rules[i] + " = " + r);
                     if (!r) return false;
                 }
                 

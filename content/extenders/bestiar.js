@@ -539,7 +539,7 @@ pageExtenders.add(PageExtender.create({
     
         context.headers.each(function(h) {
             // Vytvor tooltip
-            var linkTooltip = createRulesTooltipHtml(table, context.config, h);
+            var linkTooltip = createRulesTooltipHtml(table, context.config, h, page.regent, page.provincie);
             
             // Uprav hlavicku
             var b = $X('span/b', h.cell);
@@ -562,7 +562,7 @@ pageExtenders.add(PageExtender.create({
             $('plus_filterAktivovan').style.display = 'none';
             // Reset tabulky
             for (let i in Rules) {
-                Rules[i](table, null);
+                Rules[i](table, null, page.regent, page.provincie);
             }
         });
         
@@ -574,14 +574,14 @@ pageExtenders.add(PageExtender.create({
         // Aplikuj aktualni filtry
         for (let i in Rules) {
             if (typeof Rules[i] == "function" && context.config.hasRules(i))
-                Rules[i](table, context.config.createRuleSet(i));
+                Rules[i](table, context.config.createRuleSet(i), page.regent, page.provincie);
         }
         
         if (context.config.hasRules("filter"))
             spanFilterAktivovan.style.display = '';
     },
     
-    _createRulesTooltipHtml: function(table, config, header) {
+    _createRulesTooltipHtml: function(table, config, header, regent, provincie) {
         var link = Element.create("a", header.title, {href: "javascript://"});
         
         var tooltipName = "header_" + header.name;
@@ -617,7 +617,7 @@ pageExtenders.add(PageExtender.create({
                             
                             // Updatuj tabulku
                             var rules = config.createRuleSet(r.type);
-                            Rules[r.type](table, rules);
+                            Rules[r.type](table, rules, regent, provincie);
                             
                             if (r.type == "filter")
                                 $('plus_filterAktivovan').style.display = (rules.length > 0) ? '' : 'none';

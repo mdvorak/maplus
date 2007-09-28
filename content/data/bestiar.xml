@@ -37,26 +37,28 @@
 <aukce>
   <!-- Funkce Object.compare je definovana v webExtenderLib.js -->
   
-  <rulelist name="jmeno" title="Jednotka">
+  <rulelist name="jmeno">
     <rule type="sort" condition="Object.compare(stack1.jmeno, stack2.jmeno)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.jmeno, stack1.jmeno)">Sestupně</rule>
+    <rule type="filter" condition="stack.barva == regent.barva">Moje barva</rule>
+    <rule type="filter" condition="stack.barva == 'N'">Neutrální</rule>
   </rulelist>
 
-  <rulelist name="pocet" title="Počet">
+  <rulelist name="pocet">
     <rule type="sort" condition="Object.compare(stack1.pocet, stack2.pocet)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.pocet, stack1.pocet)">Sestupně</rule>
     <rule type="filter" condition="stack.pocet &gt;= 2000">&gt; 2000</rule>
     <rule type="filter" condition="stack.pocet &gt;= 5000">&gt; 5000</rule>
   </rulelist>
   
-  <rulelist name="zkusenost" title="Zkušenost">
+  <rulelist name="zkusenost">
     <rule type="sort" condition="Object.compare(stack1.zkusenost, stack2.zkusenost)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.zkusenost, stack1.zkusenost)">Sestupně</rule>
     <rule type="filter" condition="stack.zkusenost &gt;= 0.40">&gt; 40%</rule>
     <rule type="filter" condition="stack.zkusenost &gt;= 0.60">&gt; 60%</rule>
   </rulelist>
 
-  <rulelist name="silaJednotky" title="Síla jednotky">
+  <rulelist name="silaJednotky">
     <rule type="sort" condition="Object.compare(stack1.silaJednotky, stack2.silaJednotky)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.silaJednotky, stack1.silaJednotky)">Sestupně</rule>
     <rule type="filter" condition="stack.silaJednotky &lt;= 50">&lt;= 50</rule>
@@ -64,7 +66,7 @@
     <rule type="filter" condition="stack.silaJednotky &gt; 120">&gt; 120</rule>
   </rulelist>
 
-  <rulelist name="ini" title="Iniciativa">
+  <rulelist name="ini">
     <rule type="sort" condition="Object.compare(stack1.ini, stack2.ini)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.ini, stack1.ini)">Sestupně</rule>
     <rule type="filter" condition="stack.ini &gt; 10">&gt; 10</rule>
@@ -72,17 +74,39 @@
     <rule type="filter" condition="stack.ini &gt; 30">&gt; 30</rule>
   </rulelist>
 
-  <rulelist name="druh" title="Druh">
+  <rulelist name="druh">
     <rule type="filter" condition="stack.druh == 'Poz.'">Pozemní</rule>
     <rule type="filter" condition="stack.druh == 'Let.'">Letecké</rule>
   </rulelist>
 
-  <rulelist name="typ" title="Typ">
+  <rulelist name="typ">
     <rule type="filter" condition="stack.typ == 'Boj.'">Bojové</rule>
     <rule type="filter" condition="stack.typ == 'Str.'">Střelecké</rule>
   </rulelist>
   
-  <rulelist name="silaStacku" title="Síla stacku">
+  <rulelist name="phb">
+    <rule type="sort" condition="Object.compare(stack1.phb, stack2.phb)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.phb, stack1.phb)">Sestupně</rule>
+    <rule type="filter" condition="stack.phb &lt;= 1">Max 1</rule>
+    <rule type="filter" condition="stack.phb &lt;= 2">Max 2</rule>
+    <rule type="filter" condition="stack.phb &gt;= 2">Min 2</rule>
+    <rule type="filter" condition="stack.phb &gt;= 3">Min 3</rule>
+  </rulelist>
+
+  <rulelist name="typKratce">
+    <rule type="filter" condition="stack.druh == 'Poz.' &amp;&amp; stack.typ == 'Str.'">Pozemní Střelecké</rule>
+    <rule type="filter" condition="stack.druh == 'Let.' &amp;&amp; stack.typ == 'Str.'">Letecké Střelecké</rule>
+    <rule type="filter" condition="stack.druh == 'Poz.' &amp;&amp; stack.typ == 'Boj.'">Pozemní Bojové Vše</rule>
+    <rule type="filter" condition="stack.druh == 'Let.' &amp;&amp; stack.typ == 'Boj.'">Letecké Bojové Vše</rule>
+    <rule type="filter" condition="stack.druh == 'Poz.' &amp;&amp; stack.typ == 'Boj.' &amp;&amp; stack.phb == 1">Pozemní Bojové 1</rule>
+    <rule type="filter" condition="stack.druh == 'Poz.' &amp;&amp; stack.typ == 'Boj.' &amp;&amp; stack.phb == 2">Pozemní Bojové 2</rule>
+    <rule type="filter" condition="stack.druh == 'Poz.' &amp;&amp; stack.typ == 'Boj.' &amp;&amp; stack.phb == 3">Pozemní Bojové 3</rule>
+    <rule type="filter" condition="stack.druh == 'Let.' &amp;&amp; stack.typ == 'Boj.' &amp;&amp; stack.phb == 1">Letecké Bojové 1</rule>
+    <rule type="filter" condition="stack.druh == 'Let.' &amp;&amp; stack.typ == 'Boj.' &amp;&amp; stack.phb == 2">Letecké Bojové 2</rule>
+    <rule type="filter" condition="stack.druh == 'Let.' &amp;&amp; stack.typ == 'Boj.' &amp;&amp; stack.phb == 3">Letecké Bojové 3</rule>
+  </rulelist>
+  
+  <rulelist name="silaStacku">
     <rule type="sort" condition="Object.compare(stack1.silaStacku, stack2.silaStacku)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.silaStacku, stack1.silaStacku)">Sestupně</rule>
     <rule type="filter" condition="stack.silaStacku &lt; 2000">&lt; 2000</rule>
@@ -90,20 +114,44 @@
     <rule type="filter" condition="stack.silaStacku &gt; 10000">&gt; 10000</rule>
   </rulelist>
 
-  <rulelist name="cenaZaSilu" title="Cena za 1 síly">
+  <rulelist name="maxSilaStacku">
+    <rule type="sort" condition="Object.compare(stack1.maxSilaStacku, stack2.maxSilaStacku)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.maxSilaStacku, stack1.maxSilaStacku)">Sestupně</rule>
+    <rule type="filter" condition="stack.maxSilaStacku &lt; 2000">&lt; 5000</rule>
+    <rule type="filter" condition="stack.maxSilaStacku &gt; 2000">&gt; 5000</rule>
+    <rule type="filter" condition="stack.maxSilaStacku &gt; 10000">&gt; 20000</rule>
+  </rulelist>
+
+  <rulelist name="zlataTU">
+    <rule type="sort" condition="Object.compare(stack1.zlataTU, stack2.zlataTU)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.zlataTU, stack1.zlataTU)">Sestupně</rule>
+  </rulelist>
+
+  <rulelist name="manyTU">
+    <rule type="sort" condition="Object.compare(stack1.manyTU, stack2.manyTU)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.manyTU, stack1.manyTU)">Sestupně</rule>
+  </rulelist>
+
+  <rulelist name="popTU">
+    <rule type="sort" condition="Object.compare(stack1.popTU, stack2.popTU)">Vzestupně</rule>
+    <rule type="sort" condition="Object.compare(stack2.popTU, stack1.popTU)">Sestupně</rule>
+  </rulelist>
+  
+  <rulelist name="cenaZaSilu">
     <rule type="sort" condition="Object.compare(stack1.cenaZaSilu, stack2.cenaZaSilu)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.cenaZaSilu, stack1.cenaZaSilu)">Sestupně</rule>
     <rule type="filter" condition="stack.cenaZaSilu &lt;= 15">&lt; 15</rule>
     <rule type="filter" condition="stack.cenaZaSilu &lt;= 30">&lt; 30</rule>
   </rulelist>
   
-  <rulelist name="cas" title="Čas prodeje">
+  <rulelist name="cas">
     <rule type="sort" condition="Object.compare(stack1.cas, stack2.cas)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.cas, stack1.cas)">Sestupně</rule>
   </rulelist>
 
-  <rulelist name="nabidka" title="Nabídka">
+  <rulelist name="nabidka">
     <rule type="sort" condition="Object.compare(stack1.nabidka, stack2.nabidka)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.nabidka, stack1.nabidka)">Sestupně</rule>
+    <rule type="filter" condition="stack.nabidka &lt; provincie.zlato">Pouze na co mám</rule>
   </rulelist>
 </aukce>
