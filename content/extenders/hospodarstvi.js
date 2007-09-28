@@ -34,6 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+// Analyza
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Hospodarstvi - Analyza"; },
 
@@ -67,38 +68,42 @@ pageExtenders.add(PageExtender.create({
         console.debug("Jednotky za tah: sila=%d pocet=%d zlata=%f many=%f pop=%f", jednotky.silaCelkem, jednotky.pocetCelkem, jednotky.zlataCelkem, jednotky.manyCelkem, jednotky.popCelkem);
         
         for (var i = 1; i < jednotkyRows.length; i++) {
-            if (jednotkyRows[i].cells.length < 10)
+            if (jednotkyRows[i].cells.length < 10 || jednotkyRows[i].cells[0].textContent == "Jednotka")
                 continue;
             
-            // Najdi bunky
-            jednotkyRows[i].cells.jmeno = jednotkyRows[i].cells[0];
-            jednotkyRows[i].cells.zkusenost = jednotkyRows[i].cells[1];
-            jednotkyRows[i].cells.phb = jednotkyRows[i].cells[2];
-            jednotkyRows[i].cells.druh = jednotkyRows[i].cells[3];
-            jednotkyRows[i].cells.typ = jednotkyRows[i].cells[4];
-            jednotkyRows[i].cells.sila = jednotkyRows[i].cells[5];
-            jednotkyRows[i].cells.pocet = jednotkyRows[i].cells[6];
-            jednotkyRows[i].cells.zlata = jednotkyRows[i].cells[7];
-            jednotkyRows[i].cells.many = jednotkyRows[i].cells[8];
-            jednotkyRows[i].cells.pop = jednotkyRows[i].cells[9];
+            var row = ElementDataStore.get(jednotkyRows[i]);
             
-            // Vytvor informace o jednotce
-            jednotkyRows[i].data = {
-                jmeno: jednotkyRows[i].cells.jmeno.textContent,
-                zkusenost: parseFloat(jednotkyRows[i].cells.zkusenost.textContent),
-                phb: parseInt(jednotkyRows[i].cells.phb.textContent),
-                druh: jednotkyRows[i].cells.druh.textContent,
-                typ: jednotkyRows[i].cells.typ.textContent,
-                sila: parseInt(jednotkyRows[i].cells.zlata.textContent),
-                pocet: parseInt(jednotkyRows[i].cells.zlata.textContent),
-                zlata: parseFloat(jednotkyRows[i].cells.zlata.textContent),
-                many: parseFloat(jednotkyRows[i].cells.many.textContent),
-                pop: parseFloat(jednotkyRows[i].cells.pop.textContent),
+            // Najdi bunky
+            row.cells = {
+                jmeno: jednotkyRows[i].cells[0],
+                zkusenost: jednotkyRows[i].cells[1],
+                phb: jednotkyRows[i].cells[2],
+                druh: jednotkyRows[i].cells[3],
+                typ: jednotkyRows[i].cells[4],
+                sila: jednotkyRows[i].cells[5],
+                pocet: jednotkyRows[i].cells[6],
+                zlata: jednotkyRows[i].cells[7],
+                many: jednotkyRows[i].cells[8],
+                pop: jednotkyRows[i].cells[9]
             };
             
-            jednotkyRows[i].data.cenaZaSilu = -parseFloat(jednotkyRows[i].data.zlata) / jednotkyRows[i].data.sila * 1000
+            // Vytvor informace o jednotce
+            row.data = {
+                jmeno: row.cells.jmeno.textContent,
+                zkusenost: parseFloat(row.cells.zkusenost.textContent),
+                phb: parseInt(row.cells.phb.textContent),
+                druh: row.cells.druh.textContent,
+                typ: row.cells.typ.textContent,
+                sila: parseInt(row.cells.zlata.textContent),
+                pocet: parseInt(row.cells.zlata.textContent),
+                zlata: parseFloat(row.cells.zlata.textContent),
+                many: parseFloat(row.cells.many.textContent),
+                pop: parseFloat(row.cells.pop.textContent)
+            };
             
-            jednotky.push(jednotkyRows[i]);
+            row.data.cenaZaSilu = -parseFloat(row.data.zlata) / row.data.sila * 1000
+            
+            jednotky.push(row);
         }
         
         page.hospodarstvi.jednotky = jednotky;
@@ -110,6 +115,8 @@ pageExtenders.add(PageExtender.create({
     process: null
 }));
 
+
+// Pomer farem
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Hospodarstvi - Pomer farem"; },
 
@@ -132,6 +139,8 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+
+// Barvy
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Hospodarstvi - Barvy"; },
 
@@ -188,6 +197,7 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Aktivni jednotky
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Hospodarstvi - Jednotky"; },
 
@@ -208,6 +218,7 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Sirka tabulky
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Hospodarstvi - Sirka tabulek"; },
 

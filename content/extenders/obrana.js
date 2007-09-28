@@ -61,10 +61,10 @@ pageExtenders.add(PageExtender.create({
         context.paktari = new Array();
         
         $XL('tbody/tr/td[1]/font', page.tableObrana).each(function(i) {
-                var id = parseInt(i.textContent);
-                if (!isNaN(id))
-                    context.paktari.push({ id: id, element: i });
-            });
+            var id = parseInt(i.textContent);
+            if (!isNaN(id))
+                context.paktari.push({ id: id, element: i });
+        });
         
         return context.paktari.length > 0;
     },
@@ -72,18 +72,18 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         // Aktivni id
         context.paktari.each(function(i) {        
-                var link = MaPlus.Tooltips.createActiveId(page, i.id);
-                
-                i.element.replaceChild(link, i.element.firstChild);
-                new Insertion.After(link, '&nbsp;');
-            });
+            var link = MaPlus.Tooltips.createActiveId(page, i.id);
+            
+            i.element.replaceChild(link, i.element.firstChild);
+            new Insertion.After(link, '\xA0');
+        });
             
         // Napsat vsem
         var idStr = "";
         context.paktari.each(function(i) {
-                if (idStr != "") idStr += ",";
-                idStr += i.id;
-            });
+            if (idStr != "") idStr += ",";
+            idStr += i.id;
+        });
         
         var url = MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: idStr});
         var napsatVsem = '<tr><td><a href="' + url + '"><span>Napsat všem</span></a></td></tr>';
@@ -110,12 +110,12 @@ pageExtenders.add(PageExtender.create({
 
     process: function(page, context) {
         context.jednotky.each(function(i) {
-                var link = MaPlus.Tooltips.createActiveUnit(page, i.textContent);
-                
-                if (link) {
-                    i.replaceChild(link, i.firstChild);
-                }
-            });
+            var link = MaPlus.Tooltips.createActiveUnit(page, i.textContent);
+            
+            if (link) {
+                i.replaceChild(link, i.firstChild);
+            }
+        });
     }
 }));
 

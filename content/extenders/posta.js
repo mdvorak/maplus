@@ -293,7 +293,7 @@ pageExtenders.add(PageExtender.create({
             // Oprav datum ve stare poste
             if (page.arguments["posta"] != "nova") {
             	var c = zprava.cas;
-            	zprava.fontCas.innerHTML = String.format("&nbsp;&nbsp;{0}.{1}.{2} {3}:{4}:{5}", c.getDate(), c.getMonth(), c.getFullYear(), c.getHours().toPaddedString(2), c.getMinutes().toPaddedString(2), c.getSeconds().toPaddedString(2));
+            	zprava.fontCas.innerHTML = String.format("&nbsp;&nbsp;{0}.{1}.{2} {3}:{4}:{5}", c.getDate(), c.getMonth() + 1, c.getFullYear(), c.getHours().toPaddedString(2), c.getMinutes().toPaddedString(2), c.getSeconds().toPaddedString(2));
             }
         });
         
