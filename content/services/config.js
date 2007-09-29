@@ -39,7 +39,18 @@ const CONFIG_ROOT_NAME = "prefs";
 XmlConfigNode.XPath.useExtension();
 XmlConfigNode.Extended.useExtension();
 
-var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME);
+// Validace na vek
+function ageValidator(root) {
+    if (root.getAttribute("vek") != null && root.getAttribute("vek") != AGE_NAME) {
+        // Odstran veskera nastaveni
+        while (root.firstChild != null)
+            root.removeChild(root.firstChild);
+    }
+    root.setAttribute("vek", AGE_NAME);
+}
+
+// Vytvor a registruj sluzby
+var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME, ageValidator);
 var localConfigManager = new XmlConfigManager(null, CONFIG_ROOT_NAME);
 
 var plusConfigAutosave = PageExtender.create({

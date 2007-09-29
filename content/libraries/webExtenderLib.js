@@ -185,12 +185,14 @@ Object.extend(Element, {
         var e = doc.createElement(tagName);
         
         if (attributes != null) {
-            $H(attributes).each(function(attr) {
-                    e.setAttribute(attr[0], (attr[1] != null) ? attr[1] : "");
-                });
+            for (var i in attributes) {
+                e.setAttribute(i, (attributes[i] != null) ? attributes[i] : "");
+            }
         }
         
-        e.innerHTML = (innerHtml != null ? innerHtml : "");
+        if (innerHtml != null) {
+            e.innerHTML = innerHtml;
+        }
         
         return e;
     }
@@ -427,7 +429,7 @@ Page.prototype = {
         if (doc == null) doc = document;
     
         this.document = $(doc);
-        this.url = this.document.location.href.replace(/#.*$/, "");
+        this.url = this.document.location.href.replace(/#.*$/, "");;
         this.name = this.url.match(/\/([\w.]+?)([?].+?)?$/)[1];
         
         // Analyze url encoded arguments
@@ -451,7 +453,7 @@ var PageExtender = Class.create();
 PageExtender.prototype = {
     initialize: function() {
     },
-        
+    
     // Override this for better debugging
     getName: function() {
         return "(anonymous)";

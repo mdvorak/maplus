@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-var PERSISTENT_FIELDS_WARNING = "Pozn: Pokud je checkbox vedle pole zatržen, hodnota bude uložena a použita při dalších zobrazeních.";
+var PERSISTENT_FIELDS_WARNING = "Pozn: Zelený okraj pole znamená, že hodnota pole byla načtena.<br/>Modrá signalizuje že pole neodpovídá uložené hodnotě.";
 
 // Utok
 pageExtenders.add(PageExtender.create({
@@ -73,7 +73,7 @@ pageExtenders.add(PageExtender.create({
 
     process: function(page, context) {
         // Pridat hlasku
-        var upozorneni = Element.create("span", '<br/><br/>' + PERSISTENT_FIELDS_WARNING);
+        var upozorneni = Element.create("span", '<br/><br/>' + PERSISTENT_FIELDS_WARNING + '<br/>');
         upozorneni.className = "small";
         page.content.appendChild(upozorneni);
     
@@ -85,15 +85,6 @@ pageExtenders.add(PageExtender.create({
         
         // Obnov prepocitavani many
         window.count_sum = context.count_sum;
-        
-        // Tlacitko neukladat zmeny
-        var neukladat = Element.create("input", null, {value: "\xA0Neukládat Změny\xA0", type: "button"});
-        Event.observe(neukladat, 'click', function() {
-            var checks = $XL('.//div[@type = "checkbox" and @state = "' + Checkbox.STATE_CHECKED + '"]');
-            checks.each(function(i) { i.setState(Checkbox.STATE_UNKNOWN); });
-        });
-        
-        page.content.appendChild(neukladat);
     }
 }));
 
@@ -193,26 +184,19 @@ pageExtenders.add(PageExtender.create({
 
     process: function(page, context) {
         // Pridat hlasku
-        var upozorneni = Element.create("span", '<br/><br/>' + PERSISTENT_FIELDS_WARNING);
+        var upozorneni = Element.create("span", '<br/><br/>' + PERSISTENT_FIELDS_WARNING + '<br/>');
         upozorneni.className = "small";
         page.content.appendChild(upozorneni);
     
         // Inicializace poli
         PersistentElements.initializeList(context.elements, context.config);
-        
-        // Tlacitko neukladat zmeny
-        var neukladat = Element.create("input", null, {value: "\xA0Neukládat Změny\xA0", type: "button"});
-        Event.observe(neukladat, 'click', function() {
-            var checks = $XL('.//div[@type = "checkbox" and @state = "' + Checkbox.STATE_CHECKED + '"]');
-            checks.each(function(i) { i.setState(Checkbox.STATE_UNKNOWN); });
-        });
-        
-        page.content.appendChild(neukladat);
     }
 }));
 
+
 /** PersistentElements class **/
-var PersistentElements = {
+
+var PersistentElementsCheck = {
     initialize: function(element, config) {
         var name = element.name;
         var value = config.getPrefByName("pole", name);
@@ -224,10 +208,9 @@ var PersistentElements = {
         if (value != null) {
             console.debug("Setting field '%s' value to %o", name, value);
         
-            check.setChecked(true);
+            check.setState(Checkbox.STATE_CHECKED);
             element.value = value;
             element.style.borderColor = "green";
-            element.style.borderWidth = "2px";
             
             try {
                 Event.dispatch(element, "change");
@@ -237,15 +220,28 @@ var PersistentElements = {
             }
         }
         
-        var changeCallback = function() {
-            if (check.getState() == Checkbox.STATE_CHECKED)
-                config.setPrefByName("pole", name, element.value);
-            else if (check.getState() == Checkbox.STATE_UNCHECKED)
-                config.setPrefByName("pole", name, null);
-        };
+        // Event handlers
+        Event.observe(element, "change", function() {
+            if (check.getState() != Checkbox.STATE_UNCHECKED) {
+                if (element.value == value)
+                    check.setState(Checkbox.STATE_CHECKED);
+                else
+                    check.setState(Checkbox.STATE_UNKNOWN);
+            }
+        });
         
-        Event.observe(element, "change", changeCallback);
-        Event.observe(check, "change", changeCallback);
+        Event.observe(check, "change", function() {
+            if (check.getState() == Checkbox.STATE_CHECKED) {
+                value = element.value;
+                config.setPrefByName("pole", name, element.value);
+                element.style.borderColor = "green";
+            }
+            else if (check.getState() == Checkbox.STATE_UNCHECKED) {
+                value = null;
+                config.setPrefByName("pole", name, null);
+                element.style.borderColor = "";
+            }
+        });
         
         element.parentNode.insertBefore(check, element.nextSibling);
     },
@@ -255,4 +251,76 @@ var PersistentElements = {
             this.initialize(list[i], config);
         }
     }
-}
+};
+
+var PersistentElementsTwoButtons = {
+    SAVE_IMG: '<img src="' + CHROME_CONTENT_URL + 'html/img/check.png" alt="" style="width: 13px; height: 13px;" class="link" />',
+    RESET_IMG: '<img src="' + CHROME_CONTENT_URL + 'html/img/reset.png" alt="" style="width: 13px; height: 13px;" class="link" />',
+
+    initialize: function(element, config) {
+        var name = element.name;
+        var value = config.getPrefByName("pole", name);
+        
+        // Create control elements
+        var control = Element.create("span", null, {style: "margin: 1px;"});
+        var save = control.appendChild(Element.create("a", this.SAVE_IMG, {href: "javascript://", title: "Uložit hodnotu."}));
+        var reset = control.appendChild(Element.create("a", this.RESET_IMG, {href: "javascript://", title: "Odstranit uloženou hodnotu."}));
+        
+        // This method will update element border according to persistance state
+        var updateStatus = function() {
+            if (value != null) {
+                if (element.value == value)
+                    element.style.borderColor = "green";
+                else
+                    element.style.borderColor = "blue";
+            }
+            else {
+                element.style.borderColor = "";
+            }
+        };
+        
+        // Set current value
+        if (value != null) {
+            console.debug("Setting field '%s' value to %o", name, value);
+        
+            element.value = value;
+            
+            try {
+                Event.dispatch(element, "change");
+            }
+            catch (ex) {
+                console.warn("Error invoking change event on control %o:\r\n%o", element, ex);
+            }   
+
+            updateStatus();
+        }
+                
+        // Control handlers
+        Event.observe(save, "click", function() {
+            value = element.value;
+            config.setPrefByName("pole", name, element.value);
+            updateStatus();
+        });
+        
+        Event.observe(reset, "click", function() {
+            value = null;
+            config.setPrefByName("pole", name, null);
+            updateStatus();
+        });
+
+        Event.observe(element, "change", function() { updateStatus(); });
+
+        // Insert control elements after data element        
+        element.parentNode.insertBefore(control, element.nextSibling);
+    },
+    
+    initializeList: function(list, config) {
+        for (var i = 0; i < list.length; i++) {
+            this.initialize(list[i], config);
+        }
+    }
+};
+
+
+// TODO vybrat si jednu moznost :)
+var PersistentElements = PersistentElementsCheck;

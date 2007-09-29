@@ -43,7 +43,7 @@ var Checkbox = {
     imagesPath: CHROME_CONTENT_URL + "html/img/checkbox/",
 
     create: function(clickHandler) {
-        var root = Element.create("div", null, {style: "width: 13px; height: 13px;", type: "checkbox"});
+        var root = Element.create("span", null, {style: "width: 13px; height: 13px; margin: 1px;", type: "checkbox"});
         
         // Create img elements for each state
         var createImg = function(name) {

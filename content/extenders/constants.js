@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const TIMERS_DISABLED = false;
+const TIMERS_DISABLED = true;
 
 const MAX_TAHU_DEFAULT = 30;
 const MAX_RADKU_DEFAULT = 30;

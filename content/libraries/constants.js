@@ -46,7 +46,7 @@ const MARSHAL_DEBUG = 1; // 0=None, 1=Basic, 2=Verbose
 const XPATH_DEBUG = 1;
 
 // Oznaceni veku
-const AGE_NAME = "5.6";
+const AGE_NAME = "5.6"; // Pozn: Zmena tohoto atributu vymaze veskere nastaveni
 const ADMIN_ID = 2131; // Vek 5.6
 
 // Custom constants

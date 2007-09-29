@@ -97,7 +97,7 @@ pageExtenders.add(PageExtender.create({
             // Sila stacku
             row.data.silaStacku = parseInt(row.data.maxSilaStacku * row.data.zkusenost);
             // Cena za 1 sily
-            row.data.cenaZaSilu = parseFloat((row.data.nabidka / row.data.silaStacku).toFixed(1));
+            row.data.cenaZaSilu = (row.data.silaStacku > 0) ? parseFloat((row.data.nabidka / row.data.silaStacku).toFixed(1)) : 0;
              
             // Dodatecne informace
             var stats = Jednotky.vyhledej(row.data.jmeno);

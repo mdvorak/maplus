@@ -141,7 +141,7 @@ pageExtenders.add(PageExtender.create({
             
             // Pridej Info link
             var infoUrl = MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: data.id});
-            var infoHtml = '<a href="' + infoUrl + '"><img src="' + CHROME_CONTENT_URL + 'html/img/info.png" alt="" style="padding-top: 1px; border-width: 0px;" alt="" /></a>';
+            var infoHtml = '<a href="' + infoUrl + '"><img src="' + CHROME_CONTENT_URL + 'html/img/info.png" alt="" style="width: 16px; height: 16px; padding-top: 1px; border-width: 0px;" alt="" /></a>';
             
             var tdInfo = Element.create("td", infoHtml, {align: "center", style: "white-space: nowrap;"});
             tr.appendChild(tdInfo);
