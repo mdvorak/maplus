@@ -53,7 +53,7 @@ var Checkbox = {
         var normal = createImg("check_n.png");
         var checked = createImg("check_c.png");
         var unknown = createImg("check_u.png");
-        var normalHover = createImg("check_h.png");
+        var normalHover = createImg("check_nh.png");
         var checkedHover = createImg("check_ch.png");
         var unknownHover = createImg("check_uh.png");
         
