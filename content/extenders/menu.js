@@ -195,18 +195,24 @@ pageExtenders.add(PageExtender.create({
         seznam.each(function(i) {
             var link = i.getPref("link");
             var text = i.getPref("text");
+            var title = i.getPref("title");
             var externi = Boolean.parse(i.getAttribute("externi"));
-            var newWindow = Boolean.parse(i.getAttribute("newWindow"));
+            var noveokno = Boolean.parse(i.getAttribute("noveokno"));
             
             if (link != null && link.blank())
                 link = null;
             
-            if (link != null && !externi) {
-                link += "&id=" + page.id + "&code=" + page.code;
-                if (page.ftc) link += "&ftc=" + page.ftc;
+            if (link != null) {
+                if (!externi) {
+                    link = MELIOR_ANNIS_URL + "/" + link + "&id=" + page.id + "&code=" + page.code;
+                    if (page.ftc) link += "&ftc=" + page.ftc;
+                }
+                else {
+                    link = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: link});
+                }
             }
-
-            context.list.push({url: link, text: text, newWindow: newWindow});
+            
+            context.list.push({url: link, text: text, noveokno: noveokno, title: title});
         });
         
         return true;
@@ -219,8 +225,8 @@ pageExtenders.add(PageExtender.create({
             var element = null;
             
             if (i.url != null) {
-                element = Element.create("a", i.text, {href: i.url});
-                if (i.newWindow)
+                element = Element.create("a", i.text, {href: i.url, title: i.title});
+                if (i.noveokno)
                     element.setAttribute("target", "_blank");
             }
             else {

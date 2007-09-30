@@ -59,20 +59,22 @@ pageExtenders.add(PageExtender.create({
         var link = $X('.//a[@id = "plus_enable"]', div);
         if (!link) 
             throw new Exception(String.format("Unable to find 'plus_enable' link."));
+            
+        var aNastaveni = $X('.//a[@id = "plus_nastaveni"]', div);
+        if (aNastaveni == null) 
+            throw new Exception(String.format("Unable to find 'plus_nastaveni' link."));
         
         Event.observe(link, "click", function(event) 
             {
                 var value = !page.config.getEnabled();
                 page.config.setPref("enabled", value);
                 link.updateText(value); // Defined in 'maplus.htm'
+                aNastaveni.style.display = (value ? '' : 'none');
             });
             
         var enabled = page.config.getEnabled();
         link.updateText(enabled);
         
-        var aNastaveni = $X('.//a[@id = "plus_nastaveni"]', div);
-        if (aNastaveni == null) 
-            throw new Exception(String.format("Unable to find 'plus_nastaveni' link."));
         aNastaveni.href = MaPlus.buildUrl(page, "main.html", { plus: "nastaveni" });
         
         // Stop execution

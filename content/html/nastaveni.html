@@ -6,7 +6,7 @@ td.nadpis
     border-bottom-style: solid;
 }
 </style>
-<script type="text/javascript" src="chrome://maplus/content/html/tabmanager.js"></script>
+<script type="text/javascript" src="chrome://maplus/content/html/tabmanager.js" charset="UTF-8"></script>
 
 <div><b>Melior Annis Plus - Nastavení</b></div>
 <div><img height="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></div>
@@ -119,6 +119,32 @@ nastaveniManager.addTab("Obecné", "n_obecne");
             </td>
         </tr>
         <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        
+        <!-- Sem patri dalsi nastaveni -->
+        
+        <tr><td colspan="2"><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        <tr>
+            <td colspan="5"><span style="font-weight: bold;">Vlastní linky</span></td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <script type="text/javascript" src="chrome://maplus/content/html/vlastnilinky.js" charset="UTF-8"></script>
+                
+                <!-- Seznam linku -->
+                <table id="n_vlastnilinky">
+                    <colgroup>
+                        <col width="440" />
+                        <col width="50" />
+                    </colgroup>
+                    <tbody>
+                    </tbody>
+                </table>
+                
+                <script type="text/javascript">
+                    var table = $('n_vlastnilinky');
+                </script>
+            </td>
+        </tr>
     </tbody>
 </table>
 <script type="text/javascript">

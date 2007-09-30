@@ -441,7 +441,7 @@ Page.prototype = {
             
             $A(this.url.substring(argsIndex + 1).match(/[^&=]+=[^&=]+/g)).each(function(a) {
                 var pair = a.split("=");
-                _this.arguments[pair[0]] = pair[1];
+                _this.arguments[pair[0]] = unescape(pair[1]);
             });
         }
     }

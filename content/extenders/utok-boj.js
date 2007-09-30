@@ -88,6 +88,7 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Nastaveni readonly atributu polim ktere maji byt readonly
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Utok - Readonly fix"; },
 

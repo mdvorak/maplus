@@ -89,12 +89,23 @@ pageExtenders.add(PageExtender.create({
             
         // Najdi 'kolik' pole pro stejny formular jako je pocet tahu (nutne kvuli formulari pro propousteni)
         context.kolik = $X('.//input[@name = "kolik"]', context.tahy.form);    
-        return (context.kolik != null);
+        context.jednotka = $X('.//select[@name = "jednotka"]', context.tahy.form);    
+        return (context.kolik != null && context.jednotka != null);
     },
     
     process: function(page, context) {
+        context.jednotka.setAttribute("onchange", null);
+    
         Event.observe(context.kolik, "keyup", function() { spocitat_tahy(); }, false);
         Event.observe(context.tahy, "keyup", function() { spocitat_pocet(); }, false);
+        
+        var jednotkaChange = function() {
+            if (context.tahy.value == '')
+                context.tahy.value = "1";
+            spocitat_pocet();
+        };
+        Event.observe(context.jednotka, "keyup", jednotkaChange, false);
+        Event.observe(context.jednotka, "change", jednotkaChange, false);
     }
 }));
 

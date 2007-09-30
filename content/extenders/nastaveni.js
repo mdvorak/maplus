@@ -54,9 +54,8 @@ pageExtenders.add(PageExtender.create({
             window.initNastaveni = null;
             
             // Zobraz id admina
-            var adminLink = MaPlus.Tooltips.createActiveId(page, ADMIN_ID);
-            if (adminLink != null) {
-                adminLink.className = "";
+            if (ADMIN_ID != null) {
+                adminLink = Element.create("a", ADMIN_ID, {href: MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: ADMIN_ID})});
                 $('plus_mikeeId').appendChild(adminLink);
             }
         

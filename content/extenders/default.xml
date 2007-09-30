@@ -38,6 +38,9 @@
     <script url="#{melior}/prehled.html" name="prehled.js" />
     <script url="#{melior}/budovy.html" name="budovy.js" type="application/javascript;version=1.7" />
 
+    <!-- Zobrazeni externiho linku v obsahu -->
+    <script url="#{melior}/main.html" name="externilink.js" />
+
     <!-- Nastaveni -->
     <script url="#{melior}/main.html" name="bestiar-style.js" />
     <script url="#{melior}/main.html" name="nastaveni.js" />
