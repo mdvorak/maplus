@@ -200,7 +200,7 @@ nastaveniManager.addTab("Menu", "n_menu");
             <td><span>Nebalit zprávy od posla</span></td>
             <td>
                 <input type="checkbox"
-                    onload="this.checked = this.config.getPrefNode('posta', true).getNumber('nebalitPosla', false);"
+                    onload="this.checked = this.config.getPrefNode('posta', true).getBoolean('nebalitPosla', false);"
                     onsave="this.config.getPrefNode('posta', true).setPref('nebalitPosla', this.checked);" />
             </td>
         </tr>
