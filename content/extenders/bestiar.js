@@ -402,10 +402,15 @@ pageExtenders.add(PageExtender.create({
                 var id = parseInt(td.textContent.match(/(?:.*?\s+\[\s+(\d+)\s+\])?/)[1]);
                 
                 var link = MaPlus.Tooltips.createActiveUnit(page, jmeno);
-                link.innerHTML = '<span>' + jmeno + '</span>';
-                
-                td.innerHTML = '<span>&nbsp;</span>';
-                td.appendChild(link);
+                if (link != null) {
+                    link.innerHTML = '<span>' + jmeno + '</span>';
+                    
+                    td.innerHTML = '<span>&nbsp;</span>';
+                    td.appendChild(link);
+                }
+                else {
+                    td.innerHTML = '<span>&nbsp;</span>' + td.innerHTML;
+                }
                 
                 if (!isNaN(id)) {
                 	link = MaPlus.Tooltips.createActiveId(page, id);

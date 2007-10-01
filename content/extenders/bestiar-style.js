@@ -121,8 +121,13 @@ var BestiarColumnStyle = {
         td.style.color = Color.fromRange(data.zkusenost, 0.20, 0.60, Color.Pickers.redGreen);
     },
     silaJednotky: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + data.silaJednotky.toFixed(2) + '&nbsp;</span>';
-        td.style.color = Color.fromRange(data.silaJednotky, 1, 220, Color.Pickers.grayWhite);
+        if (!isNaN(data.silaJednotky)) {
+            td.innerHTML = '<span>&nbsp;' + data.silaJednotky.toFixed(2) + '&nbsp;</span>';
+            td.style.color = Color.fromRange(data.silaJednotky, 1, 220, Color.Pickers.grayWhite);
+        }
+        else {
+            td.innerHTML = '<span>&nbsp;??.??&nbsp;</span>';
+        }
     },
     druh: function(td, data) {
         td.innerHTML = '<span>&nbsp;' + data.druh + '</span>';
@@ -139,7 +144,7 @@ var BestiarColumnStyle = {
             td.innerHTML = '<span>&nbsp;---&nbsp;</span>';
     },
     phb: function(td, data) {
-        td.innerHTML = '<span>' + data.phb + '</span>';
+        td.innerHTML = '<span>' + (data.phb || '?') + '</span>';
         td.style.textAlign = "center";
         td.className = "phb" + data.phb;
     },
@@ -160,7 +165,10 @@ var BestiarColumnStyle = {
         td.style.color = Color.fromRange(data.ini, 5, 35, Color.Pickers.redGreen);
     },
     silaStacku: function(td, data) {
-        td.style.color = Color.fromRange(data.silaStacku, 500, 12000, Color.Pickers.grayWhite);
+        if (!isNaN(data.silaJednotky))
+            td.style.color = Color.fromRange(data.silaStacku, 500, 12000, Color.Pickers.grayWhite);
+        else
+            td.innerHTML = '<span>&nbsp;???&nbsp;</span>';
     },
     maxSilaStacku: function(td, data) {
         td.style.color = Color.fromRange(data.maxSilaStacku, 1000, 25000, Color.Pickers.grayWhite);
