@@ -48,7 +48,12 @@ pageExtenders.add(PageExtender.create({
         return true;
     },
 
-    process: function(page, context) {        
+    process: function(page, context) {    
+        // Uprav rozlozeni obrazovky
+        page.content.setAttribute("width", null);
+        page.leftMenu.setAttribute("width", "29%");
+        page.rightMenu.setAttribute("width", "29%");
+        
         // Na konci html se vyvola funkce window.initNastaveni(); kde se provede vlastni inicializace
         window.initNastaveni = function() {
             window.initNastaveni = null;

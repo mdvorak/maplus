@@ -12,7 +12,7 @@ td.nadpis
 <div><img height="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></div>
 
 <!-- Vytvoreni containeru pro taby -->
-<div id="n_container" style="text-align: left;"></div>
+<div id="n_container" style="text-align: left; width: 460px;"></div>
 <script type="text/javascript">
 window.nastaveniManager = new TabManager('n_container');
 </script>
@@ -22,10 +22,10 @@ window.nastaveniManager = new TabManager('n_container');
 <table id="n_obecne" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
         <col width="10" />
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
     </colgroup>
     <tbody>
         <tr>
@@ -76,10 +76,10 @@ nastaveniManager.addTab("Obecné", "n_obecne");
 <table id="n_menu" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
         <col width="10" />
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
     </colgroup>
     <tbody>
         <tr>
@@ -155,10 +155,10 @@ nastaveniManager.addTab("Menu", "n_menu");
 <table id="n_posta" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
         <col width="10" />
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
     </colgroup>
     <tbody>
         <tr>
@@ -252,10 +252,10 @@ nastaveniManager.addTab("Pošta", "n_posta");
 <table id="n_bestiar" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
         <col width="10" />
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
     </colgroup>
     <tbody>
         <script type="text/javascript">
@@ -315,12 +315,21 @@ nastaveniManager.addTab("Pošta", "n_posta");
             <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
             
             <td colspan="2" style="vertical-align: top;">
-                <table>
+                <table cellpadding="0" cellspacing="0">
                     <colgroup>
                         <col width="140" />
-                        <col width="100" />
+                        <col width="80" />
                     </colgroup>
                     <tbody>
+                        <tr title="Posune postranní menu více k okraji obrazovky.">
+                            <td><span>Široká tabulka bestiáře</span></td>
+                            <td>
+                                <input type="checkbox"
+                                    onload="this.checked = this.config.getAukce().getBoolean('sirokaTabulka', false);"
+                                    onsave="this.config.getAukce().setPref('sirokaTabulka', this.checked);" />
+                            </td>
+                        </tr>
+            
                         <!-- TODO -->
                     </tbody>
                 </table>
@@ -337,9 +346,13 @@ nastaveniManager.addTab("Pošta", "n_posta");
                     &nbsp;
                 </span>
             </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
         </tr>
         <td colspan="2">
             <span class="small dark">(Pro výběr použijte Ctrl nebo Shift)</span>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
         </td>
         <script type="text/javascript">
             NastaveniBestiar.init('plus_bestiarSloupce');
@@ -378,10 +391,10 @@ nastaveniManager.addTab("Bestiář", "n_bestiar");
 <table id="n_about" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
         <col width="10" />
         <col width="140" />
-        <col width="100" />
+        <col width="80" />
     </colgroup>
     <tbody>
         <tr>

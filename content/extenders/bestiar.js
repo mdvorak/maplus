@@ -155,6 +155,25 @@ pageExtenders.add(PageExtender.create({
     process: null
 }));
 
+// Zvetsit sirku tabulky bestiare
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Rozlozeni stranky"; },
+
+    analyze: function(page, context) {
+        // Bestiar
+        if (!page.bestiar || !page.bestiar.table || !page.bestiar.sloupce)
+            return false;    
+       
+        return page.config.getAukce().getBoolean("sirokaTabulka", false);
+    },
+
+    process: function(page, context) {
+        // Uprav rozlozeni stranky
+        page.content.setAttribute("width", null);
+        page.leftMenu.setAttribute("width", 160);
+        page.rightMenu.setAttribute("width", 160);
+    }
+}));
 
 // Sloupce
 pageExtenders.add(PageExtender.create({
