@@ -27,7 +27,8 @@ window.Poznamky = {
         poznamky.value = value || "";
 
         if (onchange) {
-            Event.observe(poznamky, "change", onchange, true);
+            Event.observe(poznamky, "change", onchange);
+            Event.observe(poznamky, "blur", onchange);
         }
     }
 }

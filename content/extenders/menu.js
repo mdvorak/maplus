@@ -171,12 +171,23 @@ pageExtenders.add(PageExtender.create({
         page.leftMenu.appendChild(div);
 
         var cfg = context.poznamky;
+        var tracker = 0;
+        
         // Definovano v html
-        Poznamky.init(cfg.getPref("text", ""), 
-            function(e)
-            {
+        Poznamky.init(cfg.getPref("text", ""), function(e) {
+            if (e.type == "change") {
+                var id = ++tracker;
+                // Tohle zajisti update ale nebude ho spamovat pri kazdy klavese 
+                setTimeout(function() {
+                    if (tracker == id)
+                        cfg.setPref("text", e.target.value);
+                }, 3000);
+            }
+            else {
+                ++tracker;
                 cfg.setPref("text", e.target.value);
-            });
+            }
+        });
     }
 }));
 
