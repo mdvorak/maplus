@@ -602,7 +602,7 @@ pageExtenders.add(PageExtender.create({
         }
         
         if (context.config.hasRules("filter"))
-            spanFilterAktivovan.style.display = '';
+            $('plus_filterAktivovan').style.display = '';
     },
     
     _createRulesTooltipHtml: function(table, config, header, regent, provincie) {
