@@ -154,8 +154,8 @@ pageExtenders.add(PageExtender.create({
             zprava.linkOdpovedet = $X('td//a[. = "Odpovědět"]', trHeader);
             zprava.linkPredat = $X('td//a[. = "Předat"]', trHeader);
             zprava.fontCas = $X('td[2]/font[2]', trHeader);
+            zprava.inputSmazat = $X('td[2]/font/input[starts-with(@name, "smazat_") and @type = "checkbox"]', trHeader);
             zprava.fontText = $X('tbody/tr[2]/td/p/font', zprava.element);
-            // TODO input oznacit
             
             zprava.typ = trHeader.className.match(/(?:_([a-zA-Z]+))?$/)[1];
             zprava.od = (zprava.linkOd != null) ? zprava.linkOd.textContent : null;
@@ -602,3 +602,43 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+
+// Smazat specificke typy zprav
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Posta -  Smazat zpravy podle typu"; },
+
+    analyze: function(page, context) {
+    	if (page.posta == null || page.posta.zpravy == null)
+            return false;
+        if (page.posta.zpravy.length == 0)
+            return false;
+        
+        context.ovladaniHtml = Chrome.loadText("html/posta_ovladani.html");
+        if (context.ovladaniHtml == null)
+            return false;
+        
+		return true;
+    },
+    
+    process: function(page, context) {
+        // Pomocna funkce
+		var oznacZpravy = function(checked, typy) {
+		    var oznaceno = 0;
+		    
+		    page.posta.zpravy.each(function(zprava) {
+			    if (zprava.inputSmazat != null && (typy == null || typy.indexOf(zprava.typ) > -1)) {
+			        zprava.inputSmazat.checked = checked;
+			    }
+			    
+			    if (zprava.inputSmazat != null && zprava.inputSmazat.checked)
+			        ++oznaceno;
+		    });
+		    
+		    return oznaceno;
+		};
+		
+        // TODO
+        
+        page.content.appendChild(Element.create("div", context.ovladaniHtml));
+    }
+}));

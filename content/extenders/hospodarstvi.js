@@ -94,14 +94,15 @@ pageExtenders.add(PageExtender.create({
                 phb: parseInt(row.cells.phb.textContent),
                 druh: row.cells.druh.textContent,
                 typ: row.cells.typ.textContent,
-                sila: parseInt(row.cells.zlata.textContent),
+                sila: parseInt(row.cells.sila.textContent),
                 pocet: parseInt(row.cells.zlata.textContent),
-                zlata: parseFloat(row.cells.zlata.textContent),
+                zlata: parseFloat(row.cells.pocet.textContent),
                 many: parseFloat(row.cells.many.textContent),
                 pop: parseFloat(row.cells.pop.textContent)
             };
             
             row.data.cenaZaSilu = -parseFloat(row.data.zlata) / row.data.sila * 1000
+            row.data.maxSila = Math.floor(100 * row.data.sila / row.data.zkusenost);
             
             jednotky.push(row);
         }
@@ -112,7 +113,12 @@ pageExtenders.add(PageExtender.create({
         return true;
     },
 
-    process: null
+    process: function(page, context) {
+        // Pridani tooltipu s max silou stacku
+        page.hospodarstvi.jednotky.each(function(row) {
+            row.cells.sila.setAttribute("title", "Max síla stacku: " + row.data.maxSila);
+        }); 
+    }
 }));
 
 
