@@ -40,16 +40,18 @@ pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         if (page.arguments["vypis"] != "utoky_detailne")
             return false;
-            
-        page.tableRozdane = $X('table[tbody/tr[1]/td[1]/font/b = "Rozdané útoky"]', page.content);
-        page.tableBranene = $X('table[tbody/tr[1]/td[1]/font/b = "Bráněné útoky"]', page.content);
-        if (!page.tableRozdane || !page.tableBranene)
+        
+        var vypis = page.vypis = new Object();
+        
+        vypis.tableRozdane = $X('table[tbody/tr[1]/td[1]/font/b = "Rozdané útoky"]', page.content);
+        vypis.tableBranene = $X('table[tbody/tr[1]/td[1]/font/b = "Bráněné útoky"]', page.content);
+        if (!vypis.tableRozdane || !vypis.tableBranene)
             return false;
             
-        page.tableRozdane.utoky = this._zpracujTabulku(page.tableRozdane);
-        page.tableBranene.utoky = this._zpracujTabulku(page.tableBranene);
+        vypis.rozdaneUtoky = this._zpracujTabulku(vypis.tableRozdane);
+        vypis.braneneUtoky = this._zpracujTabulku(vypis.tableBranene);
         
-        console.debug("Utoky rozdane=%d branene=%d", page.tableRozdane.utoky.length, page.tableBranene.utoky.length);
+        console.debug("Utoky rozdane=%d branene=%d", vypis.rozdaneUtoky.length, vypis.braneneUtoky.length);
         
         return true;
     },
@@ -69,43 +71,46 @@ pageExtenders.add(PageExtender.create({
             
             if (isNaN(id))
                 continue;
+                
+            var row = ElementDataStore.get(tr);
             
             // Bunky
-            tr.cells.barva = tr.cells[1];
-            tr.cells.id = tr.cells[2];
-            tr.cells.regent = tr.cells[3];
-            tr.cells.presvedceni = tr.cells[4];
-            tr.cells.cas = tr.cells[5];
-            tr.cells.sila = tr.cells[6];
-            tr.cells.uroven = tr.cells[7];
-            tr.cells.typ = tr.cells[8];
-            tr.cells.status = tr.cells[9];
-            tr.cells.utok = tr.cells[10];
-            tr.cells.ztratyUtocnik = tr.cells[11];
-            tr.cells.ztratyObrance = tr.cells[13];
+            row.cells = {
+                barva: tr.cells[1],
+                id: tr.cells[2],
+                regent: tr.cells[3],
+                presvedceni: tr.cells[4],
+                cas: tr.cells[5],
+                sila: tr.cells[6],
+                uroven: tr.cells[7],
+                typ: tr.cells[8],
+                status: tr.cells[9],
+                utok: tr.cells[10],
+                ztratyUtocnik: tr.cells[11],
+                ztratyObrance: tr.cells[13]
+            }
             
             // Data
-            var m = tr.cells.cas.textContent.match(/(\d+):(\d+)/);
+            var m = row.cells.cas.textContent.match(/(\d+):(\d+)/);
             var cas = m ? parseInt(m[1]) * 60 + parseInt(m[2]) : Number.NaN;
             
-            var utok = {
-                row: tr,
+            row.utok = {
+                tr: tr,
             
-                barva: tr.cells.barva.textContent,
+                barva: row.cells.barva.textContent[0],
                 id: id,
-                regent: tr.cells.regent.textContent,
-                presvedceni: tr.cells.presvedceni.textContent[0],
+                regent: row.cells.regent.textContent,
+                presvedceni: row.cells.presvedceni.textContent[0],
                 cas: cas, // Cas od utoku v minutach
-                sila: parseInt(tr.cells.sila.textContent),
-                uroven: parseFloat(tr.cells.uroven.textContent),
-                typ: tr.cells.typ.textContent,
-                status: tr.cells.status.textContent,
-                ztratyUtocnik: parseFloat(tr.cells.ztratyUtocnik.textContent),
-                ztratyObrance: parseFloat(tr.cells.ztratyObrance.textContent)
+                sila: parseInt(row.cells.sila.textContent),
+                uroven: parseFloat(row.cells.uroven.textContent),
+                typ: row.cells.typ.textContent,
+                status: row.cells.status.textContent,
+                ztratyUtocnik: parseFloat(row.cells.ztratyUtocnik.textContent),
+                ztratyObrance: parseFloat(row.cells.ztratyObrance.textContent)
             };
             
-            tr.data = utok;
-            utoky.push(utok);
+            utoky.push(row.utok);
         }
         
         return utoky;
@@ -118,14 +123,13 @@ pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         if (page.arguments["vypis"] != "utoky_detailne")
             return false;
-            
-        if (!page.tableRozdane || !page.tableBranene)
+        if (page.vypis == null)
             return false;
             
-        page.tableRozdane.tdStats = $X('tbody/tr[last()]/td[1]', page.tableRozdane);
-        page.tableBranene.tdStats = $X('tbody/tr[last()]/td[1]', page.tableBranene);
+        context.tdRozdaneStats = $X('tbody/tr[last()]/td[1]', page.vypis.tableRozdane);
+        context.tdBraneneStats = $X('tbody/tr[last()]/td[1]', page.vypis.tableBranene);
         
-        if (!page.tableRozdane.tdStats || !page.tableBranene.tdStats)
+        if (context.tdRozdaneStats == null || context.tdBraneneStats == null)
             return false;
         
         // Vypocitej statistiky
@@ -133,7 +137,7 @@ pageExtenders.add(PageExtender.create({
         context.nevracenoPrv = 0;
         context.posledniBojMinuty = null;
         
-        page.tableRozdane.utoky.each(function(utok) {
+        page.vypis.rozdaneUtoky.each(function(utok) {
             if (utok.cas < 24*60)
                 context.utokuZaPosledniDen++;
             if (utok.typ.search("nevráceno") > -1)
@@ -145,7 +149,7 @@ pageExtenders.add(PageExtender.create({
         context.nevracenoCsek = 0;
         context.prvDoProtu = 3;
         
-        page.tableBranene.utoky.each(function(utok) {
+        page.vypis.braneneUtoky.each(function(utok) {
             if (utok.typ.search("nevráceno") > -1)
                 context.nevracenoCsek++; 
             if (utok.typ.search("prvoútok") > -1 
@@ -182,7 +186,7 @@ pageExtenders.add(PageExtender.create({
         else
             utokyStats += "rozdáno <i>" + context.utokuZaPosledniDen + "</i> útoků.";
             
-        page.tableRozdane.tdStats.innerHTML = '<font size="1">' + utokyStats + '</font>';
+        context.tdRozdaneStats.innerHTML = '<font size="1">' + utokyStats + '</font>';
         
         // Obrana
         obranaStats = "Zbývá vrátit <i>" + context.nevracenoCsek + "</i> ";
@@ -200,7 +204,7 @@ pageExtenders.add(PageExtender.create({
                 obranaStats += "<br/>Zbývají <i>" + context.prvDoProtu + "</i> prvoútoky do protu.";
         }
         
-        page.tableBranene.tdStats.innerHTML = '<font size="1">' + obranaStats + '</font>';
+        context.tdBraneneStats.innerHTML = '<font size="1">' + obranaStats + '</font>';
         
     }
 }));
@@ -211,14 +215,14 @@ pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         if (page.arguments["vypis"] != "utoky_detailne")
             return false;
-        if (!page.tableRozdane || !page.tableBranene)
+        if (page.vypis == null)
             return false;
         return true;
     },
 
     process: function(page, context) {
-        TableHelper.thinBorders(page.tableRozdane);
-        TableHelper.thinBorders(page.tableBranene);
+        TableHelper.thinBorders(page.vypis.tableRozdane);
+        TableHelper.thinBorders(page.vypis.tableBranene);
     }
 }));
 
@@ -228,39 +232,39 @@ pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         if (page.arguments["vypis"] != "utoky_detailne")
             return false;
-        if (!page.tableRozdane || !page.tableBranene)
+        if (page.vypis == null)
             return false;
             
         context.barvy = page.config.getBarevnyText();
         
-        context.vsechnyUtoky = $A(page.tableRozdane.utoky).concat($A(page.tableBranene.utoky));
+        context.vsechnyUtoky = page.vypis.rozdaneUtoky.concat(page.vypis.braneneUtoky);
         return context.vsechnyUtoky.length > 0;
     },
 
     process: function(page, context) {
         context.vsechnyUtoky.each(function(utok) {
-            var tr = utok.row;
+            var row = ElementDataStore.get(utok.tr);
     
             // Obarvy uroven
             if (context.barvy) {
-                tr.cells.uroven.style.color = Color.fromRange(utok.uroven, 125, 50, Color.Pickers.redGreen);
+                row.cells.uroven.style.color = Color.fromRange(utok.uroven, 125, 50, Color.Pickers.redGreen);
             }
             
             // Linky
             var link = MaPlus.Tooltips.createActiveId(page, utok.id);
-            tr.cells.id.innerHTML = "<span></span>";
-            tr.cells.id.valign = "middle";
-            tr.cells.id.firstChild.appendChild(link);
+            row.cells.id.innerHTML = "<span></span>";
+            row.cells.id.valign = "middle";
+            row.cells.id.firstChild.appendChild(link);
 
             // Nahrad v typu newline mezerou 
-            tr.cells.typ.innerHTML = tr.cells.typ.innerHTML.replace('<br>', ' ');
+            row.cells.typ.innerHTML = row.cells.typ.innerHTML.replace('<br>', ' ');
             
             // Tooltip kdy vyprsi utok
             var casUtoku = new Date().getTime() - utok.cas * 60 * 1000;
             var vyprsi = new Date(casUtoku + 72 * 3600 * 1000);
             vyprsi.setSeconds(0, 0);
             
-            tr.cells.cas.setAttribute("title", "Vyprší: " + vyprsi.toLocaleString().replace(/:00$/, ""));
+            row.cells.cas.setAttribute("title", "Vyprší: " + vyprsi.toLocaleString().replace(/:00$/, ""));
         });
     }
 }));
