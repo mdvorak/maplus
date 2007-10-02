@@ -47,9 +47,17 @@ pageExtenders.add(PageExtender.create({
         vypis.tableBranene = $X('table[tbody/tr[1]/td[1]/font/b = "Bráněné útoky"]', page.content);
         if (!vypis.tableRozdane || !vypis.tableBranene)
             return false;
-            
-        vypis.rozdaneUtoky = this._zpracujTabulku(vypis.tableRozdane);
-        vypis.braneneUtoky = this._zpracujTabulku(vypis.tableBranene);
+        
+        try {
+            console.group("Rozdane utoky");
+            vypis.rozdaneUtoky = this._zpracujTabulku(vypis.tableRozdane);
+        } 
+        finally { console.groupEnd(); }
+        try {
+            console.group("Branene utoky");
+            vypis.braneneUtoky = this._zpracujTabulku(vypis.tableBranene);
+        } 
+        finally { console.groupEnd(); }
         
         console.debug("Utoky rozdane=%d branene=%d", vypis.rozdaneUtoky.length, vypis.braneneUtoky.length);
         
@@ -94,7 +102,7 @@ pageExtenders.add(PageExtender.create({
             var m = row.cells.cas.textContent.match(/(\d+):(\d+)/);
             var cas = m ? parseInt(m[1]) * 60 + parseInt(m[2]) : Number.NaN;
             
-            row.utok = {
+            var utok = {
                 tr: tr,
             
                 barva: row.cells.barva.textContent[0],
@@ -110,7 +118,10 @@ pageExtenders.add(PageExtender.create({
                 ztratyObrance: parseFloat(row.cells.ztratyObrance.textContent)
             };
             
-            utoky.push(row.utok);
+            row.utok = utok;
+            utoky.push(utok);
+            
+            console.log("Utok id=%d cas=%d sila=%d uroven=%f\% typ=%s status=%s vysledek=%f:%f", utok.id, utok.cas, utok.sila, utok.uroven, utok.typ, utok.status, utok.ztratyUtocnik, utok.ztratyObrance);
         }
         
         return utoky;
@@ -236,6 +247,7 @@ pageExtenders.add(PageExtender.create({
             return false;
             
         context.barvy = page.config.getBarevnyText();
+        context.obarvovatVse = page.config.getPrefNode("vypis", true).getBoolean("obarvovatVse", false);
         
         context.vsechnyUtoky = page.vypis.rozdaneUtoky.concat(page.vypis.braneneUtoky);
         return context.vsechnyUtoky.length > 0;
@@ -246,7 +258,7 @@ pageExtenders.add(PageExtender.create({
             var row = ElementDataStore.get(utok.tr);
     
             // Obarvy uroven
-            if (context.barvy) {
+            if (context.barvy && (context.obarvovatVse || utok.typ.search("nevráceno") > 0)) {
                 row.cells.uroven.style.color = Color.fromRange(utok.uroven, 125, 50, Color.Pickers.redGreen);
             }
             
@@ -265,6 +277,41 @@ pageExtenders.add(PageExtender.create({
             vyprsi.setSeconds(0, 0);
             
             row.cells.cas.setAttribute("title", "Vyprší: " + vyprsi.toLocaleString().replace(/:00$/, ""));
+        });
+    }
+}));
+
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Vypis Utoku - Vracene utoky"; },
+
+    analyze: function(page, context) {
+        if (page.arguments["vypis"] != "utoky_detailne")
+            return false;
+        if (page.vypis == null)
+            return false;
+        
+        var cfg = page.config.getPrefNode("vypis", true);
+        var skrytPrva = cfg.getBoolean("skrytVraceneUtoky", false);
+        var skrytCska = cfg.getBoolean("skrytCska", false);
+        
+        if (!skrytPrva && !skrytCska)
+            return false;
+        
+        // Vytvor seznam vracench utoku
+        context.skrytRadky = new Array();
+        
+        page.vypis.rozdaneUtoky.concat(page.vypis.braneneUtoky).each(function(utok) {
+            if ((skrytPrva && utok.typ == "prvoútokvráceno") || (skrytCska && utok.typ == "csko")) {
+                context.skrytRadky.push(utok.tr);
+            }
+        });
+        
+        return context.skrytRadky.length > 0;
+    },
+
+    process: function(page, context) {
+        context.skrytRadky.each(function(tr) {
+            tr.style.display = 'none';
         });
     }
 }));

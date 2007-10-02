@@ -387,6 +387,52 @@ nastaveniManager.addTab("Pošta", "n_posta");
 nastaveniManager.addTab("Bestiář", "n_bestiar");
 </script>
 
+<!-- Výpis útoků -->
+<table id="n_vypis" cellpadding="0" cellspacing="0" style="display: none;">
+    <colgroup>
+        <col width="140" />
+        <col width="80" />
+        <col width="10" />
+        <col width="140" />
+        <col width="80" />
+    </colgroup>
+    <tbody>
+        <tr>
+            <td><span>Skrýt vrácené prvoútoky</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('vypis', true).getBoolean('skrytVraceneUtoky', false);"
+                    onsave="this.config.getPrefNode('vypis', true).setPref('skrytVraceneUtoky', this.checked);" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span>Skrýt cska</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('vypis', true).getBoolean('skrytCska', false);"
+                    onsave="this.config.getPrefNode('vypis', true).setPref('skrytCska', this.checked);" />
+            </td>
+        </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        
+        <tr>
+            <td><span>Obarvovat úrověň všech útoků</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('vypis', true).getBoolean('obarvovatVse', false);"
+                    onsave="this.config.getPrefNode('vypis', true).setPref('obarvovatVse', this.checked);" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+        </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+    </tbody>
+</table>
+<script type="text/javascript">
+nastaveniManager.addTab("Výpis útoků", "n_vypis");
+</script>
+
 <!-- O Aplikaci -->
 <table id="n_about" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
