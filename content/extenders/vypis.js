@@ -297,6 +297,10 @@ pageExtenders.add(PageExtender.create({
         if (!skrytPrva && !skrytCska)
             return false;
         
+        context.tableTop = $X('table[1 and count(tbody/tr) = 1]', page.content);
+        if (context.tableTop == null)
+            return false;
+        
         // Vytvor seznam vracench utoku
         context.skrytRadky = new Array();
         
@@ -310,8 +314,24 @@ pageExtenders.add(PageExtender.create({
     },
 
     process: function(page, context) {
+        // Skryj radky
         context.skrytRadky.each(function(tr) {
             tr.style.display = 'none';
         });
+        
+        // Zobraz skryte utoky
+        var spanUpozorneni = Element.create("span", "Některé útoky byly skryty.\xA0");
+        var linkZobrazit = spanUpozorneni.appendChild(Element.create("a", "Zobrazit", {href: "javascript://"}));
+        
+        Event.observe(linkZobrazit, 'click', function() {
+            context.skrytRadky.each(function(tr) {
+                tr.style.display = '';
+            });
+            
+            spanUpozorneni.innerHTML = '\xA0';
+        });
+        
+        page.content.insertBefore(spanUpozorneni, context.tableTop.nextSibling);
+        page.content.insertBefore(Element.create("br"), context.tableTop.nextSibling);
     }
 }));
