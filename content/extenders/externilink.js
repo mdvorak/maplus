@@ -41,7 +41,7 @@ pageExtenders.add(PageExtender.create({
         if (page.arguments["plus"] != "openurl" || page.arguments["url"] == null)
             return false;
         
-        context.url = page.arguments["url"];
+        context.url = unescape(page.arguments["url"]);
         if (context.url.search("http://") != 0) {
             console.error("Nepovolena adresa: %s", context.url);
             return false;

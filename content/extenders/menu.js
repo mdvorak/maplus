@@ -219,7 +219,7 @@ pageExtenders.add(PageExtender.create({
                     if (page.ftc) link += "&ftc=" + page.ftc;
                 }
                 else {
-                    link = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: link});
+                    link = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: escape(link)});
                 }
             }
             

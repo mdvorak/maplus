@@ -56,7 +56,7 @@ var MaPlus = {
         
         if (args) {
             args = $H(args);
-            args.keys().each(function(k) { url += "&" + k + "=" + escape(args[k]); });
+            args.keys().each(function(k) { url += "&" + k + "=" + args[k]; });
         }
         
         return url;
