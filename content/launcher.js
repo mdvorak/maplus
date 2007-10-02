@@ -38,6 +38,9 @@ window.addEventListener("load", function(e) {
     // Create and initialize extension private space in the XPCOM
     var privateSpace = Components.classes["@michal.dvorak/privatespace_maplus;1"].createInstance();
     privateSpace.wrappedJSObject.initialize(window);    
+    
+    // Register window
+    privateSpace.wrappedJSObject.registerWindow(window);    
 }, false);
 
 /*

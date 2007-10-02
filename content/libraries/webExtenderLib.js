@@ -185,14 +185,12 @@ Object.extend(Element, {
         var e = doc.createElement(tagName);
         
         if (attributes != null) {
-            for (var i in attributes) {
-                e.setAttribute(i, (attributes[i] != null) ? attributes[i] : "");
-            }
+            $H(attributes).each(function(attr) {
+                    e.setAttribute(attr[0], (attr[1] != null) ? attr[1] : "");
+                });
         }
         
-        if (innerHtml != null) {
-            e.innerHTML = innerHtml;
-        }
+        e.innerHTML = (innerHtml != null ? innerHtml : "");
         
         return e;
     }
@@ -441,7 +439,7 @@ Page.prototype = {
             
             $A(this.url.substring(argsIndex + 1).match(/[^&=]+=[^&=]+/g)).each(function(a) {
                 var pair = a.split("=");
-                _this.arguments[pair[0]] = unescape(pair[1]);
+                _this.arguments[pair[0]] = pair[1];
             });
         }
     }

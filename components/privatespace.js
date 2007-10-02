@@ -55,6 +55,7 @@ PrivateSpace.prototype = {
         if (this._initialized)
             return;
 
+        // Only for debugging
         alert = function() { win.alert.apply(win, arguments); };
         
         var jssubscriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
@@ -70,15 +71,21 @@ PrivateSpace.prototype = {
             jssubscriptLoader.loadSubScript(services[i]);
         }
         
-        // Must be loaded by services.xml
-        WebExtender.init(win);
-        
+        // Load includes
         var libraries = loadFileListDefinition(CONTENT_URL + "includes.xml", CONTENT_URL);
         for (var i = 0; i < libraries.length; i++) {
             ExtenderManager.include(libraries[i]);
         }
         
         this._initialized = true;
+    },
+    
+    registerWindow: function(win) {
+        if (!this._initialized)
+            return;
+    
+        // Must be loaded by services.xml
+        WebExtender.init(win);
     },
 
     // for nsISupports
