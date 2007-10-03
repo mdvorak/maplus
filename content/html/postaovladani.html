@@ -1,0 +1,52 @@
+<a href="javascript://" onclick="$('plus_ovladaniPosty').show(); $(this).hide();">
+    <span>Pokročilé ovládání pošty</span>
+</a>
+<table id="plus_ovladaniPosty" style="display: none;" cellspacing="0" cellpadding="0">
+    <colgroup>
+        <col width="130" />
+        <col width="30" />
+    </colgroup>
+    <tbody>
+        <tr>
+            <td colspan="2"><span>Zprávy typu:</span></td>
+        </tr>
+        <tr>
+            <td><span class="small">Posel</span></td>
+            <td><input id="plus_posel" type="checkbox" /></td>
+        </tr>
+        <tr>
+            <td><span class="small">Soukromá</span></td>
+            <td><input id="plus_soukroma" type="checkbox" /></td>
+        </tr>
+        <tr>
+            <td><span class="small">Veřejná aliance</span></td>
+            <td><input id="plus_verejna" type="checkbox" /></td>
+        </tr>
+        <tr>
+            <td><span class="small">Tajná aliance</span></td>
+            <td><input id="plus_tajna" type="checkbox" /></td>
+        </tr>
+        
+        <script type="text/javascript">
+            window.plus_vybraneTypyZprav = function() {
+                var typy = new Array();
+                
+                if ($('plus_posel').checked) typy.push("posel");
+                if ($('plus_soukroma').checked) typy.push("soukroma");
+                if ($('plus_verejna').checked) typy.push("verejna");
+                if ($('plus_tajna').checked) typy.push("tajna");
+                
+                return typy;
+            };
+        </script>
+        
+        <tr>
+            <td colspan="2" style="text-align: center;">
+                <input type="button" value="Označit" onclick="var typy = plus_vybraneTypyZprav(); plus_oznacZpravy(typy);" />
+                <!-- &nbsp;
+                <input type="button" value="Smazat" onclick="var typy = plus_vybraneTypyZprav(); plus_oznacZpravy(typy);" />
+                -->
+            </td>
+        </tr>
+    </tbody>
+</table>

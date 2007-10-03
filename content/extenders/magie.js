@@ -111,6 +111,22 @@ pageExtenders.add(PageExtender.create({
                     e.appendChild(document.createTextNode(")"));
                     e.appendChild(document.createTextNode(provincie));
                 }
-            });      
+            });
+    }
+}));
+
+// Zobrazit hlasku pokud bylo kouzlo seslano pres url
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Magie - Upozorneni"; },
+
+    analyze: function(page, context) {
+        return (page.name == "magie.html" 
+             && parseInt(page.arguments["kolikrat"]) > 0 
+             && parseInt(page.arguments["seslat_kouzlo"]) > 0);
+    },
+    
+    process: function(page, context) {
+        var upozorneni = Element.create("span", 'Kouzlo sesláno<br/><br/>', {style: "color: #FFDD55;"});
+        page.content.insertBefore(upozorneni, page.content.firstChild);
     }
 }));

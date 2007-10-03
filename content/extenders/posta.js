@@ -613,7 +613,7 @@ pageExtenders.add(PageExtender.create({
         if (page.posta.zpravy.length == 0)
             return false;
         
-        context.ovladaniHtml = Chrome.loadText("html/posta_ovladani.html");
+        context.ovladaniHtml = Chrome.loadText("html/postaovladani.html");
         if (context.ovladaniHtml == null)
             return false;
         
@@ -622,19 +622,12 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         // Pomocna funkce
-		var oznacZpravy = function(checked, typy) {
-		    var oznaceno = 0;
-		    
+		window.plus_oznacZpravy = function(typy) {
 		    page.posta.zpravy.each(function(zprava) {
-			    if (zprava.inputSmazat != null && (typy == null || typy.indexOf(zprava.typ) > -1)) {
-			        zprava.inputSmazat.checked = checked;
-			    }
-			    
-			    if (zprava.inputSmazat != null && zprava.inputSmazat.checked)
-			        ++oznaceno;
+		        if (zprava.inputSmazat != null) {
+		            zprava.inputSmazat.checked = (typy == null || typy.indexOf(zprava.typ) > -1);
+		        }
 		    });
-		    
-		    return oznaceno;
 		};
 		
         // TODO

@@ -95,8 +95,8 @@ pageExtenders.add(PageExtender.create({
                 druh: row.cells.druh.textContent,
                 typ: row.cells.typ.textContent,
                 sila: parseInt(row.cells.sila.textContent),
-                pocet: parseInt(row.cells.zlata.textContent),
-                zlata: parseFloat(row.cells.pocet.textContent),
+                pocet: parseInt(row.cells.pocet.textContent),
+                zlata: parseFloat(row.cells.zlata.textContent),
                 many: parseFloat(row.cells.many.textContent),
                 pop: parseFloat(row.cells.pop.textContent)
             };
@@ -105,6 +105,7 @@ pageExtenders.add(PageExtender.create({
             row.data.maxSila = Math.floor(100 * row.data.sila / row.data.zkusenost);
             
             jednotky.push(row);
+            console.log("Stack jmeno=%s zkusenost=%f\% phb=%d druh=%s typ=%s sila=%d pocet=%d zlata=%d many=%d pop=%d", row.data.jmeno, row.data.zkusenost, row.data.phb, row.data.druh, row.data.typ, row.data.sila, row.data.pocet, row.data.zlata, row.data.many, row.data.pop);
         }
         
         page.hospodarstvi.jednotky = jednotky;
