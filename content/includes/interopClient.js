@@ -38,7 +38,7 @@
 var Marshal = {
     _proxyCache: new Hash(),
     
-    callMethod: function(objectName, methodName, args) {
+    callMethod: function(objectName, methodName, args, isAnonymousReference) {
         if (objectName == null)
             throw new ArgumentNullException("objectName");
         if (methodName == null)
@@ -50,9 +50,9 @@ var Marshal = {
         if (args != null) {
             for (var i = 0; i < args.length; i++) {
                 if (this.isProxy(args[i]))
-                    transportArgs.push({ reference: args[i].__proxy });
+                    transportArgs.push({ reference: args[i].__proxy, toString: function() { return "<ref " + this.reference + ">"; } });
                 else
-                    transportArgs.push({ value: args[i] });
+                    transportArgs.push({ value: args[i], toString: function() { return this.value; } });
             }
         }
         
@@ -60,7 +60,8 @@ var Marshal = {
         document.body.appendChild(elem);
         
         try {
-            this._group("Marshal: Calling method %s.%s(%s)", objectName, methodName, args.join(", "));
+            var objectDescription = (!isAnonymousReference ? objectName : "<ref " + objectName + ">");
+            this._group("Marshal: Calling method %s.%s(%s)", objectDescription, methodName, transportArgs.join(", "));
             
             elem.setAttribute("objectName", objectName);
             elem.setAttribute("methodName", methodName);
@@ -93,7 +94,7 @@ var Marshal = {
 
                 var proxy = this._proxyCache[reference.objectId];
                 if (proxy == null) {
-                    proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition);
+                    proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition, true);
                     this._proxyCache[reference.objectId] = proxy;
                 }
                 
@@ -116,7 +117,7 @@ var Marshal = {
 
                     var proxy = this._proxyCache[reference.objectId];
                     if (proxy == null) {
-                        proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition);
+                        proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition, true);
                         this._proxyCache[reference.objectId] = proxy;
                     }
                     
@@ -185,7 +186,7 @@ var Marshal = {
                 && typeof object.__proxy == "string");
     },
     
-    _createProxyFromDefinition: function(objectName, def) {
+    _createProxyFromDefinition: function(objectName, def, isAnonymousReference) {
         if (objectName == null)
             throw new ArgumentNullException("objectName");
         if (def == null)
@@ -199,7 +200,7 @@ var Marshal = {
         var _this = this;
         proxyMethods.each(
             function(method) {
-                proxy[method.name] = function() { return _this.callMethod(objectName, method.name, $A(arguments)); };
+                proxy[method.name] = function() { return _this.callMethod(objectName, method.name, $A(arguments), isAnonymousReference); };
             });
             
         proxy.__proxy = objectName;

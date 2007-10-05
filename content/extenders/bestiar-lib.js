@@ -146,15 +146,15 @@ PlusConfig.Aukce.prototype = {
     
         var f = this.evalPrefNode('filter[@name = "' + name + '" and @type = "' + type + '"]');
         if (f != null) {
-            f.setPref(null, condition);
+            this.removePrefNode(f);
+            f = null;
         }
-        else {
-            var first = this.getFirstChild();
-            f = (first ? this.insertPref : this.addPref)("filter", condition, first);
-            
-            f.setAttribute("name", name);
-            f.setAttribute("type", type);
-        }
+        
+        var first = this.getFirstChild();
+        f = (first ? this.insertPref : this.addPref)("filter", condition, first);
+        
+        f.setAttribute("name", name);
+        f.setAttribute("type", type);
 
         return f;
     },
