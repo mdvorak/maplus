@@ -385,8 +385,6 @@ Object.extend(Marshal, {
         
         page.document.addEventListener("MarshalMethodCall", function(event) { _this._methodCallHandler(event); }, false);
         page.document.addEventListener("MarshalGetProxyDefinition", function(event) { _this._getProxyDefinitionHandler(event); }, false);
-        
-        Script.executeFile(page.document, CHROME_CONTENT_URL + "interopClient.js");
     },
     
     // Callback must be function(document, objectName) which must throw exception when call is invalid

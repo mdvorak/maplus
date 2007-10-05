@@ -52,7 +52,7 @@ var Marshal = {
                 if (this.isProxy(args[i]))
                     transportArgs.push({ reference: args[i].__proxy, toString: function() { return "<ref " + this.reference + ">"; } });
                 else
-                    transportArgs.push({ value: args[i], toString: function() { return this.value; } });
+                    transportArgs.push({ value: args[i], toString: function() { return "" + this.value; } });
             }
         }
         
