@@ -63,14 +63,25 @@ var Tooltip = {
                 tooltip.appendChild(html);
         }
         
-        Event.observe(tooltip, 'mouseout', function(e)
-            {
-                if (e.pageX < this.offsetLeft || e.pageX >= (this.offsetLeft + this.offsetWidth)
-                        || e.pageY < this.offsetTop || e.pageY >= (this.offsetTop + this.offsetHeight)) {
-                    this.hideTooltip();
-                }
-            }, false);
-            
+        var tracker = 0;
+             
+        Event.observe(tooltip, 'mouseout', function(e) {
+            if (e.pageX < this.offsetLeft || e.pageX >= (this.offsetLeft + this.offsetWidth)
+                    || e.pageY < this.offsetTop || e.pageY >= (this.offsetTop + this.offsetHeight)) {
+                // Hide tooltip after some amount of time
+                var id = ++tracker;
+                setTimeout(function() {
+                    // Don't hide tooltip when mouse has returned into tooltip area
+                    if (tracker == id)
+                        tooltip.hideTooltip();
+                }, 250);
+            }
+        });
+        
+        Event.observe(tooltip, 'mouseover', function(e) {
+            ++tracker;
+        });
+        
         if (hideOnClick) 
             Event.observe(tooltip, 'click', function() { this.hideTooltip(); }, false);
             
