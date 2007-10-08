@@ -1,4 +1,4 @@
-/* ***** BEGIN LICENSE BLOCK *****
+﻿/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -33,23 +33,41 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
+ 
+var Dialog = Class.create();
 
-const EXTENSION_NAME = "maplus";
-const EXTENSION_ID = "maplus@michal.dvorak";
-const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
+Dialog.prototype = {
+    _createContentElement: function() {
+        throw new InvalidOperationException("Not implemented.");
+    },
+    
+    _getContentElement: function() {
+        if (this._contentElement == null) {
+            this._contentElement = this._createContentElement();
+        }
+        return this._contentElement;
+    },
+    
+    _createModalContainer: function() {
+        var divBackround = Element.create("div", null, {style: "layer-background-color: lightgrey; z-index: 0; background: lightgrey; position: absolute;"});
+        var divContent = Element.create("div", null, {style: "position: absolute;"});
+        
+        divBackround.appendChild(divContent);
+        return divContent;
+    },
+    
+    _getModalContainer: function() {
+        if (this._modalContainer == null) {
+            this._modalContainer = this._createModalContainer();
+        }
+        return this._modalContainer;
+    },
 
-const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
-const CHROME_CONTENT_URL = CHROME_URL + "content/";
+    show: function() {
+        
+    }
+};
 
-// Debugging
-const DEBUG = 1; // Generic debugging option
-const MARSHAL_DEBUG = 1; // 0=None, 1=Basic, 2=Verbose
-const XPATH_DEBUG = 1;
-
-// Oznaceni veku
-const AGE_NAME = "5.6"; // Pozn: Zmena tohoto atributu vymaze veskere nastaveni
-const ADMIN_ID = 2131; // Vek 5.6
-
-// Custom constants
-const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
-
+Object.extend(Dialog, {
+    
+});

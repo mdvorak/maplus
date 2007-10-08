@@ -185,12 +185,14 @@ Object.extend(Element, {
         var e = doc.createElement(tagName);
         
         if (attributes != null) {
-            $H(attributes).each(function(attr) {
-                    e.setAttribute(attr[0], (attr[1] != null) ? attr[1] : "");
-                });
+            for (var i in attributes) {
+                e.setAttribute(i, (attributes[i] != null) ? attributes[i] : "");
+            }
         }
         
-        e.innerHTML = (innerHtml != null ? innerHtml : "");
+        if (innerHtml != null) {
+            e.innerHTML = innerHtml;
+        }
         
         return e;
     }
@@ -203,7 +205,12 @@ Exception.prototype = {
     initialize: function(message, innerException) {
         this.message = message;
         this.innerException = innerException;
-        this.caller = arguments.callee.caller; 
+        // This will contain also stack trace of exception constructors, however better then nothing.
+        this.stack = new Error().stack;
+    },
+    
+    getStack: function() {
+        return this.stack;
     },
     
     getType: function() {
@@ -225,7 +232,7 @@ Exception.prototype = {
         if (this.innerException != null)
             str += "\n>>" + this.innerException.toString().replace(/\n/g, "\n>>");
             
-        return str;
+        return "" + str;
     }
 };
 
@@ -255,6 +262,8 @@ Object.extend(ArgumentException.prototype, {
         
         if (this.name != null)
             str += String.format("\nargument name='{0}' value='{1}'", this.name, String(this.value));
+            
+        return str;
     }
 });
 
