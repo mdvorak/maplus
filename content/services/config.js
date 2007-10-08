@@ -68,8 +68,36 @@ var plusConfigAutosave = PageExtender.create({
     }
 });
 
+// Optimilizace rychlosti
+var ConfigMenuHelper = {
+    getLinkData_PROXY: Marshal.BY_VALUE,
+    getLinkData: function(configNode) {
+        if (configNode == null)
+            throw new ArgumentNullException("configNode");
+            
+        return {
+            link: configNode.getPref("link"),
+            text: configNode.getPref("text"),
+            title: configNode.getPref("title"),
+            externi: this.parseBoolean(configNode.getAttribute("externi")),
+            noveokno: this.parseBoolean(configNode.getAttribute("noveokno"))
+        };
+    },
+    
+    parseBoolean: function(str) {
+        if (str == null)
+            return false;
+        
+        if (String.equals(str, "true", true))
+            return true;
+        var n = parseInt(str);
+        return !isNaN(n) && (n != 0);
+    }
+};
+
 // Register
 Marshal.registerObject("configManager", configManager);
 Marshal.registerObject("localConfigManager", localConfigManager);
+Marshal.registerObject("ConfigMenuHelper", ConfigMenuHelper);
 WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
 WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });

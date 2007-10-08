@@ -204,26 +204,23 @@ pageExtenders.add(PageExtender.create({
         context.list = new Array();
         
         seznam.each(function(i) {
-            var link = i.getPref("link");
-            var text = i.getPref("text");
-            var title = i.getPref("title");
-            var externi = Boolean.parse(i.getAttribute("externi"));
-            var noveokno = Boolean.parse(i.getAttribute("noveokno"));
+            // Mala optimilizace rychlosti
+            var data = Marshal.callMethod("ConfigMenuHelper", "getLinkData", [i]);
             
-            if (link != null && link.blank())
-                link = null;
+            if (data.link != null && data.link.blank())
+                data.link = null;
             
-            if (link != null) {
-                if (!externi) {
-                    link = MELIOR_ANNIS_URL + "/" + link + "&id=" + page.id + "&code=" + page.code;
-                    if (page.ftc) link += "&ftc=" + page.ftc;
+            if (data.link != null) {
+                if (!data.externi) {
+                    data.link = MELIOR_ANNIS_URL + "/" + data.link + "&id=" + page.id + "&code=" + page.code;
+                    if (page.ftc) data.link += "&ftc=" + page.ftc;
                 }
                 else {
-                    link = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: escape(link)});
+                    data.link = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: escape(data.link)});
                 }
             }
             
-            context.list.push({url: link, text: text, noveokno: noveokno, title: title});
+            context.list.push({url: data.link, text: data.text, noveokno: data.noveokno, title: data.title});
         });
         
         return true;
