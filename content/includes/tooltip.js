@@ -34,6 +34,11 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+/*
+// Example:
+Tooltip.register('example', function() { return Tooltip.create('<span>Example</span>'); });
+*/
+
 var Tooltip = {
     _callbacks: new Hash(),
     _library: new Hash(),
@@ -47,8 +52,8 @@ var Tooltip = {
         
         tooltip.style.display = 'none';
         tooltip.style.position = 'absolute';
-        tooltip.style.left = '0px';
-        tooltip.style.top = '0px';
+        tooltip.style.left = '-500px';
+        tooltip.style.top = '-500px';
         tooltip.style.padding = '1px';
 
         if (html) {
@@ -62,12 +67,12 @@ var Tooltip = {
             {
                 if (e.pageX < this.offsetLeft || e.pageX >= (this.offsetLeft + this.offsetWidth)
                         || e.pageY < this.offsetTop || e.pageY >= (this.offsetTop + this.offsetHeight)) {
-                    this.hide();
+                    this.hideTooltip();
                 }
             }, false);
             
         if (hideOnClick) 
-            Event.observe(tooltip, 'click', function() { this.hide(); }, false);
+            Event.observe(tooltip, 'click', function() { this.hideTooltip(); }, false);
             
         Element.extend(tooltip);
         Object.extend(tooltip, Tooltip.Methods);
@@ -125,7 +130,7 @@ var Tooltip = {
     show: function(event, tooltip) {
         tooltip = this.getTooltip(tooltip);
         
-        this.hide();
+        Tooltip.hide();
         
         var _this = this;
         tooltip.onHide = function() {
@@ -138,7 +143,7 @@ var Tooltip = {
     
     hide: function() {
         if (this._currentTooltip) {
-            this._currentTooltip.hide();
+            this._currentTooltip.hideTooltip();
             this._currentTooltip = null;
         }
     },
@@ -154,14 +159,16 @@ var Tooltip = {
 };
 
 Tooltip.Methods = {
-    show: function(x, y) {
-        this.style.left = (x - 5) + 'px';
-        this.style.top = (y - 5) + 'px';
+    showTooltip: function(x, y) {
         this.style.display = '';
+        this.style.left = Math.min(x - 5, window.scrollX + window.innerWidth - this.offsetWidth) + 'px';
+        this.style.top = Math.min(y - 5, window.scrollY + window.innerHeight - this.offsetHeight) + 'px';
     }, 
     
-    hide: function() {
+    hideTooltip: function() {
         this.style.display = 'none';
+        this.style.left = '-500px';
+        this.style.top = '-500px';
         
         if (this.onHide)
             this.onHide();
@@ -172,6 +179,6 @@ Tooltip.Methods = {
     },
     
     showHandler: function(e) {
-        this.show(e.pageX, e.pageY);
+        this.showTooltip(e.pageX, e.pageY);
     }
 };
