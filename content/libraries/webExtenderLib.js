@@ -34,6 +34,20 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+/*** parseBoolean function ***/
+function parseBoolean(str) {
+    if (str == null)
+        return false;
+    
+    str = ("" + str).toLowerCase();
+    if (str == "true")
+        return true;
+    
+    var n = parseInt(str);
+    return !isNaN(n) && (n != 0);
+}
+
+/*** Extender object model ***/
 Object.extend(Function, {
     bind: function(object, method) {
         return function() { return method.apply(object, arguments); };
@@ -103,6 +117,7 @@ Class.BaseObject = function(owner, clazz) {
     }
 };
 
+/*** Misc objects extension ***/
 Object.extend(Event, {
     dispatch: function(element, eventName, bubbles, cancelable) {
         var evt = document.createEvent('Events');

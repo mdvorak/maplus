@@ -207,20 +207,19 @@ pageExtenders.add(PageExtender.create({
             // Mala optimilizace rychlosti
             var data = Marshal.callMethod("ConfigMenuHelper", "getLinkData", [i]);
             
-            if (data.link != null && data.link.blank())
-                data.link = null;
+            var url = (data.link != null && !data.link.blank()) ? data.link : null;
             
-            if (data.link != null) {
+            if (url != null) {
                 if (!data.externi) {
-                    data.link = MELIOR_ANNIS_URL + "/" + data.link + "&id=" + page.id + "&code=" + page.code;
+                    url = MELIOR_ANNIS_URL + "/" + url + "&id=" + page.id + "&code=" + page.code;
                     if (page.ftc) data.link += "&ftc=" + page.ftc;
                 }
                 else {
-                    data.link = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: escape(data.link)});
+                    url = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: escape(url)});
                 }
             }
             
-            context.list.push({url: data.link, text: data.text, noveokno: data.noveokno, title: data.title});
+            context.list.push({url: url, text: data.text, noveokno: data.noveokno, title: data.title});
         });
         
         return true;

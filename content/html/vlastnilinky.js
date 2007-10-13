@@ -34,77 +34,121 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-var StaticArgument = Class.create();
-StaticArgument.prototype = {
-    initialize: function(name, value) {
-        this.name = name;
-        this.value = value;
+var NastaveniVlastniLinky = {
+    reset: function(table) {
+        table = $(table);
+        
+        // Vycisti tabulku
+        while(table.firstChild != null)
+            table.removeChild(table.firstChild);
     },
     
-    toString: function() {
-        return this.name + "=" + this.value;
-    }
-};
-
-var DynamicArgument = Class.create();
-DynamicArgument.prototype = {
-    initialize: function(name) {
-        this.name = name;
-    },
-    
-    createElement: function() {
-        throw new Exception("Not implemented.");
-    },
-    
-    getValue: function(element) {
-        return element.value;
-    },
-    
-    setValue: function(element, value) {
-        element.value = value;
-    },
-    
-    toString: function() {
-        return this.name + "=<dynamic>";
-    }
-};
-
-var TextDynamicArgument = Class.inherit(DynamicArgument);
-Object.extend(TextDynamicArgument.prototype, {
-    createElement: function() {
-        return Element.create("input", null, {type: "text"});
-    }
-});
-
-var SelectDynamicArgument = Class.inherit(DynamicArgument);
-Object.extend(SelectDynamicArgument.prototype, {
-    // options = { value: text }
-    initialize: function(name, options) {
-        base.initialize(name);
-        this.options = $H(options);
-    },
-    
-    createElement: function() {
-        var select = Element.create("select");
-        this.options.each(function(i) {
-            select.options.add(new Option(i[1], i[0]));
+    onload: function(table, config) {
+        table = $(table);
+        this.reset(table);
+            
+        // Nacti data
+        var links = config.evalPrefNodeList('url[text]');
+        var poradi = 0;
+        var createRecord = this.createRecord;
+        
+        links.each(function(i) {
+            // Optimilizace rychlosti
+            var data = Marshal.callMethod("ConfigMenuHelper", "getLinkData", [i]);
+            
+            // Vytvor novy radek
+            var record = createRecord();
+            record.setPoradi(++poradi);
+            record.setData(data);
+            
+            // Odstranit event handler
+            Event.observe(record.odstranit, "click", function() {
+                table.removeChild(record.element);
+            });
+            
+            table.appendChild(record.element);
         });
-    }
-});
-
-var LinkDefinition = Class.create();
-LinkDefinition.prototype = {
-    initialize: function(text, pageName, staticArguments, dynamicArguments) {
-        this.text = text;
-        this.pageName = pageName;
-        this.staticArguments = staticArguments;
-        this.dynamicArguments = dynamicArguments;
+    },
+    
+    onsave: function(table, config) {
+        table = $(table);
+        
+        // Serad zaznamy podle poradi
+        var rows = $A(table.rows);
+        rows.sort(function(r1, r2) {
+            var d1 = ElementDataStore.get(r1);
+            var d2 = ElementDataStore.get(r2);
+        
+            return Object.compare(d1.getData().poradi, d2.getData().poradi);
+        });
+        
+        // Uloz zaznamy do configu
+        config.clearChildNodes();
+        
+        rows.each(function(tr) {
+            var row = ElementDataStore.get(tr);
+            if (row.getData == null)
+                return; // continue;
+            
+            var data = row.getData();
+            if (data.text == null || data.text.blank())
+                return; // continue;
+            
+            var cfg = config.addPref("url");
+            LinkData.toConfig(cfg);
+        });
+    },
+    
+    createRecord: function() {
+        var tr = Element.create("tr");
+        var record = ElementDataStore.get(tr);
+        
+        // Vytvor datove elementy
+        record.poradi = Element.create("input", null, {type: "text", style: "width: 25px; text-align: center;", title: "Pořadí"});
+        record.text = Element.create("input", null, {type: "text", style: "width: 90px; text-align: center;", title: "Text"});
+        record.title = Element.create("input", null, {type: "text", style: "width: 90px; text-align: left;", title: "Popisek (tooltip)"});
+        record.url = Element.create("input", null, {type: "text", style: "width: 140px; text-align: left;", title: "Adresa"});
+        record.externi = Element.create("input", null, {type: "checkbox", title: "Externí link"});
+        record.noveokno = Element.create("input", null, {type: "checkbox", title: "Otevřít v novém okně"});
+        record.odstranit = Element.create("a", '<img src="' + CHROME_CONTENT_URL + 'html/img/remove.png" alt="" class="link" />', {href: "javascript://", title: "Odstranit"});
+        
+        // Pridej je do sloupcu
+        tr.appendChild(Element.create("td")).appendChild(record.poradi);
+        tr.appendChild(Element.create("td")).appendChild(record.text);
+        tr.appendChild(Element.create("td")).appendChild(record.title);
+        tr.appendChild(Element.create("td")).appendChild(record.url);
+        tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.externi);
+        tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.noveokno);
+        tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.odstranit);
+        
+        record.setPoradi = function(poradi) {
+            record.poradi.value = poradi;
+        };
+        record.getPoradi = function() {
+            return parseInt(record.poradi.value);
+        };
+        
+        // Definuj getData a setData metody
+        record.setData = function(linkData) {
+            record.url.value = linkData.url || "";
+            record.text.value = linkData.text || "";
+            record.title.value = linkData.title || "";
+            record.externi.checked = linkData.externi;
+            record.noveokno.checked = linkData.noveokno;
+        };
+        
+        record.getData = function() {
+            return new LinkData(record.url.value, 
+                                record.text.value,
+                                record.title.value,
+                                record.externi.checked,
+                                record.noveokno.checked);
+        };
+        
+        return record;
     }
 };
 
-var LinkEditDialog = Class.create();
-LinkEditDialog.prototype = {
-};
 
 
 
@@ -112,18 +156,7 @@ LinkEditDialog.prototype = {
 
 
 
-
-var VlastniLink = Class.create();
-VlastniLink.prototype = {
-    initialize: function(link, text, externi, noveokno) {
-        this.link = (link == null || link.blank()) ? null : link;
-        this.text = text;
-        this.externi = !!externi;
-        this.noveokno = !!noveokno;
-    }
-};
-
-
+/*
 var VlastniLinky = {
     predefined: function() {
         var list = new Array();
@@ -133,76 +166,4 @@ var VlastniLinky = {
         return list;
     }
 };
-
-var NastaveniVlastniLinky = {
-    reset: function(table) {
-    },
-    
-    load: function(table, config) {
-        
-    },
-    
-    save: function(table, config) {
-        // Serad zaznamy podle poradi
-        var rows = $A(table.rows);
-        rows.sort(function(r1, r2) {
-            return Object.compare(ElementDataStore.get(r1).getData().poradi, ElementDataStore.get(r2).getData().poradi);
-        });
-        
-        // Uloz zaznamy do configu
-        config.clearChildNodes();
-        
-        rows.each(function(tr) {
-            var row = ElementDataStore.get(tr);
-            var data = row.getData();
-            
-            var cfg = config.addPref("url");
-            cfg.setPref("link", data.url);
-            cfg.setPref("text", data.text);
-            cfg.setAttribute("externi", data.externi);
-            cfg.setAttribute("noveokno", data.noveokno);
-        });
-    },
-    
-    createRecord: function() {
-        var tr = Element.create("tr");
-        var record = ElementDataStore.get(tr);
-        
-        // Vytvor datove elementy
-        record.poradi = Element.create("input", null, {type: "text"});
-        record.url = Element.create("input", null, {type: "text"});
-        record.text = Element.create("input", null, {type: "text"});
-        record.externi = Element.create("input", null, {type: "checkbox"});
-        record.noveokno = Element.create("input", null, {type: "checkbox"});
-        record.odstranit = Element.create("a", '<img src="' + CHROME_CONTENT_URL + 'html/img/remove.png" alt="" class="link" />', {href: "javascript://"});
-        
-        // Pridej je do sloupcu
-        tr.appendChild(Element.create("td")).appendChild(record.poradi);
-        tr.appendChild(Element.create("td")).appendChild(record.url);
-        tr.appendChild(Element.create("td")).appendChild(record.text);
-        tr.appendChild(Element.create("td")).appendChild(record.externi);
-        tr.appendChild(Element.create("td")).appendChild(record.noveokno);
-        tr.appendChild(Element.create("td")).appendChild(record.odstranit);
-        
-        // Definuj getData a setData metody
-        record.setData = function(poradi, url, text, externi, noveokno) {
-            record.poradi.value = poradi;
-            record.url.value = url;
-            record.text.value = text;
-            record.externi.checked = externi;
-            record.noveokno.checked = noveokno;
-        };
-        
-        record.getData = function() {
-            return {
-                poradi: parseInt(record.poradi.value),
-                url: record.url.value,
-                text: record.text.value,
-                externi: record.externi.checked,
-                noveokno: record.noveokno.checked
-            };
-        };
-        
-        return record;
-    }
-};
+*/

@@ -131,18 +131,36 @@ nastaveniManager.addTab("Obecné", "n_obecne");
                 <script type="text/javascript" src="chrome://maplus/content/html/vlastnilinky.js" charset="UTF-8"></script>
                 
                 <!-- Seznam linku -->
-                <table id="n_vlastnilinky">
+                <table cellpadding="0" style="width: 490px;">
                     <colgroup>
-                        <col width="440" />
-                        <col width="50" />
+                        <col width="25" />
+                        <col width="90" />
+                        <col width="90" />
+                        <col width="140" />
+                        <col width="40" />
+                        <col width="85" />
+                        <col width="20" />
                     </colgroup>
+                    <!-- Nadpis -->
                     <tbody>
+                        <tr>
+                            <td style="text-align: center;"><span>#</span></td>
+                            <td><span>Text</span></td>
+                            <td><span>Popisek</span></td>
+                            <td><span>Adresa</span></td>
+                            <td><span>Externí</span></td>
+                            <td><span>&nbsp;Nové Okno</span></td>
+                            <td><span></span></td>
+                        </tr>
+                    </tbody>
+                    <!-- Data -->
+                    <tbody id="n_vlastnilinky">
                     </tbody>
                 </table>
                 
-                <script type="text/javascript">
-                    var table = $('n_vlastnilinky');
-                </script>
+                <input type="hidden"
+                    onload="NastaveniVlastniLinky.onload('n_vlastnilinky', this.config.getMenu().getPrefNode('linky', true));"
+                    onsave="NastaveniVlastniLinky.onsave('n_vlastnilinky', this.config.getMenu().getPrefNode('linky', true));" />
             </td>
         </tr>
     </tbody>

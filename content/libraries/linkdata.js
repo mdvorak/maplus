@@ -33,55 +33,41 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
+ 
+var LinkData = Class.create();
 
-const CONFIG_ROOT_NAME = "prefs";
-
-XmlConfigNode.XPath.useExtension();
-XmlConfigNode.Extended.useExtension();
-
-// Validace na vek
-function ageValidator(root) {
-    if (root.getAttribute("vek") != null && root.getAttribute("vek") != AGE_NAME) {
-        // Odstran veskera nastaveni
-        while (root.firstChild != null)
-            root.removeChild(root.firstChild);
-    }
-    root.setAttribute("vek", AGE_NAME);
-}
-
-// Vytvor a registruj sluzby
-var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME, ageValidator);
-var localConfigManager = new XmlConfigManager(null, CONFIG_ROOT_NAME);
-
-var plusConfigAutosave = PageExtender.create({
-    SAVE_INTERVAL: 100,
-    
-    _hits: 0,
-    
-    analyze: function(page, context) {
-        if (++this._hits > this.SAVE_INTERVAL) {
-            this._hits = 0;
-            configManager.saveAll();
-        }
-        
-        return false;
-    }
-});
-
-// Optimilizace rychlosti
-var ConfigMenuHelper = {
-    getLinkData_PROXY: Marshal.BY_VALUE,
-    getLinkData: function(configNode) {
-        if (configNode == null)
-            throw new ArgumentNullException("configNode");
-            
-        return LinkData.fromConfig(configNode);
+LinkData.prototype = {
+    initialize: function(url, text, title, externi, noveokno) {
+        this.url = url;
+        this.text = text;
+        this.title = title;
+        this.externi = !!externi;
+        this.noveokno = !!noveokno;
     }
 };
 
-// Register
-Marshal.registerObject("configManager", configManager);
-Marshal.registerObject("localConfigManager", localConfigManager);
-Marshal.registerObject("ConfigMenuHelper", ConfigMenuHelper);
-WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
-WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });
+Object.extend(LinkData, {
+    fromConfig: function(configNode) {
+        if (configNode == null)
+            throw new ArgumentNullException("configNode");
+            
+        return new LinkData(configNode.getPref("link"),
+                            configNode.getPref("text"),
+                            configNode.getPref("title"),
+                            parseBoolean(configNode.getAttribute("externi")),
+                            parseBoolean(configNode.getAttribute("noveokno")));
+    },
+    
+    toConfig: function(linkData, configNode) {
+        if (linkData == null)
+            throw new ArgumentNullException("linkData");
+        if (configNode == null)
+            throw new ArgumentNullException("configNode");
+        
+        configNode.setPref("link", data.url);
+        configNode.setPref("text", data.text);
+        configNode.setPref("title", data.title);
+        configNode.setAttribute("externi", data.externi);
+        configNode.setAttribute("noveokno", data.noveokno);
+    }
+});
