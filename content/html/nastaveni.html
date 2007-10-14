@@ -105,8 +105,8 @@ nastaveniManager.addTab("Obecné", "n_obecne");
             <td><span>Zobrazit kalkulačku</span></td>
             <td>
                 <input type="checkbox"
-                    onload="this.checked = this.config.getPrefNode('kalkulacka', true).getBoolean('zobrazit', true);"
-                    onsave="this.config.getPrefNode('kalkulacka', true).setPref('zobrazit', this.checked);" />
+                    onload="this.checked = this.config.getMenu().getPrefNode('kalkulacka', true).getBoolean('zobrazit', true);"
+                    onsave="this.config.getMenu().getPrefNode('kalkulacka', true).setPref('zobrazit', this.checked);" />
             </td>
             
             <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
@@ -114,8 +114,8 @@ nastaveniManager.addTab("Obecné", "n_obecne");
             <td><span>Zobrazit poznámky</span></td>
             <td>
                 <input type="checkbox"
-                    onload="this.checked = this.config.getPrefNode('poznamky', true).getBoolean('zobrazit', true);"
-                    onsave="this.config.getPrefNode('poznamky', true).setPref('zobrazit', this.checked);" />
+                    onload="this.checked = this.config.getMenu().getPrefNode('poznamky', true).getBoolean('zobrazit', true);"
+                    onsave="this.config.getMenu().getPrefNode('poznamky', true).setPref('zobrazit', this.checked);" />
             </td>
         </tr>
         <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
