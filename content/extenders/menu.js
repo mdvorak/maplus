@@ -207,7 +207,7 @@ pageExtenders.add(PageExtender.create({
             // Mala optimilizace rychlosti
             var data = Marshal.callMethod("ConfigMenuHelper", "getLinkData", [i]);
             
-            var url = (data.link != null && !data.link.blank()) ? data.link : null;
+            var url = (data.url != null && !data.url.blank()) ? data.url : null;
             
             if (url != null) {
                 if (!data.externi) {

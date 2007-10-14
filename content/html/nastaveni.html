@@ -131,36 +131,47 @@ nastaveniManager.addTab("Obecné", "n_obecne");
                 <script type="text/javascript" src="chrome://maplus/content/html/vlastnilinky.js" charset="UTF-8"></script>
                 
                 <!-- Seznam linku -->
-                <table cellpadding="0" style="width: 490px;">
+                <table cellpadding="0" style="width: 460px;">
                     <colgroup>
-                        <col width="25" />
-                        <col width="90" />
-                        <col width="90" />
-                        <col width="140" />
+                        <col width="30" />
+                        <col width="100" />
+                        <col width="170" />
                         <col width="40" />
-                        <col width="85" />
+                        <col width="70" />
+                        <col width="20" />
                         <col width="20" />
                     </colgroup>
                     <!-- Nadpis -->
                     <tbody>
-                        <tr>
+                        <tr style="border-bottom: solid 1px gray;">
                             <td style="text-align: center;"><span>#</span></td>
                             <td><span>Text</span></td>
-                            <td><span>Popisek</span></td>
                             <td><span>Adresa</span></td>
-                            <td><span>Externí</span></td>
-                            <td><span>&nbsp;Nové Okno</span></td>
-                            <td><span></span></td>
+                            <td style="text-align: center;"><span>Externí</span></td>
+                            <td style="text-align: center;"><span>Nové Okno</span></td>
+                            <td style="text-align: center;"><span></span></td>
+                            <td style="text-align: center;"><span></span></td>
                         </tr>
                     </tbody>
                     <!-- Data -->
                     <tbody id="n_vlastnilinky">
                     </tbody>
+                    <!-- Pridat novy -->
+                    <tbody>
+                        <tr>
+                            <td colspan="7" style="text-align: left;">
+                                <span><input id="n_pridatLink" type="button" value="Přidat" /></span>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
                 
+                <script type="text/javascript">
+                    NastaveniVlastniLinky.init('n_vlastnilinky', 'n_pridatLink');
+                </script>
                 <input type="hidden"
-                    onload="NastaveniVlastniLinky.onload('n_vlastnilinky', this.config.getMenu().getPrefNode('linky', true));"
-                    onsave="NastaveniVlastniLinky.onsave('n_vlastnilinky', this.config.getMenu().getPrefNode('linky', true));" />
+                    onload="NastaveniVlastniLinky.onload(this.config.getMenu().getPrefNode('linky', true));"
+                    onsave="NastaveniVlastniLinky.onsave(this.config.getMenu().getPrefNode('linky', true));" />
             </td>
         </tr>
     </tbody>

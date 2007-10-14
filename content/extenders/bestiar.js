@@ -34,6 +34,30 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+// Mala optimilizace rychlosti
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Cache"; },
+    
+    analyze: function(page, context) {
+        if (page.arguments["obchod"] != null && page.arguments["obchod"] != "jedn_new")
+            return false;
+            
+        return true;
+    },
+    
+    process: function(page, context) {
+        var div = Element.create("div", null, {style: "top: -500px; left: -500px;"});
+        
+        var img1 = Element.create("img", null, {src: "chrome://maplus/content/html/img/copy.png", alt: ""});
+        div.appendChild(img1);
+        var img2 = Element.create("img", null, {src: "chrome://maplus/content/html/img/questionmark.png", alt: ""});
+        div.appendChild(img2);
+        
+        document.body.appendChild(div);
+        div.style.display = 'none';
+    }
+}));
+    
 // Analyza
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Bestiar - Analyza"; },
@@ -325,7 +349,7 @@ pageExtenders.add(PageExtender.create({
             copy.setAttribute("title", "Zkopíruje popis stacku do schránky");
             Event.observe(copy, 'click', function() { Clipboard.copyText(row.description); });
             td.appendChild(copy);
-            
+           
             // Zobraz chybejici sloupce
             if (context.chybejiciTemplate != null) {
                 let chybejici = this._createMissingTooltip(context.chybejiciTemplate, i, row.data);
@@ -433,7 +457,7 @@ pageExtenders.add(PageExtender.create({
         // Bestiar
         if (!page.bestiar || !page.bestiar.table)
             return false;
-        if (TIMERS_DISABLED)
+        if (window.TIMERS_DISABLED)
             return false;
        
         // Sestav list bunek s casem
@@ -622,7 +646,7 @@ pageExtenders.add(PageExtender.create({
                         span.appendChild(Element.create("br"));
                         
                         // Link pravidla
-                        var filter = span.appendChild(Element.create("a", r.title));
+                        var filter = span.appendChild(Element.create("a", r.title, {href: "javascript://", style: "text-decoration: none;"}));
                         
                         // Event handler pravidla
                         Event.observe(filter, 'click', function() {

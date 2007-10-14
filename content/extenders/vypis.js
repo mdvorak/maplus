@@ -200,7 +200,7 @@ pageExtenders.add(PageExtender.create({
         context.tdRozdaneStats.innerHTML = '<font size="1">' + utokyStats + '</font>';
         
         // Obrana
-        obranaStats = "Zbývá vrátit <i>" + context.nevracenoCsek + "</i> ";
+        var obranaStats = "Zbývá vrátit <i>" + context.nevracenoCsek + "</i> ";
         if (context.nevracenoCsek == 1)
             obranaStats += "csko.";
         else if (context.nevracenoCsek > 1 && context.nevracenoCsek < 5)

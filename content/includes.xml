@@ -7,10 +7,11 @@
   <script src="includes/interopClient.js" />
   
   <!-- Custom libraries -->
+  <script src="libraries/linkdata.js" />
   <script src="includes/tooltip.js" />
   <script src="includes/checkbox.js" />d
+  <script src="includes/dialog.js" />
   <script src="includes/maplus-lib.js" />
-  <script src="libraries/linkdata.js" />
 
   <!--
   Note:

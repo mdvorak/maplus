@@ -35,17 +35,29 @@
  * ***** END LICENSE BLOCK ***** */
 
 var NastaveniVlastniLinky = {
-    reset: function(table) {
-        table = $(table);
-        
+    init: function(content, pridat) {
+        this.content = $(content);
+        if (this.content == null)
+            throw new ArgumentNullException("content");
+            
+        this.linkPridat = $(pridat);
+        if (this.linkPridat == null)
+            throw new ArgumentNullException("pridat");
+            
+        Event.observe(this.linkPridat, 'click', function() {
+            alert("Not implemented.");
+        });
+    },
+
+    reset: function() {
         // Vycisti tabulku
-        while(table.firstChild != null)
-            table.removeChild(table.firstChild);
+        while(this.content.firstChild != null)
+            this.content.removeChild(this.content.firstChild);
     },
     
-    onload: function(table, config) {
-        table = $(table);
-        this.reset(table);
+    onload: function(config) {
+        var content = this.content;
+        this.reset();
             
         // Nacti data
         var links = config.evalPrefNodeList('url[text]');
@@ -63,18 +75,18 @@ var NastaveniVlastniLinky = {
             
             // Odstranit event handler
             Event.observe(record.odstranit, "click", function() {
-                table.removeChild(record.element);
+                content.removeChild(record.element);
             });
             
-            table.appendChild(record.element);
+            content.appendChild(record.element);
         });
     },
     
-    onsave: function(table, config) {
-        table = $(table);
+    onsave: function(config) {
+        var content = this.content;
         
         // Serad zaznamy podle poradi
-        var rows = $A(table.rows);
+        var rows = $A(content.rows);
         rows.sort(function(r1, r2) {
             var d1 = ElementDataStore.get(r1);
             var d2 = ElementDataStore.get(r2);
@@ -100,6 +112,69 @@ var NastaveniVlastniLinky = {
     },
     
     createRecord: function() {
+        var tr = Element.create("tr");
+        var record = ElementDataStore.get(tr);
+        
+        // Vytvor datove elementy
+        record.poradi = Element.create("input", null, {type: "text", style: "width: 30px; text-align: center;", title: "Pořadí"});
+        record.text = Element.create("input", null, {type: "text", style: "width: 100px; text-align: center;", title: "Text"});
+        record.url = Element.create("input", null, {type: "text", style: "width: 170px; text-align: left;", title: "Adresa"});
+        record.externi = Element.create("input", null, {type: "checkbox", title: "Externí link", disabled: "disabled"});
+        record.noveokno = Element.create("input", null, {type: "checkbox", title: "Otevřít v novém okně"});
+        record.upravit = Element.create("a", '<img src="' + CHROME_CONTENT_URL + 'html/img/remove.png" alt="" class="link" />', {href: "javascript://", title: "Upravit"});
+        record.odstranit = Element.create("a", '<img src="' + CHROME_CONTENT_URL + 'html/img/remove.png" alt="" class="link" />', {href: "javascript://", title: "Odstranit"});
+        
+        // Pridej je do sloupcu
+        tr.appendChild(Element.create("td")).appendChild(record.poradi);
+        tr.appendChild(Element.create("td")).appendChild(record.text);
+        tr.appendChild(Element.create("td")).appendChild(record.url);
+        tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.externi);
+        tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.noveokno);
+        tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.odstranit);
+        tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.upravit);
+        
+        record.setPoradi = function(poradi) {
+            record.poradi.value = poradi;
+        };
+        record.getPoradi = function() {
+            return parseInt(record.poradi.value);
+        };
+        
+        // Definuj getData a setData metody
+        record.setData = function(linkData) {
+            record.url.value = linkData.url || "";
+            record.text.value = linkData.text || "";
+            record.externi.checked = linkData.externi;
+            record.noveokno.checked = linkData.noveokno;
+        };
+        
+        record.getData = function() {
+            return new LinkData(record.url.value, 
+                                record.text.value,
+                                record.externi.checked,
+                                record.noveokno.checked);
+        };
+        
+        return record;
+    }
+};
+
+ 
+var LinkEditors = {
+    "default": function(parent) {
+    }
+};
+
+
+
+
+
+
+
+
+
+/*
+function() {
         var tr = Element.create("tr");
         var record = ElementDataStore.get(tr);
         
@@ -146,17 +221,9 @@ var NastaveniVlastniLinky = {
         };
         
         return record;
-    }
-};
+    },
 
 
-
-
-
-
-
-
-/*
 var VlastniLinky = {
     predefined: function() {
         var list = new Array();

@@ -37,12 +37,13 @@
 var LinkData = Class.create();
 
 LinkData.prototype = {
-    initialize: function(url, text, title, externi, noveokno) {
+    initialize: function(url, text, title, externi, noveokno, editor) {
         this.url = url;
         this.text = text;
         this.title = title;
         this.externi = !!externi;
         this.noveokno = !!noveokno;
+        this.editor = editor;
     }
 };
 
@@ -55,7 +56,8 @@ Object.extend(LinkData, {
                             configNode.getPref("text"),
                             configNode.getPref("title"),
                             parseBoolean(configNode.getAttribute("externi")),
-                            parseBoolean(configNode.getAttribute("noveokno")));
+                            parseBoolean(configNode.getAttribute("noveokno")),
+                            configNode.getAttribute("editor"));
     },
     
     toConfig: function(linkData, configNode) {
@@ -64,10 +66,11 @@ Object.extend(LinkData, {
         if (configNode == null)
             throw new ArgumentNullException("configNode");
         
-        configNode.setPref("link", data.url);
-        configNode.setPref("text", data.text);
-        configNode.setPref("title", data.title);
-        configNode.setAttribute("externi", data.externi);
-        configNode.setAttribute("noveokno", data.noveokno);
+        configNode.setPref("link", linkData.url);
+        configNode.setPref("text", linkData.text);
+        configNode.setPref("title", linkData.title);
+        configNode.setAttribute("externi", !!linkData.externi);
+        configNode.setAttribute("noveokno", !!linkData.noveokno);
+        configNode.setAttribute("editor", linkData.editor);
     }
 });
