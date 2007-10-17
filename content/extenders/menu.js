@@ -214,7 +214,8 @@ pageExtenders.add(PageExtender.create({
                     url = MELIOR_ANNIS_URL + "/" + url + "&id=" + page.id + "&code=" + page.code;
                     if (page.ftc) data.link += "&ftc=" + page.ftc;
                 }
-                else {
+                else if (!data.noveokno) {
+                    // Externi ale v okne MA
                     url = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: escape(url)});
                 }
             }

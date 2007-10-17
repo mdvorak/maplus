@@ -146,13 +146,17 @@ var NastaveniVlastniLinky = {
             record.text.value = linkData.text || "";
             record.externi.checked = linkData.externi;
             record.noveokno.checked = linkData.noveokno;
+            record._title = linkData.title;
+            record._editor = linkData.editor;
         };
         
         record.getData = function() {
             return new LinkData(record.url.value, 
                                 record.text.value,
+                                record._title,
                                 record.externi.checked,
-                                record.noveokno.checked);
+                                record.noveokno.checked,
+                                record._editor);
         };
         
         return record;

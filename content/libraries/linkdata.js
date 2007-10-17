@@ -38,6 +38,9 @@ var LinkData = Class.create();
 
 LinkData.prototype = {
     initialize: function(url, text, title, externi, noveokno, editor) {
+        if (text == null)
+            throw new ArgumentNullException("text");
+    
         this.url = url;
         this.text = text.stripScripts();
         this.title = title;
@@ -65,12 +68,14 @@ Object.extend(LinkData, {
             throw new ArgumentNullException("linkData");
         if (configNode == null)
             throw new ArgumentNullException("configNode");
+        if (linkData.text == null)
+            throw new ArgumentNullException("linkData.text");
         
         configNode.setPref("link", linkData.url);
         configNode.setPref("text", linkData.text.stripScripts());
         configNode.setPref("title", linkData.title);
         configNode.setAttribute("externi", !!linkData.externi);
         configNode.setAttribute("noveokno", !!linkData.noveokno);
-        configNode.setAttribute("editor", linkData.editor);
+        configNode.setAttribute("editor", (linkData.editor != null) ? linkData.editor : null);
     }
 });
