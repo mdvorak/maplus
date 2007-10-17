@@ -59,6 +59,7 @@ Dialog.prototype = {
         
         // Create and initialize modal backround
         var background = this._createModalBackground();
+        background.style.display = 'none';
         background.style.zIndex = 1;
         background.style.position = 'absolute';
         background.style.left = '0px';
@@ -87,8 +88,11 @@ Dialog.prototype = {
         
         // Create and initialize content element
         var content = this._createContentElement();
+        content.style.display = 'none';
         content.style.position = 'absolute';
         content.style.zIndex = 100000;
+        content.style.left = '-1000px';
+        content.style.top = '-1000px';
         
         var centerContent = function() {
             content.style.left = window.scrollX + (window.innerWidth - content.offsetWidth) / 2;
@@ -109,8 +113,6 @@ Dialog.prototype = {
         document.body.appendChild(background);
         document.body.appendChild(content);
         
-        centerContent();
-        
         // Store references
         this._destructor = function() {
             for (var i = 0; i < destructors.length; i++)
@@ -125,6 +127,8 @@ Dialog.prototype = {
             else {
                 background.style.display = 'none';
                 content.style.display = 'none';
+                content.style.left = '-1000px';
+                content.style.top = '-1000px';
             }
         };
         this._content = content;

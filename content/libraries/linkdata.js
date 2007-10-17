@@ -39,7 +39,7 @@ var LinkData = Class.create();
 LinkData.prototype = {
     initialize: function(url, text, title, externi, noveokno, editor) {
         this.url = url;
-        this.text = text;
+        this.text = text.stripScripts();
         this.title = title;
         this.externi = !!externi;
         this.noveokno = !!noveokno;
@@ -67,7 +67,7 @@ Object.extend(LinkData, {
             throw new ArgumentNullException("configNode");
         
         configNode.setPref("link", linkData.url);
-        configNode.setPref("text", linkData.text);
+        configNode.setPref("text", linkData.text.stripScripts());
         configNode.setPref("title", linkData.title);
         configNode.setAttribute("externi", !!linkData.externi);
         configNode.setAttribute("noveokno", !!linkData.noveokno);

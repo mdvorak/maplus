@@ -91,7 +91,7 @@ var NastaveniVlastniLinky = {
             var d1 = ElementDataStore.get(r1);
             var d2 = ElementDataStore.get(r2);
         
-            return Object.compare(d1.getData().poradi, d2.getData().poradi);
+            return Object.compare(d1.getPoradi(), d2.getPoradi());
         });
         
         // Uloz zaznamy do configu
@@ -107,7 +107,7 @@ var NastaveniVlastniLinky = {
                 return; // continue;
             
             var cfg = config.addPref("url");
-            LinkData.toConfig(cfg);
+            LinkData.toConfig(data, cfg);
         });
     },
     
@@ -159,9 +159,82 @@ var NastaveniVlastniLinky = {
     }
 };
 
+
+var LinkEditorDialog = Class.inherit(Dialog);
+
+Object.extend(LinkEditorDialog.prototype, {
+    initialize: function(editorName) {
+        this._editorName = editorName;
+        this._editor = LinkEditors[editorName];
+    },
+    
+    getData: function() {
+    },
+    
+    setData: function(linkData) {
+        this._data = linkData;
+    },
+        
+    _createContentElement: function() {
+        var _this = this;
+    
+        var root = Element.create("div", null, {class: "linkDialog"});
+    
+        // Zakladni struktura
+        const columns = 4;
+        var tableLayout = Element.create("table", null, {cellspacing: 0, cellpadding: 0});
+        var tbodyLayout = tableLayout.appendChild(Element.create("tbody"));
+        
+        // Hlavicka
+        var tdHeader = tbodyLayout.appendChild(Element.create("tr", null, {style: "vertical-align: top;"})).appendChild(Element.create("td", null, {colspan: columns, style: "border-bottom: solid 1px gray;"}));
+        tdHeader.innerHTML = "<b>Upravit odkaz</b>"; // TODO
+
+
+        // Typ
+        var trType = tbodyLayout.appendChild(Element.create("tr"));
+        // TODO
+        trType.innerHTML = '<td><span>TODO</span></td>';
+        
+        // Obecny obsah
+        var tdDescription = tbodyLayout.appendChild(Element.create("tr"));
+        // TODO
+        tdDescription.innerHTML = '<td><span>TODO</span></td>';
+        
+        if (this._editor != null) {
+            // Specificky obsah
+            var tdContent = tbodyLayout.appendChild(Element.create("tr")).appendChild(Element.create("td", null, {colspan: columns}));
+            // TODO
+        }
+            
+        // Ulozit/Zrusit
+        var tdFooter = tbodyLayout.appendChild(Element.create("tr")).appendChild(Element.create("td", null, {colspan: columns, style: "text-align: center;"}));
+        
+        var inputZrusit = tdFooter.appendChild(Element.create("input", null, {value: "Zrušit", type: "button", style: "margin: 3px;"}));
+        var inputUlozit = tdFooter.appendChild(Element.create("input", null, {value: "Uložit", type: "button", style: "margin: 3px;"}));
+        
+        Event.observe(inputZrusit, "click", function() {
+            _this.hide();
+        });
+        
+        Event.observe(inputUlozit, "click", function() {
+            // TODO nacist data
+            _this.hide();
+        });
+        
+        root.appendChild(tableLayout);
+        return root;
+    }
+});
+
  
 var LinkEditors = {
-    "default": function(parent) {
+    "default": {
+        title: "Vlastní",
+        width: 300,
+        height: 100,
+        
+        create: function() {
+        }
     }
 };
 
