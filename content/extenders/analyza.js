@@ -50,6 +50,10 @@ pageExtenders.add(PageExtender.create({
         if (!page.id || isNaN(page.id))
             throw new AbortException("Id nenalezeno.");
             
+        // TODO odstranit
+        if (AGE_NAME == "5.6" && page.id == 3751)
+            throw new AbortException();
+            
         console.info("id=%d, code=%s, ftc=%s", page.id, page.code, page.ftc);
         
         // Najdi zakladni strukturu stranky
