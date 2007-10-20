@@ -353,7 +353,7 @@ var XPath = {
             throw retval;
         }
         finally {
-            if (XPATH_DEBUG && !noLog)
+            if (window.XPATH_DEBUG && !noLog)
                 console.debug("XPath.evaluate('%s', %o, %d): %o", xpath, context, resultType, retval);
         }
     },
@@ -377,7 +377,7 @@ var XPath = {
             throw ex;
         }
         finally {
-            if (XPATH_DEBUG)
+            if (window.XPATH_DEBUG)
                 console.debug("XPath.evalList('%s', %o): %o", xpath, context, retval);
         }
     },
@@ -394,7 +394,7 @@ var XPath = {
             throw ex;
         }
         finally {
-            if (XPATH_DEBUG)
+            if (window.XPATH_DEBUG)
                 console.debug("XPath.evalSingle('%s', %o): %o", xpath, context, retval);
         }
     },
@@ -411,7 +411,7 @@ var XPath = {
             throw ex;
         }
         finally {
-            if (XPATH_DEBUG)
+            if (window.XPATH_DEBUG)
                 console.debug("XPath.evalString('%s', %o): %o", xpath, context, retval);
         }
     },
@@ -428,7 +428,7 @@ var XPath = {
             throw ex;
         }
         finally {
-            if (XPATH_DEBUG)
+            if (window.XPATH_DEBUG)
                 console.debug("XPath.evalNumber('%s', %o): %o", xpath, context, retval);
         }
     }

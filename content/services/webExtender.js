@@ -637,7 +637,14 @@ var ExtenderManager = {
     },
     
     // Called directly by WebExtender
-    initPage: function(page) {
+    initPage: function(page) {   
+        // Set debugging options
+        var debugging = "// " + EXTENSION_ID + "\n" +
+                        "window.MARSHAL_DEBUG = " + WebExtenderPreferences.getMarshalDebug() + ";\n" +
+                        "window.XPATH_DEBUG = " + WebExtenderPreferences.getXPathDebug() + ";";
+        Script.execute(page.document, debugging);
+        
+        // Insert libraries
         for (var i = 0; i < this._libraries.length; i++) {
             var src = this._libraries[i];
             Script.executeFile(page.document, src);

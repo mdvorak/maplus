@@ -210,19 +210,19 @@ var Marshal = {
     
     // TODO: Do it better
     _debug: function() {
-        if (MARSHAL_DEBUG >= 2)
+        if (window.MARSHAL_DEBUG >= 2)
             console.debug.apply(console, arguments);
     },
     
     _group: function() {
-        if (MARSHAL_DEBUG >= 2)
+        if (window.MARSHAL_DEBUG >= 2)
             console.group.apply(console, arguments);
-        else if (MARSHAL_DEBUG >= 1)
+        else if (window.MARSHAL_DEBUG >= 1)
             console.debug.apply(console, arguments);
     },
     
     _groupEnd: function() {
-        if (MARSHAL_DEBUG >= 2)
+        if (window.MARSHAL_DEBUG >= 2)
             console.groupEnd.apply(console, arguments);
     }
 };

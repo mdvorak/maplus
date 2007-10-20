@@ -41,11 +41,6 @@ const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
 const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
 const CHROME_CONTENT_URL = CHROME_URL + "content/";
 
-// Debugging
-const DEBUG = 0; // Generic debugging option
-const MARSHAL_DEBUG = 0; // 0=None, 1=Basic, 2=Verbose
-const XPATH_DEBUG = 0;
-
 // Oznaceni veku
 const AGE_NAME = "5.6"; // Pozn: Zmena tohoto atributu vymaze veskere nastaveni
 const ADMIN_ID = 2131; // Vek 5.6

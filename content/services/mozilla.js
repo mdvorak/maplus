@@ -125,3 +125,24 @@ var FileIO = {
         return url;
     }
 };
+
+
+/*** WebExtenderPreferences class ***/
+var WebExtenderPreferences = {
+    getBranch: function() {
+        if (this._branch == null) {
+            this._branch = Components.classes["@mozilla.org/preferences-service;1"]
+                                     .getService(Components.interfaces.nsIPrefService)
+                                     .getBranch("extensions.maplus.");
+        }
+        return this._branch;
+    },
+
+    getMarshalDebug: function() {
+        return this.getBranch().getIntPref("debug_marshal");
+    },
+
+    getXPathDebug: function() {
+        return this.getBranch().getIntPref("debug_xpath");
+    }
+};
