@@ -145,7 +145,9 @@ pageExtenders.add(PageExtender.create({
             }
         }
         
-        MaData.seznamAlianciUpdatovan();
+        if (page.arguments["prehled"] != "top") {
+            MaData.seznamAlianciUpdatovan();
+        }
         return true;
     },
     

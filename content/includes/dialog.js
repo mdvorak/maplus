@@ -39,6 +39,7 @@ var Dialog = Class.create();
 
 Dialog.prototype = {
     initialize: function() {
+        // Use this object for storing data
         this.data = new Object();
     },
     
@@ -47,6 +48,15 @@ Dialog.prototype = {
             throw new Error("Dialog is not created.");
         
         return this._content;
+    },
+    
+    setReturnValue: function(value) {
+        this._returnValue = value;
+    },
+    
+    getReturnValue: function() {
+        // Return last value
+        return this._returnValue;
     },
     
     create: function() {
@@ -165,16 +175,21 @@ Dialog.prototype = {
         if (!this._created)
             this.create();
         
+        console.log("Showing dialog %o...", this);
+        
         // Show content
         this._producer(true);
+        this.setReturnValue(null);
         this._callback = callback;
         
         this._visible = true;
     },
     
-    hide: function() {
+    hide: function(returnValue) {
         if (!this._visible)
             return;
+        
+        console.log("Hiding dialog %o with return value %o...", this, returnValue);
         
         // Hide content
         this._producer(false);
@@ -183,12 +198,14 @@ Dialog.prototype = {
         // Call callback function
         var callback = this._callback;
         this._callback = null;
+        
+        this.setReturnValue(returnValue);
         if (callback != null)
-            callback.call(this);
+            callback.call(this, returnValue);
     },
     
-    close: function() {
-        this.hide();
+    close: function(returnValue) {
+        this.hide(returnValue);
         this.destroy();
     },
     

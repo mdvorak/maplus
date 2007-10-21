@@ -43,7 +43,7 @@ var Checkbox = {
     imagesPath: CHROME_CONTENT_URL + "html/img/checkbox/",
 
     create: function() {
-        var root = Element.create("span", null, {style: "width: 13px; height: 13px; margin: 1px;", type: "checkbox"});
+        var root = Element.create("span", null, {style: "width: 13px; height: 13px; margin: 1px; overflow: hidden;", type: "checkbox"});
         return this.initialize(root);
     },
     

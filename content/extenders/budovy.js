@@ -167,8 +167,10 @@ pageExtenders.add(PageExtender.create({
                 }
                 else {
                     let pocet = parseInt(inputKolik.value);
-                    if (!isNaN(pocet))
-                        kolik += pocet;
+                    if (!isNaN(pocet)) {
+                        if (pocet > 1 || multiplier == 1)
+                            kolik += Math.max(pocet, 0);
+                    }
                 }
                 inputKolik.value = Math.min(kolik, data.pocet);
                 inputKolik.select();
@@ -178,7 +180,7 @@ pageExtenders.add(PageExtender.create({
             var linkVybrat = Element.create("a", '<span>' + data.jmeno + '</span>', {href: "javascript://", class: "idlink"});
             Event.observe(linkVybrat, "click", function(event) {
                 Event.stop(event);
-                var kolik = (event.shiftKey ? 10 : 1);
+                let kolik = (event.shiftKey ? 10 : 1);
                 if (event.ctrlKey) {
             		// Stavet
             		if (selectBudova.value == data.id) {
