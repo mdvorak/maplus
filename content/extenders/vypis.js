@@ -159,21 +159,24 @@ pageExtenders.add(PageExtender.create({
         
         context.nevracenoCsek = 0;
         context.prvDoProtu = 3;
-        
-        page.vypis.braneneUtoky.each(function(utok) {
-            if (utok.typ.search("nevráceno") > -1)
-                context.nevracenoCsek++; 
-            if (utok.typ.search("prvoútok") > -1 
-                    && utok.status == "prošel" 
-                    && (context.posledniBojMinuty == null || utok.cas < context.posledniBojMinuty))
-                context.prvDoProtu--;
-        });
-        
+                
         // Nejsem uz v protu?
-        if (page.provincie.protV > 0)
+        if (page.provincie.protV > 0) {
             context.prvDoProtu = 0;
-        else
-            context.prvDoProtu = Math.max(0, context.prvDoProtu);
+        }
+        else {
+            page.vypis.braneneUtoky.each(function(utok) {
+                if (utok.typ.search("nevráceno") > -1)
+                    context.nevracenoCsek++; 
+                if (utok.typ.search("prvoútok") > -1 
+                        && utok.status == "prošel" 
+                        && (context.posledniBojMinuty == null || utok.cas < context.posledniBojMinuty))
+                    context.prvDoProtu--;
+            });
+            
+            if (context.prvDoProtu == 0 && page.provincie.protV == 0)
+                context.prvDoProtu = 3; // Vylezl jsem z protu sam
+        }
         
         return true;
     },
