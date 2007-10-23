@@ -130,3 +130,34 @@ pageExtenders.add(PageExtender.create({
         page.content.insertBefore(upozorneni, page.content.firstChild);
     }
 }));
+
+
+// Confirm na form vynalezani kouzel
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Magie - Potvrzeni vynalezani"; },
+
+    analyze: function(page, context) {
+        var formVynalezani = $X('//form[contains(font, "Vaši mágové právě pracují na kouzlu")]');
+        if (formVynalezani == null)
+            return false;
+            
+        context.inputZrusit = $X('.//input[@type = "submit" and contains(@value, "Zrušit")]', formVynalezani);
+        context.links = $XL('.//a[@href and @href != "javascript://"]', formVynalezani);
+        
+        return (context.inputZrusit != null) && (context.links.length > 0);
+    },
+    
+    process: function(page, context) {
+        Event.observe(context.inputZrusit, "click", function(event) {
+            if (!confirm("Opravdu chcete zrušit vynalézání kouzla?"))
+                Event.stop(event);
+        });
+        
+        context.links.each(function(i) {
+            Event.observe(i, "click", function(event) {
+                if (!confirm("Opravdu chcete odehrát potřebný počet tahů pro vynalezení kouzla?"))
+                    Event.stop(event);
+            });
+        });
+    }
+}));
