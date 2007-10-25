@@ -166,9 +166,47 @@ var NastaveniVlastniLinky = {
     }
 };
 
+var SelectLinkDialog = Class.inherit(Dialog);
+Object.extend(SelectLinkDialog.prototype, {
+    _createContentElement: function() {
+        var html = '<table style="width: 100%;" cellpadding="0"><tbody>' +
+                   '    <tr style="vertical-align: top;"><td style="border-bottom: solid 1px gray;">' +
+                   '        <b>Typ odkazu</b>' +
+                   '    </td></tr>' +
+                   '    <tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>' +
+                   '    <tr><td>' +
+                   '        <span>Vyberte typ odkazu:\xA0</span>' +
+                   '        <select id="d_typOdkazu"></select>' +
+                   '    </td></tr>' +
+                   '    <tr><td style="text-align: center;">' +
+                   '        <input id="d_zrusit" value="\xA0Zrušit\xA0" type="button" />\xA0' +
+                   '        <input id="d_vytvorit" value="\xA0Vytvořit\xA0" type="button" />' +
+                   '    </td></tr>' +
+                   '</tbody></table>';
+    
+        var root = Element.create("div", html, {class: "linkDialog", style: "width: 350px; height: 130px;"});
+        
+        var dialog = this;
+        var select = $X('.//select[@id = "d_typOdkazu"]', root);
+        var inputZrusit = $X('.//input[@id = "d_zrusit"]', root);
+        var inputVytvorit = $X('.//input[@id = "d_vytvorit"]', root);
+        
+        // TODO naplnit select
+        
+        Event.observe(inputZrusit, "click", function() {
+            dialog.hide();
+        });
+        
+        Event.observe(inputVytvorit, "click", function() {
+            dialog.hide(select.value);
+        });
+        
+        return root;
+    }
+});
+
 
 var LinkEditorDialog = Class.inherit(Dialog);
-
 Object.extend(LinkEditorDialog.prototype, {
     initialize: function(editorName) {
         this._editorName = editorName;
@@ -202,36 +240,29 @@ Object.extend(LinkEditorDialog.prototype, {
             tbodyLayout.appendChild(Element.create("tr")).appendChild(Element.create("td", '<img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" />'));
         }
 
-        // Typ a nove okno
-        {
-            var trTypNoveOkno = tbodyLayout.appendChild(Element.create("tr"));
-        
-            // Typ
-            trTypNoveOkno.appendChild(Element.create("td", '<span>Typ:\xA0</span>'));
-            var selectTyp = trTypNoveOkno.appendChild(Element.create("td")).appendChild(Element.create("select"));
-            
-            // Mezera
-            trTypNoveOkno.appendChild(Element.create("td", '<img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" />'));
-            
-            // Nove okno
-            trTypNoveOkno.appendChild(Element.create("td", '<span>Otevřít v novém okně:\xA0</span>'));
-            var inputNoveOkno = trTypNoveOkno.appendChild(Element.create("td")).appendChild(Element.create("input", null, {type: "checkbox"}));
-        }
-        
         // Obecny obsah
         {
-            var trDescription = tbodyLayout.appendChild(Element.create("tr"));
+            var tr = tbodyLayout.appendChild(Element.create("tr"));
         
             // Text
-            trDescription.appendChild(Element.create("td", '<span>Text:\xA0</span>'));
-            var inputText = trDescription.appendChild(Element.create("td")).appendChild(Element.create("input", null, {type: "text", maxlength: 100}));
+            tr.appendChild(Element.create("td", '<span>Text:\xA0</span>'));
+            var inputText = tr.appendChild(Element.create("td")).appendChild(Element.create("input", null, {type: "text", maxlength: 100}));
             
             // Mezera
-            trDescription.appendChild(Element.create("td", '<img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" />'));
+            tr.appendChild(Element.create("td", '<img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" />'));
             
             // Tooltip
-            trDescription.appendChild(Element.create("td", '<span>Popisek:\xA0</span>'));
-            var inputPopisek = trDescription.appendChild(Element.create("td")).appendChild(Element.create("input", null, {type: "text", maxlength: 200}));
+            tr.appendChild(Element.create("td", '<span>Popisek:\xA0</span>'));
+            var inputPopisek = tr.appendChild(Element.create("td")).appendChild(Element.create("input", null, {type: "text", maxlength: 200}));
+        }
+        
+        // Nove okno
+        {
+            var tr = tbodyLayout.appendChild(Element.create("tr"));
+        
+            // Nove okno
+            tr.appendChild(Element.create("td", '<span>Otevřít v novém okně:\xA0</span>'));
+            var inputNoveOkno = tr.appendChild(Element.create("td")).appendChild(Element.create("input", null, {type: "checkbox"}));
         }
         
         // Specificky obsah
