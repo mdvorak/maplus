@@ -40,3 +40,4 @@ var MaData = Marshal.getObjectProxy("MaData");
 var Jednotky = Marshal.getObjectProxy("Jednotky");
 var Clipboard = Marshal.getObjectProxy("Clipboard");
 var DataCache = Marshal.getObjectProxy("DataCache");
+

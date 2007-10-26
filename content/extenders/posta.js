@@ -428,10 +428,11 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
 		page.posta.zpravy.each(function(zprava) {
 			if (zprava.dulezitost != null) {
+			
 				switch (zprava.dulezitost) {
 					case "dulezite":
 						zprava.trHeader.className += " zprava_dulezita";
-						break;
+						return; // Neodstranuj popisek
 
 					case "spam":
 						zprava.trHeader.className += " zprava_spam_" + zprava.typ;
@@ -640,3 +641,44 @@ pageExtenders.add(PageExtender.create({
         page.content.appendChild(Element.create("div", context.ovladaniHtml));
     }
 }));
+
+// Zvyrazni moje jmeno a id
+/*
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Posta -  Zvyrazneni regenta"; },
+
+    analyze: function(page, context) {
+    	if (page.posta == null || page.posta.zpravy == null)
+            return false;
+        if (page.posta.zpravy.length == 0)
+            return false;
+        
+        var replaceList = new Array();
+        var xpath = './/text()[contains(., "' + page.regent.jmeno + '") or contains(., "' + page.regent.id + '")]';
+        var regexString = "\\b" + page.regent.jmeno + "\\b|\\b" + page.regent.id + "\\b";
+        
+        page.posta.zpravy.each(function(zprava) {
+            var list = $XL(xpath, zprava.fontText);
+            
+            list.each(function(i) {
+                var regex = new RegExp(regexString, "gi");
+                var result = new Array();
+                var m = null;
+            
+                while (m = regex.exec(i.nodeValue))
+                    result.push({start: regex.lastIndex, end: (regex.lastIndex + m[0].length)});
+                    
+                if (result.length > 0)
+                    replaceList.push({textNode: i, result: result});
+            });            
+        });        
+        
+        context.list = replaceList;
+		return replaceList.length > 0;
+    },
+    
+    process: function(page, context) {
+    
+    }
+}));
+*/

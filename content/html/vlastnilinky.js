@@ -34,6 +34,8 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+/*** NastaveniVlastniLinky class ***/
+
 var NastaveniVlastniLinky = {
     init: function(content, pridat) {
         this.content = $(content);
@@ -166,24 +168,21 @@ var NastaveniVlastniLinky = {
     }
 };
 
+
+/*** SelectLinkDialog class ***/
+
 var SelectLinkDialog = Class.inherit(Dialog);
+
+SelectLinkDialog.getHtml = function() {
+    if (this._html == null) {
+        this._html = Chrome.getText(CHROME_CONTENT_URL + "html/newlinkdialog.html");
+    }
+    return this._html;
+};
+
 Object.extend(SelectLinkDialog.prototype, {
     _createContentElement: function() {
-        var html = '<table style="width: 100%;" cellpadding="0"><tbody>' +
-                   '    <tr style="vertical-align: top;"><td style="border-bottom: solid 1px gray;">' +
-                   '        <b>Typ odkazu</b>' +
-                   '    </td></tr>' +
-                   '    <tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>' +
-                   '    <tr><td>' +
-                   '        <span>Vyberte typ odkazu:\xA0</span>' +
-                   '        <select id="d_typOdkazu"></select>' +
-                   '    </td></tr>' +
-                   '    <tr><td style="text-align: center;">' +
-                   '        <input id="d_zrusit" value="\xA0Zrušit\xA0" type="button" />\xA0' +
-                   '        <input id="d_vytvorit" value="\xA0Vytvořit\xA0" type="button" />' +
-                   '    </td></tr>' +
-                   '</tbody></table>';
-    
+        var html = SelectLinkDialog.getHtml();
         var root = Element.create("div", html, {class: "linkDialog", style: "width: 350px; height: 130px;"});
         
         var dialog = this;
@@ -205,6 +204,8 @@ Object.extend(SelectLinkDialog.prototype, {
     }
 });
 
+
+/*** LinkEditorDialog class ***/
 
 var LinkEditorDialog = Class.inherit(Dialog);
 Object.extend(LinkEditorDialog.prototype, {

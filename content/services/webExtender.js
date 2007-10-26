@@ -375,6 +375,7 @@ Object.extend(Marshal, {
     DEFAULT: 0,
 
     PROXY_SUFFIX: "_PROXY",
+    PROXY_CACHED_SUFFIX: "_PROXY_CACHED",
 
     // Private members
     _objects: new Marshal.ObjectCollection(),
@@ -402,9 +403,9 @@ Object.extend(Marshal, {
             throw new ArgumentNullException("pattern");
             
         this.registerCallValidator(function(doc) {
-                if (!doc.location.href.match(pattern))
-                    throw new InvalidOperationException("This call is not enabled by the host security.");
-            });
+            if (!doc.location.href.match(pattern))
+                throw new InvalidOperationException("This call is not enabled by the host security.");
+        });
     },
     
     registerObject: function(name, obj) {
@@ -449,11 +450,11 @@ Object.extend(Marshal, {
             
                 var transportArgs = argsStr.evalJSON();
                 transportArgs.each(function(a) {
-                        if (a.reference != null)
-                            args.push(objects.getObject(elem.ownerDocument, a.reference, true));
-                        else
-                            args.push(a.value);
-                    });
+                    if (a.reference != null)
+                        args.push(objects.getObject(elem.ownerDocument, a.reference, true));
+                    else
+                        args.push(a.value);
+                });
             }
   
             // Call method
@@ -534,8 +535,8 @@ Object.extend(Marshal, {
         // No validators means disabled validation
          
         this._validators.each(function(v) {
-                v.call(null, doc, objectName);
-            });
+            v.call(null, doc, objectName);
+        });
     },
     
     _createProxyDefinition: function(obj) {
@@ -546,11 +547,13 @@ Object.extend(Marshal, {
         for (var f in obj) {
             if (typeof obj[f] == "function") {
                 var type = this._getMethodType(obj, f);
+                var cached = this._isMethodCached(obj, f);
             
                 if (type != Marshal.NONE) {
                     def.methods.push({ 
                         name: f,
-                        type: type
+                        type: type,
+                        cached: cached
                     });
                 }
             }
@@ -578,6 +581,10 @@ Object.extend(Marshal, {
             default:
                 return Marshal.NONE;
         }
+    },
+    
+    _isMethodCached: function(obj, methodName) {
+        return !! obj[methodName + this.PROXY_CACHED_SUFFIX];
     }
 });
 
@@ -687,6 +694,7 @@ ExtenderManager.Extenders = {
 // Methods available to the client via proxy
 var Chrome = {
     loadText_PROXY: Marshal.BY_VALUE,
+    loadText_PROXY_CACHED: true,
     loadText: function(path) {
         return FileIO.loadText(CHROME_CONTENT_URL + path);
     }

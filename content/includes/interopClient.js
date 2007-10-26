@@ -37,6 +37,7 @@
 /*** Marshal client component class ***/
 var Marshal = {
     _proxyCache: new Hash(),
+    _callCache: new Hash(),
     
     callMethod: function(objectName, methodName, args, isAnonymousReference) {
         if (objectName == null)
@@ -186,6 +187,30 @@ var Marshal = {
                 && typeof object.__proxy == "string");
     },
     
+    callCachedMethod: function(objectName, methodName, args, isAnonymousReference) {
+        if (objectName == null)
+            throw new ArgumentNullException("objectName");
+        if (methodName == null)
+            throw new ArgumentNullException("methodName");
+        if (args != null && !(args instanceof Array))
+            throw new ArgumentException("args", args, "Arguments must be an array.");
+            
+        var callID = objectName + "." + methodName + "(" + args.join(", ") + ")";
+        console.log("Marshal: Calling cached method %s", callID);
+        
+        var result = this._callCache[callID];
+        if (result == null) {
+            // Call original method and cache result
+            result = {
+                id: callID,
+                value: this.callMethod(objectName, methodName, args, isAnonymousReference)
+            };
+            this._callCache[callID] = result;
+        }
+        
+        return result.value;
+    },
+    
     _createProxyFromDefinition: function(objectName, def, isAnonymousReference) {
         if (objectName == null)
             throw new ArgumentNullException("objectName");
@@ -200,7 +225,8 @@ var Marshal = {
         var _this = this;
         proxyMethods.each(
             function(method) {
-                proxy[method.name] = function() { return _this.callMethod(objectName, method.name, $A(arguments), isAnonymousReference); };
+                var transport = (method.cached ? _this.callCachedMethod : _this.callMethod);
+                proxy[method.name] = function() { return transport.call(_this, objectName, method.name, $A(arguments), isAnonymousReference); };
             });
             
         proxy.__proxy = objectName;
