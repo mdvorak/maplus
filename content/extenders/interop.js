@@ -34,7 +34,11 @@
  * 
  * ***** END LICENSE BLOCK ***** */
  
-var Chrome = Marshal.getObjectProxy("Chrome");
+var Chrome = {
+    loadText: function(path, cached) {
+        return (cached ? Marshal.callCachedMethod : Marshal.callMethod)("Chrome", "loadText", [path]);
+    }
+};
 
 var MaData = Marshal.getObjectProxy("MaData");
 var Jednotky = Marshal.getObjectProxy("Jednotky");

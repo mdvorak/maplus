@@ -50,7 +50,7 @@ var Marshal = {
         var transportArgs = new Array();
         if (args != null) {
             for (var i = 0; i < args.length; i++) {
-                if (this.isProxy(args[i]))
+                if (Marshal.isProxy(args[i]))
                     transportArgs.push({ reference: args[i].__proxy, toString: function() { return "<ref " + this.reference + ">"; } });
                 else
                     transportArgs.push({ value: args[i], toString: function() { return "" + this.value; } });
@@ -62,25 +62,25 @@ var Marshal = {
         
         try {
             var objectDescription = (!isAnonymousReference ? objectName : "<ref " + objectName + ">");
-            this._group("Marshal: Calling method %s.%s(%s)", objectDescription, methodName, transportArgs.join(", "));
+            Marshal._group("Marshal: Calling method %s.%s(%s)", objectDescription, methodName, transportArgs.join(", "));
             
             elem.setAttribute("objectName", objectName);
             elem.setAttribute("methodName", methodName);
             elem.setAttribute("arguments", Object.toJSON(transportArgs));
             
             Event.dispatch(elem, "MarshalMethodCall", true);
-            this._debug("%o", elem);
+            Marshal._debug("%o", elem);
             
             // Exception
             if (elem.getAttribute("exception") != null) {
                 var ex = elem.getAttribute("exception").evalJSON();
-                this._debug("Exception=%o", ex);
+                Marshal._debug("Exception=%o", ex);
                 throw new RemoteException(objectName, methodName, ex);
             }
             // Simple type
             else if (elem.getAttribute("retval") != null) {
                 var retval = elem.getAttribute("retval").evalJSON();
-                this._debug("Return value=%o", retval);
+                Marshal._debug("Return value=%o", retval);
                 return retval;
             }
             // Single object reference
@@ -93,13 +93,13 @@ var Marshal = {
                 if (reference.proxyDefinition == null)
                     throw new MarshalException("Unable to find returned reference proxy definition.", objectName, methodName);
 
-                var proxy = this._proxyCache[reference.objectId];
+                var proxy = Marshal._proxyCache[reference.objectId];
                 if (proxy == null) {
-                    proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition, true);
-                    this._proxyCache[reference.objectId] = proxy;
+                    proxy = Marshal._createProxyFromDefinition(reference.objectId, reference.proxyDefinition, true);
+                    Marshal._proxyCache[reference.objectId] = proxy;
                 }
                 
-                this._debug("Reference=%o", proxy);
+                Marshal._debug("Reference=%o", proxy);
                 return proxy;
             }
             // Object reference list
@@ -116,16 +116,16 @@ var Marshal = {
                     if (reference.proxyDefinition == null)
                         throw new MarshalException("Unable to find returned reference proxy definition.", objectName, methodName);
 
-                    var proxy = this._proxyCache[reference.objectId];
+                    var proxy = Marshal._proxyCache[reference.objectId];
                     if (proxy == null) {
-                        proxy = this._createProxyFromDefinition(reference.objectId, reference.proxyDefinition, true);
-                        this._proxyCache[reference.objectId] = proxy;
+                        proxy = Marshal._createProxyFromDefinition(reference.objectId, reference.proxyDefinition, true);
+                        Marshal._proxyCache[reference.objectId] = proxy;
                     }
                     
                     proxies[i] = proxy;
                 }
                 
-                this._debug("ReferenceList=%o", proxies);
+                Marshal._debug("ReferenceList=%o", proxies);
                 return proxies;
             }
             // No return value
@@ -136,7 +136,7 @@ var Marshal = {
         finally {
             // Comment this for easier debugging
             document.body.removeChild(elem);
-            this._groupEnd();
+            Marshal._groupEnd();
         }
     },
     
@@ -144,14 +144,14 @@ var Marshal = {
         if (objectName == null)
             throw new ArgumentNullException("objectName");
   
-        var proxy = this._proxyCache[objectName];
+        var proxy = Marshal._proxyCache[objectName];
         
         if (proxy == null) {
             var elem = document.createElement("marshal");
             document.body.appendChild(elem);
             
             try {
-                this._group("Marshal: Creating proxy object '%s'", objectName);
+                Marshal._group("Marshal: Creating proxy object '%s'", objectName);
             
                 elem.setAttribute("objectName", objectName);
                 Event.dispatch(elem, "MarshalGetProxyDefinition", true);
@@ -166,14 +166,14 @@ var Marshal = {
                     throw new MarshalException("Unable to get proxy definition.", objectName);
                 
                 var def = defJSON.evalJSON();
-                this._debug("%o", def);
+                Marshal._debug("%o", def);
                 
-                proxy = this._createProxyFromDefinition(objectName, def);
+                proxy = Marshal._createProxyFromDefinition(objectName, def);
             }
             finally {
                 // Comment this for easier debugging
                 document.body.removeChild(elem);
-                this._groupEnd();
+                Marshal._groupEnd();
             }
         }
         
@@ -198,14 +198,14 @@ var Marshal = {
         var callID = objectName + "." + methodName + "(" + args.join(", ") + ")";
         console.log("Marshal: Calling cached method %s", callID);
         
-        var result = this._callCache[callID];
+        var result = Marshal._callCache[callID];
         if (result == null) {
             // Call original method and cache result
             result = {
                 id: callID,
-                value: this.callMethod(objectName, methodName, args, isAnonymousReference)
+                value: Marshal.callMethod(objectName, methodName, args, isAnonymousReference)
             };
-            this._callCache[callID] = result;
+            Marshal._callCache[callID] = result;
         }
         
         return result.value;
@@ -222,11 +222,10 @@ var Marshal = {
         var proxy = new Object();
         var proxyMethods = $A(def.methods);
         
-        var _this = this;
         proxyMethods.each(
             function(method) {
-                var transport = (method.cached ? _this.callCachedMethod : _this.callMethod);
-                proxy[method.name] = function() { return transport.call(_this, objectName, method.name, $A(arguments), isAnonymousReference); };
+                var transport = (method.cached ? Marshal.callCachedMethod : Marshal.callMethod);
+                proxy[method.name] = function() { return transport.call(Marshal, objectName, method.name, $A(arguments), isAnonymousReference); };
             });
             
         proxy.__proxy = objectName;
