@@ -258,7 +258,7 @@ pageExtenders.add(PageExtender.create({
                 if (data.aliance != null) {           
                     // Vytvor link
                     var linkOdpovedetVsem = Element.create("a", "Odpovědět všem");
-                    linkOdpovedetVsem.href = MaPlus.buildUrl(page, "posta.html", { posta: "posta_v_ally", odpoved: zprava.id });
+                    linkOdpovedetVsem.href = MaPlus.buildUrl(page, "posta.html", { posta: "posta_v_ally", odpoved: zprava.id, dulezitost: zprava.dulezitost });
                     linkOdpovedetVsem.href += psal;
                     
                     // Ulozeni zpravy
@@ -430,15 +430,20 @@ pageExtenders.add(PageExtender.create({
 			if (zprava.dulezitost != null) {
 				switch (zprava.dulezitost) {
 					case "dulezite":
-						
+						zprava.trHeader.className += " zprava_dulezita";
 						break;
 
 					case "spam":
-						// TODO
+						zprava.trHeader.className += " zprava_spam_" + zprava.typ;
+						zprava.element.className += " zprava_spam";
+						if (zprava.linkOd != null) zprava.linkOd.className += " zprava_spam";
+						if (zprava.linkOdpovedet != null) zprava.linkOdpovedet.className += " zprava_spam";
+						if (zprava.linkPredat != null) zprava.linkPredat.className += " zprava_spam";
+						if (zprava.linkOdpovedetVsem != null) zprava.linkOdpovedetVsem.className += " zprava_spam";
 						break;
 
 					case "bestiar":
-						// TODO
+						zprava.trHeader.className += " zprava_bestiar";
 						break;
 				
 					default:
