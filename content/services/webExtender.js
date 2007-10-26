@@ -694,7 +694,6 @@ ExtenderManager.Extenders = {
 // Methods available to the client via proxy
 var Chrome = {
     loadText_PROXY: Marshal.BY_VALUE,
-    loadText_PROXY_CACHED: true,
     loadText: function(path) {
         return FileIO.loadText(CHROME_CONTENT_URL + path);
     }
