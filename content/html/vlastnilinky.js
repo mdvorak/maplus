@@ -170,20 +170,12 @@ var NastaveniVlastniLinky = {
 
 
 /*** SelectLinkDialog class ***/
-
 var SelectLinkDialog = Class.inherit(Dialog);
-
-SelectLinkDialog.getHtml = function() {
-    if (this._html == null) {
-        this._html = Chrome.getText(CHROME_CONTENT_URL + "html/newlinkdialog.html");
-    }
-    return this._html;
-};
 
 Object.extend(SelectLinkDialog.prototype, {
     _createContentElement: function() {
-        var html = SelectLinkDialog.getHtml();
-        var root = Element.create("div", html, {class: "linkDialog", style: "width: 350px; height: 130px;"});
+        var html = Chrome.loadText("html/newlinkdialog.html", true);
+        var root = Element.create("div", html, {class: "linkDialog"});
         
         var dialog = this;
         var select = $X('.//select[@id = "d_typOdkazu"]', root);
