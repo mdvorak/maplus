@@ -539,6 +539,22 @@ pageExtenders.add(PageExtender.create({
         // Konfigurace
         context.config = PlusConfig.Aukce.extend(page.config.getAukce().getPrefNode("filtry", true));
 
+        // Optimilizace (lepsi to vzit najednou nez po jedne)
+        context.rules = new Hash();
+        
+        var allRules = BestiarFiltry.getAllRules();
+        allRules.each(function(i) {
+            var list = context.rules[i.name];
+            if (list == null) {
+                list = new Array();
+                context.rules[i.name] = list;
+            }
+        
+            list.push(i);
+        });        
+        
+        console.debug("Rules: %o", context.rules);
+        
         return true;
     },
 
@@ -554,7 +570,7 @@ pageExtenders.add(PageExtender.create({
                 return; // continue;
             
             // Get available rules for this column
-            var rules = BestiarFiltry.getRules(name);
+            var rules = context.rules[name];
             
             if (rules != null && rules.length > 0) {
                 // Najdi jestli sloupec podporuje filtrovani

@@ -47,6 +47,7 @@ var Jednotky = {
     },
     
     vyhledej_PROXY: Marshal.BY_VALUE,
+    vyhledej_PROXY_CACHED: true,
     vyhledej: function(jmeno) {
         if (jmeno == null)
             return null;

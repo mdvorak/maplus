@@ -37,20 +37,19 @@
 /*** NastaveniVlastniLinky class ***/
 
 var NastaveniVlastniLinky = {
-    init: function(content, pridat) {
-        this.content = $(content);
+    init: function(content, pridat, barvaRadku) {
+        this.content =  $(content);
         if (this.content == null)
             throw new ArgumentNullException("content");
             
         this.linkPridat = $(pridat);
         if (this.linkPridat == null)
             throw new ArgumentNullException("pridat");
-            
-        Event.observe(this.linkPridat, 'click', function() {
-            var dialog = new LinkEditorDialog();
-            dialog.show(function() {
-                this.destroy();
-            });
+        
+        // Handler pro pridani zaznamu
+        var addLink = this.addLink.bind(this);
+        Event.observe(this.linkPridat, "click", function(event) {
+            addLink();
         });
     },
 
@@ -67,7 +66,8 @@ var NastaveniVlastniLinky = {
         // Nacti data
         var links = config.evalPrefNodeList('url[text]');
         var poradi = 0;
-        var createRecord = this.createRecord;
+        var barvaRadku = $('n_barvaRadku').getAttribute("bgcolor");
+        var createRecord = this.createRecord.bind(this);
         
         links.each(function(i) {
             // Optimilizace rychlosti
@@ -78,10 +78,8 @@ var NastaveniVlastniLinky = {
             record.setPoradi(++poradi);
             record.setData(data);
             
-            // Odstranit event handler
-            Event.observe(record.odstranit, "click", function() {
-                content.removeChild(record.element);
-            });
+            if ((poradi % 2) == 0)
+                record.element.setAttribute("bgcolor", barvaRadku);
             
             content.appendChild(record.element);
         });
@@ -104,7 +102,7 @@ var NastaveniVlastniLinky = {
         
         rows.each(function(tr) {
             var row = ElementDataStore.get(tr);
-            if (row.getData == null)
+            if (typeof row.getData != "function")
                 return; // continue;
             
             var data = row.getData();
@@ -116,14 +114,68 @@ var NastaveniVlastniLinky = {
         });
     },
     
+    addLink: function() {
+        var content = this.content;
+        var createRecord = this.createRecord.bind(this);
+        var editRecord = this.editRecord.bind(this);
+        var barvaRadku = $('n_barvaRadku').getAttribute("bgcolor");
+        
+        // Zjisti nejvetsi poradi
+        var poradi = 0;
+        var rows = $A(content.rows);
+        rows.each(function(tr) {
+            poradi = Math.max(poradi, ElementDataStore.get(tr).getPoradi());
+        });
+        ++poradi;
+        
+        // Zobraz dialog pro vyber typu linku
+        var vyberDialog = new SelectLinkDialog();
+        vyberDialog.show(function(editorName) {
+            if (editorName == null || editorName.blank())
+                return;
+        
+            // Zobraz novy zaznam
+            var record = createRecord();
+            record.setPoradi(poradi);
+            record.setData({editor: editorName});
+            
+            if ((poradi % 2) == 0)
+                record.element.setAttribute("bgcolor", barvaRadku);
+            
+            // Zobraz dialog pro editaci dat
+            editRecord(record, function() {
+                content.appendChild(record.element);
+            });
+        });
+    },
+    
+    editRecord: function(record, callback) {
+        var data = record.getData();
+        var dialog = new LinkEditorDialog(data.editor);
+        dialog.create();
+        
+        // Set previous data
+        dialog.setData(data);
+        
+        // Show dialog
+        dialog.show(function(returnValue) {
+            if (returnValue) {
+                record.setData(dialog.getData());
+                if (callback != null)
+                    callback();
+            }
+            
+            dialog.close();
+        });
+    },
+    
     createRecord: function() {
         var tr = Element.create("tr");
         var record = ElementDataStore.get(tr);
         
         // Vytvor datove elementy
         record.poradi = Element.create("input", null, {type: "text", style: "width: 30px; text-align: center;", title: "Pořadí"});
-        record.text = Element.create("input", null, {type: "text", style: "width: 100px; text-align: center;", title: "Text"});
-        record.url = Element.create("input", null, {type: "text", style: "width: 170px; text-align: left;", title: "Adresa"});
+        record.text = Element.create("input", null, {type: "text", style: "width: 200px; text-align: center;", title: "Text"});
         record.externi = Element.create("input", null, {type: "checkbox", title: "Externí link", disabled: "disabled"});
         record.noveokno = Element.create("input", null, {type: "checkbox", title: "Otevřít v novém okně"});
         record.upravit = Element.create("a", '<img src="' + CHROME_CONTENT_URL + 'html/img/copy.png" alt="" class="link" />', {href: "javascript://", title: "Upravit"});
@@ -132,36 +184,40 @@ var NastaveniVlastniLinky = {
         // Pridej je do sloupcu
         tr.appendChild(Element.create("td")).appendChild(record.poradi);
         tr.appendChild(Element.create("td")).appendChild(record.text);
-        tr.appendChild(Element.create("td")).appendChild(record.url);
         tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.externi);
         tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.noveokno);
         tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.upravit);
         tr.appendChild(Element.create("td", null, {style: "text-align: center;"})).appendChild(record.odstranit);
         
+        // Event handlery
+        var editRecord = this.editRecord.bind(this);
+        Event.observe(record.upravit, "click", function(event) {
+            editRecord(record);
+        });
+        
+        Event.observe(record.odstranit, "click", function(event) {
+            tr.parentNode.removeChild(tr);
+        });
+
+        // Vlastnosti        
         record.setPoradi = function(poradi) {
             record.poradi.value = poradi;
         };
         record.getPoradi = function() {
-            return parseInt(record.poradi.value);
+            return parseFloat(record.poradi.value);
         };
-        
-        // Definuj getData a setData metody
+
         record.setData = function(linkData) {
-            record.url.value = linkData.url || "";
+            record._url = linkData.url;
             record.text.value = linkData.text || "";
             record.externi.checked = linkData.externi;
             record.noveokno.checked = linkData.noveokno;
             record._title = linkData.title;
             record._editor = linkData.editor;
         };
-        
         record.getData = function() {
-            return new LinkData(record.url.value, 
-                                record.text.value,
-                                record._title,
-                                record.externi.checked,
-                                record.noveokno.checked,
-                                record._editor);
+            return new LinkData(record._url, record.text.value, record._title, record.externi.checked,
+                                record.noveokno.checked, record._editor);
         };
         
         return record;
@@ -182,14 +238,18 @@ Object.extend(SelectLinkDialog.prototype, {
         var inputZrusit = $X('.//input[@id = "d_zrusit"]', root);
         var inputVytvorit = $X('.//input[@id = "d_vytvorit"]', root);
         
-        // TODO naplnit select
+        // Napln select
+        for (var i in LinkEditors) {
+            select.options.add(new Option(LinkEditors[i].title, i));
+        }
         
+        // Event handlery
         Event.observe(inputZrusit, "click", function() {
-            dialog.hide();
+            dialog.close();
         });
         
         Event.observe(inputVytvorit, "click", function() {
-            dialog.hide(select.value);
+            dialog.close(select.value);
         });
         
         return root;
@@ -198,108 +258,112 @@ Object.extend(SelectLinkDialog.prototype, {
 
 
 /*** LinkEditorDialog class ***/
-
 var LinkEditorDialog = Class.inherit(Dialog);
+
 Object.extend(LinkEditorDialog.prototype, {
     initialize: function(editorName) {
+        if (LinkEditors[editorName] == null)
+            editorName = "default";
+        
         this._editorName = editorName;
         this._editor = LinkEditors[editorName];
     },
     
-    getData: function() {
-    },
-    
-    setData: function(linkData) {
-        this._data = linkData;
-    },
+    getData: function() { throw new InvalidOperationException("Dialog is not created."); },
+    setData: function(data) { throw new InvalidOperationException("Dialog is not created."); },
         
     _createContentElement: function() {
         var _this = this;
     
-        var root = Element.create("div", null, {class: "linkDialog"});
+        var html = Chrome.loadText("html/linkeditor.html", true);
+        var root = Element.create("div", html, {class: "linkDialog", style: "width: 465px;"});
     
-        // Zakladni struktura
-        const columns = 5;
-        var tableLayout = Element.create("table");
-        var tbodyLayout = tableLayout.appendChild(Element.create("tbody"));
+        // Ziskej elementy
+        var inputText = $X('.//input[@id = "d_text"]', root);
+        var inputPopisek = $X('.//input[@id = "d_popisek"]', root);
+        var inputNoveokno = $X('.//input[@id = "d_noveokno"]', root);
+        var inputExterni = $X('.//input[@id = "d_externi"]', root);
         
-        // Hlavicka
-        {
-            // Nadpis
-            var tdHeader = tbodyLayout.appendChild(Element.create("tr", null, {style: "vertical-align: top;"})).appendChild(Element.create("td", null, {colspan: columns, style: "border-bottom: solid 1px gray;"}));
-            tdHeader.innerHTML = "<b>Upravit odkaz</b>"; // TODO
-
-            // Mezera
-            tbodyLayout.appendChild(Element.create("tr")).appendChild(Element.create("td", '<img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" />'));
-        }
-
-        // Obecny obsah
-        {
-            var tr = tbodyLayout.appendChild(Element.create("tr"));
-        
-            // Text
-            tr.appendChild(Element.create("td", '<span>Text:\xA0</span>'));
-            var inputText = tr.appendChild(Element.create("td")).appendChild(Element.create("input", null, {type: "text", maxlength: 100}));
-            
-            // Mezera
-            tr.appendChild(Element.create("td", '<img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" />'));
-            
-            // Tooltip
-            tr.appendChild(Element.create("td", '<span>Popisek:\xA0</span>'));
-            var inputPopisek = tr.appendChild(Element.create("td")).appendChild(Element.create("input", null, {type: "text", maxlength: 200}));
+        // Nastav vychozi text
+        inputText.value = this._editor.defaultText || "";
+        // Zobraz externi check
+        if (this._editorName == "default") {
+            $XL('.//*[@class = "externi"]', root).each(function(i) { i.style.display = ""; });
         }
         
-        // Nove okno
-        {
-            var tr = tbodyLayout.appendChild(Element.create("tr"));
-        
-            // Nove okno
-            tr.appendChild(Element.create("td", '<span>Otevřít v novém okně:\xA0</span>'));
-            var inputNoveOkno = tr.appendChild(Element.create("td")).appendChild(Element.create("input", null, {type: "checkbox"}));
-        }
-        
-        // Specificky obsah
-        var iface = null;       
-        if (this._editor != null) {
-            var tdContent = tbodyLayout.appendChild(Element.create("tr")).appendChild(Element.create("td", null, {colspan: columns}));
-            
-            iface = this._editor.create(tdContent);
-        }
-            
+        // Custom content
+        var tdCustomContent = $X('.//td[@id = "d_customcontent"]', root);
+        var editorData = this._editor.create(tdCustomContent);
+    
         // Ulozit/Zrusit
-        {
-            // Mezera
-            tbodyLayout.appendChild(Element.create("tr")).appendChild(Element.create("td", '<img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" />'));
-            
-            // Tlacitka
-            var tdFooter = tbodyLayout.appendChild(Element.create("tr")).appendChild(Element.create("td", null, {colspan: columns, style: "text-align: center;"}));
+        var inputZrusit = $X('.//input[@id = "d_zrusit"]', root);
+        var inputUlozit = $X('.//input[@id = "d_ulozit"]', root);
+    
+        Event.observe(inputZrusit, "click", function() {
+            _this.hide(false);
+        });
         
-            var inputZrusit = tdFooter.appendChild(Element.create("input", null, {value: "Zrušit", type: "button", style: "margin: 3px;"}));
-            var inputUlozit = tdFooter.appendChild(Element.create("input", null, {value: "Uložit", type: "button", style: "margin: 3px;"}));
+        Event.observe(inputUlozit, "click", function() {            
+            _this.hide(true);
+        });
         
-            Event.observe(inputZrusit, "click", function() {
-                _this.hide(false);
-            });
-            
-            Event.observe(inputUlozit, "click", function() {
-                // TODO nacist data
-                _this.hide(true);
-            });
-        }
+        this.getData = function() {
+            return new LinkData(editorData.get(),
+                                inputText.value,
+                                inputPopisek.value,
+                                inputExterni.checked,
+                                inputNoveokno.checked,
+                                _this._editorName);
+        };
         
-        root.appendChild(tableLayout);
+        this.setData = function(data) {
+            editorData.set(data.url);
+            if (data.text != null) inputText.value = data.text;
+            if (data.title != null) inputPopisek.value = data.title;
+            inputNoveokno.checked = !!data.noveokno;
+            inputExterni.checked = !!data.externi;
+        };
+        
         return root;
+    },
+    
+    destroy: function() {
+        base.destroy();
+    
+        this.getData = function() { throw new InvalidOperationException("Dialog is not created."); };
+        this.setData = function(data) { throw new InvalidOperationException("Dialog is not created."); };
     }
 });
 
  
 var LinkEditors = {
     "default": {
-        title: "Vlastní",        
+        title: "Vlastní",
         defaultText: "",
         
         create: function(parent) {
-            return {};
+            var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
+                       '<colgroup>' +
+                       '    <col width="75" />' +
+                       '    <col width="145" />' +
+                       '    <col width="10" />' +
+                       '    <col width="75" />' +
+                       '    <col width="145" />' +
+                       '</colgroup>' +
+                       '<tbody>' +
+                       '<tr>' +
+                       '    <td><span>Adresa: </span></td>' +
+                       '    <td colspan="4"><input id="d_url" type="text" maxlength="200" style="width: 100%; text-align: left;" /></td>' +
+                       '</tr>' +
+                       '</tbody></table>';
+            
+            parent.innerHTML = html;
+            var inputUrl = $X('.//input[@id = "d_url"]', parent);
+        
+            return {
+                get: function() { return inputUrl.value; },
+                set: function(url) { inputUrl.value = url || ""; }
+            };
         }
     },
     
@@ -309,17 +373,10 @@ var LinkEditors = {
         
         create: function(parent) {
             return {
-                read: function() {
-                    return {
-                        externi: false,
-                        url: "rekrutovat.html?jednotka=1&kolik=0"
-                    };
-                },
-                
-                write: function(data) {
-                }
+                get: function() { return "rekrutovat.html?jednotka=1&kolik=0"; },
+                set: function(url) { }
             };
         }
-    }
+    },
 };
 

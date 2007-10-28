@@ -38,12 +38,9 @@ var LinkData = Class.create();
 
 LinkData.prototype = {
     initialize: function(url, text, title, externi, noveokno, editor) {
-        if (text == null)
-            throw new ArgumentNullException("text");
-    
         this.url = url;
-        this.text = text.stripScripts();
-        this.title = title;
+        this.text = (text == null || text.blank()) ? null : text.stripScripts();
+        this.title = (title == null || title.blank()) ? null : title;
         this.externi = !!externi;
         this.noveokno = !!noveokno;
         this.editor = editor;

@@ -131,11 +131,10 @@ nastaveniManager.addTab("Obecné", "n_obecne");
                 <script type="text/javascript" src="chrome://maplus/content/html/vlastnilinky.js" charset="UTF-8"></script>
                 
                 <!-- Seznam linku -->
-                <table cellpadding="0" style="width: 460px;">
+                <table cellpadding="0" cellspacing="0" style="width: 460px;">
                     <colgroup>
                         <col width="30" />
-                        <col width="100" />
-                        <col width="170" />
+                        <col width="200" />
                         <col width="40" />
                         <col width="70" />
                         <col width="20" />
@@ -143,25 +142,36 @@ nastaveniManager.addTab("Obecné", "n_obecne");
                     </colgroup>
                     <!-- Nadpis -->
                     <tbody>
-                        <tr style="border-bottom: solid 1px gray;">
+                        <tr bgcolor="#505050">
+                            <td valign="top" align="left"><img width="26" height="15" alt="*" src="http://meliorannis.idnes.cz/html/img/rohy/lh.jpg"/></td>
+                            <td valign="middle" align="center" colspan="4"> </td>
+                            <td valign="top" align="right"><img width="26" height="15" alt="*" src="http://meliorannis.idnes.cz/html/img/rohy/ph.jpg"/></td>
+                        </tr>
+                        <tr style="border-bottom: solid 1px gray;" bgcolor="#505050">
                             <td style="text-align: center;"><span>#</span></td>
                             <td><span>Text</span></td>
-                            <td><span>Adresa</span></td>
                             <td style="text-align: center;"><span>Externí</span></td>
                             <td style="text-align: center;"><span>Nové Okno</span></td>
                             <td style="text-align: center;"><span></span></td>
                             <td style="text-align: center;"><span></span></td>
                         </tr>
+                        <tr id="n_barvaRadku" bgcolor="#303030"><!-- Pomocny radek pro barvu --></tr>
                     </tbody>
                     <!-- Data -->
                     <tbody id="n_vlastnilinky">
                     </tbody>
                     <!-- Pridat novy -->
                     <tbody>
-                        <tr>
-                            <td colspan="7" style="text-align: left;">
+                        <tr bgcolor="#505050"><td colspan="6"><span class="small">&nbsp;</span></td></tr>
+                        <tr bgcolor="#505050">
+                            <td colspan="6" style="text-align: left;">
                                 <span><input id="n_pridatLink" type="button" value="Přidat" /></span>
                             </td>
+                        </tr>
+                        <tr bgcolor="#505050">
+                            <td valign="bottom" align="left"><img width="26" height="15" alt="*" src="http://meliorannis.idnes.cz/html/img/rohy/ld.jpg"/></td>
+                            <td valign="middle" align="center" colspan="4"> </td>
+                            <td valign="bottom" align="right"><img width="26" height="15" alt="*" src="http://meliorannis.idnes.cz/html/img/rohy/pd.jpg"/></td>
                         </tr>
                     </tbody>
                 </table>

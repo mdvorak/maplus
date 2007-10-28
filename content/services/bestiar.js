@@ -46,14 +46,15 @@ var BestiarFiltry = {
     
     getRules_PROXY: Marshal.BY_VALUE,
     getRules: function(name, type) {
+        if (name == null)
+            throw new ArgumentNullException("name");
+    
         if (!this.data)
             this._load();
         if (!this.data)
             return null;
     
-        var path = '/aukce/rulelist';
-        if (name) path += '[@name = "' + name + '"]';
-        path += '/rule';
+        var path = '/aukce/rulelist[@name = "' + name + '"]/rule';
         if (type) path += '[@type = "' + type + '"]';
         
         var rules = this.data.evaluate(path, this.data, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
@@ -68,6 +69,27 @@ var BestiarFiltry = {
                 title: i.textContent
             };
             arr.push(rule);
+        }
+        
+        return arr;
+    },
+    
+    getAllRules_PROXY: Marshal.BY_VALUE,
+    getAllRules: function(type) {
+        if (!this.data)
+            this._load();
+        if (!this.data)
+            return null;
+    
+        var path = '/aukce/rulelist[@name]';
+        
+        var rulelists = this.data.evaluate(path, this.data, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        var i;
+        var arr = new Array();
+        
+        while((i = rulelists.iterateNext()) != null) {
+            var name = i.getAttribute("name");
+            arr = arr.concat(this.getRules(name, type));
         }
         
         return arr;
