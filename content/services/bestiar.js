@@ -74,25 +74,33 @@ var BestiarFiltry = {
         return arr;
     },
     
-    getAllRules_PROXY: Marshal.BY_VALUE,
-    getAllRules: function(type) {
+    getAllRulesJSON_PROXY: Marshal.BY_VALUE,
+    getAllRulesJSON: function(type) {
         if (!this.data)
             this._load();
         if (!this.data)
             return null;
-    
-        var path = '/aukce/rulelist[@name]';
         
-        var rulelists = this.data.evaluate(path, this.data, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-        var i;
-        var arr = new Array();
+        var cacheName = "_all_" + type;
+        var json = this[cacheName];
         
-        while((i = rulelists.iterateNext()) != null) {
-            var name = i.getAttribute("name");
-            arr = arr.concat(this.getRules(name, type));
+        if (arr == null) {
+            var path = '/aukce/rulelist[@name]';
+            
+            var rulelists = this.data.evaluate(path, this.data, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+            var i;
+            var arr = new Array();
+            
+            while((i = rulelists.iterateNext()) != null) {
+                var name = i.getAttribute("name");
+                arr = arr.concat(this.getRules(name, type));
+            }
+            
+            json = Object.toJSON(arr);
+            this[cacheName] = json;
         }
         
-        return arr;
+        return json;
     }
 };
 

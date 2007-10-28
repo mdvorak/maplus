@@ -542,7 +542,7 @@ pageExtenders.add(PageExtender.create({
         // Optimilizace (lepsi to vzit najednou nez po jedne)
         context.rules = new Hash();
         
-        var allRules = BestiarFiltry.getAllRules();
+        var allRules = BestiarFiltry.getAllRulesJSON().evalJSON();
         allRules.each(function(i) {
             var list = context.rules[i.name];
             if (list == null) {
