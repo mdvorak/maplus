@@ -245,7 +245,7 @@ Object.extend(SelectLinkDialog.prototype, {
         
         // Event handlery
         Event.observe(inputZrusit, "click", function() {
-            dialog.close();
+            dialog.close(null);
         });
         
         Event.observe(inputVytvorit, "click", function() {
@@ -253,6 +253,11 @@ Object.extend(SelectLinkDialog.prototype, {
         });
         
         return root;
+    },
+    
+    validate: function(returnValue) {
+        if (returnValue != null && returnValue.blank())
+            throw "Prosím vyberte typ odkazu.";
     }
 });
 
@@ -271,7 +276,8 @@ Object.extend(LinkEditorDialog.prototype, {
     
     getData: function() { throw new InvalidOperationException("Dialog is not created."); },
     setData: function(data) { throw new InvalidOperationException("Dialog is not created."); },
-        
+    validate: function(returnValue) { },
+    
     _createContentElement: function() {
         var _this = this;
     
@@ -307,35 +313,55 @@ Object.extend(LinkEditorDialog.prototype, {
             _this.hide(true);
         });
         
-        this.getData = function() {
-            return new LinkData(editorData.get(),
-                                inputText.value,
-                                inputPopisek.value,
-                                inputExterni.checked,
-                                inputNoveokno.checked,
-                                _this._editorName);
-        };
-        
-        this.setData = function(data) {
-            editorData.set(data.url);
-            if (data.text != null) inputText.value = data.text;
-            if (data.title != null) inputPopisek.value = data.title;
-            inputNoveokno.checked = !!data.noveokno;
-            inputExterni.checked = !!data.externi;
-        };
+        // Pokud danemu editoru neco chyby, vrati null
+        if (editorData != null) {
+            this.getData = function() {
+                return new LinkData(editorData.get(),
+                                    inputText.value,
+                                    inputPopisek.value,
+                                    inputExterni.checked,
+                                    inputNoveokno.checked,
+                                    _this._editorName);
+            };
+            
+            this.setData = function(data) {
+                editorData.set(data.url);
+                if (data.text != null) inputText.value = data.text;
+                if (data.title != null) inputPopisek.value = data.title;
+                inputNoveokno.checked = !!data.noveokno;
+                inputExterni.checked = !!data.externi;
+            };
+            this.validate = function(returnValue) { 
+                if (returnValue) {
+                    if (inputText.value.blank())
+                        throw 'Text linku musí být vyplněn. Pro prázdný řádek použijte "-".';
+                    
+                    editorData.validate();
+                }
+            };
+        }
+        else {
+            this.getData = function() { };
+            this.setData = function(data) { };
+            this.validate = function(returnValue) { 
+                if (returnValue) throw new Exception("Odkaz nelze vytvořit.");
+            };
+            inputUlozit.disabled = true;
+        }
         
         return root;
     },
-    
+        
     destroy: function() {
         base.destroy();
     
         this.getData = function() { throw new InvalidOperationException("Dialog is not created."); };
         this.setData = function(data) { throw new InvalidOperationException("Dialog is not created."); };
+        this.validate = function(returnValue) { };
     }
 });
 
- 
+
 var LinkEditors = {
     "default": {
         title: "Vlastní",
@@ -362,7 +388,8 @@ var LinkEditors = {
         
             return {
                 get: function() { return inputUrl.value; },
-                set: function(url) { inputUrl.value = url || ""; }
+                set: function(url) { inputUrl.value = url || ""; },
+                validate: function() { }
             };
         }
     },
@@ -374,9 +401,122 @@ var LinkEditors = {
         create: function(parent) {
             return {
                 get: function() { return "rekrutovat.html?jednotka=1&kolik=0"; },
-                set: function(url) { }
+                set: function(url) { },
+                validate: function() { }
             };
         }
     },
+    
+    "rekrutJednotky": {
+        title: "Rekrut jednotky",
+        defaultText: "",
+        
+        create: function(parent) {
+            // TODO
+            if (true) {
+                parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Armáda.</span>';
+                return null;
+            }
+        
+            var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
+                       '<colgroup>' +
+                       '    <col width="75" />' +
+                       '    <col width="145" />' +
+                       '    <col width="10" />' +
+                       '    <col width="75" />' +
+                       '    <col width="145" />' +
+                       '</colgroup>' +
+                       '<tbody>' +
+                       '<tr>' +
+                       '    <td><span>Jednotka: </span></td>' +
+                       '    <td>' +
+                       '        <select id="d_jednotka" type="text" maxlength="200">' +
+                       '            <option value="0"> - Rekrutovat - </option>' +
+                       '        </select>' + 
+                       '    </td>' +
+                       '</tr>' +
+                       '<tr>' +
+                       '    <td><span>Počet: </span></td>' +
+                       '    <td><input id="d_pocet" type="text" maxlength="6" /></td>' +
+                       '' +
+                       '    <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>' +
+                       '' +
+                       '    <td><span>Tahů: </span></td>' +
+                       '    <td><input id="d_tahu" type="text" maxlength="5" /></td>' +
+                       '</tr>' +
+                       '</tbody>' +
+                       '</table>';
+            
+            parent.innerHTML = html;
+        
+            var selectJednotka = $X('.//select[@id = "d_jednotka"]', parent);
+            var inputPocet = $X('.//input[@id = "d_pocet"]', parent);
+            var inputTahu = $X('.//input[@id = "d_tahu"]', parent);
+        
+            // TODO napln select
+            
+            return {
+                get: function() {
+                    return "rekrutovat.html?jednotka=" + selectJednotka.value + "&tahu=" + inputTahu.value + "&kolik=" + inputPocet.value;
+                },
+                set: function(url) {
+                },
+                validate: function() {
+                    if (!(parseInt(selectJednotka.value) > 0))
+                        throw new Exception("Prosím vyberte jednotku ze seznamu.");
+                    if (!(parseInt(inputPocet.value) >= 0))
+                        throw new Exception("Počet rekrutovaných jednotek musí být větší než nula.");
+                    if (!(parseInt(inputTahu.value) >= 0))
+                        throw new Exception("Počet tahů rekrutu musí být větší než nula.");
+                }
+            };
+        }
+    },
+    
+    
+    "seslaniKouzla": {
+        title: "Seslání kouzla",
+        defaultText: "",
+        
+        create: function(parent) {
+            // TODO
+            if (true) {
+                parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Kouzla.</span>';
+                return null;
+            }
+        
+            var html = '<input id="d_kolikrat" type="text" name="kolikrat" value="1" size="3"/>' +
+                       '<span>&nbsp;x&nbsp;<span>' +
+                       '<select id="d_kouzlo" name="seslat_kouzlo">' +
+	                   '    <option value=""> - kouzlo - </option>' +
+	                   '</select>' +
+	                   '&nbsp;seslat na ID #&nbsp;' +
+	                   '<input id="d_koho" type="text" name="koho" maxlength="8" size="5"/>';	                   
+            
+            parent.innerHTML = html;
+        
+            var selectKouzlo = $X('.//select[@id = "d_kolikrat"]', parent);
+            var inputKolikrat = $X('.//input[@id = "d_kolikrat"]', parent);
+            var inputKoho = $X('.//input[@id = "d_koho"]', parent);
+        
+            // TODO napln select
+            
+            return {
+                get: function() {
+                    return "magie.html?kolikrat=" + inputKolikrat.value + "&seslat_kouzlo=" + selectKouzlo.value + "&koho=" + inputKoho.value;
+                },
+                set: function(url) {
+                },
+                validate: function() {
+                    if (selectJednotka.value == "")
+                        throw new Exception("Prosím vyberte kouzlo.");
+                    if (!(parseInt(inputKolikrat.value) > 0))
+                        throw new Exception("Počet seslání kouzla musí být číslo > 0.");
+                    if (inputKoho.value.length > 0 && isNaN(parseInt(inputKoho.value)))
+                        throw new Exception("Cíl kouzla musí být ID hráče.");
+                }
+            };
+        }
+    }
 };
 

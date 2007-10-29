@@ -63,7 +63,7 @@ Dialog.prototype = {
         if (this._created)
             this.destroy();
         
-        console.log("Creating dialog %o...", this);
+        console.debug("Creating dialog %o...", this);
         
         var destructors = new Array();
         
@@ -153,7 +153,7 @@ Dialog.prototype = {
         if (this._visible)
             throw new Error("Visible dialog cannot be destroyed.");
             
-        console.log("Destroying dialog %o...", this);
+        console.debug("Destroying dialog %o...", this);
         
         this._created = false;
         
@@ -175,7 +175,7 @@ Dialog.prototype = {
         if (!this._created)
             this.create();
         
-        console.log("Showing dialog %o...", this);
+        console.debug("Showing dialog %o...", this);
         
         // Show content
         this._producer(true);
@@ -188,8 +188,18 @@ Dialog.prototype = {
     hide: function(returnValue) {
         if (!this._visible)
             return;
+            
+        try {
+            console.debug("Validating dialog %o with return value %o...", this, returnValue);
+            this.validate(returnValue);
+        }
+        catch (ex) {
+            console.log("Dialog %o validation with return value %o failed: %o", this, returnValue, ex);
+            this._onValidationError(ex);
+            return false;
+        }
         
-        console.log("Hiding dialog %o with return value %o...", this, returnValue);
+        console.debug("Hiding dialog %o with return value %o...", this, returnValue);
         
         // Hide content
         this._producer(false);
@@ -202,11 +212,20 @@ Dialog.prototype = {
         this.setReturnValue(returnValue);
         if (callback != null)
             callback.call(this, returnValue);
+            
+        return true;
     },
     
     close: function(returnValue) {
-        this.hide(returnValue);
-        this.destroy();
+        if (this.hide(returnValue))
+            this.destroy();
+    },
+    
+    validate: function(returnValue) {
+    },
+    
+    _onValidationError: function(err) {
+        alert("" + err);
     },
     
     _createContentElement: function() {
