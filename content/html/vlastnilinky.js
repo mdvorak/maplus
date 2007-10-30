@@ -153,17 +153,18 @@ window.NastaveniVlastniLinky = {
             // Zobraz dialog pro editaci dat
             editRecord(record, function() {
                 content.appendChild(record.element);
-            });
+            }, true);
         });
     },
     
-    editRecord: function(record, callback) {
+    editRecord: function(record, callback, isNew) {
         var data = record.getData();
         var dialog = new LinkEditorDialog(data.editor, this.localConfig);
         dialog.create();
         
         // Set previous data
-        dialog.setData(data);
+        if (!isNew)
+            dialog.setData(data);
         
         // Show dialog
         dialog.show(function(returnValue) {
@@ -333,7 +334,7 @@ Object.extend(LinkEditorDialog.prototype, {
             this.getData = function() {
                 // Odstran pripadne z url bordel
                 var str = editorData.get();
-                if (!inputExterni.checked && str.substring(0, MELIOR_ANNIS_URL.length) == MELIOR_ANNIS_URL) {
+                if (str != null && !inputExterni.checked && str.substring(0, MELIOR_ANNIS_URL.length) == MELIOR_ANNIS_URL) {
                     var url = parseUrl(str);
                     
                     // Sestav znovu url

@@ -257,6 +257,8 @@ pageExtenders.add(PageExtender.create({
     },
 
     process: function(page, context) {
+        var formatVyprsi = this._formatVyprsi;
+    
         context.vsechnyUtoky.each(function(utok) {
             var row = ElementDataStore.get(utok.tr);
     
@@ -279,8 +281,12 @@ pageExtenders.add(PageExtender.create({
             var vyprsi = new Date(casUtoku + 72 * 3600 * 1000);
             vyprsi.setSeconds(0, 0);
             
-            row.cells.cas.setAttribute("title", "Vyprší: " + vyprsi.toLocaleString().replace(/:00$/, ""));
+            row.cells.cas.setAttribute("title", formatVyprsi(vyprsi), ""));
         });
+    },
+    
+    _formatVyprsi: function(date) {
+        return "Vyprší: " + date.toLocaleString().replace(/:00$/);
     }
 }));
 

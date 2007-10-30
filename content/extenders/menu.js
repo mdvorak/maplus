@@ -220,7 +220,7 @@ pageExtenders.add(PageExtender.create({
                 }
             }
             
-            context.list.push({url: url, text: data.text, noveokno: data.noveokno, title: data.title});
+            context.list.push({url: url, text: data.text, noveokno: data.noveokno, title: data.title, barva: data.barva});
         });
         
         return true;
@@ -236,9 +236,15 @@ pageExtenders.add(PageExtender.create({
                 element = Element.create("a", i.text, {href: i.url, title: i.title});
                 if (i.noveokno)
                     element.setAttribute("target", "_blank");
+                if (i.barva != null) {
+                    element.style.color = i.barva;
+                    element.style.textDecoration = "underline";
+                }
             }
             else {
-                element = document.createTextNode(i.text.length > 0 && i.text != "-" ? i.text : '\xA0');
+                element = Element.create("span", (i.text.length > 0 && i.text != "-") ? i.text : '\xA0');
+                if (i.barva != null)
+                    element.style.color = i.barva;
             }
             
             spanCustomMenu.appendChild(Element.create("br"));
