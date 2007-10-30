@@ -413,7 +413,9 @@ var LinkEditors = {
 	                   '    <option value=""> - kouzlo - </option>' +
 	                   '</select>' +
 	                   '&nbsp;seslat na ID #&nbsp;' +
-	                   '<input id="d_koho" type="text" name="koho" maxlength="8" size="5"/>';	                   
+	                   '<input id="d_koho" type="text" name="koho" maxlength="8" size="5"/>' +
+	                   '<br/>' + 
+	                   '<span class="small">(Pokud kouzlo není uvedeno v seznamu, znamená to že jste na něj neměli manu v době sbíraní dat v menu Kouzla.)</span>';	                   
             
             parent.innerHTML = html;
         
