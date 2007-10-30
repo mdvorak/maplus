@@ -309,6 +309,7 @@ Object.extend(LinkEditorDialog.prototype, {
         // Zobraz externi check
         if (this._editorName == "default") {
             $XL('.//*[@class = "externi"]', root).each(function(i) { i.style.display = ""; });
+            inputExterni.checked = true;
         }
         
         // Custom content
@@ -330,7 +331,26 @@ Object.extend(LinkEditorDialog.prototype, {
         // Pokud danemu editoru neco chyby, vrati null
         if (editorData != null) {
             this.getData = function() {
-                return new LinkData(editorData.get(),
+                // Odstran pripadne z url bordel
+                var str = editorData.get();
+                if (!inputExterni.checked && str.substring(0, MELIOR_ANNIS_URL.length) == MELIOR_ANNIS_URL) {
+                    var url = parseUrl(str);
+                    
+                    // Sestav znovu url
+                    str = url.name;
+                    var and = "?";
+                    url.arguments.each(function([key, value]) {
+                        if (value == null || value == "")
+                            return;
+                        if (key == "id" || key == "ftc" || key == "code")
+                            return;
+                    
+                        str += and + key + "=" + value;
+                        and = "&";
+                    });
+                }
+            
+                return new LinkData(str,
                                     inputText.value,
                                     inputPopisek.value,
                                     inputExterni.checked,
