@@ -285,11 +285,14 @@ Object.extend(LinkEditorDialog.prototype, {
         var root = Element.create("div", html, {class: "linkDialog", style: "width: 465px;"});
     
         // Ziskej elementy
+        var spanEditor = $X('.//span[@id = "d_editor"]', root);
         var inputText = $X('.//input[@id = "d_text"]', root);
         var inputPopisek = $X('.//input[@id = "d_popisek"]', root);
         var inputNoveokno = $X('.//input[@id = "d_noveokno"]', root);
         var inputExterni = $X('.//input[@id = "d_externi"]', root);
         
+        // Nastav popisek editoru
+        spanEditor.innerHTML = this._editor.title;
         // Nastav vychozi text
         inputText.value = this._editor.defaultText || "";
         // Zobraz externi check
@@ -394,6 +397,21 @@ var LinkEditors = {
         }
     },
     
+    "text": {
+        title: "Text",
+        defaultText: "-",
+        
+        create: function(parent) {
+            parent.innerHTML = '<span class="small">Pro prázdný řádek použijte "-" (bez uvozovek).</span>';
+        
+            return {
+                get: function() { return null; },
+                set: function(url) { },
+                validate: function() { }
+            };
+        }
+    },
+    
     "zrusRekrut": {
         title: "Zruš Rekrut",
         defaultText: "Zruš Rekrut",
@@ -481,7 +499,9 @@ var LinkEditors = {
         create: function(parent) {
             // TODO
             if (true) {
-                parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Kouzla.</span>';
+                parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Kouzla.</span>' +
+                                   '<br/>' +
+                                   '<span class="small">(Aby se dané kouzlo objevilo v seznamu, musíte na něj mít manu.)</span>';
                 return null;
             }
         

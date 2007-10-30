@@ -40,6 +40,7 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         context.cells = $XL('form/table[1]/tbody/tr/td[1]/font', page.content);
+        context.cells = $XL('form/form/table/tbody/tr/td[1]/font', page.content).concat(context.cells);
         return context.cells.length > 0;
     },
     
@@ -155,4 +156,40 @@ pageExtenders.add(PageExtender.create({
         
         context.propustit.parentNode.appendChild(notes);
     }
+}));
+
+// Uloz id rekrutovatelnych jednotek do localconfigu
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Armada - ID Jednotek"; },
+
+    analyze: function(page, context) {
+        var config = page.localConfig.getPrefNode("armada", true);
+        
+        var selectJednotka = $X('.//form[@name = "rekrutovat"]//select[@name = "jednotka"]', page.content);
+        if (selectJednotka == null)
+            return false;
+            
+        // Nerefreshuj zbytecne pri kazdem zobrazeni
+        if (parseInt(config.getAttribute("pocet")) == selectJednotka.options.length)
+            return true;
+        
+        console.debug("Probiha refresh rekrutovatelnych jednotek..");
+        config.clearChildNodes();
+        
+        for (var i = 0; i < selectJednotka.options.length; i++) {
+            var id = parseInt(selectJednotka.options[i].value);
+            
+            if (id > 0) {
+                var p = config.addPref("jednotka");
+                p.setPref("id", id);
+                p.setPref("name", selectJednotka.options[i].text);
+            }
+        }
+        
+        config.setAttribute("pocet", selectJednotka.options.length);
+        
+        return true;
+    },
+    
+    process: null
 }));
