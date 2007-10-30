@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-/*** parseBoolean function ***/
+/*** parse functions ***/
 function parseBoolean(str) {
     if (str == null)
         return false;
@@ -45,6 +45,30 @@ function parseBoolean(str) {
     
     var n = parseInt(str);
     return !isNaN(n) && (n != 0);
+}
+
+function parseUrl(href) {
+    var url = String(href).replace(/#.*$/, "");
+    var m = url.match(/\/?([\w.]+?)([?].+?)?$/);
+    var name = (m != null) ? m[1] : null;
+        
+    // Analyze url encoded arguments
+    var args = new Hash();
+    
+    var argsIndex = url.indexOf("?");
+    if (argsIndex > -1) {
+        $A(url.substring(argsIndex + 1).match(/[^&=]+=[^&=]+/g)).each(function(a) {
+            var pair = a.split("=");
+            args[pair[0]] = pair[1];
+        });
+    }
+    
+    return {
+        href: href,
+        url: url,
+        name: name,
+        arguments: args
+    };
 }
 
 /*** Extender object model ***/
@@ -451,21 +475,11 @@ Page.prototype = {
         if (doc == null) doc = document;
     
         this.document = $(doc);
-        this.url = this.document.location.href.replace(/#.*$/, "");;
-        this.name = this.url.match(/\/([\w.]+?)([?].+?)?$/)[1];
         
-        // Analyze url encoded arguments
-        this.arguments = new Hash();
-        
-        var argsIndex = this.url.indexOf("?");
-        if (argsIndex > -1) {
-            var _this = this;
-            
-            $A(this.url.substring(argsIndex + 1).match(/[^&=]+=[^&=]+/g)).each(function(a) {
-                var pair = a.split("=");
-                _this.arguments[pair[0]] = pair[1];
-            });
-        }
+        var urlData = parseUrl(this.document.location.href);
+        this.url = urlData.url;
+        this.name = urlData.name;
+        this.arguments = urlData.arguments; // Url encoded arguments
     }
 };
 

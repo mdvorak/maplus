@@ -36,8 +36,8 @@
 
 /*** NastaveniVlastniLinky class ***/
 
-var NastaveniVlastniLinky = {
-    init: function(content, pridat, barvaRadku) {
+window.NastaveniVlastniLinky = {
+    init: function(content, pridat) {
         this.content =  $(content);
         if (this.content == null)
             throw new ArgumentNullException("content");
@@ -51,6 +51,14 @@ var NastaveniVlastniLinky = {
         Event.observe(this.linkPridat, "click", function(event) {
             addLink();
         });
+    },
+    
+    // Tahle funkce je volana extenderem
+    initPage: function(page) {
+        if (page == null)
+            throw new ArgumentNullException("page");
+            
+        this.localConfig = page.localConfig;
     },
 
     reset: function() {
@@ -151,7 +159,7 @@ var NastaveniVlastniLinky = {
     
     editRecord: function(record, callback) {
         var data = record.getData();
-        var dialog = new LinkEditorDialog(data.editor);
+        var dialog = new LinkEditorDialog(data.editor, this.localConfig);
         dialog.create();
         
         // Set previous data
@@ -266,10 +274,13 @@ Object.extend(SelectLinkDialog.prototype, {
 var LinkEditorDialog = Class.inherit(Dialog);
 
 Object.extend(LinkEditorDialog.prototype, {
-    initialize: function(editorName) {
+    initialize: function(editorName, localConfig) {
         if (LinkEditors[editorName] == null)
             editorName = "default";
+        if (localConfig == null)
+            throw new ArgumentNullException("localConfig");
         
+        this._localConfig = localConfig;
         this._editorName = editorName;
         this._editor = LinkEditors[editorName];
     },
@@ -302,7 +313,7 @@ Object.extend(LinkEditorDialog.prototype, {
         
         // Custom content
         var tdCustomContent = $X('.//td[@id = "d_customcontent"]', root);
-        var editorData = this._editor.create(tdCustomContent);
+        var editorData = this._editor.create(tdCustomContent, this._localConfig);
     
         // Ulozit/Zrusit
         var inputZrusit = $X('.//input[@id = "d_zrusit"]', root);
@@ -337,7 +348,7 @@ Object.extend(LinkEditorDialog.prototype, {
             this.validate = function(returnValue) { 
                 if (returnValue) {
                     if (inputText.value.blank())
-                        throw 'Text linku musí být vyplněn. Pro prázdný řádek použijte "-".';
+                        throw 'Text linku musí být vyplněn.';
                     
                     editorData.validate();
                 }
@@ -370,7 +381,7 @@ var LinkEditors = {
         title: "Vlastní",
         defaultText: "",
         
-        create: function(parent) {
+        create: function(parent, localConfig) {
             var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
                        '<colgroup>' +
                        '    <col width="75" />' +
@@ -401,7 +412,7 @@ var LinkEditors = {
         title: "Text",
         defaultText: "-",
         
-        create: function(parent) {
+        create: function(parent, localConfig) {
             parent.innerHTML = '<span class="small">Pro prázdný řádek použijte "-" (bez uvozovek).</span>';
         
             return {
@@ -416,7 +427,7 @@ var LinkEditors = {
         title: "Zruš Rekrut",
         defaultText: "Zruš Rekrut",
         
-        create: function(parent) {
+        create: function(parent, localConfig) {
             return {
                 get: function() { return "rekrutovat.html?jednotka=1&kolik=0"; },
                 set: function(url) { },
@@ -429,9 +440,10 @@ var LinkEditors = {
         title: "Rekrut jednotky",
         defaultText: "",
         
-        create: function(parent) {
-            // TODO
-            if (true) {
+        create: function(parent, localConfig) {
+            var jednotky = localConfig.evalPrefNodeList('armada/jednotka[id and name]');
+            
+            if (jednotky.length == 0) {
                 parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Armáda.</span>';
                 return null;
             }
@@ -453,14 +465,15 @@ var LinkEditors = {
                        '        </select>' + 
                        '    </td>' +
                        '</tr>' +
+                       '<tr><td><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>' +
                        '<tr>' +
                        '    <td><span>Počet: </span></td>' +
-                       '    <td><input id="d_pocet" type="text" maxlength="6" /></td>' +
+                       '    <td><input id="d_pocet" type="text" maxlength="7" /></td>' +
                        '' +
                        '    <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>' +
                        '' +
                        '    <td><span>Tahů: </span></td>' +
-                       '    <td><input id="d_tahu" type="text" maxlength="5" /></td>' +
+                       '    <td><input id="d_tahy" type="text" maxlength="5" /></td>' +
                        '</tr>' +
                        '</tbody>' +
                        '</table>';
@@ -469,22 +482,30 @@ var LinkEditors = {
         
             var selectJednotka = $X('.//select[@id = "d_jednotka"]', parent);
             var inputPocet = $X('.//input[@id = "d_pocet"]', parent);
-            var inputTahu = $X('.//input[@id = "d_tahu"]', parent);
+            var inputTahy = $X('.//input[@id = "d_tahy"]', parent);
         
-            // TODO napln select
+            // napln select
+            jednotky.each(function(i) {
+                var o = new Option(i.getPref("name"), i.getNumber("id"));
+                selectJednotka.options.add(o);
+            });
             
             return {
                 get: function() {
-                    return "rekrutovat.html?jednotka=" + selectJednotka.value + "&tahu=" + inputTahu.value + "&kolik=" + inputPocet.value;
+                    return "rekrutovat.html?jednotka=" + selectJednotka.value + "&tahy=" + inputTahy.value + "&kolik=" + inputPocet.value;
                 },
                 set: function(url) {
+                    var args = parseUrl(url).arguments;
+                    selectJednotka.value = args["jednotka"] || "0";
+                    inputPocet.value = args["kolik"] || "";
+                    inputTahy.value = args["tahy"] || "";
                 },
                 validate: function() {
                     if (!(parseInt(selectJednotka.value) > 0))
                         throw new Exception("Prosím vyberte jednotku ze seznamu.");
                     if (!(parseInt(inputPocet.value) >= 0))
                         throw new Exception("Počet rekrutovaných jednotek musí být větší než nula.");
-                    if (!(parseInt(inputTahu.value) >= 0))
+                    if (!(parseInt(inputTahy.value) >= 0))
                         throw new Exception("Počet tahů rekrutu musí být větší než nula.");
                 }
             };
@@ -496,9 +517,10 @@ var LinkEditors = {
         title: "Seslání kouzla",
         defaultText: "",
         
-        create: function(parent) {
-            // TODO
-            if (true) {
+        create: function(parent, localConfig) {
+            var kouzla = localConfig.evalPrefNodeList('magie/kouzlo[id and name]');
+            
+            if (kouzla.length == 0) {
                 parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Kouzla.</span>' +
                                    '<br/>' +
                                    '<span class="small">(Aby se dané kouzlo objevilo v seznamu, musíte na něj mít manu.)</span>';
@@ -519,13 +541,21 @@ var LinkEditors = {
             var inputKolikrat = $X('.//input[@id = "d_kolikrat"]', parent);
             var inputKoho = $X('.//input[@id = "d_koho"]', parent);
         
-            // TODO napln select
+            // napln select
+            kouzla.each(function(i) {
+                var o = new Option(i.getPref("name"), i.getNumber("id"));
+                selectKouzlo.options.add(o);
+            });
             
             return {
                 get: function() {
                     return "magie.html?kolikrat=" + inputKolikrat.value + "&seslat_kouzlo=" + selectKouzlo.value + "&koho=" + inputKoho.value;
                 },
                 set: function(url) {
+                    var args = parseUrl(url).arguments;
+                    inputKolikrat.value = args["kolikrat"] || "0";
+                    selectKouzlo.value = args["seslat_kouzlo"] || "";
+                    inputKoho.value = args["koho"] || "";
                 },
                 validate: function() {
                     if (selectJednotka.value == "")

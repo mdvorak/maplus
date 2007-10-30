@@ -63,6 +63,9 @@ pageExtenders.add(PageExtender.create({
                 adminLink = Element.create("a", ADMIN_ID, {href: MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: ADMIN_ID})});
                 $('plus_mikeeId').appendChild(adminLink);
             }
+            
+            // Inicializace vlastnich linku
+            window.NastaveniVlastniLinky.initPage(page);
         
             // Vyhledej vsechny konfiguracni elementy
             var list = $XL('.//*[@onload and @onsave]', page.content);
