@@ -281,7 +281,7 @@ pageExtenders.add(PageExtender.create({
             var vyprsi = new Date(casUtoku + 72 * 3600 * 1000);
             vyprsi.setSeconds(0, 0);
             
-            row.cells.cas.setAttribute("title", formatVyprsi(vyprsi), ""));
+            row.cells.cas.setAttribute("title", formatVyprsi(vyprsi));
         });
     },
     
