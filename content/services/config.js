@@ -76,6 +76,21 @@ var ConfigMenuHelper = {
             throw new ArgumentNullException("configNode");
             
         return LinkData.fromConfig(configNode);
+    },
+    
+    updateKouzla_PROXY: Marshal.BY_VALUE,
+    updateKouzla: function(configNode, kouzla) {
+        if (configNode == null)
+            throw new ArgumentNullException("configNode");
+            
+        for (var i = 0; i < kouzla.length; i++) {
+            if (configNode.evalPrefNode('kouzlo[id = "' + kouzla[i].id + '" and name]') != null)
+                continue;
+                
+            var p = configNode.addPref("kouzlo");
+            p.setPref("id", kouzla[i].id);
+            p.setPref("name", kouzla[i].name);
+        }
     }
 };
 

@@ -161,3 +161,32 @@ pageExtenders.add(PageExtender.create({
         });
     }
 }));
+
+// Analyza ID kouzel pro vlastni linky
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Magie - ID kouzel"; },
+
+    analyze: function(page, context) {
+        var select = $X('.//form[@action = "/magie.html"]//select[@name = "seslat_kouzlo"]', page.content);
+        if (select == null)
+            return false;
+        
+        // Vytvor seznam kouzel
+        var kouzla = new Array();
+        for (var i = 0; i < select.options.length; i++) {
+            var id = parseInt(select.options[i].value);
+            
+            if (id > 0) {
+                kouzla.push({id: id, name: select.options[i].text});
+            }
+        }
+        
+        // Updatuj kouzla
+        var config = page.localConfig.getPrefNode("magie", true);
+        Marshal.callMethod("ConfigMenuHelper", "updateKouzla", [config, kouzla]);
+        
+        return true;
+    },
+    
+    process: null
+}));

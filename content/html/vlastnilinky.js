@@ -377,37 +377,6 @@ Object.extend(LinkEditorDialog.prototype, {
 
 
 var LinkEditors = {
-    "default": {
-        title: "Vlastní",
-        defaultText: "",
-        
-        create: function(parent, localConfig) {
-            var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
-                       '<colgroup>' +
-                       '    <col width="75" />' +
-                       '    <col width="145" />' +
-                       '    <col width="10" />' +
-                       '    <col width="75" />' +
-                       '    <col width="145" />' +
-                       '</colgroup>' +
-                       '<tbody>' +
-                       '<tr>' +
-                       '    <td><span>Adresa: </span></td>' +
-                       '    <td colspan="4"><input id="d_url" type="text" maxlength="200" style="width: 100%; text-align: left;" /></td>' +
-                       '</tr>' +
-                       '</tbody></table>';
-            
-            parent.innerHTML = html;
-            var inputUrl = $X('.//input[@id = "d_url"]', parent);
-        
-            return {
-                get: function() { return inputUrl.value; },
-                set: function(url) { inputUrl.value = url || ""; },
-                validate: function() { }
-            };
-        }
-    },
-    
     "text": {
         title: "Text",
         defaultText: "-",
@@ -423,19 +392,64 @@ var LinkEditors = {
         }
     },
     
-    "zrusRekrut": {
-        title: "Zruš Rekrut",
-        defaultText: "Zruš Rekrut",
+    
+    "seslaniKouzla": {
+        title: "Seslání kouzla",
+        defaultText: "",
         
         create: function(parent, localConfig) {
+            var kouzla = localConfig.evalPrefNodeList('magie/kouzlo[id and name]');
+            
+            if (kouzla.length == 0) {
+                parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Kouzla.</span>' +
+                                   '<br/>' +
+                                   '<span class="small">(Aby se dané kouzlo objevilo v seznamu, musíte na něj mít manu.)</span>';
+                return null;
+            }
+        
+            var html = '<input id="d_kolikrat" type="text" name="kolikrat" value="1" size="3"/>' +
+                       '<span>&nbsp;x&nbsp;<span>' +
+                       '<select id="d_kouzlo" name="seslat_kouzlo">' +
+	                   '    <option value=""> - kouzlo - </option>' +
+	                   '</select>' +
+	                   '&nbsp;seslat na ID #&nbsp;' +
+	                   '<input id="d_koho" type="text" name="koho" maxlength="8" size="5"/>';	                   
+            
+            parent.innerHTML = html;
+        
+            var inputKolikrat = $X('.//input[@id = "d_kolikrat"]', parent);
+            var selectKouzlo = $X('.//select[@id = "d_kouzlo"]', parent);
+            var inputKoho = $X('.//input[@id = "d_koho"]', parent);
+        
+            // napln select
+            kouzla.each(function(i) {
+                var o = new Option(i.getPref("name"), i.getNumber("id"));
+                selectKouzlo.options.add(o);
+            });
+            
             return {
-                get: function() { return "rekrutovat.html?jednotka=1&kolik=0"; },
-                set: function(url) { },
-                validate: function() { }
+                get: function() {
+                    return "magie.html?kolikrat=" + inputKolikrat.value + "&seslat_kouzlo=" + selectKouzlo.value + "&koho=" + inputKoho.value;
+                },
+                set: function(url) {
+                    var args = parseUrl(url).arguments;
+                    inputKolikrat.value = args["kolikrat"] || "1";
+                    selectKouzlo.value = args["seslat_kouzlo"] || "";
+                    inputKoho.value = args["koho"] || "";
+                },
+                validate: function() {
+                    if (selectKouzlo.value.length == 0)
+                        throw new Exception("Prosím vyberte kouzlo.");
+                    if (!(parseInt(inputKolikrat.value) > 0))
+                        throw new Exception("Počet seslání kouzla musí být číslo > 0.");
+                    if (inputKoho.value.length > 0 && isNaN(parseInt(inputKoho.value)))
+                        throw new Exception("Cíl kouzla musí být ID hráče.");
+                }
             };
         }
     },
     
+        
     "rekrutJednotky": {
         title: "Rekrut jednotky",
         defaultText: "",
@@ -513,58 +527,48 @@ var LinkEditors = {
     },
     
     
-    "seslaniKouzla": {
-        title: "Seslání kouzla",
+    "zrusRekrut": {
+        title: "Zruš Rekrut",
+        defaultText: "Zruš Rekrut",
+        
+        create: function(parent, localConfig) {
+            return {
+                get: function() { return "rekrutovat.html?jednotka=1&kolik=0"; },
+                set: function(url) { },
+                validate: function() { }
+            };
+        }
+    },
+    
+    
+    // Vychozi
+    "default": {
+        title: "Vlastní",
         defaultText: "",
         
         create: function(parent, localConfig) {
-            var kouzla = localConfig.evalPrefNodeList('magie/kouzlo[id and name]');
-            
-            if (kouzla.length == 0) {
-                parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Kouzla.</span>' +
-                                   '<br/>' +
-                                   '<span class="small">(Aby se dané kouzlo objevilo v seznamu, musíte na něj mít manu.)</span>';
-                return null;
-            }
-        
-            var html = '<input id="d_kolikrat" type="text" name="kolikrat" value="1" size="3"/>' +
-                       '<span>&nbsp;x&nbsp;<span>' +
-                       '<select id="d_kouzlo" name="seslat_kouzlo">' +
-	                   '    <option value=""> - kouzlo - </option>' +
-	                   '</select>' +
-	                   '&nbsp;seslat na ID #&nbsp;' +
-	                   '<input id="d_koho" type="text" name="koho" maxlength="8" size="5"/>';	                   
+            var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
+                       '<colgroup>' +
+                       '    <col width="75" />' +
+                       '    <col width="145" />' +
+                       '    <col width="10" />' +
+                       '    <col width="75" />' +
+                       '    <col width="145" />' +
+                       '</colgroup>' +
+                       '<tbody>' +
+                       '<tr>' +
+                       '    <td><span>Adresa: </span></td>' +
+                       '    <td colspan="4"><input id="d_url" type="text" maxlength="200" style="width: 100%; text-align: left;" /></td>' +
+                       '</tr>' +
+                       '</tbody></table>';
             
             parent.innerHTML = html;
+            var inputUrl = $X('.//input[@id = "d_url"]', parent);
         
-            var selectKouzlo = $X('.//select[@id = "d_kolikrat"]', parent);
-            var inputKolikrat = $X('.//input[@id = "d_kolikrat"]', parent);
-            var inputKoho = $X('.//input[@id = "d_koho"]', parent);
-        
-            // napln select
-            kouzla.each(function(i) {
-                var o = new Option(i.getPref("name"), i.getNumber("id"));
-                selectKouzlo.options.add(o);
-            });
-            
             return {
-                get: function() {
-                    return "magie.html?kolikrat=" + inputKolikrat.value + "&seslat_kouzlo=" + selectKouzlo.value + "&koho=" + inputKoho.value;
-                },
-                set: function(url) {
-                    var args = parseUrl(url).arguments;
-                    inputKolikrat.value = args["kolikrat"] || "0";
-                    selectKouzlo.value = args["seslat_kouzlo"] || "";
-                    inputKoho.value = args["koho"] || "";
-                },
-                validate: function() {
-                    if (selectJednotka.value == "")
-                        throw new Exception("Prosím vyberte kouzlo.");
-                    if (!(parseInt(inputKolikrat.value) > 0))
-                        throw new Exception("Počet seslání kouzla musí být číslo > 0.");
-                    if (inputKoho.value.length > 0 && isNaN(parseInt(inputKoho.value)))
-                        throw new Exception("Cíl kouzla musí být ID hráče.");
-                }
+                get: function() { return inputUrl.value; },
+                set: function(url) { inputUrl.value = url || ""; },
+                validate: function() { }
             };
         }
     }
