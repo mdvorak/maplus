@@ -262,7 +262,7 @@ pageExtenders.add(PageExtender.create({
         
         // Zjisti kolik zbyva minut do pulnoci
         var now = new Date();
-        var dnesZbyvaMinut = now.getHours() * 60 + now.getMinutes();
+        var dnesZbyvaMinut = DEN_MINUT - now.getHours() * 60 + now.getMinutes();
     
         context.vsechnyUtoky.each(function(utok) {
             var row = ElementDataStore.get(utok.tr);
@@ -283,6 +283,7 @@ pageExtenders.add(PageExtender.create({
             
             // Tooltip kdy vyprsi utok
             var text = "Útok vyprší ";
+            
             var vyprsiZaMinut = DEN_MINUT * 3 - utok.cas;
             var presnyCas = new Date(now.getTime() + vyprsiZaMinut * 60 * 1000);
             presnyCas.setSeconds(0, 0);
