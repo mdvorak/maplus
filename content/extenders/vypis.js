@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -257,7 +257,12 @@ pageExtenders.add(PageExtender.create({
     },
 
     process: function(page, context) {
-        var formatVyprsi = this._formatVyprsi;
+        // Den ma celkem minut..
+        const DEN_MINUT = 24 * 60;
+        
+        // Zjisti kolik zbyva minut do pulnoci
+        var now = new Date();
+        var dnesZbyvaMinut = now.getHours() * 60 + now.getMinutes();
     
         context.vsechnyUtoky.each(function(utok) {
             var row = ElementDataStore.get(utok.tr);
@@ -277,16 +282,34 @@ pageExtenders.add(PageExtender.create({
             row.cells.typ.innerHTML = row.cells.typ.innerHTML.replace('<br>', ' ');
             
             // Tooltip kdy vyprsi utok
-            var casUtoku = new Date().getTime() - utok.cas * 60 * 1000;
-            var vyprsi = new Date(casUtoku + 72 * 3600 * 1000);
-            vyprsi.setSeconds(0, 0);
+            var text = "Útok vyprší ";
+            var vyprsiZaMinut = DEN_MINUT * 3 - utok.cas;
+            var presnyCas = new Date(now.getTime() + vyprsiZaMinut * 60 * 1000);
+            presnyCas.setSeconds(0, 0);
             
-            row.cells.cas.setAttribute("title", formatVyprsi(vyprsi));
+            // Vytvor text podle doby
+            if (vyprsiZaMinut < dnesZbyvaMinut)
+                text += "dnes ";
+            else if (vyprsiZaMinut < dnesZbyvaMinut + DEN_MINUT)
+                text += "zítra ";
+            else if (vyprsiZaMinut < dnesZbyvaMinut + 2 * DEN_MINUT)
+                text += "pozítří ";
+            else if (vyprsiZaMinut < dnesZbyvaMinut + 3 * DEN_MINUT)
+                text += "za dva dny ";
+            else {
+                // Tohle by nemelo nastat ale lepsi mit to pojistene
+                text += presnyCas.toLocaleString().replace(/:00$/, "");
+                row.cells.cas.setAttribute("title", text);
+                return;                
+            }
+            
+            // Pridej cas v den utoku
+            text += "v " + presnyCas.getHours() + ":" + presnyCas.getMinutes().toPaddedString(2);
+            text += "\n(" + presnyCas.toLocaleString().replace(/\s+\d+:\d+:\d+$/, "") + ")";
+            
+            // Nastav tooltip
+            row.cells.cas.setAttribute("title", text);
         });
-    },
-    
-    _formatVyprsi: function(date) {
-        return "Vyprší: " + date.toLocaleString().replace(/:00$/);
     }
 }));
 

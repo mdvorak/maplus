@@ -51,23 +51,14 @@ function parseUrl(href) {
     var url = String(href).replace(/#.*$/, "");
     var m = url.match(/\/?([\w.]+?)([?].+?)?$/);
     var name = (m != null) ? m[1] : null;
-        
-    // Analyze url encoded arguments
-    var args = new Hash();
-    
-    var argsIndex = url.indexOf("?");
-    if (argsIndex > -1) {
-        $A(url.substring(argsIndex + 1).match(/[^&=]+=[^&=]+/g)).each(function(a) {
-            var pair = a.split("=");
-            args[pair[0]] = pair[1];
-        });
-    }
+    // url encoded arguments
+    var args = href.toQueryParams();
     
     return {
         href: href,
         url: url,
         name: name,
-        arguments: args
+        arguments: $H(args)
     };
 }
 

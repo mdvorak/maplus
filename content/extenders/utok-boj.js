@@ -34,7 +34,9 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-var PERSISTENT_FIELDS_WARNING = "Pozn: Zelený okraj pole znamená, že hodnota pole byla načtena.<br/>Modrá signalizuje že pole neodpovídá uložené hodnotě.";
+var PERSISTENT_FIELDS_WARNING = "Pozn: Zelený okraj pole znamená, že hodnota pole byla načtena.<br/>" +
+                                "Pokud je checkbox vedle pole zaškrtnutý, hodnota je uložena a bude načtena při příštím zobrazení stránky.<br/>" +
+                                "Checkbox v neurčitém stavu značí, že pole má uloženou hodnotu jinou než je v něm aktuálně vyplněná.";
 
 // Utok
 pageExtenders.add(PageExtender.create({
