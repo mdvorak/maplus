@@ -259,10 +259,12 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         // Den ma celkem minut..
         const DEN_MINUT = 24 * 60;
+        console.debug("DEN_MINUT=%d", DEN_MINUT);
         
         // Zjisti kolik zbyva minut do pulnoci
         var now = new Date();
-        var dnesZbyvaMinut = DEN_MINUT - now.getHours() * 60 + now.getMinutes();
+        var dnesZbyvaMinut = DEN_MINUT - (now.getHours() * 60 + now.getMinutes());
+        console.debug("Dnes zbyva minut=%d", dnesZbyvaMinut);
     
         context.vsechnyUtoky.each(function(utok) {
             var row = ElementDataStore.get(utok.tr);
@@ -287,6 +289,8 @@ pageExtenders.add(PageExtender.create({
             var vyprsiZaMinut = DEN_MINUT * 3 - utok.cas;
             var presnyCas = new Date(now.getTime() + vyprsiZaMinut * 60 * 1000);
             presnyCas.setSeconds(0, 0);
+            
+            console.debug("cas=%d, vyprsi=%d, presny cas=%o", utok.cas, vyprsiZaMinut, presnyCas);
             
             // Vytvor text podle doby
             if (vyprsiZaMinut < dnesZbyvaMinut)

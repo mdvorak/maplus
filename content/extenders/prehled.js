@@ -120,6 +120,11 @@ pageExtenders.add(PageExtender.create({
     },
 
     process: function(page, context) {
+        // Rozsir content pane
+        page.leftMenu.setAttribute("width", "17%");
+        page.rightMenu.setAttribute("width", "17%");
+        page.content.setAttribute("width", "66%");
+    
         // Pridej info sloupec do hlavicky
         context.table.rows[1].appendChild(Element.create("td", "&nbsp;"));
         context.columns++;
