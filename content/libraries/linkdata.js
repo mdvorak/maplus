@@ -37,13 +37,15 @@
 var LinkData = Class.create();
 
 LinkData.prototype = {
-    initialize: function(url, text, title, externi, noveokno, editor) {
+    initialize: function(url, text, title, externi, noveokno, editor, potvrzeni, barva) {
         this.url = url;
         this.text = (text == null || text.blank()) ? null : text.stripScripts();
         this.title = (title == null || title.blank()) ? null : title;
         this.externi = !!externi;
         this.noveokno = !!noveokno;
         this.editor = editor;
+        this.potvrzeni = potvrzeni;
+        this.barva = barva;
     }
 };
 
@@ -57,7 +59,9 @@ Object.extend(LinkData, {
                             configNode.getPref("title"),
                             parseBoolean(configNode.getAttribute("externi")),
                             parseBoolean(configNode.getAttribute("noveokno")),
-                            configNode.getAttribute("editor"));
+                            configNode.getAttribute("editor"),
+                            parseBoolean(configNode.getAttribute("potvrzeni")),
+                            configNode.getAttribute("barva"));
     },
     
     toConfig: function(linkData, configNode) {
@@ -74,5 +78,7 @@ Object.extend(LinkData, {
         configNode.setAttribute("externi", !!linkData.externi);
         configNode.setAttribute("noveokno", !!linkData.noveokno);
         configNode.setAttribute("editor", (linkData.editor != null) ? linkData.editor : null);
+        configNode.setAttribute("potvrzeni", !!linkData.potvrzeni);
+        configNode.setAttribute("barva", (linkData.barva != null) ? linkData.barva : null);
     }
 });

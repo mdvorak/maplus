@@ -207,6 +207,7 @@ pageExtenders.add(PageExtender.create({
             // Mala optimilizace rychlosti
             var data = Marshal.callMethod("ConfigMenuHelper", "getLinkData", [i]);
             
+            var title = (data.title != null && !data.title.blank()) ? data.title : null;
             var url = (data.url != null && !data.url.blank()) ? data.url : null;
             
             if (url != null) {
@@ -216,11 +217,11 @@ pageExtenders.add(PageExtender.create({
                 }
                 else if (!data.noveokno) {
                     // Externi ale v okne MA
-                    url = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: escape(url)});
+                    url = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: encodeURIComponent(url)});
                 }
             }
             
-            context.list.push({url: url, text: data.text, noveokno: data.noveokno, title: data.title, barva: data.barva});
+            context.list.push({url: url, text: data.text, noveokno: data.noveokno, title: title, potvrzeni: data.potvrzeni, barva: data.barva});
         });
         
         return true;
@@ -234,12 +235,18 @@ pageExtenders.add(PageExtender.create({
             
             if (i.url != null) {
                 element = Element.create("a", i.text, {href: i.url, title: i.title});
+                element.style.textDecoration = "underline";
+                
+                if (i.potvrzeni) {
+                    Event.observe(element, "click", function(event) {
+                        if (!confirm("Opravdu chcete provést akci '" + String(i.title || i.text) + "'?"))
+                            Event.stop(event);
+                    });
+                }
                 if (i.noveokno)
                     element.setAttribute("target", "_blank");
-                if (i.barva != null) {
+                if (i.barva != null)
                     element.style.color = i.barva;
-                    element.style.textDecoration = "underline";
-                }
             }
             else {
                 element = Element.create("span", (i.text.length > 0 && i.text != "-") ? i.text : '\xA0');

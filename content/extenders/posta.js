@@ -37,6 +37,7 @@
 var Posta = {
     ODDELOVAC: "____________",
     LINK_CONFIRM_TEXT: "Tento odkaz může vést na stránku s nebezpečným obsahem. Opravdu chcete pokračovat?",
+    ODESLANI_DLOUHE_ZPRAVY_CONFIRM_TEXT: "Odesíláte velmi dlouhou zprávu ({0} řádků). Opravdu ji chcete odeslat?",
     POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:pošta v rámci aliance (.*))?$"),
     DULEZITOST_REGEX: /^:\W*(\w+)\W*\s*/
 }
@@ -116,9 +117,16 @@ pageExtenders.add(PageExtender.create({
                 controls.inputPodpis.checked = false;
         }
         
-        // Odstraneni newline na konci textu pri odeslani
-        Event.observe(controls.form, "submit", function() {
+        // Odeslani posty
+        Event.observe(controls.form, "submit", function(event) {
+            // Odstraneni newline na konci textu pri odeslani
             controls.textareaZprava.value = controls.textareaZprava.value.replace(/\n{2,}$/, "");
+            // Upozorneni pri odesilani dlouhe zpravy
+            var m = controls.textareaZprava.value.match(/\n/g);
+            if (m != null && m.length > MAX_RADKU_DEFAULT) {
+                if (!confirm(String.format(Posta.ODESLANI_DLOUHE_ZPRAVY_CONFIRM_TEXT, m.length)))
+                    Event.stop(event);
+            }
         });
         
         // Focus
