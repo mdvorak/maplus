@@ -34,6 +34,20 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+// Novinky
+/*
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "MaPlus novinky"; },
+
+    analyze: function(page, context) {
+        // TODO
+    },
+    
+    process: function(page, context) {
+    }
+}));
+*/
+
 // Plus menu (zobrazit vzdy)
 pageExtenders.add(PageExtender.create({
     getName: function() { return "MaPlus menu"; },
