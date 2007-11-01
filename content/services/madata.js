@@ -191,7 +191,7 @@ var MaData = {
             
         zacatekJmena = zacatekJmena.replace(/[.]{2,3}$/, "");
         
-        var mozneAliance = this.seznamAlianci.evalPrefNodeList('aliance[starts-with(jmeno, "' + escape(zacatekJmena) + '")]');
+        var mozneAliance = this.seznamAlianci.evalPrefNodeList('aliance[starts-with(jmeno, "' + zacatekJmena + '")]');
         if (mozneAliance.length == 1)
             return mozneAliance[0].getPref("jmeno");
         else

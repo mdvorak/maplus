@@ -234,7 +234,7 @@ pageExtenders.add(PageExtender.create({
 
         // Uprava linku
         page.posta.zpravy.each(function(zprava) {
-            var psal = "&psal=" + escape(zprava.psal);
+            var psal = "&psal=" + encodeURIComponent(zprava.psal);
             
             // Odpovedet vsem
             if (zprava.typ == "verejna" || zprava.typ == "tajna") {

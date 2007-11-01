@@ -305,7 +305,7 @@ pageExtenders.add(PageExtender.create({
                 // Tohle by nemelo nastat ale lepsi mit to pojistene
                 text += presnyCas.toLocaleString().replace(/:00$/, "");
                 row.cells.cas.setAttribute("title", text);
-                return;                
+                return;
             }
             
             // Pridej cas v den utoku
