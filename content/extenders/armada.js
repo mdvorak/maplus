@@ -39,8 +39,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Armada - Jednotky"; },
 
     analyze: function(page, context) {
-        context.cells = $XL('form/table[1]/tbody/tr/td[1]/font', page.content);
-        context.cells = $XL('form/form/table/tbody/tr/td[1]/font', page.content).concat(context.cells);
+        context.cells = $XL('form//table/tbody/tr/td[1]/font', page.content);
         return context.cells.length > 0;
     },
     

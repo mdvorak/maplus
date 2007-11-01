@@ -63,6 +63,7 @@ pageExtenders.add(PageExtender.create({
         $XL('//tr[@bgcolor = "#303030"]').each(function(e) { e.bgColor = "#1b1b1b" }); // Tohle musi byt prvni
         $XL('//table[@bgcolor = "#505050"]').each(function(e) { e.bgColor = "#303030" });
         $XL('//tr[@bgcolor = "#505050"]').each(function(e) { e.bgColor = "#303030" });
+        $XL('//td[@bgcolor = "#505050"]').each(function(e) { e.bgColor = "#303030" });
         $XL('//tr[@bgcolor = "#404040"]').each(function(e) { e.bgColor = "#2b2b2b" });
 
         // Rohy tabulek
