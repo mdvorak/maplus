@@ -244,3 +244,153 @@ pageExtenders.add(PageExtender.create({
         page.hospodarstvi.tablePrijem.width = "98%";
     }
 }));
+
+// Slozeni armady
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Hospodarstvi - Slozeni armady"; },
+
+    analyze: function(page, context) {
+        if (page.hospodarstvi == null || page.hospodarstvi.jednotky.length == 0)
+            return false;
+        
+        context.zobrazPred = $X('br[last()]', page.content);
+        if (context.zobrazPred == null)
+            return false;
+        
+        return true;
+    },
+
+    process: function(page, context) {
+        var createDialog = this._createDialog.bind(this);
+        
+        var linkZobrazit = Element.create("a", '<span>Složení Armády</span>', {href: "javascript://"});
+        Event.observe(linkZobrazit, "click", function(event) {
+            // Vytvor dialog
+            if (context.dialog == null) {
+                context.dialog = createDialog(page.hospodarstvi.jednotky);
+            }
+            
+            // Zobraz dialog
+            context.dialog.show();
+        });
+        
+        // Zobraz link
+        page.content.insertBefore(linkZobrazit, context.zobrazPred);
+    },
+    
+    _createDialog: function(jednotky) {
+        // Spocitej slozeni
+        var slozeni = {
+            celkem: 0,
+            
+            pb1: 0,
+            pb2: 0,
+            pb3: 0,
+            lb1: 0,
+            lb2: 0,
+            lb3: 0,
+            ps: 0,
+            ls: 0
+        };
+        
+        jednotky.each(function(jednotka) {
+            var parametry = Jednotky.vyhledej(jednotka.data.jmeno);
+            if (parametry == null)
+                return; // continue;
+            
+            var oznaceni = "UNKNOWN";
+            if (parametry.typ == "Boj.") {
+                oznaceni = parametry.druh.toLowerCase()[0] + "b" + parametry.phb;
+            }
+            else {
+                oznaceni = parametry.druh.toLowerCase()[0] + "s";
+            }
+            
+            if (oznaceni in slozeni) {
+                slozeni.celkem += jednotka.data.sila;
+                slozeni[oznaceni] += jednotka.data.sila;
+            }
+        });
+        
+        // Vytvor dialog
+        var dialog = new SlozeniArmadyDialog(slozeni);
+        return dialog;
+    }
+}));
+
+
+var SlozeniArmadyDialog = Class.inherit(Dialog);
+Object.extend(SlozeniArmadyDialog.prototype, {
+    initialize: function(slozeni) {
+        if (slozeni == null)
+            throw new ArgumentNullException("slozeni");
+    
+        this._slozeni = slozeni;
+    },
+    
+    _createContentElement: function() {
+        var dialog = this;
+        var s = this._slozeni;
+        
+        var html = Chrome.loadText("html/slozeniarmady.html");
+        var root = Element.create("div", html, {class: "linkDialog"});
+        
+        // Zobraz data
+        var format = function(value) {
+            return (100 * value / s.celkem).toFixed(2) + "%";
+        };
+        var remove = function(rowId) {
+            var tr = $X('.//tr[@id = "' + rowId + '"]', root);
+            tr.parentNode.removeChild(tr);
+        };
+        
+        $X('.//span[@id = "d_bojove"]', root).innerHTML = format(s.pb1 + s.pb2 + s.pb3 + s.lb1 + s.lb2 + s.lb3);
+        $X('.//span[@id = "d_strelecke"]', root).innerHTML = format(s.ps + s.ls);
+        $X('.//span[@id = "d_pozemni"]', root).innerHTML = format(s.pb1 + s.pb2 + s.pb3 + s.ps);
+        $X('.//span[@id = "d_letecke"]', root).innerHTML = format(s.lb1 + s.lb2 + s.lb3 + s.ls);
+        
+        // Strelci
+        if (s.ps + s.ls > 0) {
+            $X('.//span[@id = "d_ps"]', root).innerHTML = format(s.ps);
+            $X('.//span[@id = "d_ls"]', root).innerHTML = format(s.ls);
+        }
+        else {
+            remove("d_str_row");
+        }
+        
+        // Phb 1
+        if (s.pb1 + s.lb1 > 0) {
+            $X('.//span[@id = "d_pb1"]', root).innerHTML = format(s.pb1);
+            $X('.//span[@id = "d_lb1"]', root).innerHTML = format(s.lb1);
+        }
+        else {
+            remove("d_phb1_row");
+        }
+        
+        // Phb 2
+        if (s.pb2 + s.lb2 > 0) {
+            $X('.//span[@id = "d_pb2"]', root).innerHTML = format(s.pb2);
+            $X('.//span[@id = "d_lb2"]', root).innerHTML = format(s.lb2);
+        }
+        else {
+            remove("d_phb2_row");
+        }
+        
+        // Phb 3
+        if (s.pb3 + s.lb3 > 0) {
+            $X('.//span[@id = "d_pb3"]', root).innerHTML = format(s.pb3);
+            $X('.//span[@id = "d_lb3"]', root).innerHTML = format(s.lb3);
+        }
+        else {
+            remove("d_phb3_row");
+        }
+        
+        // Zavrit event handler
+        var inputZavrit = $X('.//input[@id = "d_zavrit"]', root);
+        Event.observe(inputZavrit, "click", function(event) {
+            dialog.hide();
+        });
+        
+        return root;
+    }
+});
