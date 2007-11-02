@@ -224,7 +224,7 @@ MaPlus.Tooltips = {
         html += '  <td colspan="2"><span><b>' + id + '</b>&nbsp;</span>';
         html += '  <a href="javascript://"><sup><span class="small">(zkopírovat)</span></sup></a></td>';
         html += '</tr>';
-        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: (id == page.id ? "0" : "") + id}) + '"><span>Vyslat špehy</span></a></td></tr>';
+        html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: id}) + '"><span>Vyslat špehy</span></a></td></tr>';
         html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: id}) + '"><span>Napsat zprávu</span></a></td></tr>';
 
         // Dalsi info
