@@ -279,7 +279,6 @@ pageExtenders.add(PageExtender.create({
     },
     
     _createDialog: function(jednotky) {
-        // Spocitej slozeni
         var slozeni = {
             celkem: 0,
             
@@ -293,6 +292,9 @@ pageExtenders.add(PageExtender.create({
             ls: 0
         };
         
+        var poradi = new Array();
+        
+        // Spocitej slozeni
         jednotky.each(function(jednotka) {
             var parametry = Jednotky.vyhledej(jednotka.data.jmeno);
             if (parametry == null)
@@ -304,10 +306,14 @@ pageExtenders.add(PageExtender.create({
             
             slozeni.celkem += jednotka.data.sila;
             slozeni[oznaceni] += jednotka.data.sila;
+            
+            poradi.push(parametry);
         });
         
+        poradi.sort(function(a, b) { return b.realIni - a.realIni; });
+        
         // Vytvor dialog
-        var dialog = new SlozeniArmadyDialog(slozeni);
+        var dialog = new SlozeniArmadyDialog(slozeni, poradi);
         return dialog;
     }
 }));
@@ -315,11 +321,9 @@ pageExtenders.add(PageExtender.create({
 
 var SlozeniArmadyDialog = Class.inherit(Dialog);
 Object.extend(SlozeniArmadyDialog.prototype, {
-    initialize: function(slozeni) {
-        if (slozeni == null)
-            throw new ArgumentNullException("slozeni");
-    
+    initialize: function(slozeni, poradi) {
         this._slozeni = slozeni;
+        this._poradi = poradi;
     },
     
     _createContentElement: function() {
@@ -351,7 +355,6 @@ Object.extend(SlozeniArmadyDialog.prototype, {
         else {
             remove("d_str_row");
         }
-        
         // Phb 1
         if (s.pb1 + s.lb1 > 0) {
             $X('.//span[@id = "d_pb1"]', root).innerHTML = format(s.pb1);
@@ -360,7 +363,6 @@ Object.extend(SlozeniArmadyDialog.prototype, {
         else {
             remove("d_phb1_row");
         }
-        
         // Phb 2
         if (s.pb2 + s.lb2 > 0) {
             $X('.//span[@id = "d_pb2"]', root).innerHTML = format(s.pb2);
@@ -369,7 +371,6 @@ Object.extend(SlozeniArmadyDialog.prototype, {
         else {
             remove("d_phb2_row");
         }
-        
         // Phb 3
         if (s.pb3 + s.lb3 > 0) {
             $X('.//span[@id = "d_pb3"]', root).innerHTML = format(s.pb3);
@@ -378,6 +379,16 @@ Object.extend(SlozeniArmadyDialog.prototype, {
         else {
             remove("d_phb3_row");
         }
+        
+        // Poradi utoku
+        var tbodyPoradiUtoku = $X('.//tbody[@id = "d_poradiUtoku"]', root);
+        this._poradi.each(function(i) {
+            var tr = Element.create("tr");
+            tr.appendChild(Element.create("td", '<span>' + i.jmeno + '\xA0\xA0</span>'));
+            tr.appendChild(Element.create("td", '<span>' + i.realIni + '\xA0\xA0</span>'));
+            
+            tbodyPoradiUtoku.appendChild(tr);
+        });
         
         // Zavrit event handler
         var inputZavrit = $X('.//input[@id = "d_zavrit"]', root);

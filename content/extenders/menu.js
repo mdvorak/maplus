@@ -212,8 +212,10 @@ pageExtenders.add(PageExtender.create({
             
             if (url != null) {
                 if (!data.externi) {
-                    url = MELIOR_ANNIS_URL + "/" + url + "&id=" + page.id + "&code=" + page.code;
-                    if (page.ftc) data.link += "&ftc=" + page.ftc;
+                    var hash = url.match(/#.*$/);
+                    url = MELIOR_ANNIS_URL + "/" + url.replace(/#.*$/, "") + "&id=" + page.id + "&code=" + page.code;
+                    if (page.ftc) url += "&ftc=" + page.ftc;
+                    if (hash) url += hash;
                 }
                 else if (!data.noveokno) {
                     // Externi ale v okne MA
