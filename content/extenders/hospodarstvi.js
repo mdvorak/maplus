@@ -298,18 +298,12 @@ pageExtenders.add(PageExtender.create({
             if (parametry == null)
                 return; // continue;
             
-            var oznaceni = "UNKNOWN";
-            if (parametry.typ == "Boj.") {
-                oznaceni = parametry.druh.toLowerCase()[0] + "b" + parametry.phb;
-            }
-            else {
-                oznaceni = parametry.druh.toLowerCase()[0] + "s";
-            }
+            var oznaceni = String(parametry.druh[0] + parametry.typ[0]).toLowerCase();
+            if (parametry.typ == "Boj.")
+                oznaceni += parametry.phb;
             
-            if (oznaceni in slozeni) {
-                slozeni.celkem += jednotka.data.sila;
-                slozeni[oznaceni] += jednotka.data.sila;
-            }
+            slozeni.celkem += jednotka.data.sila;
+            slozeni[oznaceni] += jednotka.data.sila;
         });
         
         // Vytvor dialog
