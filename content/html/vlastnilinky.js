@@ -242,7 +242,7 @@ var SelectLinkDialog = Class.inherit(Dialog);
 Object.extend(SelectLinkDialog.prototype, {
     _createContentElement: function() {
         var html = Chrome.loadText("html/newlinkdialog.html", true);
-        var root = Element.create("div", html, {class: "linkDialog"});
+        var root = Element.create("div", html, {class: "dialog"});
         
         var dialog = this;
         var select = $X('.//select[@id = "d_typOdkazu"]', root);
@@ -296,7 +296,7 @@ Object.extend(LinkEditorDialog.prototype, {
         var _this = this;
     
         var html = Chrome.loadText("html/linkeditor.html", true);
-        var root = Element.create("div", html, {class: "linkDialog", style: "width: 465px;"});
+        var root = Element.create("div", html, {class: "dialog", style: "width: 465px;"});
     
         // Ziskej elementy
         var spanEditor = $X('.//span[@id = "d_editor"]', root);

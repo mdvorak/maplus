@@ -1,6 +1,7 @@
 ﻿<style type="text/css">
     span.nadpis 
     {
+    	color: lightgrey;
     	font-size: medium;
     	font-weight: bold;
     }
@@ -8,38 +9,56 @@
     {
     	color: white;
     	font-weight: bold;
-    	font-size: small;
+    	font-size: medium;
+    	font-family: monospace;
     }
-    span.zmeny
+    ul.zmeny
+    {
+    	padding: 0px 10px 0px 20px;
+    	margin: 0px 0px 10px 0px;
+    }
+    li.zmeny
     {
     	color: lightgrey;
-    	font-size: x-small;
-    }
-    td.oddelovac
-    {
-    	border-bottom: solid 1px gray;
+    	font-size: small;
     }
 </style>
+
 <table>
 <tbody>
-    <tr>
-        <td style="width: 100%; border-bottom: solid 2px gray;">
-            <span class="nadpis">Melior Annis Plus - Novinky</span>
-        </td>
-    </tr>
-    
-    <tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-    
-    <!-- 1.11.2007 -->
-    <tr>
-        <td><span class="verze"><tt>Verze 1.1</tt></span></td>
-    </tr>
-    <tr>
-        <td>
-        <span class="zmeny">
-            Přidány novinky.
-        </span>
-        </td>
-    </tr>
+<tr>
+    <td style="width: 100%; border-bottom: solid 2px gray;">
+        <span class="nadpis">Melior Annis Plus - Novinky</span>
+    </td>
+</tr>
+
+<tr>
+<td>
+    <div style="width: 400px; height: 400px; overflow-y: auto;">
+        <div>
+            <span class="verze">Verze 1.1pre1</span>
+            <ul type="square" class="zmeny">
+                <li class="zmeny">Složení armády v hospodářství.</li>
+                <li class="zmeny">Vlastní odkazy v pravém menu.</li>
+                <li class="zmeny">Při vynalézání kouzla je vyžadováno potvrzení pro jeho zrušení nebo dovynalezení.</li>
+                <li class="zmeny">Aktivní ID při vyhledávání.</li>
+                <li class="zmeny">Pod seznam nalezeých cílu k prošpehovaní přidán formulář pro nové vyhledávání.</li>
+                <li class="zmeny">Aktivní jednotky v seznamu rekrutovatelých jednotek v menu Armáda.</li>
+                <li class="zmeny">Upozornění při odesílání dlouhé zprávy.</li>
+                <li class="zmeny">Mírná optimilizace bestiáře. (urychlení zobrazení)</li>
+                <li class="zmeny">Vylepšen tooltip o času vypršení útoku. (Výpis/Doba od útoku)</li>
+            </ul>
+        </div>
+    </div>
+</td>
+</tr>
+
+<tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+<tr>
+    <td style="text-align: center; vertical-align: bottom;">
+        <input id="d_zavritNovinky" type="button" value=" Zavřít " />
+    </td>
+</tr>
+<tr><td><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
 </tbody>
 </table>

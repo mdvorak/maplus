@@ -54,6 +54,8 @@ pageExtenders.add(PageExtender.create({
         page.leftMenu.setAttribute("width", "29%");
         page.rightMenu.setAttribute("width", "29%");
         
+        var dialogNovinky = new NovinkyDialog();
+        
         // Na konci html se vyvola funkce window.initNastaveni(); kde se provede vlastni inicializace
         window.initNastaveni = function() {
             window.initNastaveni = null;
@@ -62,6 +64,7 @@ pageExtenders.add(PageExtender.create({
             if (ADMIN_ID != null) {
                 adminLink = Element.create("a", ADMIN_ID, {href: MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: ADMIN_ID})});
                 $('plus_mikeeId').appendChild(adminLink);
+                $('plus_vek').innerHTML = AGE_NAME;
             }
             
             // Inicializace vlastnich linku
@@ -72,6 +75,7 @@ pageExtenders.add(PageExtender.create({
             var inputLoad = $X('.//input[@id="plus_loadConfig" and @type="button"]', page.content);
             var inputSave = $X('.//input[@id="plus_saveConfig" and @type="button"]', page.content);
             var spanZprava = $X('.//span[@id="plus_nastaveniZprava"]', page.content);
+            var linkNovinky = $X('.//a[@id="plus_novinky"]', page.content);
             
             if (!inputLoad || !inputSave || !spanZprava)
                 throw new Exception("Nepodarilo se najit nektery dulezity prvek.");
@@ -114,7 +118,7 @@ pageExtenders.add(PageExtender.create({
 		    const NOTICE_TIMEOUT = 5000;
     		
 		    // Nastav funkce tlacitkum
-		    inputLoad.onclick = function(event) {
+		    Event.observe(inputLoad, "click", function(event) {
 	            spanZprava.update("\xA0"); 
 	            load();
 	            spanZprava.update("Nastavení načteno");
@@ -122,9 +126,9 @@ pageExtenders.add(PageExtender.create({
 	            var tracker = new Object();
 	            spanZprava.tracker = tracker;
 	            setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update("\xA0"); }, NOTICE_TIMEOUT);
-	        };
+	        });
     		    
-		    inputSave.onclick = function(event) {
+		    Event.observe(inputSave, "click", function(event) {
 	            spanZprava.update("\xA0"); 
 	            save();
 	            spanZprava.update("Nastavení uloženo");
@@ -132,7 +136,10 @@ pageExtenders.add(PageExtender.create({
 	            var tracker = new Object();
 	            spanZprava.tracker = tracker;
 	            setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update("\xA0"); }, NOTICE_TIMEOUT);
-	        };
+	        });
+		    Event.observe(linkNovinky, "click", function(event) {
+		        dialogNovinky.show();
+		    });
         };
         
         // Zobraz html (cimz se spusti i vyse definovana funkce)

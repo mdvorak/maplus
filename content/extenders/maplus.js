@@ -35,22 +35,28 @@
  * ***** END LICENSE BLOCK ***** */
 
 // Novinky
-/*
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "MaPlus novinky"; },
+    getName: function() { return "MaPlus - Novinky"; },
 
     analyze: function(page, context) {
-        // TODO
+        var last = page.config.getAttribute("posledniVerzeNovinek");
+        return (last != VERSION);
     },
     
     process: function(page, context) {
+        // Zobraz dialog s novinkama
+        var dialog = new NovinkyDialog();
+        dialog.show(function() {
+            page.config.setAttribute("posledniVerzeNovinek", VERSION);
+            dialog.close();
+        });
     }
 }));
-*/
+
 
 // Plus menu (zobrazit vzdy)
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "MaPlus menu"; },
+    getName: function() { return "MaPlus - Menu"; },
 
     analyze: function(page, context) {
         // Tohle je vyjimka: aby se neprovadela zbytecne analyza pro vsechny extendery
@@ -113,3 +119,22 @@ pageExtenders.add(PageExtender.create({
             page.content.setAttribute("valign", "top");
     }
 }));
+
+
+
+/*** NovinkyDialog class ***/
+var NovinkyDialog = Class.inherit(Dialog);
+Object.extend(NovinkyDialog.prototype, {
+    _createContentElement: function() {
+        var dialog = this;
+        var html = Chrome.loadText("html/novinky.html");
+        var root = Element.create("div", html, {"class": "dialog"});
+        
+        var inputZavrit = $X('.//input[@id = "d_zavritNovinky"]', root);
+        Event.observe(inputZavrit, "click", function(event) {
+            dialog.hide();
+        });
+        
+        return root;
+    }
+});

@@ -34,6 +34,8 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+const VERSION = "1.1pre1";
+
 const EXTENSION_NAME = "maplus";
 const EXTENSION_ID = "maplus@michal.dvorak";
 const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";

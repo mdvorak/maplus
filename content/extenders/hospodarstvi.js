@@ -331,7 +331,7 @@ Object.extend(SlozeniArmadyDialog.prototype, {
         var s = this._slozeni;
         
         var html = Chrome.loadText("html/slozeniarmady.html");
-        var root = Element.create("div", html, {class: "linkDialog"});
+        var root = Element.create("div", html, {class: "dialog"});
         
         // Zobraz data
         var format = function(value) {
