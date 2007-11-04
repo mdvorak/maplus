@@ -307,10 +307,22 @@ pageExtenders.add(PageExtender.create({
             slozeni.celkem += jednotka.data.sila;
             slozeni[oznaceni] += jednotka.data.sila;
             
-            poradi.push(parametry);
+            poradi.push({
+                jednotka: parametry.jmeno,
+                ini: parametry.realIni,
+                sila: jednotka.data.sila,
+                pocet: jednotka.data.pocet,
+                zkusenost: jednotka.data.zkusenost
+            });
         });
         
-        poradi.sort(function(a, b) { return b.realIni - a.realIni; });
+        // TODO Podle ceho se ridi jednotky se stejnou ini?
+        poradi.sort(function(a, b) { 
+            var r = b.ini - a.ini;
+            if (r == 0)
+                r = b.zkusenost - a.zkusenost; // TODO overit
+            return r;
+        });
         
         // Vytvor dialog
         var dialog = new SlozeniArmadyDialog(slozeni, poradi);
@@ -384,8 +396,8 @@ Object.extend(SlozeniArmadyDialog.prototype, {
         var tbodyPoradiUtoku = $X('.//tbody[@id = "d_poradiUtoku"]', root);
         this._poradi.each(function(i) {
             var tr = Element.create("tr");
-            tr.appendChild(Element.create("td", '<span>' + i.jmeno + '\xA0\xA0</span>'));
-            tr.appendChild(Element.create("td", '<span>' + i.realIni + '\xA0\xA0</span>'));
+            tr.appendChild(Element.create("td", '<span>' + i.jednotka + '\xA0\xA0</span>'));
+            tr.appendChild(Element.create("td", '<span>' + i.ini + '\xA0\xA0</span>'));
             
             tbodyPoradiUtoku.appendChild(tr);
         });
