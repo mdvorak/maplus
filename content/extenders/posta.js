@@ -604,7 +604,7 @@ pageExtenders.add(PageExtender.create({
     	    page.posta.zpravy.each(function(zprava) {
     	        var stari = (aktualniCas - zprava.cas.getTime());
     	        // Zjisti jestli zprava je prosly spam
-                if (zprava.dulezitost == "spam" && stari > maxStariSpamu) {
+                if (zprava.dulezitost == "spam" && stari > maxStariSpamu && XPath.evalNumber('count(br)', zprava.fontText).length > 3) {
                     // Najdi zlom
                     var zlom = $X('br[1]', zprava.fontText);
                     
@@ -679,6 +679,8 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Posta - Skryt zpravy bestiare"; },
 
     analyze: function(page, context) {
+        if (page.arguments["posta"] != "nova")
+            return false;
     	if (page.posta == null || page.posta.zpravy == null)
             return false;
         if (page.posta.zpravy.length == 0)
@@ -712,6 +714,8 @@ pageExtenders.add(PageExtender.create({
             
             // Odstran samotnou zpravu
             parent.removeChild(zprava.element);
+            
+            console.log("Odstranena zprava %d", zprava.id);
         });
     }
 }));
