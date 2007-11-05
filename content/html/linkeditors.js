@@ -151,7 +151,7 @@ var LinkEditors = {
                        '</tr>' +
                        '<tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>' +
                        '<tr>' +
-                       '    <td colspan="5">' +
+                       '    <td colspan="5" style="text-align: center;">' +
                        '        <span class="small">Upozornění: Počet rekrutovaných jednotek nesouvisí s počtem tahů přednastavených na formuláři.</span>' + 
                        '    </td>' +
                        '</tr>' +
@@ -274,6 +274,12 @@ var LinkEditors = {
                        '' +
                        '    <td><span>Objevovat: </span></td>' +
                        '    <td><input id="d_objevovat" type="checkbox" /></td>' +
+                       '</tr>' +
+                       '<tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>' +
+                       '<tr>' +
+                       '    <td colspan="5" style="text-align: center;">' +
+                       '        <span class="small">Upozornění: Tento odkaz přímo odtáhne stanovený počet TU.</span>' + 
+                       '    </td>' +
                        '</tr>' +
                        '</tbody>' +
                        '</table>';

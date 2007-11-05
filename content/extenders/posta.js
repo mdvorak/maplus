@@ -39,7 +39,15 @@ var Posta = {
     LINK_CONFIRM_TEXT: "Tento odkaz může vést na stránku s nebezpečným obsahem. Opravdu chcete pokračovat?",
     ODESLANI_DLOUHE_ZPRAVY_CONFIRM_TEXT: "Odesíláte velmi dlouhou zprávu ({0} řádků). Opravdu ji chcete odeslat?",
     POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:pošta v rámci aliance (.*))?$"),
-    DULEZITOST_REGEX: /^:\W*(\w+)\W*\s*/
+    DULEZITOST_REGEX: /^:\W*(\w+)\W*\s*/,
+    
+    zjistiDulezitost: function(zprava) {
+        var m = zprava.text.match(Posta.DULEZITOST_REGEX);
+	    if (m != null) {		
+	        zprava.dulezitost = m[1].toLowerCase();
+	        zprava.text = zprava.text.replace(Posta.DULEZITOST_REGEX, "").replace(/^\s*?\n/, "");
+	    }
+    }
 }
 
 // Psani nove zpravy
@@ -77,6 +85,18 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         var controls = context.controls;
     
+        // Zjisti dulezitost predchozi zpravy
+        var zprava = {
+            text: controls.textareaZprava.defaultValue
+        };
+        Posta.zjistiDulezitost(zprava);
+        var dulezitost = zprava.dulezitost;
+        
+        if (dulezitost != null) {
+            controls.textareaZprava.defaultValue = zprava.text;
+            controls.textareaZprava.value = zprava.text;
+        }
+    
         // Klaves. zkratky
         Event.observe(controls.textareaZprava, 'keypress', function(event) {
             if (event.keyCode == Event.KEY_ESC)
@@ -85,7 +105,7 @@ pageExtenders.add(PageExtender.create({
                 this.form.submit();                    
         });
         
-        new Insertion.Bottom(controls.form, '<br/><span class="small" style="color: gray;">Pozn.: Esc - vymaže napsaný text, Ctrl+Enter - odešle zprávu</span>');
+        new Insertion.Bottom(controls.form, '<div><span class="small" style="color: gray;">Pozn.: Esc - vymaže napsaný text, Ctrl+Enter - odešle zprávu</span></div>');
         
         // Osetreni "Odpovedet vsem"
         if (page.arguments["posta"] == "posta_v_ally" && page.arguments["odpoved"] != null) {
@@ -117,16 +137,51 @@ pageExtenders.add(PageExtender.create({
                 controls.inputPodpis.checked = false;
         }
         
+        // Dulezitost
+        var spanDulezitost = Element.create("span", 'důležitá zpráva&nbsp;');
+        var inputDulezita = spanDulezitost.appendChild(Element.create("input", null, {type: "checkbox"}));
+        
+        if (dulezitost == "dulezite")
+            inputDulezita.checked = true;
+            
+        var vybranaDulezitost = function() {
+            if (inputDulezita.checked)
+                return ":!!!DULEZITE!!!";
+            return (dulezitost != null) ? ":" + dulezitost : null;
+        };
+        
+        var elem = controls.inputOdeslat.nextSibling;
+        if (elem != null) {
+            controls.inputOdeslat.parentNode.insertBefore(Element.create("br"), elem);
+            controls.inputOdeslat.parentNode.insertBefore(spanDulezitost, elem);
+        }
+        else {
+            controls.inputOdeslat.parentNode.appendChild(Element.create("br"));
+            controls.inputOdeslat.parentNode.appendChild(spanDulezitost);
+        }
+        
+        
         // Odeslani posty
         Event.observe(controls.form, "submit", function(event) {
             // Odstraneni newline na konci textu pri odeslani
-            controls.textareaZprava.value = controls.textareaZprava.value.replace(/\n{2,}$/, "");
+            var text = controls.textareaZprava.value.replace(/\n{2,}$/, "");
+            
             // Upozorneni pri odesilani dlouhe zpravy
-            var m = controls.textareaZprava.value.match(/\n/g);
+            var m = text.match(/\n/g);
             if (m != null && m.length > MAX_RADKU_DEFAULT) {
-                if (!confirm(String.format(Posta.ODESLANI_DLOUHE_ZPRAVY_CONFIRM_TEXT, m.length)))
+                if (!confirm(String.format(Posta.ODESLANI_DLOUHE_ZPRAVY_CONFIRM_TEXT, m.length))) {
                     Event.stop(event);
+                    return;
+                }
             }
+            
+            // Pridani dulezitosti
+            var d = vybranaDulezitost();
+            if (d != null) {
+                text = d + '\n' + text;
+            }
+            
+            controls.textareaZprava.value = text;
         });
         
         // Focus
@@ -173,11 +228,7 @@ pageExtenders.add(PageExtender.create({
             zprava.text = zprava.fontText.innerHTML.replace(/<br\/?>/g, "\n").stripTags();
             
             if (zprava.typ != "posel") {
-                var m = zprava.text.match(Posta.DULEZITOST_REGEX);
-			    if (m != null) {		
-			        zprava.dulezitost = m[1].toLowerCase();
-			        zprava.text = zprava.text.replace(Posta.DULEZITOST_REGEX, "").replace(/^\s*?\n/, "");
-			    }
+                Posta.zjistiDulezitost(zprava);
             }
             
             console.info("Zprava %d: od=%d typ=%s dulezitost=%s, delka=%d cas=%s", zprava.id, zprava.od, zprava.typ, zprava.dulezitost, zprava.text.length, zprava.cas.toLocaleString());
@@ -342,6 +393,10 @@ pageExtenders.add(PageExtender.create({
         };
     
         page.posta.zpravy.each(function(zprava) {
+            // Needituj zpravy z bestiare
+            if (zprava.dulezitost == "bestiar")
+                return; //continue;
+        
             var test = false;
             
             // Neloguj to
