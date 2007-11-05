@@ -94,6 +94,7 @@ pageExtenders.add(PageExtender.create({
         var dulezitost = zprava.dulezitost;
         
         if (dulezitost != null) {
+            controls.textareaZprava.defaultValue = zprava.text;
             controls.textareaZprava.value = zprava.text;
         }
         
@@ -141,8 +142,10 @@ pageExtenders.add(PageExtender.create({
         var spanDulezitost = Element.create("span", 'důležitá zpráva&nbsp;');
         var inputDulezita = spanDulezitost.appendChild(Element.create("input", null, {type: "checkbox"}));
         
-        if (dulezitost == "dulezite")
+        if (dulezitost == "dulezite") {
             inputDulezita.checked = true;
+            dulezitost = null;
+        }
             
         var vybranaDulezitost = function() {
             if (inputDulezita.checked)
@@ -495,7 +498,7 @@ pageExtenders.add(PageExtender.create({
 				switch (zprava.dulezitost) {
 					case "dulezite":
 						zprava.trHeader.className += " zprava_dulezita";
-						return; // Neodstranuj popisek
+						break;
 
 					case "spam":
 						zprava.trHeader.className += " zprava_spam_" + zprava.typ;
@@ -671,6 +674,47 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Skryj stare zpravy bestiare (zatim jen v novych zpravach)
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Posta - Skryt zpravy bestiare"; },
+
+    analyze: function(page, context) {
+    	if (page.posta == null || page.posta.zpravy == null)
+            return false;
+        if (page.posta.zpravy.length == 0)
+            return false;
+        
+        var aktualniCas = new Date().getTime();
+        context.skryt = new Array();
+        
+        page.posta.zpravy.each(function(zprava) {
+            if (zprava.dulezitost != "bestiar")
+                return; // continue;
+            
+            var stari = (aktualniCas - zprava.cas.getTime());
+            if (stari < 30*60000) // 30 min
+                return; // continue;
+            
+            context.skryt.push(zprava);
+            zprava.skryta = true;
+        });
+        
+		return context.skryt.length > 0;
+    },
+    
+    process: function(page, context) {
+        context.skryt.each(function(zprava) {
+            var parent = zprava.element.parentNode;
+            
+            // Odstran volne radky za zpravou    
+            while (zprava.element.nextSibling != null && zprava.element.nextSibling.tagName == "BR")
+                parent.removeChild(zprava.element.nextSibling);
+            
+            // Odstran samotnou zpravu
+            parent.removeChild(zprava.element);
+        });
+    }
+}));
 
 // Smazat specificke typy zprav
 pageExtenders.add(PageExtender.create({
