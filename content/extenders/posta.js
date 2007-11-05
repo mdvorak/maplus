@@ -84,8 +84,9 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         var controls = context.controls;
-    
+        
         // Zjisti dulezitost predchozi zpravy
+        // Pozn: Dulezitost se umyslne ignoruje pri Odpovedet vsem 
         var zprava = {
             text: controls.textareaZprava.defaultValue
         };
@@ -93,19 +94,8 @@ pageExtenders.add(PageExtender.create({
         var dulezitost = zprava.dulezitost;
         
         if (dulezitost != null) {
-            controls.textareaZprava.defaultValue = zprava.text;
             controls.textareaZprava.value = zprava.text;
         }
-    
-        // Klaves. zkratky
-        Event.observe(controls.textareaZprava, 'keypress', function(event) {
-            if (event.keyCode == Event.KEY_ESC)
-                this.value = '';
-            else if (event.ctrlKey && event.keyCode == Event.KEY_RETURN)
-                this.form.submit();                    
-        });
-        
-        new Insertion.Bottom(controls.form, '<div><span class="small" style="color: gray;">Pozn.: Esc - vymaže napsaný text, Ctrl+Enter - odešle zprávu</span></div>');
         
         // Osetreni "Odpovedet vsem"
         if (page.arguments["posta"] == "posta_v_ally" && page.arguments["odpoved"] != null) {
@@ -122,6 +112,16 @@ pageExtenders.add(PageExtender.create({
                 console.log("Nenalezena zprava %s v cache.", page.arguments["odpoved"]);
             }
         }
+        
+        // Klaves. zkratky
+        Event.observe(controls.textareaZprava, 'keypress', function(event) {
+            if (event.keyCode == Event.KEY_ESC)
+                this.value = '';
+            else if (event.ctrlKey && event.keyCode == Event.KEY_RETURN)
+                this.form.submit();                    
+        });
+        
+        new Insertion.Bottom(controls.form, '<div><span class="small" style="color: gray;">Pozn.: Esc - vymaže napsaný text, Ctrl+Enter - odešle zprávu</span></div>');
         
         // Oddelovac stare posty
         var psal = page.arguments["psal"];

@@ -40,14 +40,20 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         var last = page.config.getAttribute("posledniVerzeNovinek");
-        return (last != VERSION);
+        
+        if (last != VERSION) {
+            page.config.setAttribute("posledniVerzeNovinek", VERSION);
+            return true;
+        }
+        else {
+            return false;
+        }
     },
     
     process: function(page, context) {
         // Zobraz dialog s novinkama
         var dialog = new NovinkyDialog();
         dialog.show(function() {
-            page.config.setAttribute("posledniVerzeNovinek", VERSION);
             dialog.close();
         });
     }
