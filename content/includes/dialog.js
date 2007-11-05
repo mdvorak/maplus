@@ -225,7 +225,8 @@ Dialog.prototype = {
     },
     
     _onValidationError: function(err) {
-        alert("" + err);
+        if (err != null)
+            alert("" + err);
     },
     
     _createContentElement: function() {

@@ -149,6 +149,12 @@ var LinkEditors = {
                        '    <td><span>Tahů: </span></td>' +
                        '    <td><input id="d_tahy" type="text" maxlength="5" /></td>' +
                        '</tr>' +
+                       '<tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>' +
+                       '<tr>' +
+                       '    <td colspan="5">' +
+                       '        <span class="small">Upozornění: Počet rekrutovaných jednotek nesouvisí s počtem tahů přednastavených na formuláři.</span>' + 
+                       '    </td>' +
+                       '</tr>' +
                        '</tbody>' +
                        '</table>';
             
@@ -241,6 +247,64 @@ var LinkEditors = {
                     selectTyp.value = args["prehled"] || "";
                 },
                 validate: function() { }
+            };
+        }
+    },
+    
+    
+    "odehrat": {
+        title: "Odehrát",
+        defaultText: "",
+        
+        create: function(parent, localConfig) {
+            var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
+                       '<colgroup>' +
+                       '    <col width="75" />' +
+                       '    <col width="145" />' +
+                       '    <col width="10" />' +
+                       '    <col width="75" />' +
+                       '    <col width="145" />' +
+                       '</colgroup>' +
+                       '<tbody>' +
+                       '<tr>' +
+                       '    <td><span>Tahů: </span></td>' +
+                       '    <td><input id="d_tahu" type="text" maxlength="2" size="3" value="1" /></td>' +
+                       '' +
+                       '    <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>' +
+                       '' +
+                       '    <td><span>Objevovat: </span></td>' +
+                       '    <td><input id="d_objevovat" type="checkbox" /></td>' +
+                       '</tr>' +
+                       '</tbody>' +
+                       '</table>';
+            
+            parent.innerHTML = html;
+            
+            var inputTahu = $X('.//input[@id = "d_tahu"]', parent);
+            var inputObjevovat = $X('.//input[@id = "d_objevovat"]', parent);
+        
+            return {
+                get: function() {
+                    if (inputObjevovat.checked)
+                        return "explore.html?kolikwait=" + inputTahu.value;
+                    else
+                        return "cekat.html?kolikwait=" + inputTahu.value;
+                },
+                set: function(url) {
+                    var data = parseUrl(url);
+                    inputObjevovat.checked = String.equals(data.name, "explore.html", true);
+                    inputTahu.value = data.arguments["kolikwait"] || 1;
+                },
+                validate: function() {
+                    var tahu = parseInt(inputTahu.value);
+                    if (!(tahu > 0))
+                        throw "Počet tahů musí být větší než nula.";
+                    
+                    if (tahu > MAX_TAHU_DEFAULT) {
+                        var r = confirm("Opravdu chcete mít odkaz na odehrání " + tahu + " tahů?");
+                        if (!r) throw null;
+                    }
+                }
             };
         }
     },
