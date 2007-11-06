@@ -33,6 +33,8 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
+ 
+var VybraneJednotky = Marshal.getObjectProxy("VybraneJednotky");
 
 // Mala optimilizace rychlosti
 pageExtenders.add(PageExtender.create({
@@ -140,6 +142,9 @@ pageExtenders.add(PageExtender.create({
             else {
                 console.warn("Nenalezeny informace o jednotce %s.", row.jmeno);
             }
+            
+            // Je stack bidly?
+            row.bidnuto = (row.element.getAttribute("bgcolor") == BARVA_BIDU);
             
             bestiar.table.data.push(row);
         }
@@ -522,6 +527,87 @@ pageExtenders.add(PageExtender.create({
             clearInterval(context.timer);
         }
     }
+}));
+
+
+// Oznac vybrane jednotky
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Vybrane jednotky"; },
+
+    analyze: function(page, context) {
+        // TODO tohle trosku zefektivnit
+    
+        // Bestiar
+        if (!page.bestiar || !page.bestiar.table)
+            return false;
+        
+        // Ziskej vybrane jednotky
+        var jednotky = VybraneJednotky.get(page.id);
+        var vybrane = jednotky.getList();
+        
+        var vybraneUidList = new Array();
+        vybrane.each(function(j) {
+            vybraneUidList.push(j.uid);
+        });
+        
+        // Vytvor seznam vybranych radku
+        context.list = new Array();
+        
+        page.bestiar.table.data.each(function(row) {
+            var jeVybrana = null;
+            
+            vybrane.each(function(j) {
+                if (j.jmeno == row.data.jmeno && j.pocet == row.data.pocet && j.zkusenost == row.data.zkusenost) {
+                    jeVybrana = j;
+                    return $break;
+                }                    
+            });
+            
+            // Pokud je jednotka budnuta pridej ji do seznamu            
+            if (row.bidnuto && !jeVybrana) {
+                jednotky.add({
+                    jmeno: row.data.jmeno,
+                    pocet: row.data.pocet,
+                    zkusenost: row.data.zkusenost
+                });
+                
+                console.log("Jednotka pridana mezi vybrane: %s %d %f\%", row.data.jmeno, row.data.pocet, row.data.zkusenost);
+                jeVybrana = true;
+            }
+            
+            if (jeVybrana) {
+                console.log("Vybrana jednotka: %s %d %f\%", row.data.jmeno, row.data.pocet, row.data.zkusenost);
+                context.list.push(row);
+                
+                // Odstran ze seznamu
+                vybraneUidList = vybraneUidList.without(jeVybrana.uid);
+            }
+        });
+        
+        // Odstran neexistujici jednotky
+        if (vybraneUidList.length > 0) {
+            console.debug("Odstranuji se: %o", vybraneUidList);
+            jednotky.remove(vybraneUidList);
+        }
+        
+        context.fontKomentar = $X('.//table/tbody/tr[4]/td/font[2]', page.content);
+        if (context.fontKomentar == null)
+            return false;
+        
+        return context.list.length > 0;
+     },
+     
+     process: function(page, context) {
+        // Pridej komentar
+        context.fontKomentar.appendChild(Element.create("br"));
+        context.fontKomentar.appendChild(document.createTextNode("Žluté pozadí znamená, že jste o jednotku projevili zájem, ale nemáte ji bidnutou."));
+     
+        // Uprav pozadi
+        context.list.each(function(row) {
+            if (!row.bidnuto)
+                row.element.setAttribute("bgcolor", "#685300");
+        });
+     }
 }));
 
 

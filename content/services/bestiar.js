@@ -34,6 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+/*** BestiarFiltry class ***/
 var BestiarFiltry = {
     _load: function() {
         try {
@@ -105,3 +106,90 @@ var BestiarFiltry = {
 };
 
 Marshal.registerObject("BestiarFiltry", BestiarFiltry);
+
+
+/*** VybraneJednotkyCollection class ***/
+var VybraneJednotkyCollection = Class.create();
+
+VybraneJednotkyCollection.prototype = {
+    initialize: function() {
+        this._list = new Array();
+        this._map = new Object();
+    },
+    
+    getList_PROXY: Marshal.BY_VALUE,
+    getList: function() {
+        return this._list;
+    },
+    
+    add_PROXY: Marshal.BY_VALUE,
+    add: function(jednotka) {
+        if (jednotka == null)
+            throw new ArgumentNullException("jednotka");
+        
+        var uid = this.getUid(jednotka);
+        if (uid in this._map) 
+            return; // Jednotka jiz je vybrana
+        
+        var value = {
+            uid: uid,
+            jmeno: jednotka.jmeno,
+            pocet: jednotka.pocet,
+            zkusenost: jednotka.zkusenost
+        };
+        
+        this._map[uid] = value;
+        this._list.push(value);
+    },
+    
+    remove_PROXY: Marshal.BY_VALUE,
+    remove: function(uidList) {
+        if (uidList == null)
+            throw new ArgumentNullException("uidList");
+        
+        var removeList = new Array();
+        
+        var _this = this;
+        uidList.each(function(uid) {
+            var j = _this._map[uid];
+            if (j == null)
+                return; // continue;
+                
+            removeList.push(j);
+            delete _this._map[uid];
+        });
+        
+        this._list = this._list.without.apply(this._list, removeList);
+    },
+    
+    clear_PROXY: Marshal.BY_VALUE,
+    clear: function() {
+        this._list = new Array();
+        this._map = new Object();
+    },
+    
+    getUid: function(j) {
+        return j.jmeno + "_" + j.pocet + "_" + j.zkusenost;
+    }
+};
+
+
+/*** VybraneJednotky class ***/
+var VybraneJednotky = {
+    _map: new Hash(),
+
+    get_PROXY: Marshal.BY_REF,
+    get_PROXY_CACHED: true,
+    get: function(id) {
+        var list = this._map["" + id];
+        
+        if (list == null) {
+            list = new VybraneJednotkyCollection();
+            this._map["" + id] = list;
+        }
+        
+        return list;
+    }
+};
+
+Marshal.registerObject("VybraneJednotky", VybraneJednotky);
