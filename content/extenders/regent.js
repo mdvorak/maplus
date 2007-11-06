@@ -60,16 +60,6 @@ pageExtenders.add(PageExtender.create({
         if (!isNaN(page.regent.id) && page.regent.id != page.id)
             console.error("Id z analyzy stranky (%d) a regenta (%d) se nerovnaji!", page.id, page.regent.id);
         
-        // Uloz do nastaveni
-        /*
-        var cfg = page.config.getRegent();
-        cfg.setPref("jmeno", page.regent.jmeno);
-        cfg.setPref("provincie", page.regent.provincie);
-        cfg.setPref("povolani", page.regent.povolani);
-        cfg.setPref("id", page.regent.id);
-        cfg.setPref("barva", page.regent.barva);
-        */
-        
         console.info("%s, %s (%d) [%s, %s]", page.regent.jmeno, page.regent.provincie, page.regent.id, page.regent.povolani, page.regent.barva);
         return true;
     },

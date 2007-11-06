@@ -44,24 +44,15 @@ PlusConfig.prototype = {
         return this.getBoolean('barevnyText', true);
     },
     
-    getRegent: function() {
-        if (!this._regent) {
-            this._regent = this.getPrefNode("regent", true);
-        }
-        return this._regent;
-    },
-        
     getMenu: function() {
-        if (!this._menu) {
+        if (!this._menu)
             this._menu = this.getPrefNode("menu", true);
-        }
         return this._menu;
     },
     
     getAukce: function() {
-        if (!this._aukce) {
+        if (!this._aukce)
             this._aukce = this.getPrefNode("aukce", true);
-        }
         return this._aukce;
     }
 };

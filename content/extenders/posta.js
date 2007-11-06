@@ -740,7 +740,7 @@ pageExtenders.add(PageExtender.create({
 		return true;
     },
     
-    process: function(page, context) {
+    process: function(page, context) {    
         // Pomocna funkce
 		window.plus_oznacZpravy = function(filter) {
 		    page.posta.zpravy.each(function(zprava) {
