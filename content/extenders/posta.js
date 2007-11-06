@@ -85,17 +85,20 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         var controls = context.controls;
         
-        // Zjisti dulezitost predchozi zpravy
-        // Pozn: Dulezitost se umyslne ignoruje pri Odpovedet vsem 
-        var zprava = {
-            text: controls.textareaZprava.defaultValue
-        };
-        Posta.zjistiDulezitost(zprava);
-        var dulezitost = zprava.dulezitost;
-        
-        if (dulezitost != null) {
-            controls.textareaZprava.defaultValue = zprava.text;
-            controls.textareaZprava.value = zprava.text;
+        // Zjisti dulezitost zpravy
+        var dulezitost = page.arguments["dulezitost"];
+        if (dulezitost == null) {
+            // Pozn: Dulezitost se umyslne ignoruje pri Odpovedet vsem
+            var zprava = {
+                text: controls.textareaZprava.defaultValue
+            };
+            Posta.zjistiDulezitost(zprava);
+            
+            if (zprava.dulezitost != null) {
+                controls.textareaZprava.defaultValue = zprava.text;
+                controls.textareaZprava.value = zprava.text;
+                dulezitost = zprava.dulezitost;
+            }
         }
         
         // Osetreni "Odpovedet vsem"
