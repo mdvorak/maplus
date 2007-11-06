@@ -144,7 +144,7 @@ pageExtenders.add(PageExtender.create({
             }
             
             // Je stack bidly?
-            row.bidnuto = (row.element.getAttribute("bgcolor") == BARVA_BIDU);
+            row.bidnuto = (row.element.getAttribute("bgcolor") == BESTIAR_BARVA_BID);
             
             bestiar.table.data.push(row);
         }
@@ -360,7 +360,7 @@ pageExtenders.add(PageExtender.create({
                 if (!zamluveno) {
                     jednotky.add(row.data);
                     if (!row.bidnuto)
-                        row.element.setAttribute("bgcolor", "#685300");
+                        row.element.setAttribute("bgcolor", BESTIAR_BARVA_ZAMLUVENO);
                     zamluveno = true;
                 }
             });
@@ -617,12 +617,12 @@ pageExtenders.add(PageExtender.create({
      process: function(page, context) {
         // Pridej komentar
         context.fontKomentar.appendChild(Element.create("br"));
-        context.fontKomentar.appendChild(document.createTextNode("Žluté pozadí znamená, že jste o jednotku projevili zájem, ale nemáte ji bidnutou."));
+        context.fontKomentar.appendChild(document.createTextNode("Zelené pozadí znamená, že jste o jednotku projevili zájem, ale nemáte ji bidnutou."));
      
         // Uprav pozadi
         context.list.each(function(row) {
             if (!row.bidnuto)
-                row.element.setAttribute("bgcolor", "#685300");
+                row.element.setAttribute("bgcolor", BESTIAR_BARVA_ZAMLUVENO);
         });
      }
 }));

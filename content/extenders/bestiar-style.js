@@ -34,6 +34,9 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+const BESTIAR_BARVA_BID = "#603030";
+const BESTIAR_BARVA_ZAMLUVENO = "#013500";
+
 var BestiarSloupce = {
 	data: new Hash(),
 	poradi: new Array(),

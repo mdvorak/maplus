@@ -74,5 +74,3 @@ JMENA_BAREV["C"] = "Černá";
 JMENA_BAREV["S"] = "Šedá";
 JMENA_BAREV["F"] = "Fialová";
 JMENA_BAREV["N"] = "Neutrální";
-
-const BARVA_BIDU = "#603030";
