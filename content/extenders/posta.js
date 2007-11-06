@@ -739,10 +739,11 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         // Pomocna funkce
-		window.plus_oznacZpravy = function(typy) {
+		window.plus_oznacZpravy = function(filter) {
 		    page.posta.zpravy.each(function(zprava) {
 		        if (zprava.inputSmazat != null) {
-		            zprava.inputSmazat.checked = (typy == null || typy.indexOf(zprava.typ) > -1);
+		            zprava.inputSmazat.checked = (filter.typy == null || filter.typy.indexOf(zprava.typ) > -1)
+		                                         && (filter.dulezitosti == null || filter.dulezitosti.indexOf(zprava.dulezitost) > -1);
 		        }
 		    });
 		};

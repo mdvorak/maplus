@@ -3,28 +3,52 @@
 </a>
 <table id="plus_ovladaniPosty" style="display: none;" cellspacing="0" cellpadding="0">
     <colgroup>
-        <col width="130" />
+        <col width="100" />
+        <col width="30" />
+        <col width="20" />
+        <col width="100" />
         <col width="30" />
     </colgroup>
     <tbody>
         <tr>
-            <td colspan="2"><span>Zprávy typu:</span></td>
+            <td colspan="2"><span>Zprávy typu</span></td>
+            
+            <td><img width="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td colspan="2"><span>s důležitostí:</span></td>
         </tr>
         <tr>
             <td><span class="small">Posel</span></td>
             <td><input id="plus_posel" type="checkbox" /></td>
+            
+            <td><img width="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span class="small">Normální</span></td>
+            <td><input id="plus_normalni" type="checkbox" checked="checked" /></td>
         </tr>
         <tr>
             <td><span class="small">Soukromá</span></td>
             <td><input id="plus_soukroma" type="checkbox" /></td>
+            
+            <td><img width="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span class="small">Důležitá</span></td>
+            <td><input id="plus_dulezita" type="checkbox" /></td>
         </tr>
         <tr>
             <td><span class="small">Veřejná aliance</span></td>
             <td><input id="plus_verejna" type="checkbox" checked="checked" /></td>
+            
+            <td><img width="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span class="small">Bestiář</span></td>
+            <td><input id="plus_bestiar" type="checkbox" checked="checked" /></td>
         </tr>
         <tr>
             <td><span class="small">Tajná aliance</span></td>
             <td><input id="plus_tajna" type="checkbox" checked="checked" /></td>
+            
+            <td><img width="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
         </tr>
         
         <script type="text/javascript">
@@ -36,13 +60,22 @@
                 if ($('plus_verejna').checked) typy.push("verejna");
                 if ($('plus_tajna').checked) typy.push("tajna");
                 
-                return typy;
+                var dulezitosti = new Array();
+                
+                if ($('plus_normalni').checked) dulezitosti.push(null);
+                if ($('plus_dulezita').checked) dulezitosti.push("dulezite");
+                if ($('plus_bestiar').checked) dulezitosti.push("bestiar");
+                
+                return { 
+                    typy: typy,
+                    dulezitosti: dulezitosti
+                };
             };
         </script>
         
         <tr>
-            <td colspan="2" style="text-align: center;">
-                <input type="button" value="Označit" onclick="var typy = plus_vybraneTypyZprav(); plus_oznacZpravy(typy);" />
+            <td colspan="5" style="text-align: center;">
+                <input type="button" value="Označit" onclick="var filter = plus_vybraneTypyZprav(); plus_oznacZpravy(filter);" />
                 <!-- &nbsp;
                 <input type="button" value="Smazat" onclick="var typy = plus_vybraneTypyZprav(); plus_oznacZpravy(typy);" />
                 -->

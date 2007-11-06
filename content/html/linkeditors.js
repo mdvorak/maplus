@@ -94,8 +94,18 @@ var LinkEditors = {
                 set: function(url) {
                     var args = parseUrl(url).arguments;
                     inputKolikrat.value = args["kolikrat"] || "1";
-                    selectKouzlo.value = args["seslat_kouzlo"] || "";
                     inputKoho.value = args["koho"] || "";
+                    
+                    // Zjisti jestli je kouzlo v selectu
+                    var kouzlo = args["seslat_kouzlo"];
+                    var nalezeno = false;
+                    for (var i = 0; i < selectKouzlo.options.length; i++)
+                        nalezeno |= (selectKouzlo.options[i].value == kouzlo);
+                    
+                    if (!nalezeno)
+                        selectKouzlo.options.add(new Option("<aktuální " + kouzlo + ">", kouzlo));
+                    
+                    selectKouzlo.value = kouzlo || "";
                 },
                 validate: function() {
                     if (selectKouzlo.value.length == 0)
