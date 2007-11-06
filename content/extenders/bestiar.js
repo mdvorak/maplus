@@ -338,6 +338,8 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
+        var jednotky = VybraneJednotky.get(page.id);
+        
         // Zpracuj tabulku
         for (let i = 0; i < page.bestiar.table.data.length; i++) {
             let row = page.bestiar.table.data[i];
@@ -346,8 +348,23 @@ pageExtenders.add(PageExtender.create({
             if (td == null)
                 continue;
         
-            td.style.width = "32px";
+            td.style.width = "48px";
             td.innerHTML = "";
+            
+            // Zamluvit jednotku
+            let zamluvit = Element.create("a", "<span>Z</span>", {href: "javascript://"});
+            zamluvit.setAttribute("title", "Zamluví jednotku");
+            
+            let zamluveno = false;
+            Event.observe(zamluvit, 'click', function() {
+                if (!zamluveno) {
+                    jednotky.add(row.data);
+                    if (!row.bidnuto)
+                        row.element.setAttribute("bgcolor", "#685300");
+                    zamluveno = true;
+                }
+            });
+            td.appendChild(zamluvit);
             
             // Kopiruj popis
             let copy = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/copy.png" alt="" />', {href: "javascript://"});
