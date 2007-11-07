@@ -352,8 +352,8 @@ pageExtenders.add(PageExtender.create({
             td.innerHTML = "";
             
             // Zamluvit jednotku
-            let zamluvit = Element.create("a", "<span>Z</span>", {href: "javascript://"});
-            zamluvit.setAttribute("title", "Zamluví jednotku");
+            let zamluvit = Element.create("a", '<span style="margin-right: 4px;">Z</span>', {href: "javascript://"});
+            zamluvit.setAttribute("title", "Zamluvit jednotku");
             
             let zamluveno = false;
             Event.observe(zamluvit, 'click', function() {
@@ -617,7 +617,7 @@ pageExtenders.add(PageExtender.create({
      process: function(page, context) {
         // Pridej komentar
         context.fontKomentar.appendChild(Element.create("br"));
-        context.fontKomentar.appendChild(document.createTextNode("Zelené pozadí znamená, že jste o jednotku projevili zájem, ale nemáte ji bidnutou."));
+        context.fontKomentar.appendChild(Element.create("span", "\xA0Zelené pozadí znamená, že jste o jednotku projevili zájem, ale nemáte ji bidnutou.\xA0", {"class": "small", style: "background-color: #013500;"}));
      
         // Uprav pozadi
         context.list.each(function(row) {
