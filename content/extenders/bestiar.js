@@ -82,12 +82,19 @@ pageExtenders.add(PageExtender.create({
         // Bestiar (mysli i na POST)
         if (page.arguments["obchod"] != null && page.arguments["obchod"] != "jedn_new")
             return false;
-
-        var tableData = $X('.//table[tbody/tr/td[contains(font/b, "prodeje")]]', page.content);
+            
+        var tableNakup = $X('.//table[tbody/tr[3]/td/table/tbody/tr/td[contains(font/b, "prodeje")]]', page.content);
+        if (tableNakup == null)
+            return false;
+    
+        var tableData = $X('tbody/tr[3]/td/table', tableNakup);
         if (!tableData || tableData.rows.length < 1)
             return false;
         
         var bestiar = {
+            tableNakup: tableNakup,
+            tableData: tableData,
+        
             table: ElementDataStore.get(tableData)
         };
         
@@ -607,11 +614,11 @@ pageExtenders.add(PageExtender.create({
             jednotky.remove(vybraneUidList);
         }
         
-        context.fontKomentar = $X('.//table/tbody/tr[4]/td/font[2]', page.content);
+        context.fontKomentar = $X('tbody/tr[4]/td/font[2]', page.bestiar.tableNakup);
         if (context.fontKomentar == null)
             return false;
         
-        return context.list.length > 0;
+        return true;
      },
      
      process: function(page, context) {
@@ -624,6 +631,18 @@ pageExtenders.add(PageExtender.create({
             if (!row.bidnuto)
                 row.element.setAttribute("bgcolor", BESTIAR_BARVA_ZAMLUVENO);
         });
+        
+        // Link pro odeslani zamluvenych jednotek
+        var trLast = $X('tbody/tr[last()]', page.bestiar.tableNakup);
+        
+        var trOdeslat = Element.create("tr", null, {bgcolor: "#505050"});
+        var tdOdeslat = trOdeslat.appendChild(Element.create("td", null, {colspan: "3", style: "text-align: center;"}));
+        var spanOdeslat = tdOdeslat.appendChild(Element.create("span", '<br />'));
+        
+        var odeslatHref = MaPlus.buildUrl(page, "posta.html", {zamluvene_jednotky: true, dulezitost: "bestiar", posta: "posta_v_ally"});
+        var linkOdeslat = spanOdeslat.appendChild(Element.create("a", 'Odeslat poštou vybrané jednotky', {href: odeslatHref}));
+        
+        trLast.parentNode.insertBefore(trOdeslat, trLast);
      }
 }));
 
@@ -718,7 +737,7 @@ pageExtenders.add(PageExtender.create({
         });
         
         // Link "Zrus filtrovani" nad tabulkou
-        var tdNastaveniFiltru = $X('.//font/table/tbody/tr[2]/td[1 and contains(font, "Prosím")]', page.content);
+        var tdNastaveniFiltru = $X('tbody/tr[2]/td[1 and contains(font, "Prosím")]', page.bestiar.tableNakup);
         tdNastaveniFiltru.innerHTML = '';
         
         var spanFilterAktivovan = Element.create("span", '&nbsp;<span id="plus_filterAktivovan" class="small" style="display: none; color: yellow;">(filter aktivován)</span>&nbsp;', {class: "small"});

@@ -117,6 +117,22 @@ pageExtenders.add(PageExtender.create({
             }
         }
         
+        // Psani zpravy bestiare
+        if (parseBoolean(page.arguments["zamluvene_jednotky"])) {
+            var vybraneJednotky = Marshal.callCachedMethod("VybraneJednotky", "get", [page.id]).getList();
+            console.debug("Vybranych jednotek: %d", vybraneJednotky.length);
+            
+            // Sestav text
+            var text = "";
+            vybraneJednotky.each(function(i) {
+                text += i.jmeno + " " + i.pocet + " " + (100*i.zkusenost).toFixed(2) + "%" + "\n";
+            });
+            
+            controls.textareaZprava.defaultValue = text;
+            controls.textareaZprava.value = text;
+            controls.inputPodpis.checked = true;
+        }
+        
         // Klaves. zkratky
         Event.observe(controls.textareaZprava, 'keypress', function(event) {
             if (event.keyCode == Event.KEY_ESC)
