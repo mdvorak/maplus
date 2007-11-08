@@ -349,15 +349,22 @@ Object.extend(SlozeniArmadyDialog.prototype, {
         var format = function(value) {
             return (100 * value / s.celkem).toFixed(2) + "%";
         };
+        var formatSila = function(value) {
+            return "(" + value + ")";
+        };
         var remove = function(rowId) {
             var tr = $X('.//tr[@id = "' + rowId + '"]', root);
             tr.parentNode.removeChild(tr);
         };
         
         $X('.//span[@id = "d_bojove"]', root).innerHTML = format(s.pb1 + s.pb2 + s.pb3 + s.lb1 + s.lb2 + s.lb3);
+        $X('.//span[@id = "d_bojove_sila"]', root).innerHTML = formatSila(s.pb1 + s.pb2 + s.pb3 + s.lb1 + s.lb2 + s.lb3);
         $X('.//span[@id = "d_strelecke"]', root).innerHTML = format(s.ps + s.ls);
+        $X('.//span[@id = "d_strelecke_sila"]', root).innerHTML = formatSila(s.ps + s.ls);
         $X('.//span[@id = "d_pozemni"]', root).innerHTML = format(s.pb1 + s.pb2 + s.pb3 + s.ps);
+        $X('.//span[@id = "d_pozemni_sila"]', root).innerHTML = formatSila(s.pb1 + s.pb2 + s.pb3 + s.ps);
         $X('.//span[@id = "d_letecke"]', root).innerHTML = format(s.lb1 + s.lb2 + s.lb3 + s.ls);
+        $X('.//span[@id = "d_letecke_sila"]', root).innerHTML = formatSila(s.lb1 + s.lb2 + s.lb3 + s.ls);
         
         // Strelci
         if (s.ps + s.ls > 0) {
