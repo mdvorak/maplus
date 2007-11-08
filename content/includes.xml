@@ -7,7 +7,7 @@
   <script src="includes/interopClient.js" />
   
   <!-- Custom libraries -->
-  <script src="libraries/linkdata.js" />
+  <script src="libraries/classlib.js" />
   <script src="includes/tooltip.js" />
   <script src="includes/checkbox.js" />d
   <script src="includes/dialog.js" />

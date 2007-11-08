@@ -9,7 +9,7 @@
   <script src="services/xmlConfig.js" />
 
   <!-- Custom services -->
-  <script src="libraries/linkdata.js" />
+  <script src="libraries/classlib.js" />
   <script src="services/maplus.js" />
   <script src="services/config.js" />
   <script src="services/datacache.js" />
