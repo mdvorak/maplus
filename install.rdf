@@ -3,7 +3,7 @@
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>maplus@michal.dvorak</em:id>
-    <em:version>1.1.2</em:version>
+    <em:version>1.1.3</em:version>
     <em:type>2</em:type>
     <em:name>Melior Annis Plus</em:name>
     <em:description>Vylepseni pro hru Melior Annis.</em:description>

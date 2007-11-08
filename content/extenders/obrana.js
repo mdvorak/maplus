@@ -92,7 +92,7 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-// Aktivni nazvy jednotek
+// Aktivni nazvy jednotek a max sila stacku
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Obrana - Jednotky"; },
 
@@ -105,15 +105,29 @@ pageExtenders.add(PageExtender.create({
             return false;
        
         context.jednotky = $XL('tbody/tr/td[3]/font', page.tableObrana);
-        return context.jednotky.length > 0;
+        context.sily = $XL('tbody/tr[td[8]]', page.tableObrana);
+        
+        return true;
     },
 
     process: function(page, context) {
+        // Aktivni jednotky
         context.jednotky.each(function(i) {
             var link = MaPlus.Tooltips.createActiveUnit(page, i.textContent);
             
             if (link) {
                 i.replaceChild(link, i.firstChild);
+            }
+        });
+        
+        // Max sila tooltip
+        context.sily.each(function(i) {
+            var zkusenost = parseFloat(i.cells[5].textContent);
+            var sila = parseInt(i.cells[7].textContent);
+            
+            if (!isNaN(zkusenost) && !isNaN(sila)) {
+                var maxSila = Math.floor(100 * sila / zkusenost);
+                i.cells[7].setAttribute("title", "Max síla stacku: " + maxSila);
             }
         });
     }
