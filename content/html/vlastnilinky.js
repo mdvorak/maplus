@@ -59,6 +59,7 @@ window.NastaveniVlastniLinky = {
             throw new ArgumentNullException("page");
             
         this.localConfig = page.localConfig;
+        this.dataConfig = page.config.getData();
     },
 
     reset: function() {
@@ -159,7 +160,7 @@ window.NastaveniVlastniLinky = {
     
     editRecord: function(record, callback, isNew) {
         var data = record.getData();
-        var dialog = new LinkEditorDialog(data.editor, this.localConfig);
+        var dialog = new LinkEditorDialog(data.editor, this.dataConfig);
         dialog.create();
         
         // Set previous data

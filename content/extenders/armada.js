@@ -162,7 +162,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Armada - ID Jednotek"; },
 
     analyze: function(page, context) {
-        var config = page.localConfig.getPrefNode("armada", true);
+        var config = page.config.getData().getPrefNode("armada", true);
         
         var selectJednotka = $X('.//form[@name = "rekrutovat"]//select[@name = "jednotka"]', page.content);
         if (selectJednotka == null)

@@ -39,7 +39,7 @@ var LinkEditors = {
         title: "Text",
         defaultText: "-",
         
-        create: function(parent, localConfig) {
+        create: function(parent, dataConfig) {
             parent.innerHTML = '<span class="small">Pro prázdný řádek použijte "-" (bez uvozovek).</span>';
         
             return {
@@ -55,8 +55,8 @@ var LinkEditors = {
         title: "Seslání kouzla",
         defaultText: "",
         
-        create: function(parent, localConfig) {
-            var kouzla = localConfig.evalPrefNodeList('magie/kouzlo[id and name]');
+        create: function(parent, dataConfig) {
+            var kouzla = dataConfig.evalPrefNodeList('magie/kouzlo[id and name]');
             
             if (kouzla.length == 0) {
                 parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Kouzla.</span>' +
@@ -124,8 +124,8 @@ var LinkEditors = {
         title: "Rekrut jednotky",
         defaultText: "",
         
-        create: function(parent, localConfig) {
-            var jednotky = localConfig.evalPrefNodeList('armada/jednotka[id and name]');
+        create: function(parent, dataConfig) {
+            var jednotky = dataConfig.evalPrefNodeList('armada/jednotka[id and name]');
             
             if (jednotky.length == 0) {
                 parent.innerHTML = '<span style="color: orange;">Prosím navštivte prvně menu Armáda.</span>';
@@ -207,7 +207,7 @@ var LinkEditors = {
         title: "Zruš Rekrut",
         defaultText: "Zruš Rekrut",
         
-        create: function(parent, localConfig) {
+        create: function(parent, dataConfig) {
             return {
                 get: function() { return "rekrutovat.html?jednotka=1&kolik=0"; },
                 set: function(url) { },
@@ -221,7 +221,7 @@ var LinkEditors = {
         title: "Přehled",
         defaultText: "Možné cíle",
         
-        create: function(parent, localConfig) {
+        create: function(parent, dataConfig) {
             var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
                        '<colgroup>' +
                        '    <col width="75" />' +
@@ -266,7 +266,7 @@ var LinkEditors = {
         title: "Odehrát",
         defaultText: "",
         
-        create: function(parent, localConfig) {
+        create: function(parent, dataConfig) {
             var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
                        '<colgroup>' +
                        '    <col width="75" />' +
@@ -331,7 +331,7 @@ var LinkEditors = {
         title: "Vlastní",
         defaultText: "",
         
-        create: function(parent, localConfig) {
+        create: function(parent, dataConfig) {
             var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
                        '<colgroup>' +
                        '    <col width="75" />' +
