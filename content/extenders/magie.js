@@ -182,7 +182,7 @@ pageExtenders.add(PageExtender.create({
         }
         
         // Updatuj kouzla
-        var config = page.localConfig.getPrefNode("magie", true);
+        var config = page.config.getData().getPrefNode("magie", true);
         Marshal.callMethod("ConfigMenuHelper", "updateKouzla", [config, kouzla]);
         
         return true;

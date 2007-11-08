@@ -130,7 +130,7 @@ pageExtenders.add(PageExtender.create({
             
             controls.textareaZprava.defaultValue = text;
             controls.textareaZprava.value = text;
-            controls.inputPodpis.checked = true;
+            controls.inputPodpis.checked = false;
         }
         
         // Klaves. zkratky

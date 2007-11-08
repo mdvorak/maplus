@@ -60,6 +60,12 @@ PlusConfig.prototype = {
         if (!this._regent)
             this._regent = this.getPrefNode("regent", true);
         return this._regent;
+    },
+    
+    getData: function() {
+        if (!this._data)
+            this._data = this.getPrefNode("data", true);
+        return this._data;
     }
 };
  
