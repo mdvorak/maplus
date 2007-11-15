@@ -123,53 +123,51 @@ VybraneJednotkyCollection.prototype = {
     },
     
     add_PROXY: Marshal.BY_VALUE,
-    add: function(jednotka) {
-        if (jednotka == null)
-            throw new ArgumentNullException("jednotka");
+    add: function(jednotka, text) {
+        var old = this._map[jednotka.id];
+        if (old == null) {
+            jednotka = {
+                id: jednotka.id,
+                jmeno: jednotka.jmeno,
+                pocet: jednotka.pocet,
+                zkusenost: jednotka.zkusenost,
+                text: text
+            };
         
-        var uid = this.getUid(jednotka);
-        if (uid in this._map) 
-            return; // Jednotka jiz je vybrana
-        
-        var value = {
-            uid: uid,
-            jmeno: jednotka.jmeno,
-            pocet: jednotka.pocet,
-            zkusenost: jednotka.zkusenost
-        };
-        
-        this._map[uid] = value;
-        this._list.push(value);
+            // Novy stack
+            this._map["" + jednotka.id] = jednotka;
+            this._list.push(jednotka);
+        }
+        else {
+            // Stary stack - updatuj text (kvuli cene casu atp - budme co nejpresnejsi)
+            old.text = text;
+        }
     },
     
     remove_PROXY: Marshal.BY_VALUE,
-    remove: function(uidList) {
-        if (uidList == null)
-            throw new ArgumentNullException("uidList");
+    remove: function(idList) {
+        if (idList == null)
+            throw new ArgumentNullException("idList");
         
         var removeList = new Array();
         
         var _this = this;
-        uidList.each(function(uid) {
-            var j = _this._map[uid];
+        idList.each(function(id) {
+            var j = _this._map["" + id];
             if (j == null)
                 return; // continue;
                 
             removeList.push(j);
-            delete _this._map[uid];
+            delete _this._map["" + id];
         });
         
         this._list = this._list.without.apply(this._list, removeList);
     },
-    
+
     clear_PROXY: Marshal.BY_VALUE,
     clear: function() {
         this._list = new Array();
         this._map = new Object();
-    },
-    
-    getUid: function(j) {
-        return j.jmeno + "_" + j.pocet + "_" + j.zkusenost;
     }
 };
 

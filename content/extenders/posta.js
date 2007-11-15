@@ -119,13 +119,13 @@ pageExtenders.add(PageExtender.create({
         
         // Psani zpravy bestiare
         if (parseBoolean(page.arguments["zamluvene_jednotky"])) {
-            var vybraneJednotky = Marshal.callCachedMethod("VybraneJednotky", "get", [page.id]).getList();
+            var vybraneJednotky = Marshal.callMethod("VybraneJednotky", "get", [page.id]).getList();
             console.debug("Vybranych jednotek: %d", vybraneJednotky.length);
             
             // Sestav text
             var text = "";
             vybraneJednotky.each(function(i) {
-                text += i.jmeno + " " + i.pocet + " " + (100*i.zkusenost).toFixed(2) + "%" + "\n";
+                text += "\n" + i.text;
             });
             
             controls.textareaZprava.defaultValue = text;
@@ -185,8 +185,8 @@ pageExtenders.add(PageExtender.create({
         
         // Odeslani posty
         Event.observe(controls.form, "submit", function(event) {
-            // Odstraneni newline na konci textu pri odeslani
-            var text = controls.textareaZprava.value.replace(/\n{2,}$/, "");
+            // Odstraneni newline na zacatku a konci textu pri odeslani
+            var text = controls.textareaZprava.value.replace(/^\n+|\n{2,}$/, "");
             
             // Upozorneni pri odesilani dlouhe zpravy
             var m = text.match(/\n/g);

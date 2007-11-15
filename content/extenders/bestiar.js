@@ -104,13 +104,17 @@ pageExtenders.add(PageExtender.create({
         
         bestiar.table.header = header;
         bestiar.table.data = new Array();
+        bestiar.table.bidnute = new Array();
         
         // Zpracuj jednotlive radky
         for (var i = 1; i < tableData.rows.length; i++) {
             var row = ElementDataStore.get(tableData.rows[i]);
             row.columns = this._createColumnsMap(row.element, BestiarSloupce.puvodni);
-
-            // Puvodni text
+            
+            // Nabidnout link
+            row.linkNabidka = $X('.//a', row.columns["nabidka"]);
+            
+              // Puvodni text
             row.description = row.element.textContent.replace(/\n|\s+$/g, ""); 
 
             // Analyzuj data
@@ -124,6 +128,14 @@ pageExtenders.add(PageExtender.create({
             row.data.typ = row.columns["typ"].textContent.replace(/\s+$/, "");
             row.data.cas = parseTime(row.columns["cas"].textContent.replace(/\s+$/, ""));
             row.data.nabidka = parseInt(row.columns["nabidka"].textContent);
+            
+            // Id stacku (da se zjistit pouze u nebidnutych jednotek)
+            if (row.linkNabidka != null) {
+                let onclick = row.linkNabidka.getAttribute("onclick");
+                let m = onclick.match(/^set_as_selected[(](\d+)[)]$/);
+                if (m != null)
+                    row.data.id = parseInt(m[1]);
+            }
 
             // Max sila stacku
             row.data.maxSilaStacku = parseInt(row.data.pocet * row.data.silaJednotky);
@@ -150,10 +162,15 @@ pageExtenders.add(PageExtender.create({
                 console.warn("Nenalezeny informace o jednotce %s.", row.jmeno);
             }
             
-            // Je stack bidly?
+            // Je stack bidnuty?
             row.bidnuto = (row.element.getAttribute("bgcolor") == BESTIAR_BARVA_BID);
             
+            console.log("stack id=%d jmeno=%o pocet=%d zkusenost=%f bidnuto=%o", row.data.id, row.data.jmeno, row.data.pocet, row.data.zkusenost, row.bidnuto);
             bestiar.table.data.push(row);
+            
+            if (row.bidnuto) {
+                bestiar.table.bidnute.push(row);
+            }
         }
         
         // Vytvor seznam sloupcu ktere maji byt zobrazeny
@@ -345,7 +362,7 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        var jednotky = VybraneJednotky.get(page.id);
+        var vybrane = VybraneJednotky.get(page.id);
         
         // Zpracuj tabulku
         for (let i = 0; i < page.bestiar.table.data.length; i++) {
@@ -358,20 +375,29 @@ pageExtenders.add(PageExtender.create({
             td.style.width = "48px";
             td.innerHTML = "";
             
-            // Zamluvit jednotku
-            let zamluvit = Element.create("a", '<span style="margin-right: 4px;">Z</span>', {href: "javascript://"});
-            zamluvit.setAttribute("title", "Zamluvit jednotku");
-            
-            let zamluveno = false;
-            Event.observe(zamluvit, 'click', function() {
-                if (!zamluveno) {
-                    jednotky.add(row.data);
-                    if (!row.bidnuto)
+            if (!row.bidnuto && row.linkNabidka != null && row.id != null) {
+                // Zamluvit jednotku pri kliknuti na cenu
+                row.linkNabidka.setAttribute("title", "Vybrat/Zamluvit jednotku");
+                
+                let zamluveno = false;
+                let bgcolor = row.element.getAttribute("bgcolor");
+                Event.observe(row.linkNabidka, 'click', function() {
+                    if (!zamluveno) {
+                        vybrane.add(row.data, row.description);
+                        console.log("Jednotka pridana mezi vybrane: %d", row.data.id);
+                        
                         row.element.setAttribute("bgcolor", BESTIAR_BARVA_ZAMLUVENO);
-                    zamluveno = true;
-                }
-            });
-            td.appendChild(zamluvit);
+                        zamluveno = true;
+                    }
+                    else {
+                        console.log("Jednotka odstranena z vybranych: %d", row.data.id);
+                        vybrane.remove([row.data.id]);
+                        
+                        row.element.setAttribute("bgcolor", bgcolor);
+                        zamluveno = false;
+                    }
+                });
+            }
             
             // Kopiruj popis
             let copy = Element.create("a", '<img class="link" src="chrome://maplus/content/html/img/copy.png" alt="" />', {href: "javascript://"});
@@ -560,6 +586,7 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         // TODO tohle trosku zefektivnit
+        // TODO preskakovat pouze radky ktere muzou byt duplicitni
     
         // Bestiar
         if (!page.bestiar || !page.bestiar.table)
@@ -569,49 +596,47 @@ pageExtenders.add(PageExtender.create({
         var jednotky = VybraneJednotky.get(page.id);
         var vybrane = jednotky.getList();
         
-        var vybraneUidList = new Array();
-        vybrane.each(function(j) {
-            vybraneUidList.push(j.uid);
-        });
+        var bidnuteJednotky = bestiar.table.bidnute.length > 0;
+        
+        var vybraneIdList = new Array();
+        if (!bidnuteJednotky) {
+            vybrane.each(function(j) {
+                vybraneIdList.push(j.id);
+            });
+        }
         
         // Vytvor seznam vybranych radku
         context.list = new Array();
         
         page.bestiar.table.data.each(function(row) {
-            var jeVybrana = null;
+            if (row.data.id == null)
+                return; // continue;
+        
+            var jeVybrana = false;
             
             vybrane.each(function(j) {
-                if (j.jmeno == row.data.jmeno && j.pocet == row.data.pocet && j.zkusenost == row.data.zkusenost) {
-                    jeVybrana = j;
+                if (j.id == row.data.id) {
+                    jeVybrana = true;
                     return $break;
                 }                    
             });
-            
-            // Pokud je jednotka budnuta pridej ji do seznamu            
-            if (row.bidnuto && !jeVybrana) {
-                jednotky.add({
-                    jmeno: row.data.jmeno,
-                    pocet: row.data.pocet,
-                    zkusenost: row.data.zkusenost
-                });
-                
-                console.log("Jednotka pridana mezi vybrane: %s %d %f\%", row.data.jmeno, row.data.pocet, row.data.zkusenost);
-                jeVybrana = true;
-            }
-            
+                        
             if (jeVybrana) {
-                console.log("Vybrana jednotka: %s %d %f\%", row.data.jmeno, row.data.pocet, row.data.zkusenost);
+                jednotky.add(row.data, row.description);
+            
+                console.log("Vybrana jednotka: %d", row.data.id);
                 context.list.push(row);
                 
                 // Odstran ze seznamu
-                vybraneUidList = vybraneUidList.without(jeVybrana.uid);
+                if (!bidnuteJednotky)
+                    vybraneIdList = vybraneIdList.without(row.data.id);
             }
         });
         
         // Odstran neexistujici jednotky
-        if (vybraneUidList.length > 0) {
-            console.debug("Odstranuji se: %o", vybraneUidList);
-            jednotky.remove(vybraneUidList);
+        if (vybraneIdList.length > 0) {
+            console.debug("Odstranuji se: %o", vybraneIdList);
+            jednotky.remove(vybraneIdList);
         }
         
         context.fontKomentar = $X('tbody/tr[4]/td/font[2]', page.bestiar.tableNakup);

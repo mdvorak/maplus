@@ -84,24 +84,3 @@ Object.extend(LinkData, {
     }
 });
 
-
-/*** BestiarStack class ***/
-var BestiarStack = Class.create();
-
-BestiarStack.prototype = {
-    intialize: function(data, text) {
-        if (data == null)
-            throw new ArgumentNullException("data");
-            
-        this.jmeno = data.jmeno;
-        this.pocet = data.pocet;
-        this.zkusenost = data.zkusenost;
-        
-        this.uid = this.jmeno + "_" + this.pocet + "_" + this.zkusenost;
-        this.text = (text != null) ? text : this.jmeno + " " + this.pocet + " " + (100 * this.zkusenost).toFixed(2) + "%";
-    },
-
-    toString: function() {
-        return this.text;
-    }
-};
