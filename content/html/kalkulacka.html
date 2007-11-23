@@ -42,6 +42,8 @@ window.Kalkulacka = {
         var r;
         try {
             r = eval(expression);
+            if (!isNaN(r))
+                r = Number(r.toFixed(10));
         }
         catch(e) { }
         

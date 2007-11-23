@@ -139,10 +139,14 @@ var WebExtenderPreferences = {
     },
 
     getMarshalDebug: function() {
-        return this.getBranch().getIntPref("debug_marshal");
+        if (this._debug_marshal == null)
+            this._debug_marshal = this.getBranch().getIntPref("debug_marshal");
+        return this._debug_marshal;
     },
 
     getXPathDebug: function() {
-        return this.getBranch().getIntPref("debug_xpath");
+        if (this._debug_xpath == null)
+            this._debug_xpath = this.getBranch().getIntPref("debug_xpath");
+        return this._debug_xpath;
     }
 };

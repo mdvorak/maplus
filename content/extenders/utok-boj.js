@@ -173,6 +173,39 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
+// Timer na odklik utoku
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Utok - Timer"; },
+
+    analyze: function(page, context) {
+        if (page.name != "utok.html")
+            return false;
+    
+        context.submit = $X('.//form[@name = "formular" and @action = "boj.html"]//input[@type = "submit"]', page.content);
+        return (context.submit != null);
+    },
+
+    process: function(page, context) {
+        var text = context.submit.value;
+        var cas = 8;
+        
+        var i = window.setInterval(function() {
+            if (context.submit.disabled && cas >= 0)
+                context.submit.value = " Prosím čekejte (" + cas-- + "s)";
+        }, 1000);
+        
+        setTimeout(function() {
+            context.submit.disabled = false;
+            context.submit.value = text;
+            window.clearInterval(i);
+        }, cas * 1000);
+        
+        context.submit.disabled = true;
+        context.submit.value = " Prosím čekejte (" + cas-- + "s)";
+    }
+}));
+
+
 // Boj
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Boj - Stale nastaveni"; },
@@ -207,6 +240,7 @@ pageExtenders.add(PageExtender.create({
         PersistentElements.initializeList(context.elements, context.config);
     }
 }));
+
 
 
 /** PersistentElements class **/
