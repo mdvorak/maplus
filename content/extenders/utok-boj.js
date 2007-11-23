@@ -135,6 +135,7 @@ pageExtenders.add(PageExtender.create({
 
         // Jednotky
         context.jednotky = $XL('tbody/tr/td[3]/font', context.table);
+        context.sily = $XL('tbody/tr[td[8]]', context.table);
 
         return true;
     },
@@ -154,6 +155,17 @@ pageExtenders.add(PageExtender.create({
 
             if (link)
                 i.replaceChild(link, i.firstChild);
+        });
+        
+        // Max sila tooltip
+        context.sily.each(function(i) {
+            var zkusenost = parseFloat(i.cells[5].textContent);
+            var sila = parseInt(i.cells[7].textContent);
+            
+            if (!isNaN(zkusenost) && !isNaN(sila)) {
+                var maxSila = Math.floor(100 * sila / zkusenost);
+                i.cells[7].setAttribute("title", "Max síla stacku: " + maxSila);
+            }
         });
 
         // Okraje

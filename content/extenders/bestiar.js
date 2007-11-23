@@ -92,10 +92,12 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         var bestiar = {
-            tableNakup: tableNakup,
-            tableData: tableData,
-        
-            table: ElementDataStore.get(tableData)
+            vybraneJednotky: VybraneJednotky.get(page.id),
+            table: ElementDataStore.get(tableData),
+            elements: {
+                tableNakup: tableNakup,
+                tableData: tableData
+            }
         };
         
         // Zpracuj hlavicku (chyby v ni sloupec barva)
@@ -362,7 +364,7 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        var vybrane = VybraneJednotky.get(page.id);
+        var vybrane = page.bestiar.vybraneJednotky;
         
         // Zpracuj tabulku
         for (let i = 0; i < page.bestiar.table.data.length; i++) {
@@ -372,15 +374,16 @@ pageExtenders.add(PageExtender.create({
             if (td == null)
                 continue;
         
-            td.style.width = "48px";
+            td.style.width = "32px";
             td.innerHTML = "";
             
-            if (!row.bidnuto && row.linkNabidka != null && row.id != null) {
+            if (!row.bidnuto && row.linkNabidka != null && row.data.id != null) {
                 // Zamluvit jednotku pri kliknuti na cenu
                 row.linkNabidka.setAttribute("title", "Vybrat/Zamluvit jednotku");
                 
-                let zamluveno = false;
-                let bgcolor = row.element.getAttribute("bgcolor");
+                // Tohle ma za nasledek ze se vybrana jednotka odstrani az pri druhem kliknuti (po cerstvem refreshi)
+                // coz sice nebyl zamer ale je to tak lepsi, takze zachovat
+                let zamluveno = false; 
                 Event.observe(row.linkNabidka, 'click', function() {
                     if (!zamluveno) {
                         vybrane.add(row.data, row.description);
@@ -393,7 +396,7 @@ pageExtenders.add(PageExtender.create({
                         console.log("Jednotka odstranena z vybranych: %d", row.data.id);
                         vybrane.remove([row.data.id]);
                         
-                        row.element.setAttribute("bgcolor", bgcolor);
+                        row.element.setAttribute("bgcolor", "black");
                         zamluveno = false;
                     }
                 });
@@ -593,10 +596,10 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         // Ziskej vybrane jednotky
-        var jednotky = VybraneJednotky.get(page.id);
+        var jednotky = page.bestiar.vybraneJednotky;
         var vybrane = jednotky.getList();
         
-        var bidnuteJednotky = bestiar.table.bidnute.length > 0;
+        var bidnuteJednotky = page.bestiar.table.bidnute.length > 0;
         
         var vybraneIdList = new Array();
         if (!bidnuteJednotky) {
@@ -620,7 +623,7 @@ pageExtenders.add(PageExtender.create({
                     return $break;
                 }                    
             });
-                        
+
             if (jeVybrana) {
                 jednotky.add(row.data, row.description);
             
@@ -639,7 +642,7 @@ pageExtenders.add(PageExtender.create({
             jednotky.remove(vybraneIdList);
         }
         
-        context.fontKomentar = $X('tbody/tr[4]/td/font[2]', page.bestiar.tableNakup);
+        context.fontKomentar = $X('tbody/tr[4]/td/font[2]', page.bestiar.elements.tableNakup);
         if (context.fontKomentar == null)
             return false;
         
@@ -658,7 +661,7 @@ pageExtenders.add(PageExtender.create({
         });
         
         // Link pro odeslani zamluvenych jednotek
-        var trLast = $X('tbody/tr[last()]', page.bestiar.tableNakup);
+        var trLast = $X('tbody/tr[last()]', page.bestiar.elements.tableNakup);
         
         var trOdeslat = Element.create("tr", null, {bgcolor: "#505050"});
         var tdOdeslat = trOdeslat.appendChild(Element.create("td", null, {colspan: "3", style: "text-align: center;"}));
@@ -762,7 +765,7 @@ pageExtenders.add(PageExtender.create({
         });
         
         // Link "Zrus filtrovani" nad tabulkou
-        var tdNastaveniFiltru = $X('tbody/tr[2]/td[1 and contains(font, "Prosím")]', page.bestiar.tableNakup);
+        var tdNastaveniFiltru = $X('tbody/tr[2]/td[1 and contains(font, "Prosím")]', page.bestiar.elements.tableNakup);
         tdNastaveniFiltru.innerHTML = '';
         
         var spanFilterAktivovan = Element.create("span", '&nbsp;<span id="plus_filterAktivovan" class="small" style="display: none; color: yellow;">(filter aktivován)</span>&nbsp;', {class: "small"});
