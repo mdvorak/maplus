@@ -22,8 +22,10 @@ window.Poznamky = {
         Event.dispatch(poznamky, "change", true);
     },
 
-    init: function(value, onchange) {
+    init: function(value, radku, onchange) {
         var poznamky = $('plus_poznamky');
+        if (radku >= 1)
+            poznamky.setAttribute("rows", radku);
         poznamky.value = value || "";
 
         if (onchange) {

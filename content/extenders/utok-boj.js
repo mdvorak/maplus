@@ -175,6 +175,8 @@ pageExtenders.add(PageExtender.create({
 
 // Timer na odklik utoku
 pageExtenders.add(PageExtender.create({
+    LIMIT: 15000,
+
     getName: function() { return "Utok - Timer"; },
 
     analyze: function(page, context) {
@@ -187,22 +189,55 @@ pageExtenders.add(PageExtender.create({
 
     process: function(page, context) {
         var text = context.submit.value;
-        var cas = 8;
+        var limit = this.LIMIT;
+        
+        var format = function(zbyva) {
+            return " Prosím čekejte (" + Math.floor(zbyva / 1000) + "s)";
+        };
         
         var i = window.setInterval(function() {
-            if (context.submit.disabled && cas >= 0)
-                context.submit.value = " Prosím čekejte (" + cas-- + "s)";
-        }, 1000);
-        
-        setTimeout(function() {
-            context.submit.disabled = false;
-            context.submit.value = text;
-            window.clearInterval(i);
-        }, cas * 1000);
+            var cas = new Date().getTime() - new Date(document.lastModified).getTime();
+            
+            if (cas < limit - 250) {
+                context.submit.value = format(limit - cas);
+            }
+            else {
+                context.submit.disabled = false;
+                context.submit.value = text;
+                window.clearInterval(i);
+            }    
+        }, 500);
         
         context.submit.disabled = true;
-        context.submit.value = " Prosím čekejte (" + cas-- + "s)";
+        context.submit.value =  " Prosím čekejte ";
     }
+}));
+
+// Upozorneni pri utoku prilis malou armadou
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Utok - Timer"; },
+
+    analyze: function(page, context) {
+        if (page.name != "utok.html")
+            return false;
+    
+        var input = $X('.//input[@name = "celkove_procent_armady"]', page.content);
+        var old = window.change_sum_of_power;
+    
+        if (input == null || old == null)
+            return false;
+            
+        window.change_sum_of_power = function() {
+            old();
+            
+            if (parseFloat(input.value) < 95)
+                input.className = "nizkaSilaUtoku";
+            else
+                input.className = "";
+        };
+    },
+
+    process: null
 }));
 
 
@@ -245,7 +280,7 @@ pageExtenders.add(PageExtender.create({
 
 /** PersistentElements class **/
 
-var PersistentElementsCheck = {
+var PersistentElements = {
     initialize: function(element, config) {
         var name = element.name;
         var value = config.getPrefByName("pole", name);
@@ -301,75 +336,3 @@ var PersistentElementsCheck = {
         }
     }
 };
-
-var PersistentElementsTwoButtons = {
-    SAVE_IMG: '<img src="' + CHROME_CONTENT_URL + 'html/img/check.png" alt="" style="width: 13px; height: 13px;" class="link" />',
-    RESET_IMG: '<img src="' + CHROME_CONTENT_URL + 'html/img/reset.png" alt="" style="width: 13px; height: 13px;" class="link" />',
-
-    initialize: function(element, config) {
-        var name = element.name;
-        var value = config.getPrefByName("pole", name);
-        
-        // Create control elements
-        var control = Element.create("span", null, {style: "margin: 1px;"});
-        var save = control.appendChild(Element.create("a", this.SAVE_IMG, {href: "javascript://", title: "Uložit hodnotu."}));
-        var reset = control.appendChild(Element.create("a", this.RESET_IMG, {href: "javascript://", title: "Odstranit uloženou hodnotu."}));
-        
-        // This method will update element border according to persistance state
-        var updateStatus = function() {
-            if (value != null) {
-                if (element.value == value)
-                    element.style.borderColor = "green";
-                else
-                    element.style.borderColor = "blue";
-            }
-            else {
-                element.style.borderColor = "";
-            }
-        };
-        
-        // Set current value
-        if (value != null) {
-            console.debug("Setting field '%s' value to %o", name, value);
-        
-            element.value = value;
-            
-            try {
-                Event.dispatch(element, "change");
-            }
-            catch (ex) {
-                console.warn("Error invoking change event on control %o:\r\n%o", element, ex);
-            }   
-
-            updateStatus();
-        }
-                
-        // Control handlers
-        Event.observe(save, "click", function() {
-            value = element.value;
-            config.setPrefByName("pole", name, element.value);
-            updateStatus();
-        });
-        
-        Event.observe(reset, "click", function() {
-            value = null;
-            config.setPrefByName("pole", name, null);
-            updateStatus();
-        });
-
-        Event.observe(element, "change", function() { updateStatus(); });
-
-        // Insert control elements after data element        
-        element.parentNode.insertBefore(control, element.nextSibling);
-    },
-    
-    initializeList: function(list, config) {
-        for (var i = 0; i < list.length; i++) {
-            this.initialize(list[i], config);
-        }
-    }
-};
-
-
-// TODO vybrat si jednu moznost :)
-var PersistentElements = PersistentElementsCheck;

@@ -186,7 +186,7 @@ pageExtenders.add(PageExtender.create({
         // Odeslani posty
         Event.observe(controls.form, "submit", function(event) {
             // Odstraneni newline na zacatku a konci textu pri odeslani
-            var text = controls.textareaZprava.value.replace(/^\n+|\n{2,}$/, "");
+            var text = controls.textareaZprava.value.replace(/^\n+|\n{2,}$/g, "");
             
             // Upozorneni pri odesilani dlouhe zpravy
             var m = text.match(/\n/g);

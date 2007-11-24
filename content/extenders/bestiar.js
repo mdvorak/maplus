@@ -588,9 +588,6 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Bestiar - Vybrane jednotky"; },
 
     analyze: function(page, context) {
-        // TODO tohle trosku zefektivnit
-        // TODO preskakovat pouze radky ktere muzou byt duplicitni
-    
         // Bestiar
         if (!page.bestiar || !page.bestiar.table)
             return false;
@@ -645,6 +642,11 @@ pageExtenders.add(PageExtender.create({
         context.fontKomentar = $X('tbody/tr[4]/td/font[2]', page.bestiar.elements.tableNakup);
         if (context.fontKomentar == null)
             return false;
+            
+        context.form = $X('.//input[@type = "submit"]', page.bestiar.elements.tableNakup).form;
+        context.selectJednotka = $X('.//select[@name = "nabidnout"]', page.bestiar.elements.tableNakup);
+        if (context.form == null || context.selectJednotka == null)
+            return false;
         
         return true;
      },
@@ -653,6 +655,22 @@ pageExtenders.add(PageExtender.create({
         // Pridej komentar
         context.fontKomentar.appendChild(Element.create("br"));
         context.fontKomentar.appendChild(Element.create("span", "\xA0Zelené pozadí znamená, že jste o jednotku projevili zájem, ale nemáte ji bidnutou.\xA0", {"class": "small", style: "background-color: #013500;"}));
+     
+        // Pridej handler ktery vzdy prida jednotu do seznamu pri bidnuti
+        Event.observe(context.form, "submit", function(event) {
+            var id = parseInt(context.selectJednotka.value);
+            if (id > 0) {
+                // Musime najit informace o jednotce
+                var rows = page.bestiar.table.data;
+                for (var i = 0; i < rows.length; i++) {
+                    if (id == rows[i].data.id) {
+                        // Uloz a return
+                        page.bestiar.vybraneJednotky.add(rows[i].data, rows[i].description);
+                        return;
+                    }
+                }
+            }
+        });
      
         // Uprav pozadi
         context.list.each(function(row) {
@@ -820,6 +838,7 @@ pageExtenders.add(PageExtender.create({
                             if (r.condition != "") {
                                 // Vychozi razeni vloz na zacatek retezce
                                 if (r.type == "sort" && !config.hasRules("sort")) {
+                                    config.setRule("id", "sort", "stack1.id - stack2.id");
                                     config.setRule(DEFAULT_SORT_NAME, "sort", DEFAULT_SORT_CONDITION);
                                 }
                                 

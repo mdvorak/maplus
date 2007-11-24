@@ -458,7 +458,6 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-
 // Cerpani
 pageExtenders.add(PageExtender.create({
     CERPAT: 10000000,
@@ -491,5 +490,53 @@ pageExtenders.add(PageExtender.create({
         
         context.fontSubmit.appendChild(document.createTextNode('\xA0'));
         context.fontSubmit.appendChild(btn);
+    }
+}));
+
+// Linky na dalsi cerpani
+pageExtenders.add(PageExtender.create({
+    CERPAT: 10000000,
+           
+    getName: function() { return "Aliance - Cerpano"; },
+
+    analyze: function(page, context) {
+        var typStranky = page.arguments["aliance"];
+        if (typStranky != null) // Cerpa se vzdy pres POST
+            return false;
+        
+        // Zjisti jestli opravdu bylo cerpano    
+        var fontZprava = $X('font[starts-with(., "ID ")]', page.content);
+        if (fontZprava == null || !fontZprava.textContent.match(/^ID\s.*?\sposlal\(a\)\s\d+\s\w+$/))
+            return false;
+            
+        // Najdi moje aliance a jejich jmena
+        var moje = page.config.getRegent().getPrefNode("aliance", true).evalPrefNodeList("id");
+        if (moje.length == 0)
+            return false;
+           
+        context.aliance = new Array(); 
+        moje.each(function(cfg) {
+            var id = cfg.getNumber();
+            var a = MaData.najdiAlianci(null, id);
+                
+            context.aliance.push({
+                id: id,
+                jmeno: (a != null ? a.jmeno : id)
+            });
+        });        
+        
+        return context.aliance.length > 0;
+    },
+    
+    process: function(page, context) {
+        page.content.appendChild(Element.create("br"));
+    
+        context.aliance.each(function(i) {
+            page.content.appendChild(Element.create("br"));
+            
+            var url = MaPlus.buildUrl(page, "aliance.html", {aliance: "cerpani_" + i.id});
+            var link = Element.create("a", '<span>Znovu čerpat v alianci ' + i.jmeno + '</span>', {href: url});
+            page.content.appendChild(link);
+        });
     }
 }));

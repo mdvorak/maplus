@@ -172,9 +172,10 @@ pageExtenders.add(PageExtender.create({
 
         var cfg = context.poznamky;
         var tracker = 0;
+        var radku = parseInt(cfg.getAttribute("radku"));
         
         // Definovano v html
-        Poznamky.init(cfg.getPref("text", ""), function(e) {
+        Poznamky.init(cfg.getPref("text", ""), radku, function(e) {
             if (e.type == "change") {
                 var id = ++tracker;
                 // Tohle zajisti update ale nebude ho spamovat pri kazdy klavese 
