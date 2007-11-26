@@ -1,0 +1,53 @@
+﻿<table cellpadding="0" cellspacing="0" style="margin: 5px 0px 5px 0px;">
+<tbody>
+    <tr>
+        <td><span class="">Důležitost&nbsp;&nbsp;</span></td>
+    
+        <td><span class="small">Normální&nbsp;</span></td>
+        <td><input dulezitost="normalni" type="radio" name="dulezitostZpravy" checked="checked" title="Běžná zpráva" /></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><span class="small">Vysoká&nbsp;</span></td>
+        <td><input dulezitost="dulezite" type="radio" name="dulezitostZpravy" title="Důležitá zpráva má červenou hlavičku." /></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><span class="small">Nízká&nbsp;</span></td>
+        <td><input dulezitost="spam" type="radio" name="dulezitostZpravy" title="Zpráva s nízkou důležitostí. Po uplynutí její platnosti se vždy zobrazí sbalená. (Standartní platnost zprávy je 1,5 hod)" /></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><span class="small">Bestiář&nbsp;</span></td>
+        <td><input dulezitost="bestiar" type="radio" name="dulezitostZpravy" title="Informace o bidování jednotek v bestiáři. Zpráva má zelenou hlavičku a platnost jednu hodinu. Po uplynutí platnosti je zpráva automaticky skryta." /></td>
+    </tr>
+</tbody>
+</table>
+<script type="text/javascript">
+window.DulezitostZpravy = {
+    get: function() {
+        var list = $XL('//input[@dulezitost]');
+        
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].checked)
+                return list[i].getAttribute("dulezitost");
+        }
+        
+        return this._unsupportedValue;
+    },
+    
+    set: function(value) {
+        if (value == null)
+            value = "normalni";
+    
+        var input = $X('//input[@dulezitost = "' + value + '"]');
+        if (input != null) {
+            input.checked = true;
+        }
+        else {
+            console.debug("Nepodporovana dulezitost: %s", value);
+            this._unsupportedValue = value;
+        }
+    }
+};
+</script>

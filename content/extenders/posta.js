@@ -76,9 +76,10 @@ pageExtenders.add(PageExtender.create({
             return false;
         }
         
-        controls.form = controls.textareaZprava.form;
-        
+        controls.form = controls.textareaZprava.form        
         context.controls = controls;
+        
+        context.extendHtml = Chrome.loadText("html/postapsat.html");
         return true;
     },
     
@@ -158,30 +159,32 @@ pageExtenders.add(PageExtender.create({
         }
         
         // Dulezitost
-        var spanDulezitost = Element.create("span", 'důležitá zpráva&nbsp;');
-        var inputDulezita = spanDulezitost.appendChild(Element.create("input", null, {type: "checkbox"}));
+        var vybranaDulezitost = function() { return null; }
         
-        if (dulezitost == "dulezite") {
-            inputDulezita.checked = true;
-            dulezitost = null;
-        }
+        if (context.extendHtml != null) {
+            // Pridej na spravne misto
+            var spanDulezitost = Element.create("span", context.extendHtml);
             
-        var vybranaDulezitost = function() {
-            if (inputDulezita.checked)
-                return ":!!!DULEZITE!!!";
-            return (dulezitost != null) ? ":" + dulezitost : null;
-        };
-        
-        var elem = controls.inputOdeslat.nextSibling;
-        if (elem != null) {
-            controls.inputOdeslat.parentNode.insertBefore(Element.create("br"), elem);
-            controls.inputOdeslat.parentNode.insertBefore(spanDulezitost, elem);
+            var elem = controls.inputOdeslat.nextSibling;
+            if (elem != null) {
+                if (elem.tagName == "BR")
+                    elem.style.display = "none";
+                controls.inputOdeslat.parentNode.insertBefore(spanDulezitost, elem);
+            }
+            else {
+                controls.inputOdeslat.parentNode.appendChild(spanDulezitost);
+            }
+            
+            // Nadefinuj funcknost
+            window.DulezitostZpravy.set(dulezitost);
+            
+            vybranaDulezitost = function() {
+                var d = window.DulezitostZpravy.get();
+                if (d == "dulezite") d = "!!!DULEZITE!!!";
+                else if (d == "normalni") d = null;
+                return d;
+            }
         }
-        else {
-            controls.inputOdeslat.parentNode.appendChild(Element.create("br"));
-            controls.inputOdeslat.parentNode.appendChild(spanDulezitost);
-        }
-        
         
         // Odeslani posty
         Event.observe(controls.form, "submit", function(event) {
@@ -200,7 +203,7 @@ pageExtenders.add(PageExtender.create({
             // Pridani dulezitosti
             var d = vybranaDulezitost();
             if (d != null) {
-                text = d + '\n' + text;
+                text = ":" + d + "\n" + text;
             }
             
             controls.textareaZprava.value = text;
