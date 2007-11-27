@@ -90,7 +90,7 @@ img.link
 
 .zprava_dulezita { background-color: #700000; }
 .zprava_bestiar { background-color: #013000; }
-.zprava_spam { color: #909090; }
+.zprava_spam { }
 .zprava_spam_verejna { background-color: #160A31; }
 .zprava_spam_tajna { background-color: #301010; }
 

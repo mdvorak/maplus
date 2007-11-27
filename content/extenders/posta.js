@@ -562,9 +562,10 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-// Sbaleni dlouhych zprav
+
+// Analyza dlouhych zprav
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Posta - Sbaleni"; },
+    getName: function() { return "Posta - Analyza dlouhych zprav"; },
 
     analyze: function(page, context) {
         if (page.posta == null || page.posta.zpravy == null)
@@ -574,9 +575,7 @@ pageExtenders.add(PageExtender.create({
         if (!(context.maxRadku > 0))
             return false;
     	
-    	context.zobrazRadku = Math.max(context.maxRadku - 5, 1);
-    	context.dlouheZpravy = new Array();
-    	
+    	var zobrazRadku = Math.max(context.maxRadku - 5, 1);
     	var nebalitZpravyOdPosla = page.posta.config.getBoolean("nebalitPosla", false);
     	
     	// Najdi zpravy s velkym poctem radku
@@ -585,7 +584,7 @@ pageExtenders.add(PageExtender.create({
     		if (zprava.typ == "posel" && (nebalitZpravyOdPosla || page.arguments["posta"] == "nova"))
     			return; // continue
     	
-    	    var radku = 0;
+    	    zprava.radku = 0;
     	    var zlom = null;
     	
     	    for (var i = 0; i < zprava.fontText.childNodes.length; i++) {
@@ -593,62 +592,111 @@ pageExtenders.add(PageExtender.create({
     	        
     	        // Pripocti radky
     	        if (String.equals(element.tagName, "br", true))
-    	            radku++;
+    	            zprava.radku++;
     	        else if (element.firstChild != null)
-    	            radku += XPath.evalNumber('count(.//br)', element);
+    	            zprava.radku += XPath.evalNumber('count(.//br)', element);
     	        
     	        // Oznac zlomovy element
-    	        if (zlom == null && radku > context.zobrazRadku)
+    	        if (zlom == null && zprava.radku > zobrazRadku)
                     zlom = element;
     	        
     	        // Nepokracuj v analyze pokud je zprava dlouha
-    	        if (radku > context.maxRadku)
+    	        if (zprava.radku > context.maxRadku)
     	            break;
     	    }
     	
-    	
-    	    if (zlom != null && radku > context.maxRadku) {
-     	    	context.dlouheZpravy.push({
-    	    		zprava: zprava,
-    	    		zlom: zlom
-    	    	});
-    	    	
-    	    	console.log("Zprava %d je dlouha.", zprava.id);
+    	    if (zlom != null && zprava.radku > context.maxRadku) {
+    	        zprava.dlouha = true;
+    	        zprava.zlom = zlom;
+    	    
+    	    	console.log("Zprava %d je dlouha (%d radku).", zprava.id, zprava.radku);
     	    }
     	});
-    	
-    	// Najdi zpravy s dulezitosti SPAM ktere uz vyprseli
-    	var maxStariSpamu = page.posta.config.getNumber("maxStariSpamu", 30*60) * 1000; // default=30min
+    },
+    
+    process: null
+}));
 
-    	if (maxStariSpamu > 0) {
-    	    var aktualniCas = new Date().getTime();
-        	
-    	    page.posta.zpravy.each(function(zprava) {
-    	        var stari = (aktualniCas - zprava.cas.getTime());
-    	        // Zjisti jestli zprava je prosly spam
-                if (zprava.dulezitost == "spam" && stari > maxStariSpamu && XPath.evalNumber('count(br)', zprava.fontText).length > 3) {
-                    // Najdi zlom
-                    var zlom = $X('br[1]', zprava.fontText);
-                    
-    		        if (zlom != null) {
-    		            context.dlouheZpravy.push({
-    	    		        zprava: zprava,
-    	    		        zlom: zlom
-    	    	        });
-    		        }
-    		    
-    		        console.log("Zprava %d je prosly spam (stari %ds)", zprava.id, stari);
-    		    }
-    	    });
-    	}
-    	
-    	return context.dlouheZpravy.length > 0;
+
+// Skryj/sbal zpravy
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Posta - Skryt/sbalit neaktualni zpravy"; },
+
+    analyze: function(page, context) {
+    	if (page.posta == null || page.posta.zpravy == null)
+            return false;
+        if (page.posta.zpravy.length == 0)
+            return false;
+        
+        var aktualniCas = new Date().getTime();
+        var maxStariSpamu = page.posta.config.getNumber("maxStariSpamu", 60*60) * 1000; // default=60min
+        var maxStariBestiar = page.posta.config.getNumber("maxStariBestiar", 30*60) * 1000; // default=30min
+        
+        context.skryt = new Array();
+        context.sbalit = new Array();
+        
+        var predchoziZprava = null;
+        
+        page.posta.zpravy.each(function(zprava) {
+            var stari = (aktualniCas - zprava.cas.getTime());
+            
+            if (zprava.dulezitost == "bestiar") {
+                if (stari < maxStariBestiar)
+                    return; // continue;
+                
+                console.log("Zprava %d vyprsela a bude skryta.", zprava.id);
+                
+                zprava.skryta = true;
+                context.skryt.push(zprava);
+            }
+            else if (zprava.dulezitost == "spam") {
+                if (stari < maxStariSpamu || zprava.radku < 4)
+                    return;
+                
+                zprava.zlom = $X('br[2]');
+                if (zprava.zlom == null)
+                    return;
+                
+                console.log("Zprava %d vyprsela a bude sbalena.", zprava.id);
+                zprava.balici = true;
+                context.sbalit.push(zprava);
+            }
+            else if (zprava.dlouha) {
+                console.log("Zprava %d je prilis dlouha a bude sbalena.", zprava.id);
+                
+                zprava.balici = true;
+                context.sbalit.push(zprava);
+            }
+            
+            // TODO sblizit zpravy spamu
+            
+            predchoziZprava = zprava;
+        });
+        
+		return true;
     },
     
     process: function(page, context) {
-    	context.dlouheZpravy.each(function(i) {
-    		var zprava = i.zprava;
-    		var zlom = i.zlom;
+        var skryteElementy = new Array();
+    
+        context.skryt.each(function(zprava) {
+            var parent = zprava.element.parentNode;
+            
+            // Odstran volne radky za zpravou    
+            while (zprava.element.nextSibling != null && zprava.element.nextSibling.tagName == "BR") {
+                skryteElementy.push(zprava.element.nextSibling);
+                zprava.element.nextSibling.style.display = "none";
+            }
+            
+            // Odstran samotnou zpravu
+            skryteElementy.push(zprava.element);
+            zprava.element.style.display = "none";
+            
+            console.log("Skryta zprava %d", zprava.id);
+        });
+        
+        context.sbalit.each(function(zprava) {
+    		var zlom = zprava.zlom;
     		
     		// Link v hlavicce
     		var linkHeaderRozbalit = Element.create("a", "Rozbalit", {href: "javascript://"});
@@ -690,57 +738,16 @@ pageExtenders.add(PageExtender.create({
     		var header = zprava.linkPredat.parentNode;
 			header.insertBefore(document.createTextNode("\xA0"), header.firstChild);
 			header.insertBefore(linkHeaderRozbalit, header.firstChild);
+			
+            console.log("Sbalena zprava %d", zprava.id);
     	});
     	
-    	// TODO Sbalit vse
+    	if (skryteElementy.length > 0) {
+            // TODO link na zobrazeni skrytych elementu
+        }
     }
 }));
 
-// Skryj stare zpravy bestiare (zatim jen v novych zpravach)
-pageExtenders.add(PageExtender.create({
-    getName: function() { return "Posta - Skryt zpravy bestiare"; },
-
-    analyze: function(page, context) {
-        if (page.arguments["posta"] != "nova")
-            return false;
-    	if (page.posta == null || page.posta.zpravy == null)
-            return false;
-        if (page.posta.zpravy.length == 0)
-            return false;
-        
-        var aktualniCas = new Date().getTime();
-        context.skryt = new Array();
-        
-        page.posta.zpravy.each(function(zprava) {
-            if (zprava.dulezitost != "bestiar")
-                return; // continue;
-            
-            var stari = (aktualniCas - zprava.cas.getTime());
-            if (stari < 30*60000) // 30 min
-                return; // continue;
-            
-            context.skryt.push(zprava);
-            zprava.skryta = true;
-        });
-        
-		return context.skryt.length > 0;
-    },
-    
-    process: function(page, context) {
-        context.skryt.each(function(zprava) {
-            var parent = zprava.element.parentNode;
-            
-            // Odstran volne radky za zpravou    
-            while (zprava.element.nextSibling != null && zprava.element.nextSibling.tagName == "BR")
-                parent.removeChild(zprava.element.nextSibling);
-            
-            // Odstran samotnou zpravu
-            parent.removeChild(zprava.element);
-            
-            console.log("Odstranena zprava %d", zprava.id);
-        });
-    }
-}));
 
 // Smazat specificke typy zprav
 pageExtenders.add(PageExtender.create({
@@ -775,44 +782,3 @@ pageExtenders.add(PageExtender.create({
         page.content.appendChild(Element.create("div", context.ovladaniHtml));
     }
 }));
-
-// Zvyrazni moje jmeno a id
-/*
-pageExtenders.add(PageExtender.create({
-    getName: function() { return "Posta -  Zvyrazneni regenta"; },
-
-    analyze: function(page, context) {
-    	if (page.posta == null || page.posta.zpravy == null)
-            return false;
-        if (page.posta.zpravy.length == 0)
-            return false;
-        
-        var replaceList = new Array();
-        var xpath = './/text()[contains(., "' + page.regent.jmeno + '") or contains(., "' + page.regent.id + '")]';
-        var regexString = "\\b" + page.regent.jmeno + "\\b|\\b" + page.regent.id + "\\b";
-        
-        page.posta.zpravy.each(function(zprava) {
-            var list = $XL(xpath, zprava.fontText);
-            
-            list.each(function(i) {
-                var regex = new RegExp(regexString, "gi");
-                var result = new Array();
-                var m = null;
-            
-                while (m = regex.exec(i.nodeValue))
-                    result.push({start: regex.lastIndex, end: (regex.lastIndex + m[0].length)});
-                    
-                if (result.length > 0)
-                    replaceList.push({textNode: i, result: result});
-            });            
-        });        
-        
-        context.list = replaceList;
-		return replaceList.length > 0;
-    },
-    
-    process: function(page, context) {
-    
-    }
-}));
-*/
