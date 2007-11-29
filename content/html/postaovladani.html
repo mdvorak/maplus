@@ -32,7 +32,7 @@
             
             <td><img width="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
             
-            <td><span class="small">Důležitá</span></td>
+            <td><span class="small">Vysoká</span></td>
             <td><input id="plus_dulezita" type="checkbox" /></td>
         </tr>
         <tr>
@@ -41,14 +41,17 @@
             
             <td><img width="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
             
-            <td><span class="small">Bestiář</span></td>
-            <td><input id="plus_bestiar" type="checkbox" checked="checked" /></td>
+            <td><span class="small">Nízká</span></td>
+            <td><input id="plus_spam" type="checkbox" checked="checked" /></td>
         </tr>
         <tr>
             <td><span class="small">Tajná aliance</span></td>
             <td><input id="plus_tajna" type="checkbox" checked="checked" /></td>
             
             <td><img width="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span class="small">Bestiář</span></td>
+            <td><input id="plus_bestiar" type="checkbox" checked="checked" /></td>
         </tr>
         
         <script type="text/javascript">
@@ -64,6 +67,7 @@
                 
                 if ($('plus_normalni').checked) dulezitosti.push(null);
                 if ($('plus_dulezita').checked) dulezitosti.push("dulezite");
+                if ($('plus_spam').checked) dulezitosti.push("spam");
                 if ($('plus_bestiar').checked) dulezitosti.push("bestiar");
                 
                 return { 

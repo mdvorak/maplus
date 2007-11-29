@@ -682,10 +682,12 @@ pageExtenders.add(PageExtender.create({
         context.skryt.each(function(zprava) {
             var parent = zprava.element.parentNode;
             
-            // Odstran volne radky za zpravou    
-            while (zprava.element.nextSibling != null && zprava.element.nextSibling.tagName == "BR") {
-                skryteElementy.push(zprava.element.nextSibling);
-                zprava.element.nextSibling.style.display = "none";
+            // Odstran volne radky za zpravou
+            var elem = zprava.element.nextSibling;
+            while (elem != null && elem.tagName == "BR") {
+                skryteElementy.push(elem);
+                elem.style.display = "none";
+                elem = elem.nextSibling;
             }
             
             // Odstran samotnou zpravu
@@ -743,7 +745,16 @@ pageExtenders.add(PageExtender.create({
     	});
     	
     	if (skryteElementy.length > 0) {
-            // TODO link na zobrazeni skrytych elementu
+    	    var text = 'Některým zprávám (' + skryteElementy.length + ') vypršela platnost a byly skryty.'
+    	             + ' Klikněte <a id="plus_zobrazitZpravy" href="javascript://">zde</a> pro jejich zobrazení.';
+    	    var upozorneni = MaPlusMenu.zobrazUpozorneni(text);
+    	    
+    	    var linkZobrazit = $('plus_zobrazitZpravy');
+    	    Event.observe(linkZobrazit, "click", function(event) {
+    	        skryteElementy.each(function(i) { i.style.display = ""; });
+    	        upozorneni.style.display = "none";
+    	        console.log("Skryté zprávy byly zobrazeny.");
+    	    });
         }
     }
 }));
