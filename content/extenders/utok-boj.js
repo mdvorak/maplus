@@ -175,7 +175,7 @@ pageExtenders.add(PageExtender.create({
 
 // Timer na odklik utoku
 pageExtenders.add(PageExtender.create({
-    LIMIT: 10000,
+    LIMIT: 8000,
 
     getName: function() { return "Utok - Timer"; },
 
