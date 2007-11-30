@@ -629,8 +629,8 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         var aktualniCas = new Date().getTime();
-        var maxStariSpamu = page.posta.config.getNumber("maxStariSpamu", 60*60) * 1000; // default=60min
-        var maxStariBestiar = page.posta.config.getNumber("maxStariBestiar", 30*60) * 1000; // default=30min
+        var maxStariSpamu = page.posta.config.getNumber("maxStariSpamu", 90*60) * 1000; // default=90min
+        var maxStariBestiar = page.posta.config.getNumber("maxStariBestiar", 45*60) * 1000; // default=45min
         
         context.skryt = new Array();
         context.sbalit = new Array();
