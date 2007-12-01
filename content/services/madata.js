@@ -42,10 +42,10 @@ var MaData = {
         
         // Zkontroluj vek
         this.vek = this.data.getPref("vek");
-        if (this.vek != AGE_NAME) {
+        if (this.vek != MaPlus.getAgeName()) {
             // Pokud vek nesouhlasi, smazej ulozena data
             this.data = XmlConfig.createEmpty("data");
-            this.data.setPref("vek", AGE_NAME);
+            this.data.setPref("vek", MaPlus.getAgeName());
         }
         
         this.seznamProvincii = this.data.getPrefNode("seznamProvincii", true);

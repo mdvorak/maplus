@@ -50,6 +50,13 @@ var MaPlus = {
         }
         
         return path;
+    },
+    
+    getAgeName: function() {
+        if (this._ageName == null) {
+            this._ageName = WebExtenderPreferences.getBranch().getCharPref("age_name");
+        }
+        return this._ageName;
     }
 };
 

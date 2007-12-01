@@ -41,12 +41,12 @@ XmlConfigNode.Extended.useExtension();
 
 // Validace na vek
 function ageValidator(root) {
-    if (root.getAttribute("vek") != null && root.getAttribute("vek") != AGE_NAME) {
+    if (root.getAttribute("vek") != null && root.getAttribute("vek") != MaPlus.getAgeName()) {
         // Odstran veskera nastaveni
         while (root.firstChild != null)
             root.removeChild(root.firstChild);
     }
-    root.setAttribute("vek", AGE_NAME);
+    root.setAttribute("vek", MaPlus.getAgeName());
 }
 
 // Vytvor a registruj sluzby
