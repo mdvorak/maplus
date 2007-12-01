@@ -172,7 +172,7 @@ pageExtenders.add(PageExtender.create({
 
         var cfg = context.poznamky;
         var tracker = 0;
-        var radku = parseInt(cfg.getAttribute("radku"));
+        var radku = cfg.getNumber("radku", 5);
         
         // Definovano v html
         Poznamky.init(cfg.getPref("text", ""), radku, function(e) {

@@ -5,6 +5,11 @@ td.nadpis
     border-bottom-color: #2A2A2A;
     border-bottom-style: solid;
 }
+input.number
+{
+	width: 47px; 
+	margin-left: 4px;
+}
 </style>
 <script type="text/javascript" src="chrome://maplus/content/html/tabmanager.js" charset="UTF-8"></script>
 
@@ -50,7 +55,7 @@ window.nastaveniManager = new TabManager('n_container');
         <tr>
             <td><span>Limit tahů bez potvrzení</span></td>
             <td>
-                <input type="text" style="width: 50;"
+                <input type="text" class="number"
                     onload="this.value = this.config.getNumber('maxTahu', MAX_TAHU_DEFAULT);"
                     onsave="this.config.setPref('maxTahu', parseInt(this.value));" />
             </td>
@@ -119,6 +124,25 @@ nastaveniManager.addTab("Obecné", "n_obecne");
             </td>
         </tr>
         <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        
+        
+        
+        <tr>
+            <td><span></span></td>
+            <td>
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span>Počet řádků poznámek</span></td>
+            <td>
+                <input type="text" class="number"
+                    onload="this.value = this.config.getMenu().getPrefNode('poznamky', true).getNumber('radku', 5);"
+                    onsave="this.config.getMenu().getPrefNode('poznamky', true).setPref('radku', this.value);" />
+            </td>
+        </tr>
+        <tr><td colspan="2"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        
         
         <!-- Sem patri dalsi nastaveni -->
         
@@ -230,7 +254,7 @@ nastaveniManager.addTab("Menu", "n_menu");
         <tr>
             <td><span>Max řádků dlouhé zprávy</span></td>
             <td>
-                <input type="text" style="width: 50;"
+                <input type="text" class="number"
                     onload="this.value = this.config.getPrefNode('posta', true).getNumber('maxRadku', MAX_RADKU_DEFAULT);"
                     onsave="this.config.getPrefNode('posta', true).setPref('maxRadku', this.value);" />
             </td>
@@ -257,7 +281,7 @@ nastaveniManager.addTab("Menu", "n_menu");
             <td><span></span></td>
             <td>
                 <!--
-                <input type="text" style="width: 50;"
+                <input type="text" class="number"
                     onload="this.value = this.config.getPrefNode('posta', true).getNumber('maxRadku', MAX_RADKU_DEFAULT);"
                     onsave="this.config.getPrefNode('posta', true).setPref('maxRadku', this.value);" />
                 -->
@@ -267,7 +291,7 @@ nastaveniManager.addTab("Menu", "n_menu");
             <!--
             <td><span>Maximální stáří spamu (minuty)</span></td>
             <td>
-                <input type="text"
+                <input type="text" class="number"
                     onload="this.value = this.config.getPrefNode('posta', true).getNumber('maxStariSpamu', 30);"
                     onsave="this.config.getPrefNode('posta', true).setPref('maxStariSpamu', parseInt(this.value) * 60);" />
             </td>
