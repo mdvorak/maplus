@@ -481,7 +481,7 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         var _this = this;
-        var btn = Element.create("input", null, {type: "button", value: "\xA0Čerpat maximum\xA0"});
+        var btn = Element.create("input", null, {type: "button", value: "\xA0Čerpat maximum\xA0", title: "Pokusí se čerpat 1000000"});
         
         Event.observe(btn, 'click', function() {
             context.inputKolik.value = _this.CERPAT;
@@ -495,8 +495,6 @@ pageExtenders.add(PageExtender.create({
 
 // Linky na dalsi cerpani
 pageExtenders.add(PageExtender.create({
-    CERPAT: 10000000,
-           
     getName: function() { return "Aliance - Cerpano"; },
 
     analyze: function(page, context) {
