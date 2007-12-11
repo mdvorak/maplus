@@ -640,26 +640,20 @@ pageExtenders.add(PageExtender.create({
         page.posta.zpravy.each(function(zprava) {
             var stari = (aktualniCas - zprava.cas.getTime());
             
-            if (zprava.dulezitost == "bestiar") {
-                if (stari < maxStariBestiar)
-                    return; // continue;
-                
+            if (zprava.dulezitost == "bestiar" && stari > maxStariBestiar) {
                 console.log("Zprava %d vyprsela a bude skryta.", zprava.id);
                 
                 zprava.skryta = true;
                 context.skryt.push(zprava);
             }
-            else if (zprava.dulezitost == "spam") {
-                if (stari < maxStariSpamu || zprava.radku < 4)
-                    return;
-                
+            else if (zprava.dulezitost == "spam" && stari > maxStariSpamu && zprava.radku > 3) {
                 zprava.zlom = $X('br[2]');
-                if (zprava.zlom == null)
-                    return;
-                
-                console.log("Zprava %d vyprsela a bude sbalena.", zprava.id);
-                zprava.balici = true;
-                context.sbalit.push(zprava);
+                if (zprava.zlom != null) {
+                    console.log("Zprava %d vyprsela a bude sbalena.", zprava.id);
+                    
+                    zprava.balici = true;
+                    context.sbalit.push(zprava);
+                }
             }
             else if (zprava.dlouha) {
                 console.log("Zprava %d je prilis dlouha a bude sbalena.", zprava.id);
