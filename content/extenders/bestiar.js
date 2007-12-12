@@ -598,45 +598,48 @@ pageExtenders.add(PageExtender.create({
         
         var bidnuteJednotky = page.bestiar.table.bidnute.length > 0;
         
-        var vybraneIdList = new Array();
-        if (!bidnuteJednotky) {
-            vybrane.each(function(j) {
-                vybraneIdList.push(j.id);
-            });
-        }
+        var vybraneMap = new Hash();
+        vybrane.each(function(j) {
+            vybraneMap[j.id] = j;
+        });
         
         // Vytvor seznam vybranych radku
         context.list = new Array();
+        var descriptors = new Array();
         
         page.bestiar.table.data.each(function(row) {
+            if (bidnuteJednotky)
+                descriptors.push(BestiarStack.getDescriptor(row.data));
+        
             if (row.data.id == null)
                 return; // continue;
         
-            var jeVybrana = false;
-            
-            vybrane.each(function(j) {
-                if (j.id == row.data.id) {
-                    jeVybrana = true;
-                    return $break;
-                }                    
-            });
-
-            if (jeVybrana) {
+            if (row.data.id in vybraneMap) {
                 jednotky.add(row.data, row.description);
             
                 console.log("Vybrana jednotka: %d", row.data.id);
                 context.list.push(row);
                 
                 // Odstran ze seznamu
-                if (!bidnuteJednotky)
-                    vybraneIdList = vybraneIdList.without(row.data.id);
+                delete vybraneMap[row.data.id];
             }
         });
         
+        // Zjisti jestli bidnute vybrane jednotky jeste muzou existovat
+        if (bidnuteJednotky) {
+            vybraneMap.each(function([id, j]) {
+                var desc = BestiarStack.getDescriptor(j);
+                // Pokud jednotka se stejnym deskriptorem jeste muze existovat, odstran ji ze seznamu
+                // aby nebyla odstranena z vybranych jednotek..
+                if (descriptors.indexOf(desc) > -1)
+                    delete vybraneMap[id];
+            });
+        }
+        
         // Odstran neexistujici jednotky
-        if (vybraneIdList.length > 0) {
-            console.debug("Odstranuji se: %o", vybraneIdList);
-            jednotky.remove(vybraneIdList);
+        if (vybraneMap.length > 0) {
+            console.debug("Odstranuji se: %o", vybraneMap.keys());
+            jednotky.remove(vybraneMap.keys());
         }
         
         context.fontKomentar = $X('tbody/tr[4]/td/font[2]', page.bestiar.elements.tableNakup);

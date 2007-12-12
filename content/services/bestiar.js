@@ -135,7 +135,7 @@ VybraneJednotkyCollection.prototype = {
             };
         
             // Novy stack
-            this._map["" + jednotka.id] = jednotka;
+            this._map[jednotka.id] = jednotka;
             this._list.push(jednotka);
         }
         else {
@@ -153,12 +153,12 @@ VybraneJednotkyCollection.prototype = {
         
         var _this = this;
         idList.each(function(id) {
-            var j = _this._map["" + id];
+            var j = _this._map[id];
             if (j == null)
                 return; // continue;
                 
             removeList.push(j);
-            delete _this._map["" + id];
+            delete _this._map[id];
         });
         
         this._list = this._list.without.apply(this._list, removeList);
@@ -179,11 +179,11 @@ var VybraneJednotky = {
     get_PROXY: Marshal.BY_REF,
     get_PROXY_CACHED: true,
     get: function(id) {
-        var list = this._map["" + id];
+        var list = this._map[id];
         
         if (list == null) {
             list = new VybraneJednotkyCollection();
-            this._map["" + id] = list;
+            this._map[id] = list;
         }
         
         return list;

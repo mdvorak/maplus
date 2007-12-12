@@ -50,6 +50,13 @@ function formatTime(totalSeconds) {
     return m + ":" + (s < 10 ? "0" + s : s)
 }
 
+/*** BestiarStack class ***/
+var BestiarStack = {
+    getDescriptor: function(data) {
+        return data.jmeno + "_" + data.pocet + "_" + data.zkusenost;
+    }
+};
+
 /*** Implementace pravidel ***/
 var Rules = {
     sort: function(/* table, rules, regent, provincie */) {

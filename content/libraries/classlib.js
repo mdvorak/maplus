@@ -83,4 +83,3 @@ Object.extend(LinkData, {
         configNode.setAttribute("barva", (linkData.barva != null) ? linkData.barva : null);
     }
 });
-
