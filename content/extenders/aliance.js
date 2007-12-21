@@ -34,6 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+
 // Analyza alianci kde sem clenem
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Aliance - Moje"; },
@@ -264,6 +265,13 @@ pageExtenders.add(PageExtender.create({
             presvedceni = provincie.presvedceni;
         }
         
+        // Shromazdeni dat o alianci
+        page.aliance = {
+            id: idAliance,
+            jmeno: jmenoAliance,
+            clenove: new Array()
+        }
+        
         // Projdi cleny
         var clenovePuvodni = MaData.clenoveAliance(jmenoAliance);
         context.idClenu = new Array();
@@ -283,6 +291,17 @@ pageExtenders.add(PageExtender.create({
             
             // Pro aktivni id
             context.idClenu.push({ element: tr.cells[0], id: id});
+            
+            // Pro hlidku
+            var sila = parseInt(tr.cells[3].textContent.replace(/^\s*Síla\s+P.s*/, ""));
+            
+            console.log("Clen aliance: id=%d regent=%s provincie=%s sila=%d", id, regent, provincie, sila);
+            page.aliance.clenove.push({
+                id: id,
+                regent: regent,
+                provincie: provincie,
+                sila: sila
+            });
         }
         
         // Zrus ji provinciim ktere uz tam nejsou
@@ -348,6 +367,13 @@ pageExtenders.add(PageExtender.create({
         // Analyza
         var clenovePuvodni = MaData.clenoveAliance(jmenoAliance);
         
+        // Shromazdeni dat o alianci
+        page.aliance = {
+            id: idAliance,
+            jmeno: jmenoAliance,
+            clenove: new Array()
+        }
+        
         // Vytvor seznam radku se clenama
         rows.each(function(tr) {
             var link = $X('td[3]/font/a', tr);
@@ -361,6 +387,18 @@ pageExtenders.add(PageExtender.create({
             
             clenovePuvodni = clenovePuvodni.without(id);
             MaData.aktualizujProvincii(id, regent, provincie, povolani, presvedceni, jmenoAliance);
+            
+            // Pro hlidku
+            var sila = parseInt(tr.cells[6].textContent);
+            
+            console.log("Clen aliance: id=%d regent=%s provincie=%s sila=%d povolani=%d", id, regent, provincie, sila, povolani);
+            page.aliance.clenove.push({
+                id: id,
+                regent: regent,
+                provincie: provincie,
+                povolani: povolani,
+                sila: sila
+            });
         });
         
         // Zrus ji provinciim ktere uz tam nejsou
@@ -536,5 +574,26 @@ pageExtenders.add(PageExtender.create({
             var link = Element.create("a", '<span>Znovu čerpat v alianci ' + i.jmeno + '</span>', {href: url});
             page.content.appendChild(link);
         });
+    }
+}));
+
+
+
+
+// Linky na dalsi cerpani
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Aliance - Hlidka"; },
+
+    analyze: function(page, context) {
+        if (page.aliance == null || page.aliance.clenove.length == 0)
+            return false;
+        
+        // TODO
+        
+        return true;
+    },
+    
+    process: function(page, context) {
+        // TODO
     }
 }));
