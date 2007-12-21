@@ -64,6 +64,12 @@ pageExtenders.add(PageExtender.create({
         page.rightMenu = XPath.evalSingle('tbody/tr/td[last()]', page.contentTable);
         page.content = XPath.evalSingle('tbody/tr/td[2]', page.contentTable);
         
+        // cas
+        var casStr = XPath.evalString('/html/body/center/table[4]/tbody/tr/td/font');
+        page.cas = Date.parse(casStr);
+        
+        console.info("page cas=%s", new Date(page.cas).toLocaleString());
+        
         return true;
     },
     
