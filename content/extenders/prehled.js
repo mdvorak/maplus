@@ -49,13 +49,13 @@ pageExtenders.add(PageExtender.create({
         if (context.table == null)
             return false;
         // Kontrola jestli tabulka obsahuje nejake zaznamy
-        if (context.table.rows.length < 5)
+        if (context.table.rows.length < 4)
             return false;
 
         context.typ = XPath.evalString('tbody/tr[1]/td[2]/font/b', context.table);
         context.columns = context.table.rows[2].cells.length;
         // Tohle sice nastane akorat na zacatku veku ale proc to tak nechat :)
-        if (context.columns == 1 && context.table.rows.length >= 5)
+        if (context.columns == 1 && context.table.rows.length >= 4)
             context.columns = context.table.rows[3].cells.length;
         
         // Analyza radku
