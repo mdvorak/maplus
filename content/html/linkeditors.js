@@ -261,6 +261,65 @@ var LinkEditors = {
         }
     },
     
+    "hlidka": {
+        title: "Hlídka",
+        defaultText: "Hlídka ",
+        
+        create: function(parent, dataConfig) {
+            // Vytvor seznam alianci kde jsem clenem
+            var aliance = new Array();
+        
+            var idAlianci = dataConfig.evalPrefNodeList('regent/aliance[id]');
+            idAlianci.each(function(i) {
+                var id = i.getNumber("id");
+                var data = MaData.najdiAlianci(null, id);
+                
+                if (data != null && data.jmeno != null)
+                    aliance.push([id, data.jmeno]);
+                else
+                    aliance.push([id, id]);
+            });
+            
+            // Pokud nejsem v zadne alianci nemuzu mit hlidku
+            if (aliance.length == 0) {
+                var html = '<span style="color: orange;">Nejste v žádné alianci.</span>';
+                parent.innerHTML = html;
+                return null;
+            }
+            
+            parent.innerHTML = '';
+            parent.appendChild(Element.create("span", "Hlídka pro alianci:&nbsp;"));
+            
+            // Select s aliancema
+            var select = parent.appendChild(Element.create("select"));
+            select.options.add(new Option("", "- Vyberte -"));
+            aliance.each(function(i) {
+                select.options.add(new Option(i[1], i[0]));
+            });
+        
+            // Upozorneni
+            parent.appendChild(Element.create("br"));
+            parent.appendChild(Element.create("br"));
+            parent.appendChild(Element.create("span", "Upozornění: Pokud nemáte nastavenou hlídku pro danou alianci, zobrazí se pouze výpis aliance.", {"class": "small"}));
+        
+            return {
+                get: function() {
+                    return "aliance.html?aliance=vypis_" + select.value + "&hlidka=true";
+                },
+                set: function(url) {
+                    var data = parseUrl(url);
+                    if (data.arguments["aliance"] != null)
+                        select.value = data.arguments["aliance"].replace(/vypis_/, "");
+                    else
+                        select.value = "";
+                },
+                validate: function() {
+                    if (select.value == "")
+                        throw new new Exception("Prosím vyberte alianci ze seznamu.");
+                }
+            };
+        }        
+    },
     
     "odehrat": {
         title: "Odehrát",
