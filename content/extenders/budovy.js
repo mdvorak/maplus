@@ -100,15 +100,15 @@ pageExtenders.add(PageExtender.create({
             
             // Spocitej pocet, ktery si muzu dovolit
             data.pocet = data.maxPocet;
-            if (page.provincie != null) {
+            if (page.provincie() != null) {
                 if (data.haru > 0)
-                    data.pocet = Math.min(data.pocet, Math.floor(page.provincie.volnych / data.haru));
+                    data.pocet = Math.min(data.pocet, Math.floor(page.provincie().volnych / data.haru));
                 if (data.zlata > 0)
-                    data.pocet = Math.min(data.pocet, Math.floor(page.provincie.zlato / data.zlata));
+                    data.pocet = Math.min(data.pocet, Math.floor(page.provincie().zlato / data.zlata));
                 if (data.many > 0)
-                    data.pocet = Math.min(data.pocet, Math.floor(page.provincie.mana / data.many));
+                    data.pocet = Math.min(data.pocet, Math.floor(page.provincie().mana / data.many));
                 if (data.pop > 0)
-                    data.pocet = Math.min(data.pocet, Math.floor(page.provincie.populace / data.pop));
+                    data.pocet = Math.min(data.pocet, Math.floor(page.provincie().populace / data.pop));
             }
             
             console.log("%s: id=%d, pocet=%d/%d, zlata=%d, many=%d, pop=%d, haru=%d, tahu=%d", data.jmeno, data.id, data.pocet, data.maxPocet, data.zlata, data.many, data.pop, data.haru, data.tahu);

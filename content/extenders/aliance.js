@@ -597,7 +597,7 @@ pageExtenders.add(PageExtender.create({
         if (cfg == null)
             return false;
         
-        // "http://www.okrsok.cz/melior/php/plushlidka.php"
+        // Hlidka pro okrsok: ODSTRANIT!!! "http://www.okrsok.cz/melior/php/plushlidka.php"
         context.url = cfg.getPref("url");
         if (context.url == null || context.url.length < 10)
             return false;
@@ -684,7 +684,7 @@ pageExtenders.add(PageExtender.create({
         form.appendChild(Element.create("input", null, {name: "cas", value: page.cas, type: "hidden"}));
         form.appendChild(Element.create("input", null, {name: "aliance", value: page.aliance.jmeno, type: "hidden"}));
         form.appendChild(Element.create("input", null, {name: "kdo", value: page.id, type: "hidden"}));
-        form.appendChild(Element.create("input", null, {name: "zlato", value: page.provincie.zlato || "", type: "hidden"}));
+        form.appendChild(Element.create("input", null, {name: "zlato", value: page.provincie().zlato || "", type: "hidden"}));
         
         // Sily clenu
         for (var i = 0; i < page.aliance.clenove.length; i++) {

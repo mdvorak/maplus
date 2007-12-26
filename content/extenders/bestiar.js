@@ -774,7 +774,7 @@ pageExtenders.add(PageExtender.create({
     
         context.headers.each(function(h) {
             // Vytvor tooltip
-            var linkTooltip = createRulesTooltipHtml(table, context.config, h, page.regent, page.provincie);
+            var linkTooltip = createRulesTooltipHtml(table, context.config, h, page.regent, page.provincie());
             
             // Uprav hlavicku
             var b = $X('span/b', h.cell);
@@ -797,7 +797,7 @@ pageExtenders.add(PageExtender.create({
             $('plus_filterAktivovan').style.display = 'none';
             // Reset tabulky
             for (let i in Rules) {
-                Rules[i](table, null, page.regent, page.provincie);
+                Rules[i](table, null, page.regent, page.provincie());
             }
         });
         
@@ -809,7 +809,7 @@ pageExtenders.add(PageExtender.create({
         // Aplikuj aktualni filtry
         for (let i in Rules) {
             if (typeof Rules[i] == "function" && context.config.hasRules(i))
-                Rules[i](table, context.config.createRuleSet(i), page.regent, page.provincie);
+                Rules[i](table, context.config.createRuleSet(i), page.regent, page.provincie());
         }
         
         if (context.config.hasRules("filter"))

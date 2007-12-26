@@ -170,7 +170,7 @@ pageExtenders.add(PageExtender.create({
         });
         
         // Nejsem uz v protu?
-        if (page.provincie.protV > 0) {
+        if (page.provincie().protV > 0) {
             context.prvDoProtu = 0;
         }
         else if (context.prvDoProtu == 0) {

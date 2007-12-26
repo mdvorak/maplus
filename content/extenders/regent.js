@@ -76,39 +76,55 @@ pageExtenders.add(PageExtender.create({
         if (table == null)
             return false;
         
-        // Analyzuj  
-        var p = {
-            zlato: parseInt(XPath.evalString('tbody/tr[td[1] = "Zlato:"]/td[2]', table)),
-            mana: Number.NaN,
-            maxMana: Number.NaN,
-            populace: parseInt(XPath.evalString('tbody/tr[td[1] = "Populace:"]/td[2]', table)),
-            rozloha: parseInt(XPath.evalString('tbody/tr[td[1] = "Rozloha:"]/td[2]', table)),
-            volnych: parseInt(XPath.evalString('tbody/tr[td[1] = "Volných:"]/td[2]', table)),
-            zbyva: parseInt(XPath.evalString('tbody/tr[td[1] = "zbývá:"]/td[2]', table)),
-            sila: parseInt(XPath.evalString('tbody/tr[td[1] = "Síla\xA0P.:"]/td[2]', table)),
-            protV: parseInt(XPath.evalString('tbody/tr[td[1] = "Prot.\xA0V:"]/td[2]', table)),
-            protM: parseInt(XPath.evalString('tbody/tr[td[1] = "Prot.\xA0M:"]/td[2]', table))
-        };
+        var data = -1;
         
-        var manaStr = XPath.evalString('tbody/tr[td[1] = "Mana:"]/td[2]', table);
-        if (manaStr != null) {
-            var m = manaStr.match(/^\s*(\d+)\s+\((\d+)%\)\s*$/);
-            if (m != null) {
-                p.mana = parseInt(m[1]);
-                p.maxMana = Math.floor(100 * p.mana / parseInt(m[2]));
+        page.provincie = function() {
+            if (data != -1)
+                return data;
+        
+            try {
+                // Analyzuj
+                var p = {
+                    zlato: parseInt(XPath.evalString('tbody/tr[td[1] = "Zlato:"]/td[2]', table)),
+                    mana: Number.NaN,
+                    maxMana: Number.NaN,
+                    populace: parseInt(XPath.evalString('tbody/tr[td[1] = "Populace:"]/td[2]', table)),
+                    rozloha: parseInt(XPath.evalString('tbody/tr[td[1] = "Rozloha:"]/td[2]', table)),
+                    volnych: parseInt(XPath.evalString('tbody/tr[td[1] = "Volných:"]/td[2]', table)),
+                    zbyva: parseInt(XPath.evalString('tbody/tr[td[1] = "zbývá:"]/td[2]', table)),
+                    sila: parseInt(XPath.evalString('tbody/tr[td[1] = "Síla\xA0P.:"]/td[2]', table)),
+                    protV: parseInt(XPath.evalString('tbody/tr[td[1] = "Prot.\xA0V:"]/td[2]', table)),
+                    protM: parseInt(XPath.evalString('tbody/tr[td[1] = "Prot.\xA0M:"]/td[2]', table))
+                };
+                
+                var manaStr = XPath.evalString('tbody/tr[td[1] = "Mana:"]/td[2]', table);
+                if (manaStr != null) {
+                    var m = manaStr.match(/^\s*(\d+)\s+\((\d+)%\)\s*$/);
+                    if (m != null) {
+                        p.mana = parseInt(m[1]);
+                        p.maxMana = Math.floor(100 * p.mana / parseInt(m[2]));
+                    }
+                }
+                
+                // Zmen vsechny NaN na 0
+                for (var i in p) {
+                    if (isNaN(p[i]))
+                        p[i] = 0;
+                }
+                
+                // Debug hlaska
+                data = p;
+                console.info("Provincie zlato=%d, mana=%d/%d, populace=%d, rozloha=%d/%d, sila=%d, prot=%o", p.zlato, p.mana, p.maxMana, p.populace, p.volnych, p.rozloha, p.sila, p.protV > 0);
+                return p;
+            }
+            catch (ex) {
+                console.error("Chyba pri zjistovani dat o provincii: " + ex);
+                data = null;
+                return null;
             }
         }
         
-        // Zmen vsechny NaN na 0
-        for (var i in p) {
-            if (isNaN(p[i]))
-                p[i] = 0;
-        }
-        
-        page.provincie = p;
-        
-        // Debug hlaska
-        console.info("Provincie zlato=%d, mana=%d/%d, populace=%d, rozloha=%d/%d, sila=%d, prot=%o", p.zlato, p.mana, p.maxMana, p.populace, p.volnych, p.rozloha, p.sila, p.protV > 0);
+        console.debug("Informace o provincii budou zjisteny az budou potreba.");
         return true;
     },
     
