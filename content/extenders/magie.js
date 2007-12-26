@@ -126,7 +126,7 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        var upozorneni = Element.create("span", 'Kouzlo sesláno<br/><br/>', {style: "color: #FFDD55;"});
+        var upozorneni = Element.create("span", 'Kouzlo sesláno<br/><br/>', {"class": "message"});
         page.content.insertBefore(upozorneni, page.content.firstChild);
     }
 }));

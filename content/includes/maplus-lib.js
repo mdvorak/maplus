@@ -55,12 +55,20 @@ var MaPlus = {
         if (page.ftc) url += "&ftc=" + page.ftc;
         
         if (args) {
-            args = $H(args);
-            args.keys().each(function(k) {
-                var v = args[k];
-                if (v != null)
-                    url += "&" + k + "=" + v; 
-            });
+            if (args instanceof Hash) {
+                args.keys().each(function(k) {
+                    var v = args[k];
+                    if (v != null)
+                        url += "&" + k + "=" + v; 
+                });
+            }
+            else {
+                for (var k in args) {
+                    var v = args[k];
+                    if (v != null)
+                        url += "&" + k + "=" + v; 
+                }
+            }
         }
         
         return url;

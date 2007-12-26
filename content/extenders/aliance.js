@@ -281,7 +281,7 @@ pageExtenders.add(PageExtender.create({
             
             var id = parseInt(tr.cells[0].textContent);
             var regent = tr.cells[1].textContent.replace(/\s+$/, "");
-            var provincie = tr.cells[2].textContent.replace(/\s+$/, "");
+            var jmenoProvincie = tr.cells[2].textContent.replace(/\s+$/, "");
             
             if (isNaN(id))
                 continue;
@@ -299,7 +299,7 @@ pageExtenders.add(PageExtender.create({
             page.aliance.clenove.push({
                 id: id,
                 regent: regent,
-                provincie: provincie,
+                provincie: jmenoProvincie,
                 sila: sila
             });
         }
@@ -580,7 +580,7 @@ pageExtenders.add(PageExtender.create({
 
 
 
-// Linky na dalsi cerpani
+// Hlidka
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Aliance - Hlidka"; },
 
@@ -592,19 +592,31 @@ pageExtenders.add(PageExtender.create({
             return false;
         }        
         
-        var cfg = page.config.getPrefNode("hlidka", true);
-        context.url = cfg.getPref("url", "http://www.okrsok.cz/melior/php/plushlidka.php");
-
-        return (context.url != null && context.url.length > 10);
+        // Zjisti url hlidky
+        var cfg = page.config.getPrefNode("hlidka", true).evalPrefNode('aliance[@jmeno = "' + page.aliance.jmeno + '"]');             
+        if (cfg == null)
+            return false;
+        
+        // "http://www.okrsok.cz/melior/php/plushlidka.php"
+        context.url = cfg.getPref("url");
+        if (context.url == null || context.url.length < 10)
+            return false;
+            
+        context.login = cfg.getPref("login");
+        context.password = cfg.getPref("heslo");
+            
+        // Odeslat hlidku automaticky?
+        context.odeslat = String.equals(page.arguments["hlidka"], "true", true);
+        
+        return true;
     },
     
     process: function(page, context) {
-        var e = $X('table[1]', page.content).nextSibling;
-        
-        var odeslat = Element.create("input", null, {value: "Odeslat hlídku", type: "button", style: "height: 20px;"});
-        page.content.insertBefore(odeslat, e);
+        // Element kam vlozit tlacitko/info
+        var spanInfo = Element.create("span", null, {"class": "message"});
+        page.content.insertBefore(spanInfo, $X('table[1]', page.content).nextSibling);
     
-        // IFrame pro vysledek hlidky
+        // iframe pro vysledek hlidky
         var divVysledek = Element.create("div", null, {style: "display: none;"});
         
         var iframe = Element.create("iframe", null, {name: "plus_hlidka", style: "width: 400px; height 150px; border-color: gray;"});
@@ -614,42 +626,90 @@ pageExtenders.add(PageExtender.create({
         
         page.content.appendChild(divVysledek);
     
+        // Odesli hlidku pokud to bylo vyzadano
+        if (context.odeslat) {
+            divVysledek.style.display = "";
+            odeslatHlidku(page, context.url, context.login, context.password, iframe);
+            return;
+        }
+    
+        // Vytvor tlacitko pro odeslani
+        var odeslat = Element.create("input", null, {value: "Odeslat hlídku", type: "button", style: "height: 20px;"});
+        spanInfo.appendChild(odeslat);
+    
         // Event handler
-        var odesilaSe = false;
+        var odeslatHlidku = odeslatHlidku.bind(this);
+        
         Event.observe(odeslat, "click", function(event) {
             Event.stop(event);
-            if (odesilaSe)
-                return;
-                
-            odesilaSe = true;
-            console.debug("Odeslani hlidky spusteno..");
             
-            // Zobrazit frame pro vysledek
             odeslat.blur();
-            odeslat.style.display = "none"
-            divVysledek.style.display = "";
+            odeslat.style.display = "none";
             
-            // Vytvor form
-            var form = Element.create("form", null, {action: context.url, target: "plus_hlidka", method: "post"});
-            form.appendChild(Element.create("input", null, {name: "cas", value: page.cas, type: "hidden"}));
-            form.appendChild(Element.create("input", null, {name: "aliance", value: page.aliance.jmeno, type: "hidden"}));
-            form.appendChild(Element.create("input", null, {name: "kdo", value: page.id, type: "hidden"}));
-            
-            for (var i = 0; i < page.aliance.clenove.length; i++) {
-                var data = page.aliance.clenove[i];
-                if (isNaN(data.id) || isNaN(data.sila)) {
-                    console.warn("Pozor: nepouzitelny zaznam (id=%d sila=%d)", data.id, data.sila);
-                    continue;
-                }
+            // Pokud je stranka starsi nez minutu, udelej refresh
+            if (new Date().getTime() - document.lastModified > 60000) {
+                var args = $H(page.arguments);
+                delete args["id"];
+                delete args["code"];
+                delete args["ftc"];
+                args["hlidka"] = "true";
                 
-                form.appendChild(Element.create("input", null, {name: data.id, value: data.sila, type: "hidden"}));
+                document.location.href = MaPlus.buildUrl(page, "aliance.html", args);
+            }
+            // Jinak odesli hlidku s aktualnimy daty
+            else {
+                divVysledek.style.display = "";
+                odeslatHlidku(page, context.url, context.login, context.password, iframe, context.element);
+            }
+        });
+    },
+    
+    odeslatHlidku: function(page, url, login, heslo, targetFrame, progressElement) {
+        if (page.aliance.hlidka > 0) {
+            console.warn("Hlidka jiz odeslana (stav=%d)", page.aliance.hlidka);
+            return;
+        }
+        
+        page.aliance.hlidka = 1;
+        console.debug("Vytvareni formulare hlidky..");
+        
+        if (progressElement != null)
+            progressElement.innerHTML = "Probíhá odesílání hlídky. Čekejte..."
+        
+        // Vytvor form
+        var form = Element.create("form", null, {action: context.url, target: targetFrame.name, method: "post"});
+        form.appendChild(Element.create("input", null, {name: "login", value: login || "", type: "hidden"}));
+        form.appendChild(Element.create("input", null, {name: "heslo", value: heslo || "", type: "hidden"}));
+        
+        form.appendChild(Element.create("input", null, {name: "cas", value: page.cas, type: "hidden"}));
+        form.appendChild(Element.create("input", null, {name: "aliance", value: page.aliance.jmeno, type: "hidden"}));
+        form.appendChild(Element.create("input", null, {name: "kdo", value: page.id, type: "hidden"}));
+        form.appendChild(Element.create("input", null, {name: "zlato", value: page.provincie.zlato || "", type: "hidden"}));
+        
+        // Sily clenu
+        for (var i = 0; i < page.aliance.clenove.length; i++) {
+            var data = page.aliance.clenove[i];
+            if (isNaN(data.id) || isNaN(data.sila)) {
+                console.warn("Pozor: nepouzitelny zaznam (id=%d sila=%d)", data.id, data.sila);
+                continue;
             }
             
-            page.content.appendChild(form);
+            form.appendChild(Element.create("input", null, {name: "sila[" + data.id + "]", value: data.sila, type: "hidden"}));
+        }
+        
+        page.content.appendChild(form);
+        
+        // Reakce na nacteni framu
+        Event.observe(targetFrame, "load", function(event) {
+            page.aliance.hlidka = 2;
+            console.info("Hlidka dokoncena");
             
-            // Odesli form
-            form.submit();
-            console.info("Hlidka odeslana");
+            if (progressElement != null)
+                progressElement.innerHTML = "Hlídka dokončena";
         });
+        
+        // Odesli form
+        console.info("Odesilani hlidky..");
+        form.submit();
     }
 }));
