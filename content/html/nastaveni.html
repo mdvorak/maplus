@@ -1,10 +1,4 @@
 <style type="text/css">
-td.nadpis 
-{
-    border-bottom-width: 1px;
-    border-bottom-color: #2A2A2A;
-    border-bottom-style: solid;
-}
 input.number
 {
 	width: 47px; 
@@ -282,8 +276,8 @@ nastaveniManager.addTab("Menu", "n_menu");
             <td>
                 <!--
                 <input type="text" class="number"
-                    onload="this.value = this.config.getPrefNode('posta', true).getNumber('maxRadku', MAX_RADKU_DEFAULT);"
-                    onsave="this.config.getPrefNode('posta', true).setPref('maxRadku', this.value);" />
+                    onload="this.value = this.config.getPrefNode('posta', true).getNumber('', null);"
+                    onsave="this.config.getPrefNode('posta', true).setPref('', this.value);" />
                 -->
             </td>
             
@@ -496,6 +490,97 @@ nastaveniManager.addTab("Bestiář", "n_bestiar");
 <script type="text/javascript">
 nastaveniManager.addTab("Výpis útoků", "n_vypis");
 </script>
+
+<!-- Hlídka -->
+<table id="n_hlidka" cellpadding="0" cellspacing="0" style="display: none;">
+    <colgroup>
+        <col width="140" />
+        <col width="80" />
+        <col width="10" />
+        <col width="140" />
+        <col width="80" />
+    </colgroup>
+    <tbody id="n_hlidka1">
+        <tr>
+            <td><span id="n_hlidka_aliance1" style="font-weight: bold;">Konfederace</span></td>
+            
+            <td colspan="2">
+                <select id="">
+                    <option value="">- Vyberte -</option>
+                    <option value="toolshop">Toolshop</option>
+                    <option value="custom">Vlastní</option>
+                </select>
+            </td>
+        </tr>
+        <tr><td colspan="5"><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+
+        <tr>
+            <td><span>Adresa</span></td>
+            <td colspan="4">
+                <input type="text" value="" style="width: 100%;" />
+            </td>
+        </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        <tr>
+            <td><span>Login</span></td>
+            <td>
+                <input type="text" value="" style="width: 78px;" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span>Heslo</span></td>
+            <td>
+                <input type="text" value="" style="width: 78px;" />
+            </td>
+        </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        
+        <tr>
+            <td><span>Zobrazit ve výpisu</span></td>
+            <td>
+                <input type="checkbox" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span>Zobrazit v nastavení</span></td>
+            <td>
+                <input type="checkbox" />
+            </td>
+        </tr>
+        <tr><td colspan="5"><img height="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+            
+        
+        
+        <!-- TODO 
+    
+    
+        <tr>
+            <td><span>Skrýt vrácené prvoútoky</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('vypis', true).getBoolean('skrytVraceneUtoky', false);"
+                    onsave="this.config.getPrefNode('vypis', true).setPref('skrytVraceneUtoky', this.checked);" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td><span>Skrýt cska</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('vypis', true).getBoolean('skrytCska', false);"
+                    onsave="this.config.getPrefNode('vypis', true).setPref('skrytCska', this.checked);" />
+            </td>
+        </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        -->
+    </tbody>
+</table>
+<script type="text/javascript">
+nastaveniManager.addTab("Hlídka", "n_hlidka");
+</script>
+
 
 <!-- O Aplikaci -->
 <table id="n_about" cellpadding="0" cellspacing="0" style="display: none;">
