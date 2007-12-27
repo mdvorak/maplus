@@ -500,83 +500,42 @@ nastaveniManager.addTab("Výpis útoků", "n_vypis");
         <col width="140" />
         <col width="80" />
     </colgroup>
-    <tbody id="n_hlidka1">
-        <tr>
-            <td><span id="n_hlidka_aliance1" style="font-weight: bold;">Konfederace</span></td>
-            
-            <td colspan="2">
-                <select id="">
-                    <option value="">- Vyberte -</option>
-                    <option value="toolshop">Toolshop</option>
-                    <option value="custom">Vlastní</option>
-                </select>
-            </td>
-        </tr>
-        <tr><td colspan="5"><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-
-        <tr>
-            <td><span>Adresa</span></td>
-            <td colspan="4">
-                <input type="text" value="" style="width: 100%;" />
-            </td>
-        </tr>
-        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-        <tr>
-            <td><span>Login</span></td>
-            <td>
-                <input type="text" value="" style="width: 78px;" />
-            </td>
-            
-            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
-            
-            <td><span>Heslo</span></td>
-            <td>
-                <input type="text" value="" style="width: 78px;" />
-            </td>
-        </tr>
-        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-        
-        <tr>
-            <td><span>Zobrazit ve výpisu</span></td>
-            <td>
-                <input type="checkbox" />
-            </td>
-            
-            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
-            
-            <td><span>Zobrazit v nastavení</span></td>
-            <td>
-                <input type="checkbox" />
-            </td>
-        </tr>
-        <tr><td colspan="5"><img height="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-            
-        
-        
-        <!-- TODO 
-    
-    
-        <tr>
-            <td><span>Skrýt vrácené prvoútoky</span></td>
-            <td>
-                <input type="checkbox"
-                    onload="this.checked = this.config.getPrefNode('vypis', true).getBoolean('skrytVraceneUtoky', false);"
-                    onsave="this.config.getPrefNode('vypis', true).setPref('skrytVraceneUtoky', this.checked);" />
-            </td>
-            
-            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
-            
-            <td><span>Skrýt cska</span></td>
-            <td>
-                <input type="checkbox"
-                    onload="this.checked = this.config.getPrefNode('vypis', true).getBoolean('skrytCska', false);"
-                    onsave="this.config.getPrefNode('vypis', true).setPref('skrytCska', this.checked);" />
-            </td>
-        </tr>
-        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-        -->
-    </tbody>
+    <tr><td id="n_hlidkaHelpers" style="display: none;"></td></tr>
 </table>
+<script type="text/javascript">
+function nastaveniHlidkaCreate() {
+    var aliance = dataConfig.evalPrefNodeList('regent/aliance[id]');
+    if (aliance.length == 0)
+        return;
+
+    var hlidkaHtml = Chrome.loadText("html/nastavenihlidka.html");
+    
+    aliance.each(function(i) {
+        // Zjisti jmeno aliance
+        var data = MaData.najdiAlianci(null, i.getNumber("id"));
+        if (data == null || data.jmeno == null || data.jmeno.length == 0)
+            return; // continue;
+    
+        // Vytvor html
+        var tbody = Element.create("tbody", hlidkaHtml);
+        $('n_hlidka').appendChild(tbody);
+        
+        // Inicializuj alianci (NastaveniHlidka je definovano v "nastavenihlidka.html");
+        NastaveniHlidka.init(tbody, data.jmeno);
+        
+        // Vytvor pomocny element na load a save
+        var inputController = Element.create("input", null, {type: "hidden", value: ""});
+        $('n_hlidkaHelpers').appendChild(inputController);
+        
+        var hlidka = 'NastaveniHlidka["' + data.jmeno + '"]';
+        var configPath = 'NastaveniHlidka.getAlianceConfig(' + data.jmeno + ')';
+        inputController.setAttribute("onload", hlidka + '.onload(' + configPath + ');');
+        inputController.setAttribute("onsave", hlidka + '.onsave(' + configPath + ');');
+    });
+}
+
+nastaveniHlidkaCreate();
+</script>
 <script type="text/javascript">
 nastaveniManager.addTab("Hlídka", "n_hlidka");
 </script>

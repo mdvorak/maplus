@@ -608,6 +608,15 @@ pageExtenders.add(PageExtender.create({
         // Odeslat hlidku automaticky?
         context.odeslat = String.equals(page.arguments["hlidka"], "true", true);
         
+        // Zobrazit tlacitko?
+        var typStranky = page.arguments["aliance"];
+        if (typStranky.search("vypsat_") == 0 && cfg.getBoolean("zobrazitVypis"))
+            context.tlacitko = true;
+        else if (typStranky.search("nastavit_") == 0 && cfg.getBoolean("zobrazitNastaveni"))
+            context.tlacitko = true;
+        else
+            context.tlacitko = false;
+        
         return true;
     },
     
@@ -634,6 +643,9 @@ pageExtenders.add(PageExtender.create({
         }
     
         // Vytvor tlacitko pro odeslani
+        if (!context.tlacitko)
+            return;
+        
         var odeslat = Element.create("input", null, {value: "Odeslat hlídku", type: "button", style: "height: 20px;"});
         spanInfo.appendChild(odeslat);
     

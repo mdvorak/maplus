@@ -92,7 +92,9 @@
                     });
                     
                     // onload a onsave funkce
-                    this.onload = function(config) {
+                    this[aliance] = new Object();
+                    
+                    this[aliance].onload = function(config) {
                         var adresa = config.getPref("url");
                         
                         if (adresa != null && adresa.length > 0) {
@@ -126,7 +128,7 @@
                         }
                     };
                     
-                    this.onsave = function(config) {
+                    this[aliance].onsave = function(config) {
                         if (inputAdresa.value.length > 0) {
                             config.setPref("url", inputAdresa.value);
                             config.setPref("login", inputLogin.value);
@@ -144,6 +146,18 @@
                         
                         console.debug('Hlidka "%s": url=%o login=%o', aliance, inputAdresa.value, inputLogin.value);
                     };
+                },
+                
+                getAlianceConfig: function(root, aliance) {
+                    root = root.getPrefNode("hlidka", true);
+                    
+                    var cfg = root.evalPrefNode('aliance[@jmeno = "' + aliance + '"]');
+                    if (cfg == null) {
+                        cfg = root.addPref("aliance");
+                        cfg.setAttribute("jmeno", aliance);
+                    }
+                    
+                    return cfg;
                 }
             };
         }
