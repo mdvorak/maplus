@@ -74,3 +74,6 @@ JMENA_BAREV["C"] = "Černá";
 JMENA_BAREV["S"] = "Šedá";
 JMENA_BAREV["F"] = "Fialová";
 JMENA_BAREV["N"] = "Neutrální";
+
+
+const HLIDKA_TOOLSHOP = "http://TODO";

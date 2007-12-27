@@ -44,6 +44,7 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
+        // TODO: jak dlouho to trva?
         var list = $XL('//a[@href != "javascript://" and not(@onclick)]');    
         list.each(function(e) { SafeLink.initLink(e); });
     }
