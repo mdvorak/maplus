@@ -269,9 +269,8 @@ var LinkEditors = {
             // Vytvor seznam alianci kde jsem clenem
             var aliance = new Array();
         
-            var idAlianci = dataConfig.evalPrefNodeList('regent/aliance[id]');
-            idAlianci.each(function(i) {
-                var id = i.getNumber("id");
+            // ALIANCE_ID se plni v extenders/nastaveni.js
+            ALIANCE_ID.each(function(id) {
                 var data = MaData.najdiAlianci(null, id);
                 
                 if (data != null && data.jmeno != null)
@@ -304,7 +303,7 @@ var LinkEditors = {
         
             return {
                 get: function() {
-                    return "aliance.html?aliance=vypis_" + select.value + "&hlidka=true";
+                    return "aliance.html?aliance=vypsat_" + select.value + "&hlidka=true";
                 },
                 set: function(url) {
                     var data = parseUrl(url);

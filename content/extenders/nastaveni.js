@@ -54,6 +54,14 @@ pageExtenders.add(PageExtender.create({
         page.leftMenu.setAttribute("width", "29%");
         page.rightMenu.setAttribute("width", "29%");
         
+        // Pomocne promenne pouzite poruznu v nastaveni
+        window.PAGE_ID = page.id;
+        
+        window.ALIANCE_ID = new Array();
+        page.config.evalPrefNodeList('regent/aliance/id').each(function(i) {
+            window.ALIANCE_ID.push(i.getNumber());
+        });     
+        
         var dialogNovinky = new NovinkyDialog();
         
         // Na konci html se vyvola funkce window.initNastaveni(); kde se provede vlastni inicializace
@@ -66,8 +74,6 @@ pageExtenders.add(PageExtender.create({
                 $('plus_mikeeId').appendChild(adminLink);
                 $('plus_vek').innerHTML = ADMIN_ID_AGE;
             }
-            
-            window.PAGE_ID = page.id;
             
             // Inicializace vlastnich linku
             window.NastaveniVlastniLinky.initPage(page);

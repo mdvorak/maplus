@@ -36,7 +36,7 @@ window.DulezitostZpravy = {
         return this._unsupportedValue;
     },
     
-    set: function(value) {
+    set: function(value, vypnoutPodpis) {
         if (value == null)
             value = "normalni";
     
@@ -48,13 +48,15 @@ window.DulezitostZpravy = {
             console.debug("Nepodporovana dulezitost: %s", value);
             this._unsupportedValue = value;
         }
+        
+        this._podpis = !vypnoutPodpis;
     },
     
     setPodpis: function(value) {
         if (this._podpis == null)
             this._podpis = $X('//input[@name = "podpis"]');
             
-        this._podpis.checked = value;
+        this._podpis.checked = !!this._podpis;
     }
 };
 </script>

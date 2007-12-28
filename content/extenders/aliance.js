@@ -640,7 +640,7 @@ pageExtenders.add(PageExtender.create({
         // Odesli hlidku pokud to bylo vyzadano
         if (context.odeslat) {
             divVysledek.style.display = "";
-            odeslatHlidku(page, context.url, context.login, context.password, iframe);
+            odeslatHlidku(page, context.url, context.login, context.password, iframe, spanInfo, false);
             return;
         }
     
@@ -668,15 +668,15 @@ pageExtenders.add(PageExtender.create({
                 
                 document.location.href = MaPlus.buildUrl(page, "aliance.html", args);
             }
-            // Jinak odesli hlidku s aktualnimy daty
+            // Jinak odesli hlidku s aktualnimi daty
             else {
                 divVysledek.style.display = "";
-                odeslatHlidku(page, context.url, context.login, context.password, iframe, context.element);
+                odeslatHlidku(page, context.url, context.login, context.password, iframe, spanInfo, true);
             }
         });
     },
     
-    odeslatHlidku: function(page, url, login, heslo, targetFrame, progressElement) {
+    odeslatHlidku: function(page, url, login, heslo, targetFrame, progressElement, scroll) {
         if (page.aliance.hlidka > 0) {
             console.warn("Hlidka jiz odeslana (stav=%d)", page.aliance.hlidka);
             return;
@@ -718,6 +718,9 @@ pageExtenders.add(PageExtender.create({
             
             if (progressElement != null)
                 progressElement.innerHTML = "Hlídka dokončena";
+                
+            if (scroll)
+                window.scrollBy(0, document.height);
         });
         
         // Odesli form

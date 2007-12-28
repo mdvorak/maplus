@@ -85,6 +85,7 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         var controls = context.controls;
+        var vypnoutPodpis = false;
         
         // Zjisti dulezitost zpravy
         var dulezitost = page.arguments["dulezitost"];
@@ -116,6 +117,11 @@ pageExtenders.add(PageExtender.create({
             else {
                 console.log("Nenalezena zprava %s v cache.", page.arguments["odpoved"]);
             }
+            
+            // Odskrtni prilozeni podpisu
+            if (controls.inputPodpis != null)
+                controls.inputPodpis.checked = false;
+            vypnoutPodpis = true;
         }
         
         // Psani zpravy bestiare
@@ -156,6 +162,7 @@ pageExtenders.add(PageExtender.create({
             // Odskrtni prilozeni podpisu
             if (controls.inputPodpis != null)
                 controls.inputPodpis.checked = false;
+            vypnoutPodpis = true;
         }
         
         // Dulezitost
@@ -176,7 +183,7 @@ pageExtenders.add(PageExtender.create({
             }
             
             // Nadefinuj funcknost
-            window.DulezitostZpravy.set(dulezitost);
+            window.DulezitostZpravy.set(dulezitost, vypnoutPodpis);
             
             vybranaDulezitost = function() {
                 var d = window.DulezitostZpravy.get();
