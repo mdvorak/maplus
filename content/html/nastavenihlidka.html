@@ -1,4 +1,13 @@
-﻿        <tr>
+﻿<table cellpadding="0" cellspacing="0">
+    <colgroup>
+        <col width="140" />
+        <col width="80" />
+        <col width="10" />
+        <col width="140" />
+        <col width="80" />
+    </colgroup>
+    <tbody>
+        <tr>
             <td><span id="n_hlidka_aliance" style="font-weight: bold;"></span></td>
             
             <td colspan="2">
@@ -44,121 +53,6 @@
         </tr>
         
         <tr><td colspan="5"><img height="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-        
-        <script type="text/javascript">
-        if (window.NastaveniHlidka == null) {
-            window.NastaveniHlidka = {
-                init: function(tbody, aliance) {
-                    var spanAliance = $X('.//span[@id = "n_hlidka_aliance"]', tbody);
-                    var selectHlidka = $X('.//select[@id = "n_hlidka_hlidka"]', tbody);
-                    var inputAdresa = $X('.//input[@id = "n_hlidka_adresa"]', tbody);
-                    var inputLogin = $X('.//input[@id = "n_hlidka_login"]', tbody);
-                    var inputHeslo = $X('.//input[@id = "n_hlidka_heslo"]', tbody);
-                    var inputVypis = $X('.//input[@id = "n_hlidka_vypis"]', tbody);
-                    var inputNastaveni = $X('.//input[@id = "n_hlidka_nastaveni"]', tbody);
-                    var configRows = $XL('.//tr[@class = "hlidka_config"]', tbody);
-                    
-                    // Pomocna funkce pro zobrazovani detailni konfigurace
-                    var showConfigElements = function(visible) {
-                        if (visible)
-                            configRows.each(function(i) { i.show(); });
-                        else
-                            configRows.each(function(i) { i.hide(); });
-                    }
-                    showConfigElements(false);
-                    
-                    // Nazev aliance
-                    spanAliance.innerHTML = aliance;
-                    
-                    // Konfigurace hlidky
-                    selectHlidka.options.push(new Option("", "- Vyberte -"));
-                    selectHlidka.options.push(new Option("toolshop", "Savannah Toolshop"));
-                    selectHlidka.options.push(new Option("custom", "Vlastní"));
-                    
-                    Event.observe(selectHlidka, "change", function(event) {
-                        if (selectHlidka.value == "toolshop") {
-                            inputAdresa.value = HLIDKA_TOOLSHOP;
-                            inputAdresa.readonly = true;
-                        }
-                        else {
-                            inputAdresa.value = "";
-                            inputAdresa.readonly = false;
-                        }
-                            
-                        inputLogin.value = "";
-                        inputHeslo.value = "";
-                            
-                        showConfigElements(selectHlidka.value != "");
-                    });
-                    
-                    // onload a onsave funkce
-                    this[aliance] = new Object();
-                    
-                    this[aliance].onload = function(config) {
-                        var adresa = config.getPref("url");
-                        
-                        if (adresa != null && adresa.length > 0) {
-                            if (adresa == HLIDKA_TOOLSHOP) {
-                                selectHlidka.value = "toolshop";
-                                inputAdresa.readonly = true;
-                            }
-                            else {
-                                selectHlidka.value = "custom";
-                                inputAdresa.readonly = false;
-                            }
-                            
-                            inputAdresa.value = adresa;
-                            inputLogin.value = config.getPref("login");
-                            inputHeslo.value = config.getPref("heslo");
-                            inputVypis.checked = config.getBoolean("zobrazitVypis");
-                            inputNastaveni.checked = config.getBoolean("zobrazitNastaveni");
-                            
-                            showConfigElements(true);
-                        }
-                        else {
-                            showConfigElements(false);
-                        
-                            selectHlidka.value = "";
-                            inputAdresa.value = "";
-                            inputAdresa.readonly = false;
-                            inputLogin.value = "";
-                            inputHeslo.value = "";
-                            inputVypis.checked = true;
-                            inputNastaveni.checked = true;
-                        }
-                    };
-                    
-                    this[aliance].onsave = function(config) {
-                        if (inputAdresa.value.length > 0) {
-                            config.setPref("url", inputAdresa.value);
-                            config.setPref("login", inputLogin.value);
-                            config.setPref("heslo", inputHeslo.value);
-                            config.setPref("zobrazitVypis", inputVypis.checked);
-                            config.setPref("zobrazitNastaveni", inputNastaveni.checked);
-                        }
-                        else {
-                            config.setPref("url", null);
-                            config.setPref("login", null);
-                            config.setPref("heslo", null);
-                            config.setPref("zobrazitVypis", null);
-                            config.setPref("zobrazitNastaveni", null);
-                        }
-                        
-                        console.debug('Hlidka "%s": url=%o login=%o', aliance, inputAdresa.value, inputLogin.value);
-                    };
-                },
-                
-                getAlianceConfig: function(root, aliance) {
-                    root = root.getPrefNode("hlidka", true);
-                    
-                    var cfg = root.evalPrefNode('aliance[@jmeno = "' + aliance + '"]');
-                    if (cfg == null) {
-                        cfg = root.addPref("aliance");
-                        cfg.setAttribute("jmeno", aliance);
-                    }
-                    
-                    return cfg;
-                }
-            };
-        }
-        </script>
+    </tbody>
+</table>
+    

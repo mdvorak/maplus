@@ -76,4 +76,4 @@ JMENA_BAREV["F"] = "Fialová";
 JMENA_BAREV["N"] = "Neutrální";
 
 
-const HLIDKA_TOOLSHOP = "http://TODO";
+const HLIDKA_TOOLSHOP = "http://toolshop.ma.savannahsoft.eu/manual_hlidka.php";

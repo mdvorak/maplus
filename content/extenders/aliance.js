@@ -621,6 +621,8 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
+        var odeslatHlidku = this.odeslatHlidku.bind(this);
+        
         // Element kam vlozit tlacitko/info
         var spanInfo = Element.create("span", null, {"class": "message"});
         page.content.insertBefore(spanInfo, $X('table[1]', page.content).nextSibling);
@@ -628,7 +630,7 @@ pageExtenders.add(PageExtender.create({
         // iframe pro vysledek hlidky
         var divVysledek = Element.create("div", null, {style: "display: none;"});
         
-        var iframe = Element.create("iframe", null, {name: "plus_hlidka", style: "width: 400px; height 150px; border-color: gray;"});
+        var iframe = Element.create("iframe", null, {name: "plus_hlidka", style: "width: 400px; height: 150px; border-color: gray;"});
         divVysledek.appendChild(Element.create("span", "Výsledek hlídky:"));
         divVysledek.appendChild(Element.create("br"));
         divVysledek.appendChild(iframe);
@@ -650,8 +652,6 @@ pageExtenders.add(PageExtender.create({
         spanInfo.appendChild(odeslat);
     
         // Event handler
-        var odeslatHlidku = odeslatHlidku.bind(this);
-        
         Event.observe(odeslat, "click", function(event) {
             Event.stop(event);
             
@@ -689,13 +689,13 @@ pageExtenders.add(PageExtender.create({
             progressElement.innerHTML = "Probíhá odesílání hlídky. Čekejte..."
         
         // Vytvor form
-        var form = Element.create("form", null, {action: context.url, target: targetFrame.name, method: "post"});
+        var form = Element.create("form", null, {action: url, target: targetFrame.name, method: "post"});
         form.appendChild(Element.create("input", null, {name: "login", value: login || "", type: "hidden"}));
         form.appendChild(Element.create("input", null, {name: "heslo", value: heslo || "", type: "hidden"}));
         
+        form.appendChild(Element.create("input", null, {name: "kdo", value: page.id, type: "hidden"}));
         form.appendChild(Element.create("input", null, {name: "cas", value: page.cas, type: "hidden"}));
         form.appendChild(Element.create("input", null, {name: "aliance", value: page.aliance.jmeno, type: "hidden"}));
-        form.appendChild(Element.create("input", null, {name: "kdo", value: page.id, type: "hidden"}));
         form.appendChild(Element.create("input", null, {name: "zlato", value: page.provincie().zlato || "", type: "hidden"}));
         
         // Sily clenu
@@ -706,7 +706,7 @@ pageExtenders.add(PageExtender.create({
                 continue;
             }
             
-            form.appendChild(Element.create("input", null, {name: "sila[" + data.id + "]", value: data.sila, type: "hidden"}));
+            form.appendChild(Element.create("input", null, {name: "hraci[" + data.id + "]", value: data.sila, type: "hidden"}));
         }
         
         page.content.appendChild(form);

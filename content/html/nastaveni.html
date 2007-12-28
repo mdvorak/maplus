@@ -18,7 +18,7 @@ window.nastaveniManager = new TabManager('n_container');
 
 
 <!-- Obecne -->
-<table id="n_obecne" cellpadding="0" cellspacing="0" style="display: block;">
+<table id="n_obecne" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
         <col width="80" />
@@ -72,7 +72,7 @@ nastaveniManager.addTab("Obecné", "n_obecne");
 </script>
 
 <!-- Menu -->
-<table id="n_menu" cellpadding="0" cellspacing="0" style="display: block;">
+<table id="n_menu" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
         <col width="80" />
@@ -210,7 +210,7 @@ nastaveniManager.addTab("Menu", "n_menu");
 </script>
 
 <!-- Pošta -->
-<table id="n_posta" cellpadding="0" cellspacing="0" style="display: block;">
+<table id="n_posta" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
         <col width="80" />
@@ -307,7 +307,7 @@ nastaveniManager.addTab("Pošta", "n_posta");
 </script>
 
 <!-- Bestiář -->
-<table id="n_bestiar" cellpadding="0" cellspacing="0" style="display: block;">
+<table id="n_bestiar" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
         <col width="80" />
@@ -446,7 +446,7 @@ nastaveniManager.addTab("Bestiář", "n_bestiar");
 </script>
 
 <!-- Výpis útoků -->
-<table id="n_vypis" cellpadding="0" cellspacing="0" style="display: block;">
+<table id="n_vypis" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
         <col width="80" />
@@ -490,59 +490,20 @@ nastaveniManager.addTab("Bestiář", "n_bestiar");
 <script type="text/javascript">
 nastaveniManager.addTab("Výpis útoků", "n_vypis");
 </script>
---------------------------------------
+
 <!-- Hlídka -->
-<table id="n_hlidka" cellpadding="0" cellspacing="0" style="display: block;">
-    <colgroup>
-        <col width="140" />
-        <col width="80" />
-        <col width="10" />
-        <col width="140" />
-        <col width="80" />
-    </colgroup>
-    <tr><td id="n_hlidkaHelpers" style="display: none;"></td></tr>
-</table>
-<script type="text/javascript">
-function nastaveniHlidkaCreate() {
-    var aliance = dataConfig.evalPrefNodeList('regent/aliance[id]');
-    if (aliance.length == 0)
-        return;
-
-    var hlidkaHtml = Chrome.loadText("html/nastavenihlidka.html");
-    
-    aliance.each(function(i) {
-        // Zjisti jmeno aliance
-        var data = MaData.najdiAlianci(null, i.getNumber("id"));
-        if (data == null || data.jmeno == null || data.jmeno.length == 0)
-            return; // continue;
-    
-        // Vytvor html
-        var tbody = Element.create("tbody", hlidkaHtml);
-        $('n_hlidka').appendChild(tbody);
-        
-        // Inicializuj alianci (NastaveniHlidka je definovano v "nastavenihlidka.html");
-        NastaveniHlidka.init(tbody, data.jmeno);
-        
-        // Vytvor pomocny element na load a save
-        var inputController = Element.create("input", null, {type: "hidden", value: ""});
-        $('n_hlidkaHelpers').appendChild(inputController);
-        
-        var hlidka = 'NastaveniHlidka["' + data.jmeno + '"]';
-        var configPath = 'NastaveniHlidka.getAlianceConfig(' + data.jmeno + ')';
-        inputController.setAttribute("onload", hlidka + '.onload(' + configPath + ');');
-        inputController.setAttribute("onsave", hlidka + '.onsave(' + configPath + ');');
-    });
-}
-
-nastaveniHlidkaCreate();
-</script>
+<div id="n_hlidka" style="display: none;">
+    <input type="hidden" value="" onload="NastaveniHlidka.onload(this.config);" 
+                                  onsave="NastaveniHlidka.onsave(this.config);" />
+</div>
+<script src="chrome://maplus/content/html/nastavenihlidka.js" type="text/javascript" charset="UTF-8"></script>
 <script type="text/javascript">
 nastaveniManager.addTab("Hlídka", "n_hlidka");
 </script>
 
 
 <!-- O Aplikaci -->
-<table id="n_about" cellpadding="0" cellspacing="0" style="display: block;">
+<table id="n_about" cellpadding="0" cellspacing="0" style="display: none;">
     <colgroup>
         <col width="140" />
         <col width="80" />

@@ -67,6 +67,8 @@ pageExtenders.add(PageExtender.create({
                 $('plus_vek').innerHTML = ADMIN_ID_AGE;
             }
             
+            window.PAGE_ID = page.id;
+            
             // Inicializace vlastnich linku
             window.NastaveniVlastniLinky.initPage(page);
         
