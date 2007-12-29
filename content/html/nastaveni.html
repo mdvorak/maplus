@@ -493,6 +493,11 @@ nastaveniManager.addTab("Výpis útoků", "n_vypis");
 
 <!-- Hlídka -->
 <div id="n_hlidka" style="display: none;">
+    <div id="n_hlidka_content"></div>
+    <img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /><br />
+    <span class="small dark">Pozn: Hlídka se dá přidat i jako vlastní odkaz v menu.</span><br />
+    <img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" />
+    
     <input type="hidden" value="" onload="NastaveniHlidka.onload(this.config);" 
                                   onsave="NastaveniHlidka.onsave(this.config);" />
 </div>

@@ -659,7 +659,9 @@ pageExtenders.add(PageExtender.create({
             odeslat.style.display = "none";
             
             // Pokud je stranka starsi nez minutu, udelej refresh
-            if (new Date().getTime() - document.lastModified > 60000) {
+            if (new Date().getTime() - Date.parse(document.lastModified) > 60000) {
+                spanInfo.innerHTML = "Probíhá obnovení stránky. Čekejte...";
+            
                 var args = $H(page.arguments);
                 delete args["id"];
                 delete args["code"];

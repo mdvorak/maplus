@@ -48,6 +48,7 @@ window.NastaveniHlidka = {
         
         // Html hlidky pro jednu alianci
         var hlidkaHtml = Chrome.loadText("html/nastavenihlidka.html");
+        var prvniAli = true;
         
         // Vytvor kod pro vsechny aliance
         ALIANCE_ID.each(function(id) {
@@ -59,18 +60,24 @@ window.NastaveniHlidka = {
             var aliance = data.jmeno;
                     
             // Vytvor html
-            var tbody = Element.create("tbody", hlidkaHtml);
-            $('n_hlidka').appendChild(tbody);
+            if (!prvniAli) {
+                var separator = Element.create("img", null, {src: "chrome://maplus/content/html/img/empty.bmp", height: 20, alt: ""});
+                $('n_hlidka_content').appendChild(separator);
+            }
+            prvniAli = false;
+            
+            var content = Element.create("div", hlidkaHtml);
+            $('n_hlidka_content').appendChild(content);
             
             // Inicializuj alianci
-            var spanAliance = $X('.//span[@id = "n_hlidka_aliance"]', tbody);
-            var selectHlidka = $X('.//select[@id = "n_hlidka_hlidka"]', tbody);
-            var inputAdresa = $X('.//input[@id = "n_hlidka_adresa"]', tbody);
-            var inputLogin = $X('.//input[@id = "n_hlidka_login"]', tbody);
-            var inputHeslo = $X('.//input[@id = "n_hlidka_heslo"]', tbody);
-            var inputVypis = $X('.//input[@id = "n_hlidka_vypis"]', tbody);
-            var inputNastaveni = $X('.//input[@id = "n_hlidka_nastaveni"]', tbody);
-            var configRows = $XL('.//tr[@class = "hlidka_config"]', tbody);
+            var spanAliance = $X('.//span[@id = "n_hlidka_aliance"]', content);
+            var selectHlidka = $X('.//select[@id = "n_hlidka_hlidka"]', content);
+            var inputAdresa = $X('.//input[@id = "n_hlidka_adresa"]', content);
+            var inputLogin = $X('.//input[@id = "n_hlidka_login"]', content);
+            var inputHeslo = $X('.//input[@id = "n_hlidka_heslo"]', content);
+            var inputVypis = $X('.//input[@id = "n_hlidka_vypis"]', content);
+            var inputNastaveni = $X('.//input[@id = "n_hlidka_nastaveni"]', content);
+            var configRows = $XL('.//tr[@class = "hlidka_config"]', content);
             
             // Pomocna funkce pro zobrazovani detailni konfigurace
             var showConfigElements = function(visible) {
@@ -92,11 +99,11 @@ window.NastaveniHlidka = {
             Event.observe(selectHlidka, "change", function(event) {
                 if (selectHlidka.value == "toolshop") {
                     inputAdresa.value = HLIDKA_TOOLSHOP;
-                    inputAdresa.readonly = true;
+                    inputAdresa.disabled = true;
                 }
                 else {
                     inputAdresa.value = "";
-                    inputAdresa.readonly = false;
+                    inputAdresa.disabled = false;
                 }
                     
                 inputLogin.value = window.PAGE_ID;
@@ -114,11 +121,11 @@ window.NastaveniHlidka = {
                 if (adresa != null && adresa.length > 0) {
                     if (adresa == HLIDKA_TOOLSHOP) {
                         selectHlidka.value = "toolshop";
-                        inputAdresa.readonly = true;
+                        inputAdresa.disabled = true;
                     }
                     else {
                         selectHlidka.value = "custom";
-                        inputAdresa.readonly = false;
+                        inputAdresa.disabled = false;
                     }
                     
                     inputAdresa.value = adresa;
@@ -134,7 +141,7 @@ window.NastaveniHlidka = {
                 
                     selectHlidka.value = "";
                     inputAdresa.value = "";
-                    inputAdresa.readonly = false;
+                    inputAdresa.disabled = false;
                     inputLogin.value = "";
                     inputHeslo.value = "";
                     inputVypis.checked = true;
