@@ -597,7 +597,6 @@ pageExtenders.add(PageExtender.create({
         if (cfg == null)
             return false;
         
-        // Hlidka pro okrsok: ODSTRANIT!!! "http://www.okrsok.cz/melior/php/plushlidka.php"
         context.url = cfg.getPref("url");
         if (context.url == null || context.url.length < 10)
             return false;
