@@ -82,6 +82,7 @@ pageExtenders.add(PageExtender.create({
             if (data != -1)
                 return data;
         
+            console.group("Zjistovani dat o provincii..");
             try {
                 // Analyzuj
                 var p = {
@@ -118,9 +119,12 @@ pageExtenders.add(PageExtender.create({
                 return p;
             }
             catch (ex) {
-                console.error("Chyba pri zjistovani dat o provincii: " + ex);
+                console.error(ex);
                 data = null;
                 return null;
+            }
+            finally {
+                console.groupEnd();
             }
         }
         

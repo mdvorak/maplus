@@ -683,7 +683,7 @@ pageExtenders.add(PageExtender.create({
             console.warn("Hlidka jiz odeslana (stav=%d)", page.aliance.hlidka);
             return;
         }
-        
+                
         page.aliance.hlidka = 1;
         console.debug("Vytvareni formulare hlidky..");
         
