@@ -287,7 +287,7 @@ pageExtenders.add(PageExtender.create({
                 continue;
             
             clenovePuvodni = clenovePuvodni.without(id);
-            MaData.aktualizujProvincii(id, regent, provincie, null, presvedceni, jmenoAliance);
+            MaData.aktualizujProvincii(id, regent, jmenoProvincie, null, presvedceni, jmenoAliance);
             
             // Pro aktivni id
             context.idClenu.push({ element: tr.cells[0], id: id});
