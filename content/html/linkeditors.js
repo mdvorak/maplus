@@ -308,7 +308,7 @@ var LinkEditors = {
                 set: function(url) {
                     var data = parseUrl(url);
                     if (data.arguments["aliance"] != null)
-                        select.value = data.arguments["aliance"].replace(/vypis_/, "");
+                        select.value = data.arguments["aliance"].replace(/vypsat_/, "");
                     else
                         select.value = "";
                 },
