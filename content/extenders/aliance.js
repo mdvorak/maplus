@@ -634,12 +634,25 @@ pageExtenders.add(PageExtender.create({
         divVysledek.appendChild(Element.create("br"));
         divVysledek.appendChild(iframe);
         
+        Event.observe(iframe, "load", function(event) {
+            try {
+                var docref = Marshal.getDocumentReference();
+                var size = Marshal.callMethod("FrameHelper", "getFrameContentSize", [docref, iframe.id]);
+                if (size.height > 0)
+                    iframe.style.height = (size.height + 15) + "px";
+            }
+            catch (ex) {
+                console.warn("Nepodarilo se ziskat velikost dokumentu v iframu: %o", ex);
+            }
+        });
+        
         page.content.appendChild(divVysledek);
     
         // Odesli hlidku pokud to bylo vyzadano
         if (context.odeslat) {
+            var scroll = String.equals(page.arguments["scroll"], "true", true);
             divVysledek.style.display = "";
-            odeslatHlidku(page, context.url, context.login, context.password, iframe, spanInfo, false);
+            odeslatHlidku(page, context.url, context.login, context.password, iframe, spanInfo, scroll);
             return;
         }
     
@@ -666,6 +679,7 @@ pageExtenders.add(PageExtender.create({
                 delete args["code"];
                 delete args["ftc"];
                 args["hlidka"] = "true";
+                args["scroll"] = "true";
                 
                 document.location.href = MaPlus.buildUrl(page, "aliance.html", args);
             }

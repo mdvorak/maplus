@@ -86,3 +86,20 @@ var Clipboard = {
 };
 
 Marshal.registerObject("Clipboard", Clipboard);
+
+
+var FrameHelper = {
+    getFrameContentSize_PROXY: Marshal.BY_VALUE,
+    getFrameContentSize: function(doc, frameId) {
+        var frame = doc.getElementById(frameId);
+        if (frame == null)
+            throw new ArgumentException("frame not found.", "frameId", frameId);
+            
+        return {
+            width: frame.contentDocument.width,
+            height: frame.contentDocument.height
+        };
+    }
+};
+
+Marshal.registerObject("FrameHelper", FrameHelper);
