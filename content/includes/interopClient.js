@@ -211,6 +211,11 @@ var Marshal = {
         return result.value;
     },
     
+    // Returns remote reference to the current document
+    getDocumentReference: function() {
+        return Marshal.callMethod("Marshal", "getDocumentReference");
+    },
+    
     _createProxyFromDefinition: function(objectName, def, isAnonymousReference) {
         if (objectName == null)
             throw new ArgumentNullException("objectName");

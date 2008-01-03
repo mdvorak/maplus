@@ -431,6 +431,13 @@ Object.extend(Marshal, {
             
             this._validateCall(elem.ownerDocument, objectName);
             
+            // Special case
+            if (objectName == "Marshal" && methodName == "getDocumentReference") {
+                this._processResult(elem, Marshal.BY_REF, elem.ownerDocument);
+                return;
+            }
+            
+            // Continue normal execution
             var obj = this._objects.getObject(elem.ownerDocument, objectName, false);
             if (obj == null)
                 throw new MarshalException("Object is not registered.", objectName, methodName);
@@ -460,55 +467,65 @@ Object.extend(Marshal, {
             // Call method
             var retval = method.apply(obj, args);
             
-            if (retval != null) {
-                // Process result
-                switch (methodType) {
-                    case Marshal.BY_VALUE:
-                        elem.setAttribute("retval", Object.toJSON(retval));
-                        break;
+            if (!this._processResult(elem, methodType, retval))
+                throw new MarshalException(String.format("Invalid method marshal type ({0}).", methodType), objectName, methodName);
+                
+            // Everything gone just fine
+        }
+        catch (e) {
+            elem.setAttribute("exception", Object.toJSON(e));
+        }
+    },
+    
+    _processResult: function(elem, methodType, retval) {
+        if (retval != null) {
+            // Process result
+            switch (methodType) {
+                case Marshal.BY_VALUE:
+                    elem.setAttribute("retval", Object.toJSON(retval));
+                    return true;
+                
+                case Marshal.BY_REF:
+                    var objectId = this._objects.getName(elem.ownerDocument, retval);
+                    var def = this._createProxyDefinition(retval);
                     
-                    case Marshal.BY_REF:
-                        var objectId = this._objects.getName(elem.ownerDocument, retval);
-                        var def = this._createProxyDefinition(retval);
+                    var reference = {
+                        objectId: objectId,
+                        proxyDefinition: def
+                    };
+                    
+                    elem.setAttribute("reference", Object.toJSON(reference));
+                    return true;
+                    
+                case Marshal.BY_REF_ARRAY:
+                    if (!(retval instanceof Array))
+                        throw new MarshalException("Returned object is not an array.", objectName, methodName);
+                
+                    var objects = new Array();
+                
+                    for (var i = 0; i < retval.length; i++) {
+                        var obj = retval[i];
+                        var objectId = this._objects.getName(elem.ownerDocument, obj);
+                        var def = this._createProxyDefinition(obj);
                         
                         var reference = {
                             objectId: objectId,
                             proxyDefinition: def
                         };
                         
-                        elem.setAttribute("reference", Object.toJSON(reference));
-                        break;
-                        
-                    case Marshal.BY_REF_ARRAY:
-                        if (!(retval instanceof Array))
-                            throw new MarshalException("Returned object is not an array.", objectName, methodName);
+                        objects.push(reference);
+                    }
+                
+                    elem.setAttribute("list", Object.toJSON(objects));
+                    return true;
                     
-                        var objects = new Array();
-                    
-                        for (var i = 0; i < retval.length; i++) {
-                            var obj = retval[i];
-                            var objectId = this._objects.getName(elem.ownerDocument, obj);
-                            var def = this._createProxyDefinition(obj);
-                            
-                            var reference = {
-                                objectId: objectId,
-                                proxyDefinition: def
-                            };
-                            
-                            objects.push(reference);
-                        }
-                    
-                        elem.setAttribute("list", Object.toJSON(objects));
-                        break;
-                        
-                    default:
-                        throw new MarshalException(String.format("Invalid method marshal type ({0}).", methodType), objectName, methodName);
-                }
+                default:
+                    return false;
             }
         }
-        catch (e) {
-            elem.setAttribute("exception", Object.toJSON(e));
-        }
+        
+        // else no retval
+        return true;
     },
     
     _getProxyDefinitionHandler: function(event) {

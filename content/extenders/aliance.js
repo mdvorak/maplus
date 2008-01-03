@@ -629,7 +629,7 @@ pageExtenders.add(PageExtender.create({
         // iframe pro vysledek hlidky
         var divVysledek = Element.create("div", null, {style: "display: none;"});
         
-        var iframe = Element.create("iframe", null, {name: "plus_hlidka", style: "width: 400px; height: 150px; border-color: gray;"});
+        var iframe = Element.create("iframe", null, {id: "plus_hlidka", name: "plus_hlidka", style: "width: 100%; max-width: 600px; min-height: 150px; border-color: gray;"});
         divVysledek.appendChild(Element.create("span", "Výsledek hlídky:"));
         divVysledek.appendChild(Element.create("br"));
         divVysledek.appendChild(iframe);
