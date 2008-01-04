@@ -100,3 +100,22 @@ Marshal.registerObject("localConfigManager", localConfigManager);
 Marshal.registerObject("ConfigMenuHelper", ConfigMenuHelper);
 WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
 WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });
+
+
+
+// Heslo pro hlidku
+var HlidkaHeslo = {
+    _cache: new Object(),
+
+    setPassword_PROXY: Marshal.BY_VALUE,
+    setPassword: function(url, login, heslo) {
+        PasswordManager.setPassword(url, "MaPlus Hlidka", login, heslo);
+    },
+
+    getPassword_PROXY: Marshal.BY_VALUE,
+    getPassword: function(url, login) {
+        return PasswordManager.getPassword(url, "MaPlus Hlidka", login);
+    }
+};
+
+Marshal.registerObject("HlidkaHeslo", HlidkaHeslo);

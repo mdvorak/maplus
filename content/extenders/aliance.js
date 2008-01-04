@@ -578,7 +578,7 @@ pageExtenders.add(PageExtender.create({
 }));
 
 
-
+var HlidkaHeslo = Marshal.getObjectProxy("HlidkaHeslo");
 
 // Hlidka
 pageExtenders.add(PageExtender.create({
@@ -602,7 +602,14 @@ pageExtenders.add(PageExtender.create({
             return false;
             
         context.login = cfg.getPref("login");
-        context.password = cfg.getPref("heslo");
+        
+        // Zpetna kompatibilita k verzi 1.2.2
+        var password = cfg.getPref("heslo");
+        if (password != null) {
+            if (HlidkaHeslo.getPassword(context.url, context.login) == null)
+                HlidkaHeslo.setPassword(context.url, context.login, password);
+            cfg.setPref("heslo", null);
+        }
             
         // Odeslat hlidku automaticky?
         context.odeslat = String.equals(page.arguments["hlidka"], "true", true);
@@ -652,7 +659,7 @@ pageExtenders.add(PageExtender.create({
         if (context.odeslat) {
             var scroll = String.equals(page.arguments["scroll"], "true", true);
             divVysledek.style.display = "";
-            odeslatHlidku(page, context.url, context.login, context.password, iframe, spanInfo, scroll);
+            odeslatHlidku(page, context.url, context.login, iframe, spanInfo, scroll);
             return;
         }
     
@@ -686,12 +693,12 @@ pageExtenders.add(PageExtender.create({
             // Jinak odesli hlidku s aktualnimi daty
             else {
                 divVysledek.style.display = "";
-                odeslatHlidku(page, context.url, context.login, context.password, iframe, spanInfo, true);
+                odeslatHlidku(page, context.url, context.login, iframe, spanInfo, true);
             }
         });
     },
     
-    odeslatHlidku: function(page, url, login, heslo, targetFrame, progressElement, scroll) {
+    odeslatHlidku: function(page, url, login, targetFrame, progressElement, scroll) {
         if (page.aliance.hlidka > 0) {
             console.warn("Hlidka jiz odeslana (stav=%d)", page.aliance.hlidka);
             return;
@@ -702,6 +709,9 @@ pageExtenders.add(PageExtender.create({
         
         if (progressElement != null)
             progressElement.innerHTML = "Probíhá odesílání hlídky. Čekejte..."
+        
+        // Ziskej heslo
+        var heslo = HlidkaHeslo.getPassword(url, login);
         
         // Vytvor form
         var form = Element.create("form", null, {action: url, target: targetFrame.name, method: "post"});

@@ -33,7 +33,9 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
+
+var HlidkaHeslo = Marshal.getObjectProxy("HlidkaHeslo");
+
 window.NastaveniHlidka = {
     events: new Hash(),
 
@@ -130,7 +132,7 @@ window.NastaveniHlidka = {
                     
                     inputAdresa.value = adresa;
                     inputLogin.value = config.getPref("login");
-                    inputHeslo.value = config.getPref("heslo");
+                    inputHeslo.value = HlidkaHeslo.getPassword(adresa, inputLogin.value);
                     inputVypis.checked = config.getBoolean("zobrazitVypis");
                     inputNastaveni.checked = config.getBoolean("zobrazitNastaveni");
                     
@@ -153,14 +155,14 @@ window.NastaveniHlidka = {
                 if (inputAdresa.value.length > 0) {
                     config.setPref("url", inputAdresa.value);
                     config.setPref("login", inputLogin.value);
-                    config.setPref("heslo", inputHeslo.value);
+                    HlidkaHeslo.setPassword(inputAdresa.value, inputLogin.value, inputHeslo.value);
                     config.setPref("zobrazitVypis", inputVypis.checked);
                     config.setPref("zobrazitNastaveni", inputNastaveni.checked);
                 }
                 else {
                     config.setPref("url", null);
                     config.setPref("login", null);
-                    config.setPref("heslo", null);
+                    HlidkaHeslo.setPassword(inputAdresa.value, inputLogin.value, null);
                     config.setPref("zobrazitVypis", null);
                     config.setPref("zobrazitNastaveni", null);
                 }
