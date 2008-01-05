@@ -4,6 +4,8 @@
  *  Prototype is freely distributable under the terms of an MIT-style license.
  *  For details, see the Prototype web site: http://www.prototypejs.org/
  *
+ *  Michal Dvorak - added usage of forEach from JS 1.6
+ *
 /*--------------------------------------------------------------------------*/
 
 var Prototype = {
@@ -747,6 +749,10 @@ Object.extend(Array.prototype, {
     return '[' + results.join(', ') + ']';
   }
 });
+
+// use native browser JS 1.6 implementation if available
+if (typeof Array.prototype.forEach == "function")
+  Array.prototype._each = Array.prototype.forEach;
 
 Array.prototype.toArray = Array.prototype.clone;
 
