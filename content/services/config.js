@@ -69,7 +69,7 @@ var plusConfigAutosave = PageExtender.create({
 });
 
 // Optimilizace rychlosti
-var ConfigMenuHelper = {
+var ConfigHelper = {
     getLinkData_PROXY: Marshal.BY_VALUE,
     getLinkData: function(configNode) {
         if (configNode == null)
@@ -91,13 +91,30 @@ var ConfigMenuHelper = {
             p.setPref("id", kouzla[i].id);
             p.setPref("name", kouzla[i].name);
         }
+    },
+    
+    addHit_PROXY: Marshal.BY_VALUE,
+    addHit: function(configNode) {
+        var value = configNode.getNumber();
+        if (isNaN(value) || value < 0)
+            value = 0;
+        
+        configNode.setPref(null, ++value);
+        
+        var from = parseInt(configNode.getAttribute("from"));
+        if (isNaN(from)) {
+            from = new Date().getTime();
+            configNode.setAttribute("from", from);
+        }
+        
+        return value;
     }
 };
 
 // Register
 Marshal.registerObject("configManager", configManager);
 Marshal.registerObject("localConfigManager", localConfigManager);
-Marshal.registerObject("ConfigMenuHelper", ConfigMenuHelper);
+Marshal.registerObject("ConfigHelper", ConfigHelper);
 WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
 WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });
 

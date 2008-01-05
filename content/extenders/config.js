@@ -85,7 +85,7 @@ Object.extend(PlusConfig, {
         var cfg = Marshal.callMethod("configManager", "getConfig", [name]);
         cfg = Object.extend(cfg, PlusConfig.prototype);
         
-        cfg.save = function() { PlusConfig.saveConfig(name); };
+        cfg.save = function() { PlusConfig.saveConfig(id); };
         
         return cfg;
     },

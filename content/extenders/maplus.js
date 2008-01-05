@@ -60,6 +60,20 @@ pageExtenders.add(PageExtender.create({
 }));
 
 
+// Hitcounter
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "MaPlus - Hitcounter"; },
+
+    analyze: function(page, context) {
+        var cfg = page.config.getPrefNode("hits", true);
+        var hits = Marshal.callMethod("ConfigHelper", "addHit", [cfg]);
+        console.log("Hits: %d", hits); 
+        return true;
+    },
+    
+    process: null
+}));
+
 // Plus menu (zobrazit vzdy)
 pageExtenders.add(PageExtender.create({
     getName: function() { return "MaPlus - Menu"; },

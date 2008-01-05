@@ -80,7 +80,7 @@ window.NastaveniVlastniLinky = {
         
         links.each(function(i) {
             // Optimilizace rychlosti
-            var data = Marshal.callMethod("ConfigMenuHelper", "getLinkData", [i]);
+            var data = Marshal.callMethod("ConfigHelper", "getLinkData", [i]);
             
             // Vytvor novy radek
             var record = createRecord();

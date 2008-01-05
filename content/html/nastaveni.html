@@ -543,8 +543,11 @@ nastaveniManager.addTab("Hlídka", "n_hlidka");
     </colgroup>
     <tbody>
         <tr>
-            <td width="100%">
+            <td style="width: 100%;">
             <span>
+                <span id="n_hits" style="font-style: italic;"></span>
+                <input type="hidden" onload="NastaveniHits.onload(this.config);" onsave="" />
+                
                 Zde si můžete zobrazit poslední <a id="plus_novinky" href="javascript://">Novinky</a>
                 <br />
                 <br />
@@ -555,6 +558,21 @@ nastaveniManager.addTab("Hlídka", "n_hlidka");
         </tr>
     </tbody>
 </table>
+<script type="text/javascript">
+window.NastaveniHits = {
+    onload: function(config) {
+        var c = config.getPrefNode('hits', false); 
+        
+        if (c != null) { 
+            var from = parseInt(c.getAttribute('from'));
+            var dnu = Math.ceil((new Date().getTime() - from) / (24 * 60 * 60000));
+        
+            var html = 'Za posledních ' + dnu + ' dnů jste udělal/a ' + c.getNumber() + ' hitů.';
+            $('n_hits').innerHTML = html + '<br /><br />';
+        }
+    }
+};
+</script>
 <script type="text/javascript">
 nastaveniManager.addTab("O Aplikaci", "n_about");
 </script>

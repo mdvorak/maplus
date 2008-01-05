@@ -88,6 +88,7 @@ var Clipboard = {
 Marshal.registerObject("Clipboard", Clipboard);
 
 
+// Ziskani rozmeru dokumentu v iframu
 var FrameHelper = {
     getFrameContentSize_PROXY: Marshal.BY_VALUE,
     getFrameContentSize: function(doc, frameId) {
