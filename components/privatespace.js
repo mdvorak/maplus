@@ -69,7 +69,7 @@ PrivateSpace.prototype = {
         var services = loadFileListDefinition(CONTENT_URL + "services.xml", CONTENT_URL);
         for (var i = 0; i < services.length; i++) {
             try {
-            jssubscriptLoader.loadSubScript(services[i]);
+                jssubscriptLoader.loadSubScript(services[i]);
             }
             catch(ex) { alert(services[i] + ":\n" + ex); }
         }

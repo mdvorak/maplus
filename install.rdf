@@ -3,20 +3,19 @@
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>maplus@michal.dvorak</em:id>
-    <em:version>1.2.3pre0</em:version>
+    <em:version>1.2.3</em:version>
     <em:type>2</em:type>
     <em:name>Melior Annis Plus</em:name>
     <em:description>Vylepseni pro hru Melior Annis.</em:description>
     <em:creator>Michal Dvorak</em:creator>
     <em:iconURL>chrome://maplus/skin/icon.png</em:iconURL>
     <em:homepageURL>http://maplus.zapto.org/</em:homepageURL>
-    <em:updateURL>https://maplus.zapto.org/maplus.rdf</em:updateURL>
     
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>2.0.0.3</em:minVersion>
-        <em:maxVersion>3.0b2</em:maxVersion>
+        <em:minVersion>2.0</em:minVersion>
+        <em:maxVersion>3.0b3</em:maxVersion>
       </Description>
     </em:targetApplication>
   </Description>

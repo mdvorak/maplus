@@ -65,6 +65,31 @@ window.nastaveniManager = new TabManager('n_container');
             <td></td>
         </tr>
         <tr><td colspan="2"><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        
+        <tr>
+            <td><span>Vypnout nastavení útoku</span></td>
+            <td>
+                <input type="checkbox"
+                    onload="this.checked = this.config.getPrefNode('nastaveni', true).getPrefNode('utok', true).getBoolean('disabled', false);"
+                    onsave="this.config.getPrefNode('nastaveni', true).getPrefNode('utok', true).setPref('disabled', this.checked);" />
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+
+            <td><span></span></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <span class="small dark">(Vypne jak nastavení jednotek, kouzel a podpor, tak časové omezení)</span>
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+            <td></td>
+            <td></td>
+        </tr>
+        <tr><td colspan="2"><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
     </tbody>
 </table>
 <script type="text/javascript">

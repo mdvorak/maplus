@@ -38,12 +38,28 @@ var PERSISTENT_FIELDS_WARNING = "Pozn: Zelený okraj pole znamená, že hodnota 
                                 "Pokud je checkbox vedle pole zaškrtnutý, hodnota je uložena a bude načtena při příštím zobrazení stránky.<br/>" +
                                 "Checkbox v neurčitém stavu značí, že pole má uloženou hodnotu jinou než je v něm aktuálně vyplněná.";
 
+// Disabled flag
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Utok - Disabled flag"; },
+    
+    analyze: function(page, context) {
+        page.utokDisabled = page.config.getPrefNode("nastaveni", true).getPrefNode("utok", true).getBoolean("disabled", false);
+        return true;
+    },
+    
+    process: null
+}));
+
 // Utok
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Utok - Stale nastaveni"; },
 
     analyze: function(page, context) {
         if (page.name != "utok.html")
+            return false;
+            
+        // Neni tenhle extender vypnuty?
+        if (page.utokDisabled)
             return false;
     
         // Vytvor seznam persistent poli
@@ -181,6 +197,10 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         if (page.name != "utok.html")
+            return false;
+            
+        // Neni tenhle extender vypnuty?
+        if (page.utokDisabled)
             return false;
     
         context.submit = $X('.//form[@name = "formular" and @action = "boj.html"]//input[@type = "submit"]', page.content);
