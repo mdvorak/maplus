@@ -76,7 +76,7 @@ pageExtenders.add(PageExtender.create({
         // Nacteni ulozenych alianci (musi byt v process protoze behem analyzy se teprv zjistuji id alianci)
         var seznam = page.config.getRegent().getPrefNode("aliance", true).evalPrefNodeList("id");
         if (seznam == null)
-            return false;
+            return;
             
         context.aliance = new Array();
         $A(seznam).each(function(i) {
@@ -86,7 +86,7 @@ pageExtenders.add(PageExtender.create({
             });
         
         if (context.aliance.length == 0)
-            return false;
+            return;
     
         // Prejmenovani puvodniho linku
         context.alianceLink.innerHTML = "Ali";

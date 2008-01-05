@@ -45,8 +45,10 @@ window.NastaveniHlidka = {
         this._initialized = true;
     
         // Ziskej seznam alianci kde jsem clenem (ALIANCE_ID se plni v extenders/nastaveni.js)
-        if (window.ALIANCE_ID && ALIANCE_ID.length == 0) 
+        if (window.ALIANCE_ID && ALIANCE_ID.length == 0) {
+            $('n_hlidka_content').innerHTML = '<span>Nejste v žádné alianci.</span>';
             return;
+        }
         
         // Html hlidky pro jednu alianci
         var hlidkaHtml = Chrome.loadText("html/nastavenihlidka.html");
@@ -132,7 +134,7 @@ window.NastaveniHlidka = {
                     
                     inputAdresa.value = adresa;
                     inputLogin.value = config.getPref("login");
-                    inputHeslo.value = HlidkaHeslo.getPassword(adresa, inputLogin.value);
+                    inputHeslo.value = HlidkaHeslo.getPassword(adresa, inputLogin.value) || "";
                     inputVypis.checked = config.getBoolean("zobrazitVypis");
                     inputNastaveni.checked = config.getBoolean("zobrazitNastaveni");
                     

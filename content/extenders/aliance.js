@@ -603,7 +603,7 @@ pageExtenders.add(PageExtender.create({
             
         context.login = cfg.getPref("login");
         
-        // Zpetna kompatibilita k verzi 1.2.2
+        // Zpetna kompatibilita k verzi 1.2.2 (odstranit po rekneme 1.3.2008)
         var password = cfg.getPref("heslo");
         if (password != null) {
             if (HlidkaHeslo.getPassword(context.url, context.login) == null)

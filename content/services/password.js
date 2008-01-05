@@ -45,9 +45,12 @@ var PasswordManager = {
             var nsLoginInfo = new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
                                              Components.interfaces.nsILoginInfo, "init");
                                              
-            var formLoginInfo = new nsLoginInfo(host, null, realm, user, password, null, null);
+            var loginInfo = new nsLoginInfo(host, null, realm, user, password, null, null);
             
-            loginManager.removeLogin(loginInfo);
+            try {
+                loginManager.removeLogin(loginInfo);
+            }
+            catch (ex) { }
             if (password != null && password != "")
                 loginManager.addLogin(loginInfo);
         }
@@ -57,7 +60,11 @@ var PasswordManager = {
             var passwordManager = Components.classes["@mozilla.org/passwordmanager;1"]
                                             .getService(Components.interfaces.nsIPasswordManager);
             
-            passwordManager.removeUser(host, user);
+            try {
+                passwordManager.removeUser(host, user);
+            }
+            catch (ex) { }
+            
             if (password != null && password != "")
                 passwordManager.addUser(host, user, password);                
         }

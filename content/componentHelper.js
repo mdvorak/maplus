@@ -44,7 +44,7 @@ const document = {
     createTextNode: function() { return new HTMLElement(); }
 };
 const window = { document: document };
-const navigator = { userAgent: "Gecko" }
+const navigator = { userAgent: "Gecko" };
 
 const nsIDOMXPathResult = Components.interfaces.nsIDOMXPathResult;
 const XPathResult = nsIDOMXPathResult;
@@ -80,9 +80,6 @@ function loadFileListDefinition(definitionUrl, scriptsUrl) {
     var result = new Array();
     
     if (list != null) {
-        var jssubscriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
-                                          .getService(Components.interfaces.mozIJSSubScriptLoader);
-
         // Iterate thru services definition
         for (var i = list.iterateNext(); i != null; i = list.iterateNext()) {
             var src = scriptsUrl + i.getAttribute("src");

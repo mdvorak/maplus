@@ -68,7 +68,10 @@ PrivateSpace.prototype = {
         // Load services from definition (method defined in componentHelper.js)
         var services = loadFileListDefinition(CONTENT_URL + "services.xml", CONTENT_URL);
         for (var i = 0; i < services.length; i++) {
+            try {
             jssubscriptLoader.loadSubScript(services[i]);
+            }
+            catch(ex) { alert(services[i] + ":\n" + ex); }
         }
         
         // Load includes

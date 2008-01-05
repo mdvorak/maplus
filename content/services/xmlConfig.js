@@ -128,7 +128,7 @@ XmlConfigNode.prototype = {
 
     getPrefNode_PROXY: Marshal.BY_REF,
     getPrefNode: function(name, create) {
-        if (!name || !name.match(/^[\w_-.:]+$/))
+        if (!name || !name.match(/^[\w_.:-]+$/))
             throw "Name contains invalid characters.";
         
         var elem = this.ownerDocument.evaluate(name, this, null, XPathResult.ANY_TYPE, null).iterateNext();
