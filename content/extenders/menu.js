@@ -206,7 +206,7 @@ pageExtenders.add(PageExtender.create({
         
         seznam.each(function(i) {
             // Mala optimilizace rychlosti
-            var data = Marshal.callMethod("ConfigHelper", "getLinkData", [i]);
+            var data = Marshal.callMethod("ConfigHelperService", "getLinkData", [i]);
             
             var title = (data.title != null && !data.title.blank()) ? data.title : null;
             var url = (data.url != null && !data.url.blank()) ? data.url : null;

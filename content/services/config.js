@@ -69,7 +69,7 @@ var plusConfigAutosave = PageExtender.create({
 });
 
 // Optimilizace rychlosti
-var ConfigHelper = {
+var ConfigHelperService = {
     getLinkData_PROXY: Marshal.BY_VALUE,
     getLinkData: function(configNode) {
         if (configNode == null)
@@ -114,7 +114,7 @@ var ConfigHelper = {
 // Register
 Marshal.registerObject("configManager", configManager);
 Marshal.registerObject("localConfigManager", localConfigManager);
-Marshal.registerObject("ConfigHelper", ConfigHelper);
+Marshal.registerObject("ConfigHelperService", ConfigHelperService);
 WebExtender.registerExtender(MELIOR_ANNIS_URL + "/*", plusConfigAutosave);
 WebExtender.registerUnloadHandler(function() { configManager.saveAll(); });
 
