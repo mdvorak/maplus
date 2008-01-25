@@ -58,9 +58,21 @@ pageExtenders.add(PageExtender.create({
         page.rightMenu.setAttribute("width", 160);
         
         // Zobraz link v iframu
-        var iframe = Element.create("iframe", null, {src: context.url, style: "width: 100%; height: 100%; border: 0px;"});
-        var div = Element.create("div", null, {style: "width: 100%; height: 100%;"});
+        var iframe = Element.create("iframe", null, {id: "plus_content", src: context.url, style: "width: 100%; height: 100%; border: 0px;"});
+        var div = Element.create("div", null, {style: "width: 100%; min-height: 100%;"});
         div.appendChild(iframe);
+        
+        Event.observe(iframe, "load", function(event) {
+            try {
+                var docref = Marshal.getDocumentReference();
+                var size = Marshal.callMethod("FrameHelper", "getFrameContentSize", [docref, iframe.id]);
+                if (size.height > 0)
+                    div.style.height = (size.height + 15) + "px";
+            }
+            catch (ex) {
+                console.warn("Nepodarilo se ziskat velikost dokumentu v iframu: %o", ex);
+            }
+        });
         
         page.content.innerHTML = '';
         page.content.appendChild(div);   
