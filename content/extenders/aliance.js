@@ -657,6 +657,11 @@ pageExtenders.add(PageExtender.create({
     
         // Odesli hlidku pokud to bylo vyzadano
         if (context.odeslat) {
+            // Skryt form "Vystoupit z aliance"
+            var formVystoupit = $X('//form[@action = "aliance.html" and .//input[contains(@value, "Vystoupit z aliance")]]');
+            if (formVystoupit) formVystoupit.parentNode.removeChild(formVystoupit);
+        
+            // Odesli hlidku
             var scroll = String.equals(page.arguments["scroll"], "true", true);
             divVysledek.style.display = "";
             odeslatHlidku(page, context.url, context.login, iframe, spanInfo, scroll);
