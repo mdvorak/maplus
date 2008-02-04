@@ -479,29 +479,40 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         // Pozn: styly sou definovany v bestiar-style.js
         page.bestiar.table.data.each(function(row) {
-                var td = row.columns["jmeno"];
+                var content = row.columns["jmeno"].firstChild;
                 var jmeno = row.data["jmeno"];
-                var id = parseInt(td.textContent.match(/(?:.*?\s+\[\s+(\d+)\s+\])?/)[1]);
+                var id = parseInt(content.textContent.match(/(?:.*?\s+\[\s+(\d+)\s+\])?/)[1]);
                 
+                // DEBUG
+                if (content.tagName != "FONT")
+                    console.warn("Neocekavany tag");
+                    
+                // Predpokladejme ze jmeno je prvni
+                var elemJmeno = content.firstChild;
+                elemJmeno.parentNode.removeChild(elemJmeno);
+                
+                // Vycisteme si bitevni pole
+                content.innerHTML = '&nbsp;';
+                                
+                // Aktivni jmeno
                 var link = MaPlus.Tooltips.createActiveUnit(page, jmeno);
                 if (link != null) {
-                    link.innerHTML = '<span>' + jmeno + '</span>';
-                    
-                    td.innerHTML = '<span>&nbsp;</span>';
-                    td.appendChild(link);
+                    // Prasarna ale ted se mi s tim nechce uz ......
+                    link.innerHTML = "";
+                    link.appendChild(elemJmeno);
+                    content.appendChild(link);
                 }
                 else {
-                    td.innerHTML = '<span>&nbsp;</span>' + td.innerHTML;
+                    content.appendChild(elemJmeno);
                 }
                 
+                // Id bidujiciho
                 if (!isNaN(id)) {
                 	link = MaPlus.Tooltips.createActiveId(page, id);
                     link.innerHTML = '<span class="bestiarBid">[&nbsp;' + id + '&nbsp;]</span>';
                     
-                	var spanId = Element.create("span", '&nbsp;');
-                	spanId.appendChild(link);
-                	spanId.appendChild(document.createTextNode(' '));
-                	td.appendChild(spanId);
+                	content.appendChild(document.createTextNode(' '));
+                	content.appendChild(link);
                 }
             });
     }

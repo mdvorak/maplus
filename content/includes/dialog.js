@@ -81,8 +81,8 @@ Dialog.prototype = {
             
             background.style.width = '0px';
             background.style.height = '0px';
-            background.style.width = window.innerWidth - scrollbarY + window.scrollMaxX;
-            background.style.height =  window.innerHeight - scrollbarX + window.scrollMaxY;
+            background.style.width = (window.innerWidth - scrollbarY + window.scrollMaxX) + "px";
+            background.style.height =  (window.innerHeight - scrollbarX + window.scrollMaxY) + "px";
         };
         
         resizeBackground();
@@ -105,8 +105,8 @@ Dialog.prototype = {
         content.style.top = '-1000px';
         
         var centerContent = function() {
-            content.style.left = window.scrollX + (window.innerWidth - content.offsetWidth) / 2;
-            content.style.top = window.scrollY + (window.innerHeight - content.offsetHeight) / 2;
+            content.style.left = (window.scrollX + (window.innerWidth - content.offsetWidth) / 2) + "px";
+            content.style.top = (window.scrollY + (window.innerHeight - content.offsetHeight) / 2) + "px";
         };
         
         Event.observe(window, 'resize', centerContent);

@@ -636,7 +636,7 @@ pageExtenders.add(PageExtender.create({
         // iframe pro vysledek hlidky
         var divVysledek = Element.create("div", null, {style: "display: none;"});
         
-        var iframe = Element.create("iframe", null, {id: "plus_hlidka", name: "plus_hlidka", style: "width: 100%; max-width: 600px; min-height: 150px; border-color: gray;"});
+        var iframe = Element.create("iframe", null, {id: "plus_hlidka", name: "plus_hlidka", style: "width: 100%; max-width: 700px; min-height: 150px; border-color: gray;"});
         divVysledek.appendChild(Element.create("span", "Výsledek hlídky:"));
         divVysledek.appendChild(Element.create("br"));
         divVysledek.appendChild(iframe);
@@ -756,5 +756,22 @@ pageExtenders.add(PageExtender.create({
         // Odesli form
         console.info("Odesilani hlidky..");
         form.submit();
+    }
+}));
+
+
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Aliance - Potvrzeni pri vystoupeni z aliance"; },
+
+    analyze: function(page, context) {
+        context.form = $X('//form[@action = "aliance.html" and .//input[contains(@value, "Vystoupit z aliance")]]');
+        return (context.form != null);
+    },
+    
+    process: function(page, context) {
+        Event.observe(context.form, "submit", function(event) {
+            if (!confirm('Opravdu chcete opustit alianci?'))
+                Event.stop(event);
+        });
     }
 }));
