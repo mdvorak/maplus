@@ -42,6 +42,7 @@
     <rule type="sort" condition="Object.compare(stack2.jmeno, stack1.jmeno)">Sestupně</rule>
     <rule type="filter" condition="stack.barva == regent.barva">Moje barva</rule>
     <rule type="filter" condition="stack.barva == 'N'">Neutrální</rule>
+    <rule type="filter" condition="stack.barva == regent.barva || stack.barva == 'N'">Moje + N</rule>
   </rulelist>
 
   <rulelist name="pocet">
