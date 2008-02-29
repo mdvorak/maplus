@@ -98,7 +98,7 @@ var FileIO = {
         var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
                                  .createInstance(Components.interfaces.nsIFileOutputStream);
                        
-        foStream.init(file, -1, 0664, 0);   // (file, access -1=default, perm, 0)
+        foStream.init(file, -1, 0640, 0);   // (file, access -1=default, perm, 0)
         serializer.serializeToStream(dom, foStream, ""); 
         foStream.close();
     },

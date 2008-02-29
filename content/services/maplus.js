@@ -46,7 +46,7 @@ var MaPlus = {
         path.append(EXTENSION_NAME);
 
         if(!path.exists() || !path.isDirectory()) {
-           path.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0775);
+           path.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0750);
         }
         
         return path;
