@@ -60,7 +60,7 @@ pageExtenders.add(PageExtender.create({
         
         var controls = {
             textareaZprava: $X('.//textarea[@name = "text"]', page.content),
-            inputAliance: $X('.//select[@name = "aliancni_posta"]', page.content),
+            selectAliance: $X('.//select[@name = "aliancni_posta"]', page.content),
             inputKomu: $X('.//input[@name = "komu" and @type = "text"]', page.content),
             inputPodpis: $X('.//input[@name = "podpis" and @type = "checkbox"]', page.content),
             inputOdeslat: $X('.//input[@type = "submit"]', page.content)
@@ -69,7 +69,7 @@ pageExtenders.add(PageExtender.create({
         if (controls.textareaZprava == null || controls.inputPodpis == null || controls.inputOdeslat == null)
             return false;
         if (page.arguments["posta"] == "posta_v_ally") {
-            if (controls.inputAliance == null)
+            if (controls.selectAliance == null)
                 return false;
         }
         else if (controls.inputKomu == null) {
@@ -112,7 +112,7 @@ pageExtenders.add(PageExtender.create({
                 controls.textareaZprava.defaultValue = odpoved.text;
                 controls.textareaZprava.value = odpoved.text;
                 // Nastav alianci
-                controls.inputAliance.value = odpoved.aliance;
+                controls.selectAliance.value = odpoved.aliance;
             }
             else {
                 console.log("Nenalezena zprava %s v cache.", page.arguments["odpoved"]);
@@ -215,6 +215,18 @@ pageExtenders.add(PageExtender.create({
             
             controls.textareaZprava.value = text;
         });
+        
+        // Vybrani aliance s vyssi prioritou
+        if (controls.selectAliance != null) {
+            var idPrvniAliance = page.config.getPrefNode("posta", true).getNumber("prvniAliance");
+            $A(controls.selectAliance.options).each(function(o) {
+                var id = parseInt(o.value);
+                if (id == idPrvniAliance) {
+                    controls.selectAliance.value = o.value;
+                    return $break;
+                }
+            });
+        }
         
         // Focus
         controls.textareaZprava.selectionStart = 0;

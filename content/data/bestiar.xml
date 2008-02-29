@@ -147,6 +147,7 @@
   <rulelist name="cas">
     <rule type="sort" condition="Object.compare(stack1.cas, stack2.cas)">Vzestupně</rule>
     <rule type="sort" condition="Object.compare(stack2.cas, stack1.cas)">Sestupně</rule>
+    <rule type="filter" condition="stack.cas &lt;= 600 || isNaN(stack.cas)">&lt; 10 min</rule>
   </rulelist>
 
   <rulelist name="nabidka">

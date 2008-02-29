@@ -534,8 +534,7 @@ pageExtenders.add(PageExtender.create({
 // Linky na dalsi cerpani
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Aliance - Cerpano"; },
-
-    analyze: function(page, context) {
+analyze: function(page, context) {
         var typStranky = page.arguments["aliance"];
         if (typStranky != null) // Cerpa se vzdy pres POST
             return false;
@@ -593,7 +592,11 @@ pageExtenders.add(PageExtender.create({
         }        
         
         // Zjisti url hlidky
-        var cfg = page.config.getPrefNode("hlidka", true).evalPrefNode('aliance[@jmeno = "' + page.aliance.jmeno + '"]');             
+        var cfg = page.config.getPrefNode("hlidka", true).evalPrefNode('aliance[@id = "' + page.aliance.id + '"]');
+        // TODO odstranit k 1.5.2008 - Zpetna kompatibilita
+        if (cfg == null)
+            cfg = page.config.getPrefNode("hlidka", true).evalPrefNode('aliance[@jmeno = "' + page.aliance.jmeno + '"]')
+        
         if (cfg == null)
             return false;
         

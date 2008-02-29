@@ -296,7 +296,33 @@ nastaveniManager.addTab("Menu", "n_menu");
         </tr>
         <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
         
-         <tr>
+        <tr>
+            <td><span>První aliance</span></td>
+            <td>
+                <select id="n_prvniAliance"
+                        onload="this.value = this.config.getPrefNode('posta', true).getNumber('prvniAliance', null);"
+                        onsave="this.config.getPrefNode('posta', true).setPref('prvniAliance', this.value);">
+                    <option value="">Výchozí</option>
+                </select>
+            </td>
+            
+            <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
+            
+        </tr>
+        <tr><td colspan="5"><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+        <script type="text/javascript">
+            if (window.ALIANCE_ID != null) {
+                ALIANCE_ID.each(function(id) {
+                    var data = MaData.najdiAlianci(null, id);
+                    if (data == null || data.jmeno == null || data.jmeno.length == 0)
+                        return; // continue;
+                
+                    $('n_prvniAliance').options.add(new Option(data.jmeno, id));
+                });
+            }
+        </script>
+        
+        <tr>
             <td><span></span></td>
             <td>
                 <!--

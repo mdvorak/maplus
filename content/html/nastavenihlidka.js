@@ -45,7 +45,7 @@ window.NastaveniHlidka = {
         this._initialized = true;
     
         // Ziskej seznam alianci kde jsem clenem (ALIANCE_ID se plni v extenders/nastaveni.js)
-        if (window.ALIANCE_ID && ALIANCE_ID.length == 0) {
+        if (window.ALIANCE_ID == null || ALIANCE_ID.length == 0) {
             $('n_hlidka_content').innerHTML = '<span>Nejste v žádné alianci.</span>';
             return;
         }
@@ -60,9 +60,15 @@ window.NastaveniHlidka = {
             var data = MaData.najdiAlianci(null, id);
             if (data == null || data.jmeno == null || data.jmeno.length == 0)
                 return; // continue;
+                
+            // TODO odstranit k 1.5.2008 - Zpetna kompatibilita
+            var cfg = rootConfig.getPrefNode("hlidka", true).evalPrefNode('aliance[@jmeno = "' + data.jmeno + '"]');
+            if (cfg != null) {
+                cfg.setAttribute("id", id);
+                cfg.setAttribute("jmeno", null);
+            }
             
-            var aliance = data.jmeno;
-                    
+            
             // Vytvor html
             if (!prvniAli) {
                 var separator = Element.create("img", null, {src: "chrome://maplus/content/html/img/empty.bmp", height: 20, alt: ""});
@@ -93,7 +99,7 @@ window.NastaveniHlidka = {
             showConfigElements(false);
             
             // Nazev aliance
-            spanAliance.innerHTML = aliance;
+            spanAliance.innerHTML = data.jmeno;
             
             // Konfigurace hlidky
             selectHlidka.options.add(new Option("- Vyberte -", ""));
@@ -117,9 +123,9 @@ window.NastaveniHlidka = {
             });
             
             // onload a onsave funkce
-            NastaveniHlidka.events[aliance] = new Object();
+            NastaveniHlidka.events[id] = new Object();
             
-            NastaveniHlidka.events[aliance].onload = function(config) {
+            NastaveniHlidka.events[id].onload = function(config) {
                 var adresa = config.getPref("url");
                 
                 if (adresa != null && adresa.length > 0) {
@@ -153,7 +159,7 @@ window.NastaveniHlidka = {
                 }
             };
             
-            NastaveniHlidka.events[aliance].onsave = function(config) {
+            NastaveniHlidka.events[id].onsave = function(config) {
                 if (inputAdresa.value.length > 0) {
                     config.setPref("url", inputAdresa.value);
                     config.setPref("login", inputLogin.value);
@@ -169,7 +175,7 @@ window.NastaveniHlidka = {
                     config.setPref("zobrazitNastaveni", null);
                 }
                 
-                console.debug('Hlidka "%s": url=%o login=%o', aliance, inputAdresa.value, inputLogin.value);
+                console.debug('Hlidka "%s": url=%o login=%o', data.jmeno, inputAdresa.value, inputLogin.value);
             };
         });
     },
@@ -177,26 +183,26 @@ window.NastaveniHlidka = {
     onload: function(rootConfig) {
         NastaveniHlidka.init(rootConfig);
     
-        NastaveniHlidka.events.each(function([aliance, e]) {
-            var config = NastaveniHlidka.getConfigAliance(rootConfig, aliance);
+        NastaveniHlidka.events.each(function([alianceId, e]) {
+            var config = NastaveniHlidka.getConfigAliance(rootConfig, alianceId);
             e.onload(config);
         });
     },
     
     onsave: function(rootConfig) {
-        NastaveniHlidka.events.each(function([aliance, e]) {
-            var config = NastaveniHlidka.getConfigAliance(rootConfig, aliance);
+        NastaveniHlidka.events.each(function([alianceId, e]) {
+            var config = NastaveniHlidka.getConfigAliance(rootConfig, alianceId);
             e.onsave(config);
         });
     },
     
-    getConfigAliance: function(root, aliance) {
+    getConfigAliance: function(root, alianceId) {
         root = root.getPrefNode("hlidka", true);
         
-        var cfg = root.evalPrefNode('aliance[@jmeno = "' + aliance + '"]');
+        var cfg = root.evalPrefNode('aliance[@id = "' + alianceId + '"]');
         if (cfg == null) {
             cfg = root.addPref("aliance");
-            cfg.setAttribute("jmeno", aliance);
+            cfg.setAttribute("id", alianceId);
         }
         
         return cfg;
