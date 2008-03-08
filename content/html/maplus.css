@@ -98,6 +98,8 @@ img.link
 .zprava_spam { }
 .zprava_spam_verejna { background-color: #160A31; }
 .zprava_spam_tajna { background-color: #301010; }
+.zprava_bug { background-color: #D3D300; color: black; }
+.zprava_bug:hover { color: black; }
 
 /* Nastaveni */
 .tabHeader

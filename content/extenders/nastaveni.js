@@ -70,7 +70,7 @@ pageExtenders.add(PageExtender.create({
             
             // Zobraz id admina
             if (ADMIN_ID != null) {
-                adminLink = Element.create("a", ADMIN_ID, {href: MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: ADMIN_ID})});
+                adminLink = Element.create("a", ADMIN_ID, {href: MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: ADMIN_ID, dulezitost: "bug"})});
                 $('plus_mikeeId').appendChild(adminLink);
                 $('plus_vek').innerHTML = ADMIN_ID_AGE;
             }

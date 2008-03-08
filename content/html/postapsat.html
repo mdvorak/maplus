@@ -47,6 +47,10 @@ window.DulezitostZpravy = {
         else {
             console.debug("Nepodporovana dulezitost: %s", value);
             this._unsupportedValue = value;
+            
+            $XL('//input[@name = "dulezitostZpravy"]').each(function(e) {
+                e.checked = false;
+            });
         }
         
         this.setPodpis(!vypnoutPodpis);

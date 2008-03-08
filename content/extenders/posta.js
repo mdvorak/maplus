@@ -39,7 +39,7 @@ var Posta = {
     LINK_CONFIRM_TEXT: "Tento odkaz může vést na stránku s nebezpečným obsahem. Opravdu chcete pokračovat?",
     ODESLANI_DLOUHE_ZPRAVY_CONFIRM_TEXT: "Odesíláte velmi dlouhou zprávu ({0} řádků). Opravdu ji chcete odeslat?",
     POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:pošta v rámci aliance (.*))?$"),
-    DULEZITOST_REGEX: /^:\W*(\w{4,12})\W*\s*/,
+    DULEZITOST_REGEX: /^:\W*(\w{3,12})\W*\s*/,
     
     zjistiDulezitost: function(zprava) {
         var m = zprava.text.match(Posta.DULEZITOST_REGEX);
@@ -554,6 +554,14 @@ pageExtenders.add(PageExtender.create({
 						zprava.trHeader.className += " zprava_bestiar";
 						break;
 				
+				    case "bug":
+				        zprava.trHeader.className += " zprava_bug";
+				        if (zprava.linkOd != null) zprava.linkOd.className += " zprava_bug";
+						if (zprava.linkOdpovedet != null) zprava.linkOdpovedet.className += " zprava_bug";
+						if (zprava.linkPredat != null) zprava.linkPredat.className += " zprava_bug";
+						if (zprava.linkOdpovedetVsem != null) zprava.linkOdpovedetVsem.className += " zprava_bug";
+						break;
+						
 					default:
 						console.log("Neznama dulezitost zpravy %d: %s", zprava.id, zprava.dulezitost);
 						return;
@@ -758,7 +766,7 @@ pageExtenders.add(PageExtender.create({
     	});
     	
     	if (skryteElementy.length > 0) {
-    	    var text = 'Některým zprávám (' + skryteElementy.length + ') vypršela platnost a byly skryty.'
+    	    var text = 'Některým zprávám (' + context.skryt.length + ') vypršela platnost a byly skryty.'
     	             + ' Klikněte <a id="plus_zobrazitZpravy" href="javascript://">zde</a> pro jejich zobrazení.';
     	    var upozorneni = MaPlusMenu.zobrazUpozorneni(text);
     	    
