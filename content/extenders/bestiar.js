@@ -279,7 +279,8 @@ pageExtenders.add(PageExtender.create({
                 // Pridavej pouze nove
                 if (!BestiarSloupce.jePuvodni(s)) {
                     var td = Element.create("td", text);
-                    table.header.element.appendChild(td);
+                    // Sloupec se stejne prida pri razeni a tohle zbytecne zdrzuje
+                    // table.header.element.appendChild(td);
                     
                     td.setAttribute("name", s);
                     table.header.columns[s] = td;
@@ -296,7 +297,8 @@ pageExtenders.add(PageExtender.create({
                         if (!BestiarSloupce.jePuvodni(s)) {
                             var hodnota = (row.data[s] != null ? row.data[s] : "");
                             var td = Element.create("td", '<span>' + hodnota + '&nbsp;</span>', {align: "right"});
-                            row.element.appendChild(td);
+                            // Sloupec se stejne prida pri razeni a tohle zbytecne zdrzuje
+                            // row.element.appendChild(td);
                                 
                             td.setAttribute("name", s);
                             row.columns[s] = td;
@@ -436,34 +438,6 @@ pageExtenders.add(PageExtender.create({
     }
 }));
 
-// Styl
-pageExtenders.add(PageExtender.create({
-    getName: function() { return "Bestiar - Styl"; },
-
-    analyze: function(page, context) {
-        // Bestiar
-        if (!page.bestiar || !page.bestiar.table)
-            return false;
-       
-       return page.config.getBarevnyText();
-    },
-    
-    process: function(page, context) {
-        // Pozn: styly sou definovany v bestiar-style.js
-        page.bestiar.table.data.each(function(row) {
-                row.columns.each(function(e) {
-                        var sloupec = e[0];
-                        var td = e[1];
-                        var format = BestiarColumnStyle[sloupec];
-                        
-                        if (td != null && format != null) {
-                            format(td, row.data);
-                        }
-                    });
-            });
-    }
-}));
-
 // Aktivni jmena jednotek a id
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Bestiar - Jednotky"; },
@@ -515,81 +489,6 @@ pageExtenders.add(PageExtender.create({
                 	content.appendChild(link);
                 }
             });
-    }
-}));
-
-// Odpocet casu
-pageExtenders.add(PageExtender.create({
-    getName: function() { return "Bestiar - Odpocet"; },
-
-    analyze: function(page, context) {
-        // Bestiar
-        if (!page.bestiar || !page.bestiar.table)
-            return false;
-        if (window.TIMERS_DISABLED)
-            return false;
-       
-        // Sestav list bunek s casem
-        var list = new Array();
-           
-        page.bestiar.table.data.each(function(row) {
-                if (isNaN(row.data.cas))
-                    return;
-                    
-                list.push({cell: row.columns["cas"], time: row.data.cas});
-            });
-       
-       context.list = list;
-       context.barvy = page.config.getBarevnyText();
-       return context.list.length > 0;
-    },
-    
-    process: function(page, context) {
-        // Start timer
-        var _this = this;
-        context.timer = setInterval(function() { _this._updateTime(context); }, 1000);
-    },
-    
-    _updateTime: function(context) {
-        var casZobrazeni = new Date(document.lastModified);
-        var aktualniCas = new Date();
-        var rozdil = (aktualniCas.getTime() - casZobrazeni.getTime()) / 1000;
-        var aktivni = 0;
-
-        for (var i = 0; i < context.list.length; i++) {
-            var td = context.list[i].cell;
-            var pocatecniCas = context.list[i].time;
-            
-            var first = false;
-            var spanAktualni = context.list[i].aktualni;
-            
-            if (spanAktualni == null) {
-                td.innerHTML = '';
-                // Aktualni
-                spanAktualni = Element.create("span");
-                td.appendChild(spanAktualni);
-                // Puvodni
-                td.appendChild(Element.create("span", '&nbsp;(' + formatTime(pocatecniCas) + ')&nbsp;', {style: "color: gray;"}));
-                
-                context.list[i].aktualni = spanAktualni;
-                first = true;
-            }
-        
-        
-            var cas = Math.max(0, pocatecniCas - rozdil);
-            spanAktualni.innerHTML = '&nbsp;' + formatTime(cas);
-
-            if (context.barvy && (parseInt(rozdil) % 5 == 0 || first)) // Neupdatuj barvy zbytecne kazdou vterinu
-                spanAktualni.style.color = Color.fromRange(cas, 60, 180, Color.Pickers.redGreen);
-                
-            if (cas > 0)
-                ++aktivni;
-        }
-        
-        // Stop timer pokud jiz neni zadny stack aktivni
-        if (aktivni == 0) {
-            clearInterval(context.timer);
-        }
     }
 }));
 
@@ -806,6 +705,11 @@ pageExtenders.add(PageExtender.create({
         Event.observe(linkZrusFiltry, 'click', function(event) {
             context.config.clearRules();
             $('plus_filterAktivovan').style.display = 'none';
+            
+            // Vyvolej udalost (aby se upravily styly)
+            if (typeof window.bestiarFilterChanged == "function")
+                bestiarFilterChanged();
+            
             // Reset tabulky
             for (let i in Rules) {
                 Rules[i](table, null, page.regent, page.provincie());
@@ -866,8 +770,13 @@ pageExtenders.add(PageExtender.create({
                             var rules = config.createRuleSet(r.type);
                             Rules[r.type](table, rules, regent, provincie);
                             
-                            if (r.type == "filter")
+                            if (r.type == "filter") {
                                 $('plus_filterAktivovan').style.display = (rules.length > 0) ? '' : 'none';
+                                
+                                // Vyvolej udalost
+                                if (typeof window.bestiarFilterChanged == "function")
+                                    bestiarFilterChanged();
+                            }
                         });
                         
                         // Mezera
@@ -882,3 +791,138 @@ pageExtenders.add(PageExtender.create({
         return link; 
     }
 }));
+
+
+// Styl
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Styl"; },
+
+    analyze: function(page, context) {
+        // Bestiar
+        if (!page.bestiar || !page.bestiar.table)
+            return false;
+       
+       return page.config.getBarevnyText();
+    },
+    
+    process: function(page, context) {
+        // Optimilizace: Aplikuj styl jen na viditelne radky
+        var pendingRows = new Array();
+        
+        function update(row) {
+            row.columns.each(function([sloupec, td]) {
+                if (sloupec == "cas")
+                    return; // continue;
+            
+                var format = BestiarColumnStyle[sloupec];
+                
+                if (td != null && format != null) {
+                    format(td, row.data);
+                }
+            });
+        }
+    
+        // Pozn: styly sou definovany v bestiar-style.js
+        page.bestiar.table.data.each(function(row) {
+            if (row.element.style.display == "none") {
+                pendingRows.push(row);
+                return; // continue
+            }
+        
+            update(row);
+            
+            // Styl casu musi byt hned
+            var format = BestiarColumnStyle["cas"];
+            if (row.columns["cas"] != null && format != null) {
+                format(row.columns["cas"], row.data);
+            }
+        });
+        
+        // Udalost je vyvolana pri zmene filtru
+        window.bestiarFilterChanged = function() {
+            // Update remaining rows
+            console.info("Updatuje se styl zbyvajicich radku..");
+            pendingRows.each(update);
+            pendingRows.length = 0;
+            window.bestiarFilterChanged = null;
+        };
+    }
+}));
+
+
+
+// Odpocet casu
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Bestiar - Odpocet"; },
+
+    analyze: function(page, context) {
+        // Bestiar
+        if (!page.bestiar || !page.bestiar.table)
+            return false;
+        if (window.TIMERS_DISABLED)
+            return false;
+       
+        // Sestav list bunek s casem
+        var list = new Array();
+           
+        page.bestiar.table.data.each(function(row) {
+                if (isNaN(row.data.cas))
+                    return;
+                    
+                list.push({cell: row.columns["cas"], time: row.data.cas});
+            });
+       
+       context.list = list;
+       context.barvy = page.config.getBarevnyText();
+       return context.list.length > 0;
+    },
+    
+    process: function(page, context) {
+        // Start timer
+        var _this = this;
+        context.timer = setInterval(function() { _this._updateTime(context); }, 1000);
+    },
+    
+    _updateTime: function(context) {
+        var casZobrazeni = new Date(document.lastModified);
+        var aktualniCas = new Date();
+        var rozdil = (aktualniCas.getTime() - casZobrazeni.getTime()) / 1000;
+        var aktivni = 0;
+
+        for (var i = 0; i < context.list.length; i++) {
+            var td = context.list[i].cell;
+            var pocatecniCas = context.list[i].time;
+            
+            var first = false;
+            var spanAktualni = context.list[i].aktualni;
+            
+            if (spanAktualni == null) {
+                td.innerHTML = '';
+                // Aktualni
+                spanAktualni = Element.create("span");
+                td.appendChild(spanAktualni);
+                // Puvodni
+                td.appendChild(Element.create("span", '&nbsp;(' + formatTime(pocatecniCas) + ')&nbsp;', {style: "color: gray;"}));
+                
+                context.list[i].aktualni = spanAktualni;
+                first = true;
+            }
+        
+        
+            var cas = Math.max(0, pocatecniCas - rozdil);
+            spanAktualni.innerHTML = '&nbsp;' + formatTime(cas);
+
+            if (context.barvy && (parseInt(rozdil) % 5 == 0 || first)) // Neupdatuj barvy zbytecne kazdou vterinu
+                spanAktualni.style.color = Color.fromRange(cas, 60, 180, Color.Pickers.redGreen);
+                
+            if (cas > 0)
+                ++aktivni;
+        }
+        
+        // Stop timer pokud jiz neni zadny stack aktivni
+        if (aktivni == 0) {
+            clearInterval(context.timer);
+        }
+    }
+}));
+

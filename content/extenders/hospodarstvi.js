@@ -115,9 +115,10 @@ pageExtenders.add(PageExtender.create({
     },
 
     process: function(page, context) {
-        // Pridani tooltipu s max silou stacku
+        // Pridani tooltipu s max silou stacku a silou jedne jednotky
         page.hospodarstvi.jednotky.each(function(row) {
             row.cells.sila.setAttribute("title", "Max síla stacku: " + row.data.maxSila);
+            row.cells.pocet.setAttribute("title", "Síla jedné jednotky: " + (Math.floor(row.data.sila / row.data.pocet * 100) / 100));
         }); 
     }
 }));

@@ -216,8 +216,8 @@ pageExtenders.add(PageExtender.create({
             controls.textareaZprava.value = text;
         });
         
-        // Vybrani aliance s vyssi prioritou
-        if (controls.selectAliance != null) {
+        // Vybrani aliance s vyssi prioritou (nemenit pokud odpovidame - to uz nastavena je)
+        if (controls.selectAliance != null && page.arguments["odpoved"] == null) {
             var idPrvniAliance = page.config.getPrefNode("posta", true).getNumber("prvniAliance");
             $A(controls.selectAliance.options).each(function(o) {
                 var id = parseInt(o.value);

@@ -49,14 +49,14 @@ window.DulezitostZpravy = {
             this._unsupportedValue = value;
         }
         
-        this._podpis = !vypnoutPodpis;
+        this.setPodpis(!vypnoutPodpis);
     },
     
     setPodpis: function(value) {
         if (this._podpis == null)
             this._podpis = $X('//input[@name = "podpis"]');
             
-        this._podpis.checked = !!this._podpis;
+        this._podpis.checked = !!value;
     }
 };
 </script>
