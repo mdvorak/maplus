@@ -1,23 +1,22 @@
 <?xml version="1.0"?>
-<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
-  <Description about="urn:mozilla:install-manifest">
-    <em:id>maplus@michal.dvorak</em:id>
-    <em:version>1.2.7</em:version>
-    <em:type>2</em:type>
-    <em:name>Melior Annis Plus</em:name>
-    <em:description>Vylepseni pro hru Melior Annis.</em:description>
-    <em:creator>Michal Dvorak</em:creator>
-    <em:iconURL>chrome://maplus/skin/icon.png</em:iconURL>
-    <em:homepageURL>http://maplus.zapto.org/</em:homepageURL>
-    <em:updateURL>http://maplus.zapto.org/maplus.rdf</em:updateURL>
-
-    <em:targetApplication>
-      <Description>
-        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>2.0</em:minVersion>
-        <em:maxVersion>3.*</em:maxVersion>
-      </Description>
-    </em:targetApplication>
-  </Description>
-</RDF>
+<RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="urn:mozilla:install-manifest"
+                   em:id="maplus@michal.dvorak"
+                   em:version="1.2.7"
+                   em:type="2"
+                   em:name="Melior Annis Plus"
+                   em:description="Vylepseni pro hru Melior Annis."
+                   em:creator="Michal Dvorak"
+                   em:iconURL="chrome://maplus/skin/icon.png"
+                   em:homepageURL="http://maplus.zapto.org/"
+                   em:updateURL="http://maplus.zapto.org/maplus.rdf"
+                   em:updateKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6GAAde4DIfS1mWTAT9Whdkcs/bCF6NuZO5f8O8fTCtFnS87+bwvotYcAfMUJF0w6vDa2fRHKsRNVg4scfv7o5i1M2xEKNKspBCEzKHuGiSTCM0R2CeMmDDsiF0E5z94abY0LYUaBUxeJOiToF0gsukRtLq1SMuJENncklsT9WFwIDAQAB">
+    <em:targetApplication RDF:resource="rdf:#$d7OiP2"/>
+  </RDF:Description>
+  <RDF:Description RDF:about="rdf:#$d7OiP2"
+                   em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   em:minVersion="2.0"
+                   em:maxVersion="3.*" />
+</RDF:RDF>
