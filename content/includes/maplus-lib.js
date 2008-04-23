@@ -397,3 +397,38 @@ var TableHelper = {
             });
     }
 };
+
+function timeFromNow(presnyCas) {
+    // Pomocne promenne
+    var now = new Date();
+    var dnesZbyvaMinut = DEN_MINUT - (now.getHours() * 60 + now.getMinutes());
+
+    if (now.getTime() > presnyCas.getTime())
+        return presnyCas.toLocaleString().replace(/:00$/, "");
+    
+    // Cas kdy k tomu dojde
+    var pocetMinut = (presnyCas.getTime() - now.getTime()) / 60000;
+    
+    // Vytvor text podle doby
+    var text = "";
+    
+    if (pocetMinut < dnesZbyvaMinut)
+        text += "dnes ";
+    else if (pocetMinut < dnesZbyvaMinut + DEN_MINUT)
+        text += "zítra ";
+    else if (pocetMinut < dnesZbyvaMinut + 2 * DEN_MINUT)
+        text += "pozítří ";
+    else if (pocetMinut < dnesZbyvaMinut + 3 * DEN_MINUT)
+        text += "za dva dny ";
+    else {
+        // Tohle by nemelo nastat ale lepsi mit to pojistene
+        text += presnyCas.toLocaleString().replace(/:00$/, "");
+        return text;
+    }
+    
+    // Pridej cas v den utoku
+    text += "v " + presnyCas.getHours() + ":" + presnyCas.getMinutes().toPaddedString(2);
+    text += " (" + presnyCas.toLocaleString().replace(/\s+\d+:\d+:\d+$/, "") + ")";
+    
+    return text;
+}

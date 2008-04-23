@@ -257,15 +257,6 @@ pageExtenders.add(PageExtender.create({
     },
 
     process: function(page, context) {
-        // Den ma celkem minut..
-        const DEN_MINUT = 24 * 60;
-        console.debug("DEN_MINUT=%d", DEN_MINUT);
-        
-        // Zjisti kolik zbyva minut do pulnoci
-        var now = new Date();
-        var dnesZbyvaMinut = DEN_MINUT - (now.getHours() * 60 + now.getMinutes());
-        console.debug("Dnes zbyva minut=%d", dnesZbyvaMinut);
-    
         context.vsechnyUtoky.each(function(utok) {
             var row = ElementDataStore.get(utok.tr);
     
@@ -284,8 +275,6 @@ pageExtenders.add(PageExtender.create({
             row.cells.typ.innerHTML = row.cells.typ.innerHTML.replace('<br>', ' ');
             
             // Tooltip kdy vyprsi utok
-            var text = "Útok vyprší ";
-            
             var vyprsiZaMinut = DEN_MINUT * 3 - utok.cas;
             var presnyCas = new Date(now.getTime() + vyprsiZaMinut * 60 * 1000);
             presnyCas.setSeconds(0, 0);
@@ -293,26 +282,7 @@ pageExtenders.add(PageExtender.create({
             console.debug("cas=%d, vyprsi=%d, presny cas=%o", utok.cas, vyprsiZaMinut, presnyCas);
             
             // Vytvor text podle doby
-            if (vyprsiZaMinut < dnesZbyvaMinut)
-                text += "dnes ";
-            else if (vyprsiZaMinut < dnesZbyvaMinut + DEN_MINUT)
-                text += "zítra ";
-            else if (vyprsiZaMinut < dnesZbyvaMinut + 2 * DEN_MINUT)
-                text += "pozítří ";
-            else if (vyprsiZaMinut < dnesZbyvaMinut + 3 * DEN_MINUT)
-                text += "za dva dny ";
-            else {
-                // Tohle by nemelo nastat ale lepsi mit to pojistene
-                text += presnyCas.toLocaleString().replace(/:00$/, "");
-                row.cells.cas.setAttribute("title", text);
-                return;
-            }
-            
-            // Pridej cas v den utoku
-            text += "v " + presnyCas.getHours() + ":" + presnyCas.getMinutes().toPaddedString(2);
-            text += "\n(" + presnyCas.toLocaleString().replace(/\s+\d+:\d+:\d+$/, "") + ")";
-            
-            // Nastav tooltip
+            var text = "Útok vyprší " + timeFromNow(presnyCas);
             row.cells.cas.setAttribute("title", text);
         });
     }

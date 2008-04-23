@@ -70,7 +70,7 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        var text = "Plné tahy budete mít: " + context.cas.toLocaleString();
+        var text = "Plné tahy budete mít " + timeFromNow(context.cas);
         
         context.font.appendChild(document.createTextNode(text));
         context.font.appendChild(Element.create("br"));

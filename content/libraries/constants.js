@@ -49,3 +49,4 @@ const ADMIN_ID_AGE = "6.0"; // Jmeno veku pro ktere je ID platne
 // Custom constants
 const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
 
+const DEN_MINUT = 24 * 60; // Den ma celkem minut..
