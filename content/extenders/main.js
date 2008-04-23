@@ -42,7 +42,7 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         // Font tag
-        context.font = $X('font[0]', page.content);
+        context.font = $X('center/font', page.content);
         if (context.font == null)
             return false;
         
@@ -58,11 +58,11 @@ pageExtenders.add(PageExtender.create({
         var zbyva = parseRegexInt(context.font.textContent, /\bzbývá\s+(\d+)\s+TU\b/);
         var tahZaSec = parseRegexInt(context.font.textContent, /\bDo\sdalšího\stahu:\s+(\d+)\s+sec\b/);
         
-        if (isNaN(zbyva) || isNaN(tahZaSec))
+        if (isNaN(zbyva) || isNaN(tahZaSec) || zbyva >= 360) // pokud mame plno taky nepokracovat
             return false;
         
         var chyby = Math.max(360 - zbyva, 0);
-        var plnoZaSec = chyby * 720 - tahZaSec; // 720s = 12m
+        var plnoZaSec = (chyby - 1) * 720 + tahZaSec; // 720s = 12m
         
         context.cas = new Date(new Date().getTime() + plnoZaSec * 1000);
         
@@ -70,10 +70,10 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        var text = "Plné tahy budete mít " + context.cas.toLocaleString();
+        var text = "Plné tahy budete mít: " + context.cas.toLocaleString();
         
-        context.font.appendChild(Element.create("br"));
         context.font.appendChild(document.createTextNode(text));
+        context.font.appendChild(Element.create("br"));
     }
 }));
 
