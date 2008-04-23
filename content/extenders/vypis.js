@@ -276,7 +276,7 @@ pageExtenders.add(PageExtender.create({
             
             // Tooltip kdy vyprsi utok
             var vyprsiZaMinut = DEN_MINUT * 3 - utok.cas;
-            var presnyCas = new Date(now.getTime() + vyprsiZaMinut * 60 * 1000);
+            var presnyCas = new Date(new Date().getTime() + vyprsiZaMinut * 60 * 1000);
             presnyCas.setSeconds(0, 0);
             
             console.debug("cas=%d, vyprsi=%d, presny cas=%o", utok.cas, vyprsiZaMinut, presnyCas);
