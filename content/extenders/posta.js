@@ -140,12 +140,44 @@ pageExtenders.add(PageExtender.create({
             controls.inputPodpis.checked = false;
         }
         
+        // Odeslani posty
+        var pripravZpravu = function(event) {
+            // Odstraneni newline na zacatku a konci textu pri odeslani
+            var text = controls.textareaZprava.value.replace(/^\n+|\n{2,}$/g, "");
+            
+            // Upozorneni pri odesilani dlouhe zpravy
+            var m = text.match(/\n/g);
+            if (m != null && m.length > MAX_RADKU_DEFAULT) {
+                if (!confirm(String.format(Posta.ODESLANI_DLOUHE_ZPRAVY_CONFIRM_TEXT, m.length))) {
+                    Event.stop(event);
+                    return;
+                }
+            }
+            
+            // Pokud je jiz dulezitost v textu ignoruj
+            if (!text.match(Posta.DULEZITOST_REGEX)) {
+                // Pridani dulezitosti
+                var d = vybranaDulezitost();
+                if (d != null) {
+                    text = ":" + d + "\n" + text;
+                }
+            }
+            
+            controls.textareaZprava.value = text;
+        };
+        
+        Event.observe(controls.form, "submit", pripravZpravu);
+        
         // Klaves. zkratky
         Event.observe(controls.textareaZprava, 'keypress', function(event) {
             if (event.keyCode == Event.KEY_ESC)
                 this.value = '';
-            else if (event.ctrlKey && event.keyCode == Event.KEY_RETURN)
-                this.form.submit();                    
+            else if (event.ctrlKey && event.keyCode == Event.KEY_RETURN) {
+                // manualni submit nevyvola event
+                pripravZpravu();
+                
+                this.form.submit();
+            }
         });
         
         new Insertion.Bottom(controls.form, '<div><span class="small" style="color: gray;">Pozn.: Esc - vymaže napsaný text, Ctrl+Enter - odešle zprávu</span></div>');
@@ -174,7 +206,7 @@ pageExtenders.add(PageExtender.create({
             
             var elem = controls.inputOdeslat.nextSibling;
             if (elem != null) {
-                if (elem.tagName == "BR")
+                if (elem.tagName.toLowerCase() == "br")
                     elem.style.display = "none";
                 controls.inputOdeslat.parentNode.insertBefore(spanDulezitost, elem);
             }
@@ -193,28 +225,6 @@ pageExtenders.add(PageExtender.create({
             }
         }
         
-        // Odeslani posty
-        Event.observe(controls.form, "submit", function(event) {
-            // Odstraneni newline na zacatku a konci textu pri odeslani
-            var text = controls.textareaZprava.value.replace(/^\n+|\n{2,}$/g, "");
-            
-            // Upozorneni pri odesilani dlouhe zpravy
-            var m = text.match(/\n/g);
-            if (m != null && m.length > MAX_RADKU_DEFAULT) {
-                if (!confirm(String.format(Posta.ODESLANI_DLOUHE_ZPRAVY_CONFIRM_TEXT, m.length))) {
-                    Event.stop(event);
-                    return;
-                }
-            }
-            
-            // Pridani dulezitosti
-            var d = vybranaDulezitost();
-            if (d != null) {
-                text = ":" + d + "\n" + text;
-            }
-            
-            controls.textareaZprava.value = text;
-        });
         
         // Vybrani aliance s vyssi prioritou (nemenit pokud odpovidame - to uz nastavena je)
         if (controls.selectAliance != null && page.arguments["odpoved"] == null) {

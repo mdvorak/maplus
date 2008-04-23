@@ -37,6 +37,7 @@
     <script url="#{melior}/prehled.html" name="prehled.js" />
     <script url="#{melior}/budovy.html" name="budovy.js" type="application/javascript;version=1.7" />
     <script url="#{melior}/multifunc.html" name="vyhledavani.js" />
+    <script url="#{melior}/main.html" name="main.js" />
 
     <!-- Zobrazeni externiho linku v obsahu -->
     <script url="#{melior}/main.html" name="externilink.js" />
@@ -47,7 +48,7 @@
 
     <!-- Post processing -->
     <script url="#{melior}/*" name="obecne.js" />
-    <script url="#{melior}/*" name="safelinks.js" />
+    <!-- <script url="#{melior}/*" name="safelinks.js" /> -->
     <script url="#{melior}/*" name="theme.js" />
   </extenders>
 </webExtender>
