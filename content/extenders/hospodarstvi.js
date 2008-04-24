@@ -313,7 +313,8 @@ pageExtenders.add(PageExtender.create({
                 ini: parametry.realIni,
                 sila: jednotka.data.sila,
                 pocet: jednotka.data.pocet,
-                zkusenost: jednotka.data.zkusenost
+                zkusenost: jednotka.data.zkusenost,
+                phb: parametry.phb
             });
         });
         
@@ -402,10 +403,12 @@ Object.extend(SlozeniArmadyDialog.prototype, {
         
         // Poradi utoku
         var tbodyPoradiUtoku = $X('.//tbody[@id = "d_poradiUtoku"]', root);
+
         this._poradi.each(function(i) {
             var tr = Element.create("tr");
             tr.appendChild(Element.create("td", '<span>' + i.jednotka + '\xA0\xA0</span>'));
             tr.appendChild(Element.create("td", '<span>' + i.ini + '\xA0\xA0</span>'));
+            tr.appendChild(Element.create("td", '<span>' + i.phb + '\xA0\xA0</span>'));
             
             tbodyPoradiUtoku.appendChild(tr);
         });
