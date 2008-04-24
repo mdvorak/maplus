@@ -109,11 +109,11 @@ window.NastaveniHlidka = {
             Event.observe(selectHlidka, "change", function(event) {
                 if (selectHlidka.value == "toolshop") {
                     inputAdresa.value = HLIDKA_TOOLSHOP;
-                    inputAdresa.disabled = true;
+                    inputAdresa.readOnly = true;
                 }
                 else {
                     inputAdresa.value = "";
-                    inputAdresa.disabled = false;
+                    inputAdresa.readOnly = false;
                 }
                     
                 inputLogin.value = window.PAGE_ID;

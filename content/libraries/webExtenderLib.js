@@ -400,8 +400,8 @@ var XPath = {
     evalSingle: function(xpath, context) {
         var retval;
         try {
-            var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE, true);
-            retval = (result != null) ? $(result.iterateNext()) : null;
+            var result = this.evaluate(xpath, context, XPathResult.FIRST_ORDERED_NODE_TYPE, true);
+            retval = (result != null) ? $(result.singleNodeValue) : null;
             return retval;
         }
         catch (ex) {
