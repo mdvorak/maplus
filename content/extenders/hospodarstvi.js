@@ -412,7 +412,7 @@ Object.extend(SlozeniArmadyDialog.prototype, {
             tr.appendChild(Element.create("td", '<span>' + i.jednotka + '\xA0\xA0</span>'));
             
             var str = i.ini + (i.phb != null ? "/" + i.phb : "");
-            tr.appendChild(Element.create("td", '<span>' + str '\xA0\xA0</span>'));
+            tr.appendChild(Element.create("td", '<span>' + str + '\xA0\xA0</span>'));
   
             tbodyPoradiUtoku.appendChild(tr);
         });
