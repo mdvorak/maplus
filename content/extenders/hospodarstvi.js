@@ -302,8 +302,11 @@ pageExtenders.add(PageExtender.create({
                 return; // continue;
             
             var oznaceni = String(parametry.druh[0] + parametry.typ[0]).toLowerCase();
-            if (parametry.typ == "Boj.")
+            var phb = null;
+            if (parametry.typ == "Boj.") {
                 oznaceni += parametry.phb;
+                phb = parametry.phb;
+            }
             
             slozeni.celkem += jednotka.data.sila;
             slozeni[oznaceni] += jednotka.data.sila;
@@ -314,7 +317,7 @@ pageExtenders.add(PageExtender.create({
                 sila: jednotka.data.sila,
                 pocet: jednotka.data.pocet,
                 zkusenost: jednotka.data.zkusenost,
-                phb: parametry.phb
+                phb: phb
             });
         });
         
@@ -407,9 +410,10 @@ Object.extend(SlozeniArmadyDialog.prototype, {
         this._poradi.each(function(i) {
             var tr = Element.create("tr");
             tr.appendChild(Element.create("td", '<span>' + i.jednotka + '\xA0\xA0</span>'));
-            tr.appendChild(Element.create("td", '<span>' + i.ini + '\xA0\xA0</span>'));
-            tr.appendChild(Element.create("td", '<span>' + i.phb + '\xA0\xA0</span>'));
             
+            var str = i.ini + (i.phb != null ? "/" + i.phb : "");
+            tr.appendChild(Element.create("td", '<span>' + str '\xA0\xA0</span>'));
+  
             tbodyPoradiUtoku.appendChild(tr);
         });
         

@@ -11,7 +11,7 @@
                    em:creator="Michal Dvorak"
                    em:iconURL="chrome://maplus/skin/icon.png"
                    em:homepageURL="http://maplus.zapto.org/"
-                   em:updateURL="http://maplus.zapto.org/maplus.rdf"
+                   em:updateURL="http://maplus.xf.cz/maplus.rdf"
                    em:updateKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6GAAde4DIfS1mWTAT9Whdkcs/bCF6NuZO5f8O8fTCtFnS87+bwvotYcAfMUJF0w6vDa2fRHKsRNVg4scfv7o5i1M2xEKNKspBCEzKHuGiSTCM0R2CeMmDDsiF0E5z94abY0LYUaBUxeJOiToF0gsukRtLq1SMuJENncklsT9WFwIDAQAB">
     <em:targetApplication RDF:resource="rdf:#$d7OiP2"/>
   </RDF:Description>
