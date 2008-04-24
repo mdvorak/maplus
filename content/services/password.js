@@ -45,7 +45,7 @@ var PasswordManager = {
             var nsLoginInfo = new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
                                              Components.interfaces.nsILoginInfo, "init");
                                              
-            var loginInfo = new nsLoginInfo(host, null, realm, user, password, null, null);
+            var loginInfo = new nsLoginInfo(host, null, realm, user, password, "", "");
             
             try {
                 loginManager.removeLogin(loginInfo);
