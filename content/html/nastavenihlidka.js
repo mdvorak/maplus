@@ -131,11 +131,11 @@ window.NastaveniHlidka = {
                 if (adresa != null && adresa.length > 0) {
                     if (adresa == HLIDKA_TOOLSHOP) {
                         selectHlidka.value = "toolshop";
-                        inputAdresa.disabled = true;
+                        inputAdresa.readOnly = true;
                     }
                     else {
                         selectHlidka.value = "custom";
-                        inputAdresa.disabled = false;
+                        inputAdresa.readOnly = false;
                     }
                     
                     inputAdresa.value = adresa;
@@ -151,7 +151,7 @@ window.NastaveniHlidka = {
                 
                     selectHlidka.value = "";
                     inputAdresa.value = "";
-                    inputAdresa.disabled = false;
+                    inputAdresa.readOnly = false;
                     inputLogin.value = "";
                     inputHeslo.value = "";
                     inputVypis.checked = true;
