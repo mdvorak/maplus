@@ -116,35 +116,35 @@ BestiarSloupce.pridej("rozsireni",      "",             "Rozšíření",        
 /** Styl jednotlivych sloupcu **/
 var BestiarColumnStyle = {
     pocet: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + data.pocet + '&nbsp;</span>';
+        td.innerHTML = '<span>&#xA0;' + data.pocet + '&#xA0;</span>';
         td.style.color = Color.fromRange(data.pocet, 20, 5000, Color.Pickers.grayWhite);
     },
     zkusenost: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + (data.zkusenost * 100).toFixed(2) + '%&nbsp;</span>';
+        td.innerHTML = '<span>&#xA0;' + (data.zkusenost * 100).toFixed(2) + '%&#xA0;</span>';
         td.style.color = Color.fromRange(data.zkusenost, 0.20, 0.60, Color.Pickers.redGreen);
     },
     silaJednotky: function(td, data) {
         if (!isNaN(data.silaJednotky)) {
-            td.innerHTML = '<span>&nbsp;' + data.silaJednotky.toFixed(2) + '&nbsp;</span>';
+            td.innerHTML = '<span>&#xA0;' + data.silaJednotky.toFixed(2) + '&#xA0;</span>';
             td.style.color = Color.fromRange(data.silaJednotky, 1, 220, Color.Pickers.grayWhite);
         }
         else {
-            td.innerHTML = '<span>&nbsp;??.??&nbsp;</span>';
+            td.innerHTML = '<span>&#xA0;??.??&#xA0;</span>';
         }
     },
     druh: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + data.druh + '</span>';
+        td.innerHTML = '<span>&#xA0;' + data.druh + '</span>';
         td.className = (data.druh == "Let.") ? "druhLet" : "druhPoz"
     },
     typ: function(td, data) {
-        td.innerHTML = '<span>&nbsp;' + data.typ + '</span>';
+        td.innerHTML = '<span>&#xA0;' + data.typ + '</span>';
         td.className = (data.typ == "Str.") ? "typStr" : "typBoj"
     },
     cas: function(td, data) {
         if (!isNaN(data.cas))
-            td.innerHTML = '<span>&nbsp;' + formatTime(data.cas) + '&nbsp;</span>';
+            td.innerHTML = '<span>&#xA0;' + formatTime(data.cas) + '&#xA0;</span>';
         else
-            td.innerHTML = '<span>&nbsp;---&nbsp;</span>';
+            td.innerHTML = '<span>&#xA0;---&#xA0;</span>';
     },
     phb: function(td, data) {
         td.innerHTML = '<span>' + (data.phb || '?') + '</span>';
@@ -155,11 +155,11 @@ var BestiarColumnStyle = {
         var druhClass = (data.druh == "Let.") ? "druhLet" : "druhPoz";
         var typClass = (data.typ == "Str.") ? "typStr" : "typBoj"
         
-        var html = '<span class="' + druhClass + '">&nbsp;' + data.druh[0] + '</span>';
+        var html = '<span class="' + druhClass + '">&#xA0;' + data.druh[0] + '</span>';
         html += '<span class="' + typClass + '">' + data.typ[0] + '</span>';
         if (data.typ != "Str.")
             html += '<span class="phb' + data.phb + '">' + data.phb + '</span>';
-        html += '<span>&nbsp;</span>';
+        html += '<span>&#xA0;</span>';
         
         td.innerHTML = html;
         td.setAttribute("align", "left");
@@ -171,13 +171,13 @@ var BestiarColumnStyle = {
         if (!isNaN(data.silaJednotky))
             td.style.color = Color.fromRange(data.silaStacku, 500, 12000, Color.Pickers.grayWhite);
         else
-            td.innerHTML = '<span>&nbsp;???&nbsp;</span>';
+            td.innerHTML = '<span>&#xA0;???&#xA0;</span>';
     },
     maxSilaStacku: function(td, data) {
         td.style.color = Color.fromRange(data.maxSilaStacku, 1000, 25000, Color.Pickers.grayWhite);
     },
     cenaZaSilu: function(td, data) {
-        td.innerHTML = '<span>' + data.cenaZaSilu.toFixed(1) + '&nbsp;</span>';
+        td.innerHTML = '<span>' + data.cenaZaSilu.toFixed(1) + '&#xA0;</span>';
         td.style.color = Color.fromRange(data.cenaZaSilu, 30, 5, Color.Pickers.redGreen);
     },
     zlataTU: function(td, data) {

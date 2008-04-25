@@ -274,7 +274,7 @@ pageExtenders.add(PageExtender.create({
     
         // Pridej chybejici sloupce
         sloupce.without("barva").each(function(s) {
-                var text = '<span><b>&nbsp;' + BestiarSloupce.getData(s).nazev + '&nbsp;</b></span>';
+                var text = '<span><b>&#xA0;' + BestiarSloupce.getData(s).nazev + '&#xA0;</b></span>';
                 
                 // Pridavej pouze nove
                 if (!BestiarSloupce.jePuvodni(s)) {
@@ -295,7 +295,7 @@ pageExtenders.add(PageExtender.create({
                         // Pridavej pouze nove
                         if (!BestiarSloupce.jePuvodni(s)) {
                             var hodnota = (row.data[s] != null ? row.data[s] : "");
-                            var td = Element.create("td", '<span>' + hodnota + '&nbsp;</span>', {align: "right"});
+                            var td = Element.create("td", '<span>' + hodnota + '&#xA0;</span>', {align: "right"});
                             row.element.appendChild(td);
                                 
                             td.setAttribute("name", s);
@@ -351,7 +351,7 @@ pageExtenders.add(PageExtender.create({
             html += '<tr><td colspan="2"><span><b>#{jmeno}</b></span></td></tr>';
             chybejiciSloupce.each(function(s) {
                     var nazev = BestiarSloupce.getData(s).nazev;
-                    html += '<tr><td><span>' + nazev + '&nbsp;&nbsp;</span></td>';
+                    html += '<tr><td><span>' + nazev + '&#xA0;&#xA0;</span></td>';
                     html += '<td><span>#{' + s + '}</span></td></tr>';
                 });
             html += '</table>';
@@ -411,7 +411,7 @@ pageExtenders.add(PageExtender.create({
             // Zobraz chybejici sloupce
             if (context.chybejiciTemplate != null) {
                 let chybejici = this._createMissingTooltip(context.chybejiciTemplate, i, row.data);
-                td.appendChild(Element.create("span", "&nbsp;"));
+                td.appendChild(Element.create("span", "&#xA0;"));
                 td.appendChild(chybejici);
             }
         }
@@ -492,7 +492,7 @@ pageExtenders.add(PageExtender.create({
                 elemJmeno.parentNode.removeChild(elemJmeno);
                 
                 // Vycisteme si bitevni pole
-                content.innerHTML = '&nbsp;';
+                content.innerHTML = '&#xA0;';
                                 
                 // Aktivni jmeno
                 var link = MaPlus.Tooltips.createActiveUnit(page, jmeno);
@@ -509,7 +509,7 @@ pageExtenders.add(PageExtender.create({
                 // Id bidujiciho
                 if (!isNaN(id)) {
                 	link = MaPlus.Tooltips.createActiveId(page, id);
-                    link.innerHTML = '<span class="bestiarBid">[&nbsp;' + id + '&nbsp;]</span>';
+                    link.innerHTML = '<span class="bestiarBid">[&#xA0;' + id + '&#xA0;]</span>';
                     
                 	content.appendChild(document.createTextNode(' '));
                 	content.appendChild(link);
@@ -569,7 +569,7 @@ pageExtenders.add(PageExtender.create({
                 spanAktualni = Element.create("span");
                 td.appendChild(spanAktualni);
                 // Puvodni
-                td.appendChild(Element.create("span", '&nbsp;(' + formatTime(pocatecniCas) + ')&nbsp;', {style: "color: gray;"}));
+                td.appendChild(Element.create("span", '&#xA0;(' + formatTime(pocatecniCas) + ')&#xA0;', {style: "color: gray;"}));
                 
                 context.list[i].aktualni = spanAktualni;
                 first = true;
@@ -577,7 +577,7 @@ pageExtenders.add(PageExtender.create({
         
         
             var cas = Math.max(0, pocatecniCas - rozdil);
-            spanAktualni.innerHTML = '&nbsp;' + formatTime(cas);
+            spanAktualni.innerHTML = '&#xA0;' + formatTime(cas);
 
             if (context.barvy && (parseInt(rozdil) % 5 == 0 || first)) // Neupdatuj barvy zbytecne kazdou vterinu
                 spanAktualni.style.color = Color.fromRange(cas, 60, 180, Color.Pickers.redGreen);
@@ -800,7 +800,7 @@ pageExtenders.add(PageExtender.create({
         var tdNastaveniFiltru = $X('tbody/tr[2]/td[1 and contains(font, "Prosím")]', page.bestiar.elements.tableNakup);
         tdNastaveniFiltru.innerHTML = '';
         
-        var spanFilterAktivovan = Element.create("span", '&nbsp;<span id="plus_filterAktivovan" class="small" style="display: none; color: yellow;">(filter aktivován)</span>&nbsp;', {class: "small"});
+        var spanFilterAktivovan = Element.create("span", '&#xA0;<span id="plus_filterAktivovan" class="small" style="display: none; color: yellow;">(filter aktivován)</span>&#xA0;', {class: "small"});
         
         var linkZrusFiltry = Element.create("a", '<span>Zruš filtrování a řazení</span>', {href: "javascript://"});
         Event.observe(linkZrusFiltry, 'click', function(event) {
@@ -834,7 +834,7 @@ pageExtenders.add(PageExtender.create({
         if (!Tooltip.isRegistered(tooltipName)) {
         	// Registruj tooltip
             Tooltip.register(tooltipName, function() {
-        			var tooltip = Tooltip.create('<span><b>' + header.title + '&nbsp;&nbsp;&nbsp;</b></span>', "tooltip", true); 
+        			var tooltip = Tooltip.create('<span><b>' + header.title + '&#xA0;&#xA0;&#xA0;</b></span>', "tooltip", true); 
         			tooltip.style.padding = '4px';
                     var span = tooltip.appendChild(Element.create("span"));
                     

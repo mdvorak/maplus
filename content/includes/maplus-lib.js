@@ -229,7 +229,7 @@ MaPlus.Tooltips = {
         
         var html = '<table>';
         html += '<tr>';
-        html += '  <td colspan="2"><span><b>' + id + '</b>&nbsp;</span>';
+        html += '  <td colspan="2"><span><b>' + id + '</b>&#xA0;</span>';
         html += '  <a href="javascript://"><sup><span class="small">(zkopírovat)</span></sup></a></td>';
         html += '</tr>';
         html += '<tr><td colspan="2"><a href="' + MaPlus.buildUrl(page, "setup.html", {setup: "spehovani", nolinks: 1, koho: id}) + '"><span>Vyslat špehy</span></a></td></tr>';
@@ -240,7 +240,7 @@ MaPlus.Tooltips = {
             var pridejRadek = function(jmeno, hodnota)
                 {
                     if (hodnota && hodnota != "")
-                        html += '<tr><td><span class="small">' + jmeno + '&nbsp;&nbsp;</span></td><td><span class="small">' + hodnota + '</span></td></tr>'
+                        html += '<tr><td><span class="small">' + jmeno + '&#xA0;&#xA0;</span></td><td><span class="small">' + hodnota + '</span></td></tr>'
                 };
         
             html += '<tr><td height="5"></td></tr>';

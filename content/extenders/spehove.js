@@ -97,7 +97,7 @@ pageExtenders.add(PageExtender.create({
         }
         
         // Zobrazeni idelani sily
-        new Insertion.Bottom(context.table, '<tr><td><span>Síla na útok&nbsp;&nbsp;</span></td><td><span>' + Math.floor(context.data.idealniSila) + '</span></td></tr>');
+        new Insertion.Bottom(context.table, '<tr><td><span>Síla na útok&#xA0;&#xA0;</span></td><td><span>' + Math.floor(context.data.idealniSila) + '</span></td></tr>');
         
         // Zautocit
         var zautocitUrl = MaPlus.buildUrl(page, "utok.html", {koho: context.data.id});

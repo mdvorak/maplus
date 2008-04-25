@@ -218,7 +218,7 @@ pageExtenders.add(PageExtender.create({
         context.idClenu.each(function(i) {
             var a = MaPlus.Tooltips.createActiveId(page, i.id)
             
-            i.element.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;";
+            i.element.innerHTML = "&#xA0;&#xA0;&#xA0;&#xA0;";
             i.element.insertBefore(a, i.element.firstChild);
         });
     }
@@ -319,7 +319,7 @@ pageExtenders.add(PageExtender.create({
             var a = MaPlus.Tooltips.createActiveId(page, i.id)
             a.innerHTML = '<span>' + i.id + '</span>';
             
-            i.element.innerHTML = "<span>&nbsp;&nbsp;</span>";
+            i.element.innerHTML = "<span>&#xA0;&#xA0;</span>";
             i.element.insertBefore(a, i.element.firstChild);
         });
     }

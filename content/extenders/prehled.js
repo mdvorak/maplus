@@ -126,7 +126,7 @@ pageExtenders.add(PageExtender.create({
         page.content.setAttribute("width", "66%");
     
         // Pridej info sloupec do hlavicky
-        context.table.rows[1].appendChild(Element.create("td", "&nbsp;"));
+        context.table.rows[1].appendChild(Element.create("td", "&#xA0;"));
         context.columns++;
     
         // Zpracuj radky

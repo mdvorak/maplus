@@ -68,7 +68,7 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         // Hlavicka
-        new Insertion.Before(context.table.rows[0].cells[5], '<td align="right><span><b>Síla útoku&nbsp;</b></span></td>');
+        new Insertion.Before(context.table.rows[0].cells[5], '<td align="right><span><b>Síla útoku&#xA0;</b></span></td>');
         
         for (var i = 1; i < context.table.rows.length; i++) {
             var row = context.table.rows[i];
@@ -80,7 +80,7 @@ pageExtenders.add(PageExtender.create({
             this._setActiveId(page, row.cells[10], row.data.kdo);
             
             // Sila k utoku
-            new Insertion.Before(row.cells[6], '<td align="right"><span>' + row.data.silaUtoku.toFixed(0) + '&nbsp;&nbsp;</span></td>');
+            new Insertion.Before(row.cells[6], '<td align="right"><span>' + row.data.silaUtoku.toFixed(0) + '&#xA0;&#xA0;</span></td>');
         }      
     },
     

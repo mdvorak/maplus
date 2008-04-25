@@ -206,7 +206,7 @@ pageExtenders.add(PageExtender.create({
             
             var elem = controls.inputOdeslat.nextSibling;
             if (elem != null) {
-                if (elem.tagName.toLowerCase() == "br")
+                if (elem.tagName == "BR")
                     elem.style.display = "none";
                 controls.inputOdeslat.parentNode.insertBefore(spanDulezitost, elem);
             }
@@ -628,7 +628,7 @@ pageExtenders.add(PageExtender.create({
     	        var element = zprava.fontText.childNodes[i];
     	        
     	        // Pripocti radky
-    	        if (String.equals(element.tagName, "br", true))
+    	        if (element.tagName == "BR")
     	            zprava.radku++;
     	        else if (element.firstChild != null)
     	            zprava.radku += XPath.evalNumber('count(.//br)', element);
@@ -741,7 +741,7 @@ pageExtenders.add(PageExtender.create({
     		}    		
     		
     		// Link Rozbalit pod zpravou
-    		var divRozbalit = Element.create("div", '...........&nbsp;&nbsp;');
+    		var divRozbalit = Element.create("div", '...........&#xA0;&#xA0;');
     		var linkRozbalit = Element.create("a", '<i style="color: yellow;">Zobrazit celou zprávu</i></a>', {href: "javascript://"});
     		divRozbalit.appendChild(linkRozbalit);
     		

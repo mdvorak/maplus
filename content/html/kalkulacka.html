@@ -48,7 +48,7 @@ window.Kalkulacka = {
         }
         catch(e) { }
         
-        vysledek.update(r || "&nbsp;");
+        vysledek.update(r || "\xA0");
         return r;
     },
     
@@ -57,7 +57,7 @@ window.Kalkulacka = {
         var vysledek = $('plus_kalkulackaVysledek');
         
         kalkulacka.value = "";
-        vysledek.update("&nbsp;");
+        vysledek.update("\xA0");
         
         Event.dispatch(kalkulacka, 'change', true);
     },
@@ -78,8 +78,8 @@ window.Kalkulacka = {
 <br />
 <span>Kalkulačka</span>
 <br />
-&nbsp;<input id="plus_kalkulacka" type="text" maxlength="255" class="kalkulackaIn" onchange="Kalkulacka.vypocitej();" 
+&#xA0;<input id="plus_kalkulacka" type="text" maxlength="255" class="kalkulackaIn" onchange="Kalkulacka.vypocitej();" 
         onkeyup="if (event.keyCode != Event.KEY_ESC) Kalkulacka.vypocitej(); else Kalkulacka.vymaz();" />
-<br /><div id="plus_kalkulackaVysledek" class="ma kalkulackaOut">&nbsp;</div>
+<br /><div id="plus_kalkulackaVysledek" class="ma kalkulackaOut">&#xA0;</div>
 <a href="javascript://" onclick="Kalkulacka.vymaz();"><span class="small">Vymaž</span></a>
 </div>

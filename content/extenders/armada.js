@@ -49,7 +49,7 @@ pageExtenders.add(PageExtender.create({
                 var link = MaPlus.Tooltips.createActiveUnit(page, jmeno);
 
                 if (link) {
-                    e.innerHTML = "&nbsp;";
+                    e.innerHTML = "&#xA0;";
                     e.appendChild(link);
                 }
             });

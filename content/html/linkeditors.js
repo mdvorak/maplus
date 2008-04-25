@@ -66,11 +66,11 @@ var LinkEditors = {
             }
         
             var html = '<input id="d_kolikrat" type="text" name="kolikrat" value="1" size="3"/>' +
-                       '<span>&nbsp;x&nbsp;<span>' +
+                       '<span>&#xA0;x&#xA0;<span>' +
                        '<select id="d_kouzlo" name="seslat_kouzlo">' +
 	                   '    <option value=""> - kouzlo - </option>' +
 	                   '</select>' +
-	                   '&nbsp;seslat na ID #&nbsp;' +
+	                   '&#xA0;seslat na ID #&#xA0;' +
 	                   '<input id="d_koho" type="text" name="koho" maxlength="8" size="5"/>' +
 	                   '<br/>' + 
 	                   '<span class="small">(Pokud kouzlo není uvedeno v seznamu, znamená to že jste na něj neměli manu v době sbíraní dat v menu Kouzla.)</span>';	                   
@@ -287,7 +287,7 @@ var LinkEditors = {
             }
             
             parent.innerHTML = '';
-            parent.appendChild(Element.create("span", "Hlídka pro alianci:&nbsp;"));
+            parent.appendChild(Element.create("span", "Hlídka pro alianci:&#xA0;"));
             
             // Select s aliancema
             var select = parent.appendChild(Element.create("select"));
