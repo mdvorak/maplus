@@ -39,7 +39,7 @@ var Posta = {
     LINK_CONFIRM_TEXT: "Tento odkaz může vést na stránku s nebezpečným obsahem. Opravdu chcete pokračovat?",
     ODESLANI_DLOUHE_ZPRAVY_CONFIRM_TEXT: "Odesíláte velmi dlouhou zprávu ({0} řádků). Opravdu ji chcete odeslat?",
     POSTA_V_RAMCI_ALIANCE_REGEX: new RegExp("(?:pošta v rámci aliance (.*))?$"),
-    DULEZITOST_REGEX: /^:\W*(\w{3,12})\W*\s*/,
+    DULEZITOST_REGEX: /^(?:#!|:)\W*(\w{3,12})\W*\s*/,
     
     zjistiDulezitost: function(zprava) {
         var m = zprava.text.match(Posta.DULEZITOST_REGEX);
