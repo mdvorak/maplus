@@ -28,13 +28,16 @@
 window.DulezitostZpravy = {
     get: function() {
         var list = $XL('//input[@dulezitost]');
+        var d = this._unsupportedValue;
         
         list.each(function(i) {
-            if (i.checked)
-                return i.getAttribute("dulezitost");
+            if (i.checked) {
+                d = i.getAttribute("dulezitost");
+                return $break;
+            }
         });
         
-        return this._unsupportedValue;
+        return d;
     },
     
     set: function(value, vypnoutPodpis) {
