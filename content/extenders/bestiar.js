@@ -648,9 +648,9 @@ pageExtenders.add(PageExtender.create({
         }
         
         // Odstran neexistujici jednotky
-        if (vybraneMap.length > 0) {
+        if (vybraneMap.size() > 0) {
             console.debug("Odstranuji se: %o", vybraneMap.keys());
-            jednotky.remove(vybraneMap.keys());
+            jednotky.remove($A(vybraneMap.keys()));
         }
         
         context.fontKomentar = $X('tbody/tr[4]/td/font[2]', page.bestiar.elements.tableNakup);

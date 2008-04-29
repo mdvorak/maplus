@@ -75,7 +75,7 @@ window.MaPlusMenu = {
         var m = Math.floor((elapsed / 60) % 60);
         var s = Math.floor(elapsed % 60);
         
-        $('plus_cas').innerHTML = h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+        $('plus_cas').innerHTML = h + ":" + m.toPaddedString(2) + ":" + s.toPaddedString(2);
     },
     
     startTimer: function() {
