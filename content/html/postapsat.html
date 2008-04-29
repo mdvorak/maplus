@@ -29,10 +29,10 @@ window.DulezitostZpravy = {
     get: function() {
         var list = $XL('//input[@dulezitost]');
         
-        for (var i = 0; i < list.length; i++) {
-            if (list[i].checked)
-                return list[i].getAttribute("dulezitost");
-        }
+        list.each(function(i) {
+            if (i.checked)
+                return i.getAttribute("dulezitost");
+        });
         
         return this._unsupportedValue;
     },
