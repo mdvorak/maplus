@@ -399,6 +399,8 @@ var TableHelper = {
 };
 
 function timeFromNow(presnyCas) {
+    const NAZVY_DNU = ["v pondělí", "v úterý", "ve středu", "ve čtvrtek", "v pátek", "v sobotu", "v neděli"];
+
     // Pomocne promenne
     var now = new Date();
     var dnesZbyvaMinut = DEN_MINUT - (now.getHours() * 60 + now.getMinutes());
@@ -419,7 +421,7 @@ function timeFromNow(presnyCas) {
     else if (pocetMinut < dnesZbyvaMinut + 2 * DEN_MINUT)
         text += "pozítří ";
     else if (pocetMinut < dnesZbyvaMinut + 3 * DEN_MINUT)
-        text += "za dva dny ";
+        text += NAZVY_DNU[(now.getDay() + 2) % 7] + " ";
     else {
         // Tohle by nemelo nastat ale lepsi mit to pojistene
         text += presnyCas.toLocaleString().replace(/:00$/, "");
