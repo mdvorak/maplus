@@ -108,11 +108,17 @@ pageExtenders.add(PageExtender.create({
             vsichni.sort(function(a, b) { return Object.compare(a.provincie.regent, b.provincie.regent); });
             
             // Napln select
-            select.options.length = vsichni.length;
+            select.options.length = vsichni.length + 1;
+            
+            select.options[0].value = "";
+            select.options[0].text = "- Vyberte -";
+            
             for (var i = 0; i < vsichni.length; i++) {
-                select.options[i].value = vsichni[i].id;
-                select.options[i].text = vsichni[i].popis;
+                select.options[i + 1].value = vsichni[i].id;
+                select.options[i + 1].text = vsichni[i].popis;
             }
+            
+            select.selectedIndex = 0;
             
             console.log("Dokonceno (%d)", vsichni.length);
         }
