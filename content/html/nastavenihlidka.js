@@ -46,7 +46,7 @@ window.NastaveniHlidka = {
     
         // Ziskej seznam alianci kde jsem clenem (ALIANCE_ID se plni v extenders/nastaveni.js)
         if (window.ALIANCE_ID == null || ALIANCE_ID.length == 0) {
-            $('n_hlidka_content').innerHTML = '<span>Nejste v žádné alianci.</span>';
+            $('n_hlidka_content').innerHTML = '<span>Nejste v žádné alianci. Pokud s tím nesouhlasíte, navštivte menu Aliance.</span>';
             return;
         }
         
