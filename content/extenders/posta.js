@@ -159,7 +159,7 @@ pageExtenders.add(PageExtender.create({
                 // Pridani dulezitosti
                 var d = vybranaDulezitost();
                 if (d != null) {
-                    text = ":" + d + "\n" + text;
+                    text = "#!" + d + "\n" + text;
                 }
             }
             
@@ -219,7 +219,7 @@ pageExtenders.add(PageExtender.create({
             
             vybranaDulezitost = function() {
                 var d = window.DulezitostZpravy.get();
-                if (d == "dulezite") d = "!!!DULEZITE!!!";
+                if (d == "dulezite") d = "!!DULEZITE!!!";
                 else if (d == "normalni") d = null;
                 return d;
             }

@@ -62,8 +62,10 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         var chyby = Math.max(360 - zbyva, 0);
-        var plnoZaSec = (chyby - 1) * 720 + tahZaSec; // 720s = 12m
+        // TODO Odecist puloncni bonusy
         
+        // Vypocet
+        var plnoZaSec = (chyby - 1) * 720 + tahZaSec; // 720s = 12m
         context.cas = new Date(new Date().getTime() + plnoZaSec * 1000);
         
         return true;
@@ -72,7 +74,7 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         var text = "Plné tahy budete mít " + timeFromNow(context.cas);
         
-        context.font.appendChild(document.createTextNode(text));
+        context.font.appendChild(Element.create("span", text));
         context.font.appendChild(Element.create("br"));
     }
 }));

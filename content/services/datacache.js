@@ -37,6 +37,7 @@
  var DataCache = {
     _lastUid: 0,
     _data: new Hash(),
+    _removeCandidates: new Array(),
     
     generateUid_PROXY: Marshal.BY_VALUE,
     generateUid: function() {
@@ -49,6 +50,13 @@
     
     store_PROXY: Marshal.BY_VALUE,
     store: function(uid, data, overwrite) {
+        // Procisteni
+        this._removeCandidates.each(function(uid) {
+            delete this._data[uid];
+        });
+        this._removeCandidates = new Array();
+        
+        // Samotne ulozeni
         if (uid == null)
             uid = this.generateUid();
         else
@@ -71,7 +79,7 @@
         
         // Remove record
         if (!doNotRemove)
-            delete this._data[uid];
+            _removeCandidates.push(uid);
             
         return data;
     }
