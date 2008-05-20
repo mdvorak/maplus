@@ -259,9 +259,7 @@ var Marshal = {
 
 
 /*** RemoteExceptionWrapper class ***/
-var RemoteExceptionWrapper = Class.create();
-
-RemoteExceptionWrapper.prototype = {
+var RemoteExceptionWrapper = Class.create({
     initialize: function(remoteException) {  
         this.remoteException = remoteException;
         
@@ -277,16 +275,14 @@ RemoteExceptionWrapper.prototype = {
     toString: function() {
         return this.string;
     }
-};
+});
 
 /*** RemoteException class ***/
-var RemoteException = Class.inherit(MarshalException);
-
-RemoteException.MESSAGE = "Service returned an exception.";
-
-Object.extend(RemoteException.prototype, {
-    initialize: function(objectName, methodName, remoteException) {
-        base.initialize(RemoteException.MESSAGE, objectName, methodName, new RemoteExceptionWrapper(remoteException));
+var RemoteException = Class.create(MarshalException, {
+    initialize: function($super, objectName, methodName, remoteException) {
+        $super(RemoteException.MESSAGE, objectName, methodName, new RemoteExceptionWrapper(remoteException));
     }
 });
+
+RemoteException.MESSAGE = "Service returned an exception.";
 

@@ -336,8 +336,7 @@ pageExtenders.add(PageExtender.create({
 }));
 
 
-var SlozeniArmadyDialog = Class.inherit(Dialog);
-Object.extend(SlozeniArmadyDialog.prototype, {
+var SlozeniArmadyDialog = Class.create(Dialog, {
     initialize: function(slozeni, poradi) {
         this._slozeni = slozeni;
         this._poradi = poradi;

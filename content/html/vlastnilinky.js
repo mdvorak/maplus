@@ -238,9 +238,7 @@ window.NastaveniVlastniLinky = {
 
 
 /*** SelectLinkDialog class ***/
-var SelectLinkDialog = Class.inherit(Dialog);
-
-Object.extend(SelectLinkDialog.prototype, {
+var SelectLinkDialog = Class.create(Dialog, {
     _createContentElement: function() {
         var html = Chrome.loadText("html/newlinkdialog.html", true);
         var root = Element.create("div", html, {class: "dialog"});
@@ -275,9 +273,7 @@ Object.extend(SelectLinkDialog.prototype, {
 
 
 /*** LinkEditorDialog class ***/
-var LinkEditorDialog = Class.inherit(Dialog);
-
-Object.extend(LinkEditorDialog.prototype, {
+var LinkEditorDialog = Class.create(Dialog, {
     initialize: function(editorName, localConfig) {
         if (LinkEditors[editorName] == null)
             editorName = "default";
@@ -398,8 +394,8 @@ Object.extend(LinkEditorDialog.prototype, {
         return root;
     },
         
-    destroy: function() {
-        base.destroy();
+    destroy: function($super) {
+        $super();
     
         this.getData = function() { throw new InvalidOperationException("Dialog is not created."); };
         this.setData = function(data) { throw new InvalidOperationException("Dialog is not created."); };

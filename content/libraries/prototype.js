@@ -1,15 +1,16 @@
-/*  Prototype JavaScript framework, version 1.5.1
+ /*  Prototype JavaScript framework, version 1.5.1
  *  (c) 2005-2007 Sam Stephenson
  *
  *  Prototype is freely distributable under the terms of an MIT-style license.
  *  For details, see the Prototype web site: http://www.prototypejs.org/
  *
  *  Michal Dvorak - added usage of forEach from JS 1.6
+ *                - added class inheritance from Prototype 1.6.0.2
  *
 /*--------------------------------------------------------------------------*/
 
 var Prototype = {
-  Version: '1.5.1',
+  Version: '1.5.1-Mikee',
 
   Browser: {
     IE:     !!(window.attachEvent && !window.opera),
@@ -33,13 +34,66 @@ var Prototype = {
   K: function(x) { return x }
 }
 
+/* Based on Alex Arnell's inheritance implementation. */
 var Class = {
   create: function() {
-    return function() {
+    var parent = null, properties = $A(arguments);
+    if (Object.isFunction(properties[0]))
+      parent = properties.shift();
+
+    function klass() {
       this.initialize.apply(this, arguments);
     }
+
+    Object.extend(klass, Class.Methods);
+    klass.superclass = parent;
+    klass.subclasses = [];
+
+    if (parent) {
+      var subclass = function() { };
+      subclass.prototype = parent.prototype;
+      klass.prototype = new subclass;
+      parent.subclasses.push(klass);
+    }
+
+    for (var i = 0; i < properties.length; i++)
+      klass.addMethods(properties[i]);
+
+    if (!klass.prototype.initialize)
+      klass.prototype.initialize = Prototype.emptyFunction;
+
+    klass.prototype.constructor = klass;
+
+    return klass;
   }
-}
+};
+
+Class.Methods = {
+  addMethods: function(source) {
+    var ancestor   = this.superclass && this.superclass.prototype;
+    var properties = Object.keys(source);
+
+    if (!Object.keys({ toString: true }).length)
+      properties.push("toString", "valueOf");
+
+    for (var i = 0, length = properties.length; i < length; i++) {
+      var property = properties[i], value = source[property];
+      if (ancestor && Object.isFunction(value) &&
+          value.argumentNames().first() == "$super") {
+        var method = value, value = Object.extend((function(m) {
+          return function() { return ancestor[m].apply(this, arguments) };
+        })(property).wrap(method), {
+          valueOf:  function() { return method },
+          toString: function() { return method.toString() }
+        });
+      }
+      this.prototype[property] = value;
+    }
+
+    return this;
+  }
+};
+
 
 var Abstract = new Object();
 
@@ -98,22 +152,90 @@ Object.extend(Object, {
 
   clone: function(object) {
     return Object.extend({}, object);
+  },
+  
+  isElement: function(object) {
+    return object && object.nodeType == 1;
+  },
+
+  isArray: function(object) {
+    return object != null && typeof object == "object" &&
+      'splice' in object && 'join' in object;
+  },
+
+  isHash: function(object) {
+    return object instanceof Hash;
+  },
+
+  isFunction: function(object) {
+    return typeof object == "function";
+  },
+
+  isString: function(object) {
+    return typeof object == "string";
+  },
+
+  isNumber: function(object) {
+    return typeof object == "number";
+  },
+
+  isUndefined: function(object) {
+    return typeof object == "undefined";
   }
+
 });
 
-Function.prototype.bind = function() {
-  var __method = this, args = $A(arguments), object = args.shift();
-  return function() {
-    return __method.apply(object, args.concat($A(arguments)));
-  }
-}
+Object.extend(Function.prototype, {
+  argumentNames: function() {
+    var names = this.toString().match(/^[\s\(]*function[^(]*\((.*?)\)/)[1].split(",").invoke("strip");
+    return names.length == 1 && !names[0] ? [] : names;
+  },
 
-Function.prototype.bindAsEventListener = function(object) {
-  var __method = this, args = $A(arguments), object = args.shift();
-  return function(event) {
-    return __method.apply(object, [event || window.event].concat(args));
+  bind: function() {
+    if (arguments.length < 2 && Object.isUndefined(arguments[0])) return this;
+    var __method = this, args = $A(arguments), object = args.shift();
+    return function() {
+      return __method.apply(object, args.concat($A(arguments)));
+    }
+  },
+
+  bindAsEventListener: function() {
+    var __method = this, args = $A(arguments), object = args.shift();
+    return function(event) {
+      return __method.apply(object, [event || window.event].concat(args));
+    }
+  },
+
+  curry: function() {
+    if (!arguments.length) return this;
+    var __method = this, args = $A(arguments);
+    return function() {
+      return __method.apply(this, args.concat($A(arguments)));
+    }
+  },
+
+  delay: function() {
+    var __method = this, args = $A(arguments), timeout = args.shift() * 1000;
+    return window.setTimeout(function() {
+      return __method.apply(__method, args);
+    }, timeout);
+  },
+
+  wrap: function(wrapper) {
+    var __method = this;
+    return function() {
+      return wrapper.apply(this, [__method.bind(this)].concat($A(arguments)));
+    }
+  },
+
+  methodize: function() {
+    if (this._methodized) return this._methodized;
+    var __method = this;
+    return this._methodized = function() {
+      return __method.apply(null, [this].concat($A(arguments)));
+    };
   }
-}
+});
 
 Object.extend(Number.prototype, {
   toColorPart: function() {
@@ -166,37 +288,6 @@ var Try = {
 
 /*--------------------------------------------------------------------------*/
 
-var PeriodicalExecuter = Class.create();
-PeriodicalExecuter.prototype = {
-  initialize: function(callback, frequency) {
-    this.callback = callback;
-    this.frequency = frequency;
-    this.currentlyExecuting = false;
-
-    this.registerCallback();
-  },
-
-  registerCallback: function() {
-    this.timer = setInterval(this.onTimerEvent.bind(this), this.frequency * 1000);
-  },
-
-  stop: function() {
-    if (!this.timer) return;
-    clearInterval(this.timer);
-    this.timer = null;
-  },
-
-  onTimerEvent: function() {
-    if (!this.currentlyExecuting) {
-      try {
-        this.currentlyExecuting = true;
-        this.callback(this);
-      } finally {
-        this.currentlyExecuting = false;
-      }
-    }
-  }
-}
 Object.extend(String, {
   interpret: function(value) {
     return value == null ? '' : String(value);
@@ -420,23 +511,6 @@ Object.extend(String.prototype.escapeHTML, {
 });
 
 with (String.prototype.escapeHTML) div.appendChild(text);
-
-var Template = Class.create();
-Template.Pattern = /(^|.|\r|\n)(#\{(.*?)\})/;
-Template.prototype = {
-  initialize: function(template, pattern) {
-    this.template = template.toString();
-    this.pattern  = pattern || Template.Pattern;
-  },
-
-  evaluate: function(object) {
-    return this.template.gsub(this.pattern, function(match) {
-      var before = match[1];
-      if (before == '\\') return match[2];
-      return before + String.interpret(object[match[3]]);
-    });
-  }
-}
 
 var $break = {}, $continue = new Error('"throw $continue" is deprecated, use "return" instead');
 
@@ -929,6 +1003,55 @@ Object.extend(ObjectRange.prototype, {
 
 var $R = function(start, end, exclusive) {
   return new ObjectRange(start, end, exclusive);
+}
+
+var PeriodicalExecuter = Class.create();
+PeriodicalExecuter.prototype = {
+  initialize: function(callback, frequency) {
+    this.callback = callback;
+    this.frequency = frequency;
+    this.currentlyExecuting = false;
+
+    this.registerCallback();
+  },
+
+  registerCallback: function() {
+    this.timer = setInterval(this.onTimerEvent.bind(this), this.frequency * 1000);
+  },
+
+  stop: function() {
+    if (!this.timer) return;
+    clearInterval(this.timer);
+    this.timer = null;
+  },
+
+  onTimerEvent: function() {
+    if (!this.currentlyExecuting) {
+      try {
+        this.currentlyExecuting = true;
+        this.callback(this);
+      } finally {
+        this.currentlyExecuting = false;
+      }
+    }
+  }
+}
+
+var Template = Class.create();
+Template.Pattern = /(^|.|\r|\n)(#\{(.*?)\})/;
+Template.prototype = {
+  initialize: function(template, pattern) {
+    this.template = template.toString();
+    this.pattern  = pattern || Template.Pattern;
+  },
+
+  evaluate: function(object) {
+    return this.template.gsub(this.pattern, function(match) {
+      var before = match[1];
+      if (before == '\\') return match[2];
+      return before + String.interpret(object[match[3]]);
+    });
+  }
 }
 
 var Ajax = {

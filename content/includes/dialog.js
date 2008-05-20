@@ -35,9 +35,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 /*** Dialog class ***/
-var Dialog = Class.create();
-
-Dialog.prototype = {
+var Dialog = Class.create({
     initialize: function() {
         // Use this object for storing data
         this.data = new Object();
@@ -247,51 +245,7 @@ Dialog.prototype = {
     isVisible: function() {
         return this._visible;
     }
-};
-
-/*** HTMLDialog class ***/
-var HTMLDialog = Class.inherit(Dialog);
-
-Object.extend(HTMLDialog.prototype, {
-    initialize: function(html, className, style) {
-        this._html = html;
-        this._className = className;
-        this._style = style;
-    },
-
-    _createContentElement: function() {
-        var content = document.createElement("div");
-        content.innerHTML = this._html;
-        content.className = this._className;
-        content.style = this._style;
-        
-        // TODO tohle chce trosku promyslet
-        var _this = this;
-        $XL('.//[input or select or a]', content).each(function(i) {
-            i.dialog = _this;
-        });
-        
-        return content;
-    }
 });
-
-Dialog.showHTMLDialog = function(html, className, style, callback) {
-    if (html == null)
-        throw new Error("html cannot be null.");
-    if (callback != null && typeof callback != "function")
-        throw new Error("callback must be a function.");
-
-    var dialog = new HTMLDialog(html, className, style);
-    
-    // Show dialog with callback function that will also destroy dialog.
-    dialog.show(function() {
-        dialog.close();
-        if (callback != null)
-            callback();
-    });
-    
-    return dialog;
-};
 
 
 

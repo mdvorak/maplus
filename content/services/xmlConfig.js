@@ -186,8 +186,7 @@ XmlConfigNode.prototype = {
     }
 };
 
-XmlConfigNode.Extension = Class.create();
-XmlConfigNode.Extension.prototype = {
+XmlConfigNode.Extension = Class.create({
     initialize: function() {
         this.activated = false;
     },
@@ -199,7 +198,7 @@ XmlConfigNode.Extension.prototype = {
         Object.extend(XmlConfigNode.prototype, this.prototype);
         this.activated = true;
     }
-};
+});
 
 /*** XmlConfigNode.XPath class ***/
 XmlConfigNode.XPath = new XmlConfigNode.Extension();
@@ -293,9 +292,7 @@ XmlConfigNode.Extended.prototype = {
 
 /*** XmlConfigManager class ***/
 
-var XmlConfigManager = Class.create();
-
-XmlConfigManager.prototype = {
+var XmlConfigManager = Class.create({
     initialize: function(directory, rootName, initCallback) {
         if (rootName == null)
             rootName = XmlConfig.DEFAULT_ROOT_NAME;
@@ -357,4 +354,4 @@ XmlConfigManager.prototype = {
         var _this = this;
         this._cache.keys().each(function(e) { _this.saveConfig(e); });
     }
-};
+});

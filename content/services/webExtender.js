@@ -34,9 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-var ExtenderCollection = Class.create();
-
-ExtenderCollection.prototype = {
+var ExtenderCollection = Class.create({
     initialize: function() {
         this._position = 0;
         this._generic = new Array();
@@ -164,7 +162,7 @@ ExtenderCollection.prototype = {
         
         return extenders;
     }
-};
+});
 
 // Core extension class 
 var WebExtender = {
@@ -286,9 +284,7 @@ var Script = Object.extend(Script || {}, {
 /*** Marshal server component class ***/
 var Marshal = new Object();
 
-Marshal.ObjectCollection = Class.create();
-
-Marshal.ObjectCollection.prototype = {
+Marshal.ObjectCollection = Class.create({
     initialize: function() {
         this._list = new Hash();
         this._lastId = 0;
@@ -362,7 +358,7 @@ Marshal.ObjectCollection.prototype = {
         
         return obj;
     }
-};
+});
 
 Object.extend(Marshal, {
     // Constants

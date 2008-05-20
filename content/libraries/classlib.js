@@ -35,9 +35,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 /*** LinkData class ***/
-var LinkData = Class.create();
-
-LinkData.prototype = {
+var LinkData = Class.create({
     initialize: function(url, text, title, externi, noveokno, editor, potvrzeni, barva) {
         this.url = url;
         this.text = (text == null || text.blank()) ? null : text.stripScripts();
@@ -48,7 +46,7 @@ LinkData.prototype = {
         this.potvrzeni = potvrzeni;
         this.barva = barva;
     }
-};
+});
 
 Object.extend(LinkData, {
     fromConfig: function(configNode) {

@@ -143,8 +143,7 @@ pageExtenders.add(PageExtender.create({
 
 
 /*** NovinkyDialog class ***/
-var NovinkyDialog = Class.inherit(Dialog);
-Object.extend(NovinkyDialog.prototype, {
+var NovinkyDialog = Class.create(Dialog, {
     _createContentElement: function() {
         var dialog = this;
         var html = Chrome.loadText("html/novinky.html");

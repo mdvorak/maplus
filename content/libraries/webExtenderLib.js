@@ -69,69 +69,6 @@ Object.extend(Function, {
     }
 });
 
-Object.extend(Class, {
-    _createMethodWithBase: function(__owner, base /*, method */) {
-        // Redeclaring method is nescessary because then it automaticly takes local variable base.
-        var __method = eval("(" + arguments[2] + ")");
-        // Return new method called in the context of object instance
-        return function() {
-                return __method.apply(__owner, arguments);
-            };
-    },
-    
-    inherit: function(baseClass) {
-        if (baseClass == null)
-            throw "baseClass is null.";
-            
-        var cls = function() {
-            // Object is not completed - it's prototype is created right now
-            if (arguments.callee.__baseClass == null)
-                return;
-        
-            // Create base object
-            var base = new Class.BaseObject(this, baseClass);
-            // Override local methods so they will support base variable
-            for (var p in this) {
-                var v = this[p];
-                if (typeof v == "function")
-                    this[p] = Class._createMethodWithBase(this, base, v);
-            }
-            
-            // Call initialize method
-            this.initialize.apply(this, arguments);
-        };
-        
-        // copy "static" methods (this will also copy parent prototype object)
-        Object.extend(cls, baseClass);
-        // copy "instance" methods (and set proper constructor reference)
-        cls.prototype = Object.extend(new cls(), baseClass.prototype);
-        
-        // Set baseClass property
-        cls.__baseClass = baseClass;
-        
-        return cls;
-    }
-});
-
-// Helper class
-Class.BaseObject = function(owner, clazz) {
-    var base = null;
-    if (clazz.__baseClass != null) {
-        base = new Class.BaseObject(owner, clazz.__baseClass);
-    }
-
-    for (var p in clazz.prototype) {
-        var v = clazz.prototype[p];
-        
-        if (typeof v == "function") {
-            if (base != null)
-                this[p] = Class._createMethodWithBase(owner, base, v);
-            else
-                this[p] = Function.bind(owner, v);
-        }
-    }
-};
-
 /*** Misc objects extension ***/
 Object.extend(Event, {
     dispatch: function(element, eventName, bubbles, cancelable) {
@@ -229,9 +166,7 @@ Object.extend(Element, {
 });
 
 /*** Exception class ***/
-var Exception = Class.create();
-
-Exception.prototype = {
+var Exception = Class.create({
     initialize: function(message, innerException) {
         this.message = message;
         this.innerException = innerException;
@@ -264,7 +199,7 @@ Exception.prototype = {
             
         return "" + str;
     }
-};
+});
 
 Object.extend(Exception, {
     getExceptionType: function(ex) {
@@ -273,11 +208,9 @@ Object.extend(Exception, {
 });
 
 /*** ArgumentException class ***/
-var ArgumentException = Class.inherit(Exception);
-
-Object.extend(ArgumentException.prototype, {
-    initialize: function(argName, argValue, message, innerException) {
-        base.initialize(message, innerException);
+var ArgumentException = Class.create(Exception, {
+    initialize: function($super, argName, argValue, message, innerException) {
+        $super(message, innerException);
         
         this.name = argName;
         this.value = argValue;
@@ -287,8 +220,8 @@ Object.extend(ArgumentException.prototype, {
         return "ArgumentException";
     },
 
-    getDescription: function() {
-        var str = base.getDescription();
+    getDescription: function($super) {
+        var str = $super();
         
         if (this.name != null)
             str += String.format("\nargument name='{0}' value='{1}'", this.name, String(this.value));
@@ -298,13 +231,9 @@ Object.extend(ArgumentException.prototype, {
 });
 
 /*** ArgumentNullException ***/
-var ArgumentNullException = Class.inherit(ArgumentException);
-
-ArgumentNullException.MESSAGE = "Argument is null.";
-
-Object.extend(ArgumentNullException.prototype, {
-    initialize: function(argName, innerException) {
-        base.initialize(argName, null, ArgumentNullException.MESSAGE, innerException);
+var ArgumentNullException = Class.create(ArgumentException, {
+    initialize: function($super, argName, innerException) {
+        $super(argName, null, ArgumentNullException.MESSAGE, innerException);
     },
     
     getType: function() {
@@ -312,23 +241,19 @@ Object.extend(ArgumentNullException.prototype, {
     }
 });
 
-/*** InvalidOperationException ***/
-var InvalidOperationException = Class.inherit(Exception);
+ArgumentNullException.MESSAGE = "Argument is null.";
 
-Object.extend(InvalidOperationException.prototype, {
+/*** InvalidOperationException ***/
+var InvalidOperationException = Class.create(Exception, {
     getType: function() {
         return "InvalidOperationException";
     }
 });
 
 /*** XPathException class ***/
-var XPathException = Class.inherit(Exception);
-
-XPathException.DEFAULT_MESSAGE = "Error evaluating XPath expression.";
-
-Object.extend(XPathException.prototype, {
-    initialize: function(message, expression, innerException) {
-        base.initialize(message || XPathException.DEFAULT_MESSAGE, innerException);
+var XPathException = Class.create(Exception, {
+    initialize: function($super, message, expression, innerException) {
+        $super(message || XPathException.DEFAULT_MESSAGE, innerException);
         
         this.expression = expression;
     },
@@ -337,8 +262,8 @@ Object.extend(XPathException.prototype, {
         return "XPathException";
     },
     
-    getDescription: function() {
-        var str = base.getDescription();
+    getDescription: function($super) {
+        var str = $super();
         
         if (this.expression != null)
             str += "\nexpression: '" + this.expression + "'";
@@ -346,6 +271,8 @@ Object.extend(XPathException.prototype, {
         return str;
     }
 });
+
+XPathException.DEFAULT_MESSAGE = "Error evaluating XPath expression.";
 
 /*** XPath class ***/
 var XPath = {
@@ -458,9 +385,7 @@ function $XL(xpath, context) {
 }
 
 /*** Page class ***/
-var Page = Class.create();
-
-Page.prototype = {
+var Page = Class.create({
     initialize: function(doc) {
         // Note: when you use other than default document, you can't use some prototype methods, like $('abc').
         if (doc == null) doc = document;
@@ -472,12 +397,10 @@ Page.prototype = {
         this.name = urlData.name;
         this.arguments = urlData.arguments; // Url encoded arguments
     }
-};
+});
 
 /*** PageExtender class ***/
-var PageExtender = Class.create();
-
-PageExtender.prototype = {
+var PageExtender = Class.create({
     initialize: function() {
     },
     
@@ -493,33 +416,23 @@ PageExtender.prototype = {
     // Set process to null if extender does only analyzes
     process: function(page, context) {
     }
-};
+});
 
 Object.extend(PageExtender, {
     create: function(definition) {
         return Object.extend(new PageExtender(), definition);
-    },
-    
-    createClass: function(definition) {
-        var cls = Class.inherit(PageExtender);
-        Object.extend(cls.prototype, definition);
-        return cls;
     }
 });
 
 /*** AbortException class ***/
-var AbortException = Class.inherit(Exception);
-
-Object.extend(AbortException.prototype, {
+var AbortException = Class.create(Exception, {
     getType: function() {
         return "AbortException";
     }
 });
 
 /*** PageExtenderCollection class ***/
-var PageExtenderCollection = Class.create();
-
-PageExtenderCollection.prototype = {
+var PageExtenderCollection = Class.create({
     initialize: function() {
         this._extenders = new Array();
         this._significantSize = 0;
@@ -620,17 +533,17 @@ PageExtenderCollection.prototype = {
             console.groupEnd();
         }
     }
-};
+});
 
 
 /*** Custom extender classes ***/
 
-var ScriptExtender = PageExtender.createClass({
+var ScriptExtender = Class.create(PageExtender, {
     DEFAULT_TYPE: "text/javascript",
     DEFAULT_CHARSET: "UTF-8",
 
-    initialize: function(src, type, charset) {
-        base.initialize();
+    initialize: function($super, src, type, charset) {
+        $super();
     
         if (src == null)
             throw new ArgumentNullException("src");
@@ -652,9 +565,9 @@ var ScriptExtender = PageExtender.createClass({
     }
 });
 
-var StyleExtender = PageExtender.createClass({
-    initialize: function(src) {
-        base.initialize();
+var StyleExtender = Class.create(PageExtender, {
+    initialize: function($super, src) {
+        $super();
         
         if (src == null)
             throw new ArgumentNullException("src");
@@ -680,11 +593,9 @@ var StyleExtender = PageExtender.createClass({
 });
 
 /*** MarshalException ***/
-var MarshalException = Class.inherit(Exception);
-
-Object.extend(MarshalException.prototype, {
-    initialize: function(message, objectName, methodName, innerException) {
-        base.initialize(message, innerException);
+var MarshalException = Class.create(Exception, {
+    initialize: function($super, message, objectName, methodName, innerException) {
+        $super(message, innerException);
         
         this.objectName = objectName;
         this.methodName = methodName;
@@ -694,8 +605,8 @@ Object.extend(MarshalException.prototype, {
         return "MarshalException";
     },
     
-    getDescription: function() {
-        var str = base.getDescription();
+    getDescription: function($super) {
+        var str = $super();
         
         if (this.objectName)
             str += "\nobject name='" + this.objectName + "'";
