@@ -45,14 +45,18 @@ var PasswordManager = {
             var nsLoginInfo = new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
                                              Components.interfaces.nsILoginInfo, "init");
                                              
-            var loginInfo = new nsLoginInfo(host, null, realm, user, password, "", "");
-            
-            try {
-                loginManager.removeLogin(loginInfo);
+            // Find users for this extension 
+            var logins = loginManager.findLogins({}, host, null, realm);
+              
+            for (var i = 0; i < logins.length; i++) {
+                if (logins[i].username == user) {
+                    loginManager.removeLogin(logins[i]);
+                    break;
+                }
             }
-            catch (ex) { }
+
             if (password != null && password != "")
-                loginManager.addLogin(loginInfo);
+                loginManager.addLogin(new nsLoginInfo(host, null, realm, user, password, "", ""));
         }
         // <= FF 2
         else {
