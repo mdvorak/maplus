@@ -149,7 +149,7 @@ pageExtenders.add(PageExtender.create({
         context.posledniBojMinuty = null;
         
         page.vypis.rozdaneUtoky.each(function(utok) {
-            if (utok.cas < 24*60)
+            if (utok.cas < 23*60)
                 context.utokuZaPosledniDen++;
             if (utok.typ.search("nevráceno") > -1)
                 context.nevracenoPrv++;
