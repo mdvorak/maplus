@@ -94,24 +94,30 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         context.naProvincii = $XL('tbody/tr/td[5]/font', context.tablePredkouzleno);
+        context.zrusitFrontu = $X('form/font', page.content);
         
-        return (context.naProvincii.length > 0);
+        return (context.naProvincii.length > 0) || (context.zrusitFrontu != null);
     },
     
     process: function(page, context) {
         context.naProvincii.each(function(e) {
-                var m = e.innerHTML.match(/^\((\d+)\)(.*)/);
-                var id = (m ? parseInt(m[1]) : null);
-                var provincie = (m ? m[2].replace(/&nbsp;/g, "\xA0") : null);
-                
-                if (id && !isNaN(id)) {
-                    e.innerHTML = "";
-                    e.appendChild(document.createTextNode("("));
-                    e.appendChild(MaPlus.Tooltips.createActiveId(page, id));
-                    e.appendChild(document.createTextNode(")"));
-                    e.appendChild(document.createTextNode(provincie));
-                }
-            });
+            var m = e.innerHTML.match(/^\((\d+)\)(.*)/);
+            var id = (m ? parseInt(m[1]) : null);
+            var provincie = (m ? m[2].replace(/&nbsp;/g, "\xA0") : null);
+            
+            if (id && !isNaN(id)) {
+                e.innerHTML = "";
+                e.appendChild(document.createTextNode("("));
+                e.appendChild(MaPlus.Tooltips.createActiveId(page, id));
+                e.appendChild(document.createTextNode(")"));
+                e.appendChild(document.createTextNode(provincie));
+            }
+        });
+        
+        // A jeste vlozit mezeru pred tlacitko Zrusit frontu kouzel
+        if (context.zrusitFrontu != null) {
+            context.zrusitFrontu.insertBefore(Element.create("br"), context.zrusitFrontu.firstChild);
+        }
     }
 }));
 

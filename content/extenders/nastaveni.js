@@ -82,6 +82,7 @@ pageExtenders.add(PageExtender.create({
             var list = $XL('.//*[@onload and @onsave]', page.content);
             var inputLoad = $X('.//input[@id="plus_loadConfig" and @type="button"]', page.content);
             var inputSave = $X('.//input[@id="plus_saveConfig" and @type="button"]', page.content);
+            var inputClear = $X('.//input[@id="plus_clearConfig" and @type="button"]', page.content);
             var spanZprava = $X('.//span[@id="plus_nastaveniZprava"]', page.content);
             var linkNovinky = $X('.//a[@id="plus_novinky"]', page.content);
             
@@ -145,8 +146,35 @@ pageExtenders.add(PageExtender.create({
 	            spanZprava.tracker = tracker;
 	            setTimeout(function() { if (spanZprava.tracker == tracker) spanZprava.update("\xA0"); }, NOTICE_TIMEOUT);
 	        });
+		    
 		    Event.observe(linkNovinky, "click", function(event) {
 		        dialogNovinky.show();
+		    });
+		    
+		    Event.observe(inputClear, "click", function(event) {
+		        if (!confirm('Opravdu chcete tato nastavení smazat?'))
+		            return;
+		    
+		        console.info("Vymazavam nastaveni...");
+		        
+		        if ($('cpd_maplus').checked) {
+		            page.localConfig.clearChildNodes();
+		            page.config.clearChildNodes();
+		        }
+		        else if ($('cpd_utok').checked) {
+		            page.config.getPrefNode("nastaveni", true).getPrefNode("utok", true).clearChildNodes();
+		            page.config.getPrefNode("nastaveni", true).getPrefNode("boj", true).clearChildNodes();		            
+		        }
+		        
+		        if ($('cpd_data').checked) {
+		            MaData.clear(); // Vymaze data a ulozi soubor
+		        }
+		        
+		        console.log("Nastaveni vymazano.");
+		        page.config.save();
+		        
+		        // Nacti nove hodnoty
+		        document.location.href = MaPlus.buildUrl(page, "main.html", {"plus": "nastaveni"});
 		    });
         };
         
