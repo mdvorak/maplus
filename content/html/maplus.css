@@ -39,6 +39,7 @@ div.helpTooltip
     border: solid 1px black;
     text-align: left;
     cursor: default;
+    font-size: x-small;
 }
 
 a.helpLink
