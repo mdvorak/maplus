@@ -290,7 +290,7 @@ pageExtenders.add(PageExtender.create({
         // Uprava hlavicek
         if (context.zobrazitAlianci) {
             function vytvorHlavickuAliance() {
-                var content = Element.create("span", "Aliance\xA0");
+                var content = Element.create("span", "<b>Aliance</b>\xA0");
                 
                 var help = MaPlus.Tooltips.createHelp(page, HELP_TEXT);
                 content.appendChild(help);
@@ -301,6 +301,9 @@ pageExtenders.add(PageExtender.create({
             pridatSloupec(context.hlavickaRozdane, ALIANCE_INDEX, vytvorHlavickuAliance());
             pridatSloupec(context.hlavickaBranene, ALIANCE_INDEX, vytvorHlavickuAliance());
         }
+        
+        context.hlavickaRozdane.className += " noLinkUnderstrike";
+        context.hlavickaBranene.className += " noLinkUnderstrike";
         
         // Uprav rozlozeni stranky
         if (context.roztahnoutObsah) {

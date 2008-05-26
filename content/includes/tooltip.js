@@ -54,7 +54,6 @@ var Tooltip = {
         tooltip.style.position = 'absolute';
         tooltip.style.left = '-500px';
         tooltip.style.top = '-500px';
-        tooltip.style.padding = '1px';
 
         if (html) {
             if (Object.isElement(html))

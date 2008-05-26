@@ -119,7 +119,10 @@ pageExtenders.add(PageExtender.create({
         page.hospodarstvi.jednotky.each(function(row) {
             row.cells.sila.setAttribute("title", "Max síla stacku: " + row.data.maxSila);
             row.cells.pocet.setAttribute("title", "Síla jedné jednotky: " + (Math.floor(row.data.sila / row.data.pocet * 100) / 100));
-        }); 
+        });
+        
+        // Zruseni underline na linkach v hlavicce
+        page.hospodarstvi.tableJednotky.rows[0].className += " noLinkUnderstrike";
     }
 }));
 

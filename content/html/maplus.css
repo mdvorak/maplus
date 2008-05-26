@@ -24,6 +24,7 @@ div.tooltip
     background-color: #0F0F0F;
     border: solid medium #404040;
     text-align: left;
+    padding: 1px;
 }
 
 a.idlink
@@ -39,13 +40,29 @@ div.helpTooltip
     border: solid 1px black;
     text-align: left;
     cursor: default;
-    font-size: x-small;
+    padding: 3px;
+}
+
+div.helpTooltip > span
+{
+	font-family: Tahoma;
+	font-size: 0.7em;
 }
 
 a.helpLink
 {
     font-size: x-small;
-    text-decoration: understrike;
+    text-decoration: underline;
+}
+
+tr.noLinkUnderstrike a
+{
+	text-decoration: none;
+}
+
+tr.noLinkUnderstrike a.helpLink
+{
+    text-decoration: underline;
 }
 
 img.link
@@ -84,6 +101,11 @@ span.alianceNeznama
 }
 
 /* Tabulky */
+
+table.thinBorders
+{
+	empty-cells: show;
+}
 
 table.thinBorders > tbody > tr > td
 {
