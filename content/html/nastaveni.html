@@ -578,6 +578,16 @@
     nastaveniManager.addTab("Hlídka", "n_hlidka");
     </script>
 
+    <!-- FAQ -->
+    <div id="n_faq" style="display: none;">
+    </div>
+    <script type="text/javascript">
+    setTimeout(function() {
+        $("n_faq").innerHTML = Chrome.loadText("html/faq.html");
+    }, 500);
+    
+    nastaveniManager.addTab("FAQ", "n_faq");
+    </script>
 
     <!-- O Aplikaci -->
     <table id="n_about" cellpadding="0" cellspacing="0" style="display: none;">
