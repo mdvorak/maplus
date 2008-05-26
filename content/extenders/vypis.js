@@ -263,12 +263,53 @@ pageExtenders.add(PageExtender.create({
             
         context.barvy = page.config.getBarevnyText();
         context.obarvovatVse = page.config.getPrefNode("vypis", true).getBoolean("obarvovatVse", false);
+        context.zobrazitAlianci = page.config.getPrefNode("vypis", true).getBoolean("aliance", true);
+        context.roztahnoutObsah = page.config.getPrefNode("vypis", true).getBoolean("roztahnout", true);
         
         context.vsechnyUtoky = page.vypis.rozdaneUtoky.concat(page.vypis.braneneUtoky);
+        
+        context.hlavickaRozdane = $X('tbody/tr[2]', page.vypis.tableRozdane);
+        context.hlavickaBranene = $X('tbody/tr[2]', page.vypis.tableBranene);
+        
         return context.vsechnyUtoky.length > 0;
     },
 
     process: function(page, context) {
+    
+        const ALIANCE_INDEX = 4;
+        const HELP_TEXT = 'Pokud je aliance <i>Neznámá</i> nebo neodpovídá aktuálnímu stavu, prošpehujte provnicii.';
+        
+        function pridatSloupec(tr, index, content) {
+            var td = document.createElement("td");
+            td.appendChild(content);
+            
+            tr.insertBefore(td, tr.cells[index + 1]);
+            return td;
+        }
+        
+        // Uprava hlavicek
+        if (context.zobrazitAlianci) {
+            function vytvorHlavickuAliance() {
+                var content = Element.create("span", "Aliance\xA0");
+                
+                var help = MaPlus.Tooltips.createHelp(page, HELP_TEXT);
+                content.appendChild(help);
+                
+                return content;
+            }
+        
+            pridatSloupec(context.hlavickaRozdane, ALIANCE_INDEX, vytvorHlavickuAliance());
+            pridatSloupec(context.hlavickaBranene, ALIANCE_INDEX, vytvorHlavickuAliance());
+        }
+        
+        // Uprav rozlozeni stranky
+        if (context.roztahnoutObsah) {
+            page.content.setAttribute("width", "60%");
+            page.leftMenu.setAttribute("width", "20%");
+            page.rightMenu.setAttribute("width", "20%");
+        }
+        
+        // Uprava samontych utok
         context.vsechnyUtoky.each(function(utok) {
             var row = ElementDataStore.get(utok.tr);
     
@@ -285,6 +326,7 @@ pageExtenders.add(PageExtender.create({
 
             // Nahrad v typu newline mezerou 
             row.cells.typ.innerHTML = row.cells.typ.innerHTML.replace('<br>', ' ');
+            row.cells.typ.style.maxWidth = "4em";
             
             // Tooltip kdy vyprsi utok
             var vyprsiZaMinut = DEN_MINUT * 3 - utok.cas;
@@ -296,6 +338,19 @@ pageExtenders.add(PageExtender.create({
             // Vytvor text podle doby
             var text = "Útok vyprší " + timeFromNow(presnyCas);
             row.cells.cas.setAttribute("title", text);
+            
+            // Pridej sloupec s alianci
+            if (context.zobrazitAlianci) {
+                var provincie = MaData.najdiProvincii(utok.id);
+                var spanAliance;
+                
+                if (provincie != null && provincie.alianceZnama) 
+                    spanAliance = Element.create("span", provincie.aliance || "")
+                else 
+                    spanAliance = Element.create("span", "Neznámá", {"class": "alianceNeznama"});
+                
+                pridatSloupec(utok.tr, ALIANCE_INDEX, spanAliance);
+            }
         });
     }
 }));

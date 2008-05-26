@@ -21,7 +21,7 @@ span
 
 div.tooltip 
 {
-    background: #0F0F0F;
+    background-color: #0F0F0F;
     border: solid medium #404040;
     text-align: left;
 }
@@ -30,6 +30,21 @@ a.idlink
 {
 	font-size: small;
     text-decoration: none;
+}
+
+div.helpTooltip
+{
+    background-color: #FDFFD8;
+    color: black;
+    border: solid 1px black;
+    text-align: left;
+    cursor: default;
+}
+
+a.helpLink
+{
+    font-size: x-small;
+    text-decoration: understrike;
 }
 
 img.link
@@ -60,6 +75,31 @@ img.link
 	color: Red;
 	font-weight: bold;
 }
+
+span.alianceNeznama
+{
+    font-style: italic;
+    color: Gray;
+}
+
+/* Tabulky */
+
+table.thinBorders > tbody > tr > td
+{
+    border-right-style: none;
+    border-bottom-style: none;
+}
+
+table.thinBorders > tbody > tr > td:first-child
+{
+    border-left-style: none;
+}
+
+table.thinBorders > tbody > tr:first-child > td:first-child
+{
+    border-top-style: none;
+}
+
 
 /* Druh a typ */
 .druhPoz { color: green; }

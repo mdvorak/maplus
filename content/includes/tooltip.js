@@ -57,10 +57,10 @@ var Tooltip = {
         tooltip.style.padding = '1px';
 
         if (html) {
-            if (typeof html == "string")
-                tooltip.innerHTML = html;
-            else
+            if (Object.isElement(html))
                 tooltip.appendChild(html);
+            else
+                tooltip.innerHTML = html;                
         }
         
         var tracker = 0;
@@ -95,9 +95,9 @@ var Tooltip = {
     getTooltip: function(tooltip) {
         if (!tooltip) 
             throw new ArgumentNullException("tooltip");
-            
-        if (typeof tooltip == "string") {
-            var name = tooltip;
+        
+        if (!Object.isElement(tooltip)) {
+            var name = String(tooltip);
             tooltip = this._library[name];
             
             if (!tooltip) {
@@ -145,8 +145,8 @@ var Tooltip = {
         
         var _this = this;
         tooltip.onHide = function() {
-                _this._currentTooltip = null;
-            };
+            _this._currentTooltip = null;
+        };
             
         this._currentTooltip = tooltip;
         tooltip.showHandler(event);
@@ -164,8 +164,8 @@ var Tooltip = {
         if (!tooltip) throw new ArgumentNullException("tooltip");
         
         Event.observe(link, "click", function(event) { 
-                Tooltip.show(event, tooltip); 
-            }, false);
+            Tooltip.show(event, tooltip); 
+        }, false);
     }
 };
 

@@ -87,13 +87,16 @@ var MaData = {
         var provi = this.seznamProvincii.evalPrefNode('provincie[@id = "' + id + '"]');
         
         if (provi) {
-          return {
+            var aliance = provi.getPref("aliance");
+  
+            return {
                 id: id,
                 regent: provi.getPref("regent"),
                 provincie: provi.getPref("provincie"),
                 povolani: provi.getPref("povolani"),
                 presvedceni: provi.getPref("presvedceni"),
-                aliance: provi.getPref("aliance"),
+                aliance: (aliance != ZADNA_ALIANCE ? aliance : null),
+                alianceZnama: (aliance != null),
                 update: new Date(provi.getAttribute("update"))
             };
         }
@@ -121,9 +124,6 @@ var MaData = {
         if (presvedceni && presvedceni != "") provi.setPref("presvedceni", presvedceni);
         
         if (aliance != null && aliance.length > 0) {
-            if (aliance == ZADNA_ALIANCE)
-                aliance = null;
-        
             // Zjisti jestli je aliance tajna
             var tajna = false;
             if (aliance != null)
@@ -159,10 +159,10 @@ var MaData = {
         var provincie = this.seznamProvincii.evalPrefNodeList('provincie[aliance = "' + jmenoAliance + '" or tajna= "' + jmenoAliance + '"]');
         
         provincie.each(function(provi) {
-                var id = parseInt(provi.getAttribute("id"));
-                if (!isNaN(id))
-                    list.push(id);
-            });
+            var id = parseInt(provi.getAttribute("id"));
+            if (!isNaN(id))
+                list.push(id);
+        });
             
         return list;
     },

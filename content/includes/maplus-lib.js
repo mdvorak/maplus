@@ -222,6 +222,26 @@ MaPlus.Tooltips = {
         Tooltip.attach(link, tooltipName);
         return link;
     },
+    
+    createHelp: function(page, text, /* optional */ link) {
+        // Vytvoreni linku (pokud neexistuje)
+        if (link == null) {
+            link = document.createElement("a");
+            link.className = "helpLink";
+            link.href = "javascript://";
+            link.innerHTML = "?";
+        }
+        
+        var tooltipName = "help_" + text.substring(0, 5) + "_" + Math.random(); // Pravdepodobnost ze bych se sesli stejna id je minimalni
+        
+        if (!Tooltip.isRegistered(tooltipName)) {
+            var _this = this;
+            Tooltip.register(tooltipName, function() { return Tooltip.create('<span>' + text + '</span>', 'helpTooltip'); });
+        }
+                
+        Tooltip.attach(link, tooltipName);
+        return link;
+    },
 
     _createActiveIdTooltip: function(page, id) {
         // Najdi informace o hraci
@@ -237,11 +257,10 @@ MaPlus.Tooltips = {
 
         // Dalsi info
         if (provincie) {
-            var pridejRadek = function(jmeno, hodnota)
-                {
-                    if (hodnota && hodnota != "")
-                        html += '<tr><td><span class="small">' + jmeno + '&#xA0;&#xA0;</span></td><td><span class="small">' + hodnota + '</span></td></tr>'
-                };
+            var pridejRadek = function(jmeno, hodnota) {
+                if (hodnota && hodnota != "")
+                    html += '<tr><td><span class="small">' + jmeno + '&#xA0;&#xA0;</span></td><td><span class="small">' + hodnota + '</span></td></tr>'
+            };
         
             html += '<tr><td height="5"></td></tr>';
             pridejRadek("Regent", provincie.regent);
@@ -249,7 +268,7 @@ MaPlus.Tooltips = {
             pridejRadek("Přesvědčení", JMENA_PRESVEDCENI[provincie.presvedceni]);
             pridejRadek("Povolání", provincie.povolani);
 
-            if (provincie.aliance) {
+            if (provincie.alianceZnama) {
                 var aliance = MaData.najdiAlianci(provincie.aliance);
                 
                 if (aliance) {
@@ -257,7 +276,7 @@ MaPlus.Tooltips = {
                     pridejRadek("Aliance", '<a href="' + url + '">' + provincie.aliance + '</a>');
                 }
                 else {
-                    pridejRadek("Aliance", provincie.aliance);
+                    pridejRadek("Aliance", provincie.aliance || "\xA0");
                 }
             }
         }
@@ -271,8 +290,8 @@ MaPlus.Tooltips = {
             throw new Exception("Internal error. Copy link not found.");
         
         Event.observe(copyLink, 'click', function() {
-                Clipboard.copyId(id);
-            }, false);
+            Clipboard.copyId(id);
+        }, false);
             
         return tooltip;
     },
@@ -385,16 +404,7 @@ var TableHelper = {
 
     thinBorders: function(table) {
         // Zestihli okraje (urceno primo pro tabulky MA s tlustejma okrajema)
-        $XL('tbody/tr/td', table).each(function(e) { 
-                e.style.borderRight = "0px";
-                e.style.borderBottom = "0px";
-            });
-        $XL('tbody/tr[1]/td', table).each(function(e) { 
-                e.style.borderTop = "0px";
-            });
-        $XL('tbody/tr/td[1]', table).each(function(e) { 
-                e.style.borderLeft = "0px";
-            });
+        table.className += "thinBorders";
     }
 };
 
