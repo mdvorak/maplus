@@ -145,12 +145,15 @@ pageExtenders.add(PageExtender.create({
         
         // Vypocitej statistiky
         context.utokuZaPosledniDen = 0;
+        context.prvoutokuZaPosledniDen = 0;
         context.nevracenoPrv = 0;
         context.posledniBojMinuty = null;
         
         page.vypis.rozdaneUtoky.each(function(utok) {
             if (utok.cas < 23*60)
                 context.utokuZaPosledniDen++;
+            if (utok.cas < 23*60 && utok.typ.search("prvoútok") > -1)
+                context.prvoutokuZaPosledniDen++;
             if (utok.typ.search("nevráceno") > -1)
                 context.nevracenoPrv++;
             if (context.posledniBojMinuty == null || utok.cas < context.posledniBojMinuty)
@@ -193,13 +196,22 @@ pageExtenders.add(PageExtender.create({
             
         utokyStats += "<br/>";
         utokyStats += "Za posledních 24 hodin ";
+        
         if (context.utokuZaPosledniDen == 1)
-            utokyStats += "rozdán <i>" + context.utokuZaPosledniDen + "</i> útok.";
+            utokyStats += "rozdán <i>" + context.utokuZaPosledniDen + "</i> útok, ";
         else if (context.utokuZaPosledniDen > 1 && context.utokuZaPosledniDen < 5)
-            utokyStats += "rozdány <i>" + context.utokuZaPosledniDen + "</i> útoky.";
+            utokyStats += "rozdány <i>" + context.utokuZaPosledniDen + "</i> útoky, ";
         else
-            utokyStats += "rozdáno <i>" + context.utokuZaPosledniDen + "</i> útoků.";
+            utokyStats += "rozdáno <i>" + context.utokuZaPosledniDen + "</i> útoků, ";
             
+        utokyStats += "z toho <i>" + context.prvoutokuZaPosledniDen + "</i> ";
+        if (context.prvoutokuZaPosledniDen == 1)
+            utokyStats += "prvoútok."
+        else if (context.prvoutokuZaPosledniDen > 1 && context.prvoutokuZaPosledniDen < 5)
+            utokyStats += "prvoútoky."
+        else
+            utokyStats += "prvoútoků."
+        
         context.tdRozdaneStats.innerHTML = '<font size="1">' + utokyStats + '</font>';
         
         // Obrana

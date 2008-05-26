@@ -61,7 +61,8 @@
             uid = DataCache.generateUid();
         else
             uid = String(uid);
-            
+        
+        // Postezovat si pouze pokud: prepsani neni povoleno, data existuji ale nejsou oznaceny jako smazane.
         if (!overwrite && (uid in DataCache._data) && DataCache._removeCandidates.indexOf(uid) < 0)
             throw new ArgumentException("uid", uid, "This identifier is already registered.");
         
@@ -79,7 +80,7 @@
         uid = String(uid);
         var data = DataCache._data[uid];
         
-        // Remove record
+        // Oznacit jako smazane (bude smazano pri prvnim (jakymkoliv) ulozeni nove polozky)
         if (!doNotRemove)
             DataCache._removeCandidates.push(uid);
             
