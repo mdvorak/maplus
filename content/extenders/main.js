@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -54,9 +54,9 @@ pageExtenders.add(PageExtender.create({
             return parseInt(m[1]);
         }
         
-        // Zjisti za jak dlouho bude 360 TU
-        var zbyva = parseRegexInt(context.font.textContent, /\bzbývá\s+(\d+)\s+TU\b/);
-        var tahZaSec = parseRegexInt(context.font.textContent, /\bDo\sdalšího\stahu:\s+(\d+)\s+sec\b/);
+        // Zjisti za jak dlouho bude 360 TU (tecky nahrazuji pismena s diakritikou, nevim proc to blbnulo..)
+        var zbyva = parseRegexInt(context.font.textContent, /\bzb.v.\s+(\d+)\s+TU\b/);
+        var tahZaSec = parseRegexInt(context.font.textContent, /\bDo\sdal..ho\stahu:\s+(\d+)\s+sec\b/);
         
         if (isNaN(zbyva) || isNaN(tahZaSec) || zbyva >= 360) // pokud mame plno taky nepokracovat
             return false;
