@@ -277,7 +277,7 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
     
         const ALIANCE_INDEX = 4;
-        const HELP_TEXT = 'Pokud je aliance <i>Neznámá</i> nebo neodpovídá aktuálnímu stavu, prošpehujte provnicii.';
+        const HELP_TEXT = 'Pokud je aliance <i>Neznámá</i> nebo neodpovídá aktuálnímu stavu, vyšlete do provnicie své špehy.';
         
         function pridatSloupec(tr, index, content) {
             var td = document.createElement("td");

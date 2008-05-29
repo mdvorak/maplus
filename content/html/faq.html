@@ -1,51 +1,128 @@
 ﻿<div id="faq">
     <span>Často kladené dotazy</span>
-    
     <ul>
-        <li>
-            <a href="#" onclick="$(this).toggleClassName('opened'); return false;">
-                Jsem v alianci, ale v nastavení hlídky není vidět /<br />
-                U alianční pošty chybý link <span>odpovědět všem</span> /<br />
-                Aliance v nastavení hlídky neodpovídají
-            </a>
-            <p>
-                Navštivte menu <span class="fakeLink">Aliance</span>.
-            </p>
+        <li><a href="#" onclick="$(this).toggleClassName('opened'); return false;">Je Melior
+            Annis Plus legální?</a>
+            <div>
+                <p>
+                    V podstatě nikdy jsem nedostal oficiální zákaz ani povolení, ale podle neoficiálních
+                    informací adminům jeho používání nevadí. Zaručit se vám ale samozřejmě nemohu...
+                </p>
+            </div>
         </li>
-    
-        <li>
-            <a href="#" onclick="$(this).toggleClassName('opened'); return false;">
-                V tooltipu o provincii nejsou všechny údaje
-            </a>
-            <p>
-                Vyšlete do provincie své špehy.
-            </p>
+        <li><a href="#" onclick="$(this).toggleClassName('opened'); return false;">Proč (a jak)
+            Melior Annis Plus vůbec vzniklo?</a>
+            <div>
+                <p>
+                    První verze (a myšlenka) se zrodila, když jsem si omylem odehrál asi 160TU (a rozhodně
+                    to nebyl první úklik, však to všichni znáte :) Po menším boji jsem udělal první
+                    verzi která jediné co dělala, že kontrolovala počet odehrávaných TU. No ale ve chvíli
+                    kdy už jsem věděl jak na to, a protože jsem neskutečně líný zbytečně klikat, jsem
+                    neodolal a pustil jsem se do dalších a dalších úprav... Pak se to dostalo ven, no
+                    a výsledek tu všichni vidíte :)<br />
+                    V tuto chvíly (verze 1.3) je MA+ tvořeno přes 8600 řádky javascriptu (jen best jich
+                    má skoro tisíc), k tomu nejaká ta xml a html.. Je to mnoho měsíců práce, tak je
+                    užívejte ve zdraví ;)
+                </p>
+            </div>
         </li>
-        
-        <li>
-            <a href="#" onclick="$(this).toggleClassName('opened'); return false;">
-                Na jméno aliance nelze kliknout
-            </a>
-            <p>
-                Navštivte <span class="fakeLink">Seznam aliancí</span>.<br />
-                (Platí jak pro seznam cílů, tak pro tooltip o provincii)
-            </p>
+        <li><a href="#" onclick="$('n_aliproblem').toggleClassName('opened'); return false;">
+            Jsem v alianci, ale v nastavení hlídky není vidět</a>
+            <br />
+            <a href="#" onclick="$('n_aliproblem').toggleClassName('opened'); return false;">U alianční
+                pošty chybý link <span class="fakeLink">odpovědět všem</span></a>
+            <br />
+            <a id="n_aliproblem" href="#" onclick="$(this).toggleClassName('opened'); return false;">
+                Jsem v alianci, ale v nastavení hlídky není vidět</a>
+            <div>
+                <p>
+                    Navštivte menu <span class="fakeLink">Aliance</span>.<br />
+                    (je to jedinné místo, kde se MA+ může dozvědět, v jakých jste aliancích)
+                </p>
+            </div>
         </li>
-    
-        <li>
-            <a id="details" onclick="$(this).toggleClassName('opened'); return false;">
-                Odkud získává MA+ informace a jak to celé funguje
-            </a>
-            <p>
-                MA+ ví pouze to co víte vy, což v praxi znamená, že aby vám mohlo zobrazit detailní
-                informace o provincii, musíte ji prvně prošpehovat. To platí o všem, tzn aby znalo alianci,
-                musíte si ji prvně zobrazit (jedinou vyjímkou jsou informace o jednotkách). V praxi ale
-                MA+ sbírá informace kde se dá, tzn alianci, kde je členem, se dozví např. i z výpisu cílu.
-                <br />
-                Data se ukládají na váš disk, tudíž pokud hrajete z více počítačů, každý ma svůj "set"
-                nasbíraných dat. Avšak pokud hraje více lidí za stejného uživatele, data se mezi nimi 
-                sdílejí. Nasbíraná data se nikam neodesílají.
-            </p>
+        <li><a href="#" onclick="$(this).toggleClassName('opened'); return false;">V tooltipu
+            o provincii nejsou všechny údaje</a>
+            <div>
+                <p>
+                    Vyšlete do provincie své špehy.
+                </p>
+            </div>
+        </li>
+        <li><a href="#" onclick="$(this).toggleClassName('opened'); return false;">Na jméno
+            aliance nelze kliknout</a>
+            <div>
+                <p>
+                    Navštivte <span class="fakeLink" title="Odkaz naleznete v menu Aliance">Výpis aliancí</span>.
+                    <br />
+                    (Platí jak pro seznam cílů, tak pro tooltip o provincii)
+                </p>
+            </div>
+        </li>
+        <li><a href="#" onclick="$(this).toggleClassName('opened'); return false;">Něco málo
+            o hlídce</a>
+            <div>
+                <p>
+                    Součástí dat, která hlídka odesílá jsou: Váš login a zadané heslo, vaše ID a zlato,
+                    a dále už jen ID a sílu jednotlivých provincií. Nic víc, nic míň.<br />
+                    <i>Pozn: Nastavení hlídky v MA+ opravdu nijak nesouvisí s tím jak ji máte nastavenou
+                    na Savannahu (nebo jinde), v jaké jste tam alianci atd.. O to se musíte postarat
+                    samy.</i>
+                </p>
+                <p>
+                    Pokud používáte vlastní hlídku a chcete aby i ona měla podporu pro MA+ (ano, ona
+                    musí mít podporu pro MA+ a ne naopak), řekněte svému webmasterovy. Ten by měl být
+                    bez problémů schopný zjistit v jakém formátu data chodí a co s nima dál. Do nastavení
+                    hlídky můžete zadat jakoukoliv url.
+                </p>
+            </div>
+        </li>
+        <li><a href="#" onclick="$(this).toggleClassName('opened'); return false;">Odkud získává
+            MA+ informace a jak to celé funguje</a>
+            <div>
+                <p>
+                    MA+ ví pouze to co víte vy, což v praxi znamená, že aby vám mohlo zobrazit detailní
+                    informace o provincii, musíte ji prvně prošpehovat. To platí o všem, tzn aby znalo
+                    její alianci, musíte si ji prvně zobrazit. V praxi ale MA+ sbírá informace kde se
+                    dá, tzn alianci, kde je členem, se dozví např. i z výpisu cílu.
+                </p>
+                <p>
+                    Data se ukládají na váš disk, tudíž pokud hrajete z více počítačů, každý má svoji
+                    sadu nasbíraných dat. Avšak pokud hraje více lidí za stejného uživatele, data se
+                    mezi nimi sdílejí. Nasbíraná data se nikam neodesílají.
+                </p>
+            </div>
+        </li>
+        <li><a href="#" onclick="$(this).toggleClassName('opened'); return false;">Proč MA+
+            zpomaluje zobrazování stránek</a>
+            <div>
+                <p>
+                    Stránky jsou upravovány až na strane prohlížeče, a to až po tom, co jsou úplně načteny
+                    a často i zobrazeny. Tudíž v podstate prohlížeč generuje danou stránku 2x, jednou
+                    originál a jednou upravenou (bohužel jsem nepřišel na způsob, jak to udělat lépe).
+                    Čím více úprav, tím déle to samořejmě trvá (nejhorší je přirozeně bestiář, kdy se
+                    předělává celá rozsáhlá tabulka.
+                </p>
+                <p>
+                    A jak to urychlit? Vypněte některé funkce, např obarvení bestáře je časově velmi
+                    náročná operace (tzn Obecné/Barevné texty).
+                </p>
+                <p>
+                    <i>Poznámka pro vývojáře: Firebug též velmi zpomaluje úpravy stránek, takže doporučuji
+                        ho pro MA vypnout.</i>
+                </p>
+            </div>
+        </li>
+        <li><a href="#" onclick="$(this).toggleClassName('opened'); return false;">Melior Annis
+            odesílá požadavky i na jíné adresy než je http://meliorannis.idnes.cz</a>
+            <div>
+                <p>
+                    MA používá hned dva hitcountery (počítání zobrazení stránek), z toho jeden je z
+                    idnesu a drůhý někde v polsku (neptejte se mě proč). <b>MA+</b> samo o sobě nic
+                    nikam <b>neodesílá</b>! Pokud se to někdy změní, určitě o tom budete informování
+                    při aktualizaci.
+                </p>
+            </div>
         </li>
     </ul>
 </div>

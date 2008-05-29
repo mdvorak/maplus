@@ -102,17 +102,28 @@ span.alianceNeznama
 
 /* FAQ */
 
-#faq, #faq a, #faq p
+#faq, #faq a, #faq div
 {
 	font-size: small;
 }
 
-#faq li > a + p
+#faq > ul
 {
-    display: none;
+    list-style-type: disc;
 }
 
-#faq li > a.opened + p
+#faq li
+{
+	margin: 2pt 2pt 10pt 2pt;
+}
+
+#faq li > a + div
+{
+    display: none;
+    margin-bottom: 20pt;
+}
+
+#faq li > a.opened + div
 {
     display: block;
 }
@@ -122,12 +133,7 @@ span.alianceNeznama
     text-decoration: underline;
 }
 
-#faq > ul
-{
-    list-style: none
-}
-
-#faq > div
+#faq > span
 {
     font-weight: bold; 
     clear: both;
