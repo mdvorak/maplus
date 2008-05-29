@@ -63,6 +63,21 @@ pageExtenders.add(PageExtender.create({
             row.data = data;
         }
         
+        // Specialni jednotky
+        var tableSpecialni = $X('table[.//td[1] = "Jednotka" and .//td[2] = "Vlastník"]', page.content);
+        
+        if (tableSpecialni != null) {
+            context.specialniCells = $XL('.//td[2]/font', page.content);
+            
+            context.specialniCells.each(function(font) {
+                var data = ElementDataStore.get(font);
+                
+                var m = font.textContent.match(/^(.+)[(](\d+)[)]$/) || [];
+                data.jmeno = m[1];
+                data.id = parseInt(m[2]);
+            });
+        }
+        
         return true;
     },
     
@@ -70,6 +85,7 @@ pageExtenders.add(PageExtender.create({
         // Hlavicka
         new Insertion.Before(context.table.rows[0].cells[5], '<td align="right><span><b>Síla útoku&#xA0;</b></span></td>');
         
+        // Radky
         for (var i = 1; i < context.table.rows.length; i++) {
             var row = context.table.rows[i];
             if (!row.data)
@@ -81,7 +97,22 @@ pageExtenders.add(PageExtender.create({
             
             // Sila k utoku
             new Insertion.Before(row.cells[6], '<td align="right"><span>' + row.data.silaUtoku.toFixed(0) + '&#xA0;&#xA0;</span></td>');
-        }      
+        }
+        
+        // Specialni jednotky
+        if (context.specialniCells != null) {
+            context.specialniCells.each(function(font) {
+                var data = ElementDataStore.get(font);
+                    
+                if (!isNaN(data.id)) {
+                    font.innerHTML = font.innerHTML.replace(/[(](\d+)[)]$/, "") + "(";
+                    
+                    var link = MaPlus.Tooltips.createActiveId(page, data.id);
+                    font.appendChild(link);
+                    font.appendChild(document.createTextNode(")"));
+                }
+            });
+        }
     },
     
     _setActiveId: function(page, td, id) {
