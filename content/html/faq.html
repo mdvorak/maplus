@@ -4,18 +4,47 @@
     <ul>
         <li>
             <a href="#" onclick="$(this).toggleClassName('opened'); return false;">
-                Jsem v alianci, ale v nastavení hlídky není vidět.
+                Jsem v alianci, ale v nastavení hlídky není vidět /<br />
+                U alianční pošty chybý link <span>odpovědět všem</span> /<br />
+                Aliance v nastavení hlídky neodpovídají
             </a>
             <p>
                 Navštivte menu <span class="fakeLink">Aliance</span>.
-                Pro další informace se podívejte do <a href="#details" onclick="$('details').toggleClassName('opened');">Odkud získává MA+ informace o provinciích a jak to celé funguje</a>.
             </p>
         </li>
     
         <li>
-            <a id="details">Odkud získává MA+ informace o provinciích a jak to celé funguje</a>
+            <a href="#" onclick="$(this).toggleClassName('opened'); return false;">
+                V tooltipu o provincii nejsou všechny údaje
+            </a>
             <p>
-                TODO
+                Vyšlete do provincie své špehy.
+            </p>
+        </li>
+        
+        <li>
+            <a href="#" onclick="$(this).toggleClassName('opened'); return false;">
+                Na jméno aliance nelze kliknout
+            </a>
+            <p>
+                Navštivte <span class="fakeLink">Seznam aliancí</span>.<br />
+                (Platí jak pro seznam cílů, tak pro tooltip o provincii)
+            </p>
+        </li>
+    
+        <li>
+            <a id="details" onclick="$(this).toggleClassName('opened'); return false;">
+                Odkud získává MA+ informace a jak to celé funguje
+            </a>
+            <p>
+                MA+ ví pouze to co víte vy, což v praxi znamená, že aby vám mohlo zobrazit detailní
+                informace o provincii, musíte ji prvně prošpehovat. To platí o všem, tzn aby znalo alianci,
+                musíte si ji prvně zobrazit (jedinou vyjímkou jsou informace o jednotkách). V praxi ale
+                MA+ sbírá informace kde se dá, tzn alianci, kde je členem, se dozví např. i z výpisu cílu.
+                <br />
+                Data se ukládají na váš disk, tudíž pokud hrajete z více počítačů, každý ma svůj "set"
+                nasbíraných dat. Avšak pokud hraje více lidí za stejného uživatele, data se mezi nimi 
+                sdílejí. Nasbíraná data se nikam neodesílají.
             </p>
         </li>
     </ul>

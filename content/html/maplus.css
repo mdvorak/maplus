@@ -102,6 +102,11 @@ span.alianceNeznama
 
 /* FAQ */
 
+#faq, #faq a, #faq p
+{
+	font-size: small;
+}
+
 #faq li > a + p
 {
     display: none;
