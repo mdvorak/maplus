@@ -429,7 +429,7 @@ function timeFromNow(presnyCas) {
     else if (pocetMinut < dnesZbyvaMinut + DEN_MINUT)
         text += "zítra ";
     else if (pocetMinut < dnesZbyvaMinut + 2 * DEN_MINUT)
-        text += "pozítří ";
+        text += NAZVY_DNU[(now.getDay() + 1) % 7] + " ";
     else if (pocetMinut < dnesZbyvaMinut + 3 * DEN_MINUT)
         text += NAZVY_DNU[(now.getDay() + 2) % 7] + " ";
     else {
