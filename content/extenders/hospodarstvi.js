@@ -350,7 +350,7 @@ var SlozeniArmadyDialog = Class.create(Dialog, {
         var s = this._slozeni;
         
         var html = Chrome.loadText("html/slozeniarmady.html");
-        var root = Element.create("div", html, {class: "dialog"});
+        var root = Element.create("div", html, {"class": "dialog"});
         
         // Zobraz data
         var format = function(value) {
@@ -408,16 +408,33 @@ var SlozeniArmadyDialog = Class.create(Dialog, {
         
         // Poradi utoku
         var tbodyPoradiUtoku = $X('.//tbody[@id = "d_poradiUtoku"]', root);
+        var radky = new Array(this._poradi.length);
 
-        this._poradi.each(function(i) {
+        // Prvne vytvor prazdne bunky
+        for (var i = 0; i < this._poradi.length; i++) {
             var tr = Element.create("tr");
-            tr.appendChild(Element.create("td", '<span>' + i.jednotka + '\xA0\xA0</span>'));
             
-            var str = i.ini + (i.phb != null ? "/" + i.phb : "");
-            tr.appendChild(Element.create("td", '<span>' + str + '\xA0\xA0</span>'));
-  
+            for (var j = 0; j < 8; j++) {
+                tr.appendChild(Element.create("td"));
+            }
+            
             tbodyPoradiUtoku.appendChild(tr);
-        });
+            radky[i] = tr;
+        }
+        
+        // Pak dopln hodnoty
+        for (var kolo = 0; kolo < 3; kolo++) {
+            var radek = 0;
+            
+            this._poradi.each(function(data) {
+                if (data.phb == null || (3 - data.phb) <= kolo) {
+                    var tr = radky[radek++];
+                    
+                    tr.cells[kolo * 3 + 0].innerHTML = '<span>' + data.jednotka + '\xA0\xA0</span>';
+                    tr.cells[kolo * 3 + 1].innerHTML = '<span>' + data.ini + '\xA0\xA0</span>';
+                }
+            });
+        }
         
         // Zavrit event handler
         var inputZavrit = $X('.//input[@id = "d_zavrit"]', root);

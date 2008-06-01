@@ -161,18 +161,24 @@ pageExtenders.add(PageExtender.create({
             // Pridat na poctu
             let multiplier = (data.maxPocet < Number.POSITIVE_INFINITY) ? 1 : 10;
             
-            let vybratCallback = function(kolik) {
+            let vybratCallback = function(kolik, multi) {
+                let pocet = kolik;
+            
                 if (selectBudova.value != data.id) {
                     selectBudova.value = data.id;
                 }
                 else {
-                    let pocet = parseInt(inputKolik.value);
-                    if (!isNaN(pocet)) {
-                        if (pocet > 1 || multiplier == 1)
-                            kolik += Math.max(pocet, 0);
-                    }
+                    let c = parseInt(inputKolik.value);
+                    if (c > 0)
+                        pocet += c;
                 }
-                inputKolik.value = Math.min(kolik, data.pocet);
+                
+                if (pocet < Number.POSITIVE_INFINITY) {
+                    // Zaokrouhli to vzdy tak aby to bylo delitelne nasobkem
+                    pocet = Math.floor(pocet / kolik) * kolik;
+                }
+                
+                inputKolik.value = Math.min(pocet, data.pocet);
                 inputKolik.select();
             };
             
