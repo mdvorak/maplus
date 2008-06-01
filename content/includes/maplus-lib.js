@@ -276,7 +276,7 @@ MaPlus.Tooltips = {
                     pridejRadek("Aliance", '<a href="' + url + '">' + provincie.aliance + '</a>');
                 }
                 else {
-                    pridejRadek("Aliance", provincie.aliance || "\xA0");
+                    pridejRadek("Aliance", provincie.aliance || '<span class="alianceNeznama small">Žádná</span>');
                 }
             }
         }
