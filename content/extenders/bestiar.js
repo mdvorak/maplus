@@ -33,7 +33,7 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
+
 var VybraneJednotky = Marshal.getObjectProxy("VybraneJednotky");
 
 // Mala optimilizace rychlosti
@@ -108,9 +108,17 @@ pageExtenders.add(PageExtender.create({
         bestiar.table.data = new Array();
         bestiar.table.bidnute = new Array();
         
+        // Pokus se analyzovat JS, pokud existuje
+        var scriptElement = $X('tbody/script', bestiar.table.element);
+        var jsData = null;
+        
+        if (scriptElement != null) {
+            jsData = this._analyzeJavascript(scriptElement);
+        }
+        
         // Zpracuj jednotlive radky
         for (var i = 1; i < tableData.rows.length; i++) {
-            var row = ElementDataStore.get(tableData.rows[i]);
+            let row = ElementDataStore.get(tableData.rows[i]);
             row.columns = this._createColumnsMap(row.element, BestiarSloupce.puvodni);
             
             // Nabidnout link
@@ -118,27 +126,47 @@ pageExtenders.add(PageExtender.create({
             
               // Puvodni text
             row.description = row.element.textContent.replace(/\n|\s+$/g, ""); 
-
-            // Analyzuj data
-            row.data = new Hash();
-            row.data.jmeno = row.columns["jmeno"].textContent.replace(/\s+(\[\s*\d+\s*\])?\s*$/, "");
-            row.data.barva = row.columns["barva"].textContent.replace(/\s/g, "");
-            row.data.pocet = parseInt(row.columns["pocet"].textContent);
-            row.data.zkusenost = parseFloat(row.columns["zkusenost"].textContent) / 100;
-            row.data.silaJednotky = parseFloat(row.columns["silaJednotky"].textContent);
-            row.data.druh = row.columns["druh"].textContent.replace(/\s+$/, "");
-            row.data.typ = row.columns["typ"].textContent.replace(/\s+$/, "");
-            row.data.cas = parseTime(row.columns["cas"].textContent.replace(/\s+$/, ""));
-            row.data.nabidka = parseInt(row.columns["nabidka"].textContent);
+            
+            let id = null;
             
             // Id stacku (da se zjistit pouze u nebidnutych jednotek)
             if (row.linkNabidka != null) {
                 let onclick = row.linkNabidka.getAttribute("onclick");
                 let m = onclick.match(/^set_as_selected[(](\d+)[)]$/);
                 if (m != null)
-                    row.data.id = parseInt(m[1]);
+                    id = parseInt(m[1]);
+            }
+            
+            // Zkuz JS data
+            let data = null;
+            if (jsData != null && jsData.length > i - 1) {
+                data = jsData[i - 1];
+                
+                // Kontrola ID: jestlize se nerovnaji, provedeme starou analyzu a zahodime veskera jsData
+                if (id != null && data.id != id) {
+                    data = null;
+                    jsData = null;
+                    console.warn("Na radku %d se nerovna ID z jsData a z linku (id=%d data.id=%d).", i, id, data.id);
+                }
             }
 
+            if (data == null) {
+                // Analyzuj data starym "dobrym" zpusobem
+                data = new Hash();
+                data.id = id;
+                data.jmeno = row.columns["jmeno"].textContent.replace(/\s+(\[\s*\d+\s*\])?\s*$/, "");
+                data.barva = row.columns["barva"].textContent.replace(/\s/g, "");
+                data.pocet = parseInt(row.columns["pocet"].textContent);
+                data.zkusenost = parseFloat(row.columns["zkusenost"].textContent) / 100;
+                data.silaJednotky = parseFloat(row.columns["silaJednotky"].textContent);
+                data.druh = row.columns["druh"].textContent.replace(/\s+$/, "");
+                data.typ = row.columns["typ"].textContent.replace(/\s+$/, "");
+                data.cas = parseTime(row.columns["cas"].textContent.replace(/\s+$/, ""));
+                data.nabidka = parseInt(row.columns["nabidka"].textContent);   
+            }
+
+            row.data = data;
+            
             // Max sila stacku
             row.data.maxSilaStacku = parseInt(row.data.pocet * row.data.silaJednotky);
             // Sila stacku
@@ -207,7 +235,36 @@ pageExtenders.add(PageExtender.create({
         return true;
     },
 
-    process: null
+    process: null,
+    
+    _analyzeJavascript: function(scriptElement) {
+        // bestiar_print_row (barva,jd_jmeno,zobraz_kupce,id_kupce,jd_mnozstvi,jd_zkusenost,jd_power,jd_druh,jd_typ,cas_prodeje,cena,ma_dost_penez,zobrazit_js,id_nabidky,barva_jednotky) 
+        // indexy:            1     2        3            4        5           6            7        8       9      10          11   12            13          14         15         
+        var regex = /^\s*bestiar_print_row\s*\('([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)','([^']*)'\);\s*$/mg;
+        var js = scriptElement.innerHTML;
+        var rows = new Array();
+        
+        var m;
+        while((m = regex.exec(js)) != null) {
+            var data = new Hash();
+            
+            data.id = parseInt(m[14]);
+            data.barva = m[15];
+            data.jmeno = m[2];
+            data.pocet = parseInt(m[5]);
+            data.zkusenost = parseFloat(m[6]) / 100;
+            data.silaJednotky = parseFloat(m[7]);
+            data.druh = m[8];
+            data.typ = m[9];
+            data.cas = parseTime(m[10]);
+            data.nabidka = parseInt(m[11]);
+            
+            rows.push(data);
+        }
+        
+        console.info("JS data analyzovany (%d zaznamu).", rows.length);
+        return rows;
+    }
 }));
 
 // Zvetsit sirku tabulky bestiare

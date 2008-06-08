@@ -170,9 +170,21 @@ var Tooltip = {
 
 Tooltip.Methods = {
     showTooltip: function(x, y) {
-        this.style.display = '';
-        this.style.left = Math.min(x - 5, window.scrollX + window.innerWidth - this.offsetWidth) + 'px';
-        this.style.top = Math.min(y - 5, window.scrollY + window.innerHeight - this.offsetHeight) + 'px';
+        var windowWidth = window.innerWidth - (window.scrollMaxY > 0 ? ScrollbarHelper.getWidth() : 0);
+        var windowHeight = window.innerHeight - (window.scrollMaxX > 0 ? ScrollbarHelper.getWidth() : 0);
+        
+        this.style.display = 'block';
+        
+        var dims = this.getDimensions();
+        var width = Math.min(dims.width, windowWidth);
+        var height = Math.min(dims.height, windowHeight);
+        
+        console.debug("Tooltip windowWidth=%d windowHeight=%d width=%d height=%d window.scrollX=%d window.scrollY=%d", windowWidth, windowHeight, width, height, window.scrollX, window.scrollY);
+        
+        this.style.maxWidth = windowWidth;
+        this.style.maxHeight = windowHeight;
+        this.style.left = Math.min(x - 5, window.scrollX + windowWidth - width) + 'px';
+        this.style.top = Math.min(y - 5, window.scrollY + windowHeight - height) + 'px';
     }, 
     
     hideTooltip: function() {

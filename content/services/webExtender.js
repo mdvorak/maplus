@@ -164,83 +164,83 @@ var ExtenderCollection = Class.create({
     }
 });
 
-// Core extension class 
+// Core extension class
 var WebExtender = {
     _extenders: new ExtenderCollection(),
     _unloadHandlers: new Array(),
-    
+
     registerExtender: function(url, extender, asLibrary) {
         if (url == null) throw new ArgumentNullException("url");
         if (extender == null) throw new ArgumentNullException("extender");
-        
+
         this._extenders.add(url, extender, asLibrary);
         return extender;
     },
-    
+
     registerCallback: function(url, callback) {
         if (url == null) throw new ArgumentNullException("url");
         if (callback == null) throw new ArgumentNullException("callback");
-    
+
         var extender = PageExtender.create({
-                process: function(page) {
-                    callback(page);
-                }
-            });
+            process: function(page) {
+                callback(page);
+            }
+        });
         this.registerExtender(extender);
     },
-    
+
     registerUnloadHandler: function(callback) {
         if (callback == null) return;
-    
+
         this._unloadHandlers.push(callback);
     },
- 
+
     /** Object implementation **/
     init: function(win) {
         var _this = this;
-    
-        var appcontent = win.document.getElementById("appcontent");        
+
+        var appcontent = win.document.getElementById("appcontent");
         appcontent.addEventListener("DOMContentLoaded", function(event) { _this._onPageLoad(event); }, true);
-        
+
         win.addEventListener("unload", function() { _this._onUnload(); }, false);
-        
+
         this._init = null;
     },
-    
+
     _onUnload: function() {
         for (var i = 0; i < this._unloadHandlers.length; i++) {
             this._unloadHandlers[i]();
         }
     },
-    
+
     _onPageLoad: function(event) {
         var doc = event.originalTarget;
 
-        if (doc && doc.nodeName == "#document" 
-                && doc.location 
-                && doc.location.href 
+        if (doc && doc.nodeName == "#document"
+                && doc.location
+                && doc.location.href
                 && doc.location.href.search("http://") == 0) {
             this._callExtenders(doc);
-        } 
+        }
     },
-    
+
     _callExtenders: function(doc) {
         var extenders = this._extenders.getList(doc.location.href);
         if (extenders && extenders.needsExecution()) {
             var page = new Page(doc);
-            
-            this._initExtendedPage(page);            
+
+            this._initExtendedPage(page);
             extenders.run(page);
             this._finalizeExtendedPage(page);
         }
     },
-    
-    _initExtendedPage: function(page) { 
+
+    _initExtendedPage: function(page) {
         if (ExtenderManager && ExtenderManager.initPage) {
             ExtenderManager.initPage(page);
         }
     },
-    
+
     _finalizeExtendedPage: function(page) {
         if (ExtenderManager && ExtenderManager.finalizePage) {
             ExtenderManager.finalizePage(page);

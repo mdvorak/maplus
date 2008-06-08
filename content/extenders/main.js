@@ -54,15 +54,29 @@ pageExtenders.add(PageExtender.create({
             return parseInt(m[1]);
         }
         
+        var now = new Date();
+        var dnesZbyvaMinut = DEN_MINUT - (now.getHours() * 60 + now.getMinutes());
+        var dnesPribudeTahu = Math.floor(dnesZbyvaMinut / 12);
+        
         // Zjisti za jak dlouho bude 360 TU (tecky nahrazuji pismena s diakritikou, nevim proc to blbnulo..)
         var zbyva = parseRegexInt(context.font.textContent, /\bzb.v.\s+(\d+)\s+TU\b/);
         var tahZaSec = parseRegexInt(context.font.textContent, /\bDo\sdal..ho\stahu:\s+(\d+)\s+sec\b/);
         
-        if (isNaN(zbyva) || isNaN(tahZaSec) || zbyva >= 360) // pokud mame plno taky nepokracovat
+        if (isNaN(zbyva) || isNaN(tahZaSec))
             return false;
+                    
+        var chyby = 360 - zbyva;
         
-        var chyby = Math.max(360 - zbyva, 0);
-        // TODO Odecist puloncni bonusy
+        // Odecist puloncni bonusy
+        if (chyby > dnesPribudeTahu) {
+            chyby -= 10; // Za prvni pulnoc
+            chyby -= Math.floor((chyby - dnesPribudeTahu) / 120) * 10; // Za kazdou dalsi pulnoc
+        }
+        
+        // pokud mame plno taky nepokracovat
+        chyby = Math.max(chyby, 0);
+        
+        console.debug("dnesPribudeTahu=%d zbyva=%d tahZaSec=%d chyby=%d", dnesPribudeTahu, zbyva, tahZaSec, chyby);        
         
         // Vypocet
         var plnoZaSec = (chyby - 1) * 720 + tahZaSec; // 720s = 12m
@@ -72,9 +86,13 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        var text = "Plné tahy budete mít " + timeFromNow(context.cas);
+        var text = 'Plné tahy budete mít ' + timeFromNow(context.cas) + ' ';
+        var upozorneni = "Upozornění: Do času jsou započítány půlnoční bonusy. "
+                       + "Jestliže je po půlnoci, ale ještě jste bonus nedostali, údaj je nepřesný.<br />"
+                       + "(Bonus dostanete první přihlášení za den, tzn musíte se odhlásit a zas přihlásit aby jste ho dostali okamžitě)";
         
         context.font.appendChild(Element.create("span", text));
+        context.font.appendChild(MaPlus.Tooltips.createHelp(page, upozorneni));
         context.font.appendChild(Element.create("br"));
     }
 }));
