@@ -135,6 +135,12 @@ Color.Pickers = {
     
     grayWhite: function(colors) {
         colors.blue = colors.green = colors.red = 160 + 60 * colors.koeficient; 
+    },
+    
+    grayRed: function(colors) {
+        colors.red = Math.max(192, Math.min(240, 240 * colors.koeficient));
+        colors.green = Math.max(20, Math.min(192, 245 * (1 - colors.koeficient)));
+        colors.blue = Math.max(20, Math.min(192, 210 * (1 - colors.koeficient))); 
     }
 };
 

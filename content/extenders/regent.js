@@ -76,8 +76,11 @@ pageExtenders.add(PageExtender.create({
         if (table == null)
             return false;
         
+        page.tableProvincie = table;
+        
         var data = -1;
         
+        // Forma callbacku byla vytvorena z vykonovych duvodu, nicmene ted uz se stejne zavola vzdy..
         page.provincie = function() {
             if (data != -1)
                 return data;
@@ -133,4 +136,45 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: null
+}));
+
+
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Provincie - Stav"; },
+
+    analyze: function(page, context) {
+        if (!page.config.getMenu().getBoolean("obravitStav", true))
+            return false;
+        if (page.tableProvincie == null)
+            return false;
+        
+        context.tableProvincie = page.tableProvincie;
+        
+        var rozloha10 = page.provincie().rozloha * 10;
+        var poplimit = Math.floor(Math.log(0.1 + page.provincie().rozloha / 500) * 50000);
+        // console.debug("poplimit=%d", poplimit);
+                
+        // Koeficienty kolik chyby do ocekavaneho mnozstvi, 0 pokud nechyby nic
+        context.zbyva = Math.max(30 - page.provincie().zbyva, 0) / 30;
+        context.zlato = Math.max(rozloha10 - page.provincie().zlato, 0) / rozloha10;
+        context.populace = Math.max(poplimit - page.provincie().populace, 0) / poplimit;
+        
+        return context.zbyva > 0 || context.zlato > 0 || context.populace > 0;
+    },
+    
+    process: function(page, context) {
+        // TODO postupne obarvovani
+        if (context.zbyva > 0) {
+            var c = Color.fromRange(context.zbyva, 0, 0.95, Color.Pickers.grayRed);
+            $X('tbody/tr[td[1] = "zbývá:"]/td[2]', context.tableProvincie).style.color = c;
+        }
+        if (context.zlato > 0) {
+            var c = Color.fromRange(context.zlato, 0, 0.95, Color.Pickers.grayRed);
+            $X('tbody/tr[td[1] = "Zlato:"]/td[2]', context.tableProvincie).style.color = c;
+        }
+        if (context.populace > 0) {
+            var c = Color.fromRange(context.populace, 0, 0.95, Color.Pickers.grayRed);
+            $X('tbody/tr[td[1] = "Populace:"]/td[2]', context.tableProvincie).style.color = c;
+        }
+    }
 }));
