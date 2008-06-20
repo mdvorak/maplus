@@ -264,3 +264,22 @@ pageExtenders.add(PageExtender.create({
         page.rightMenu.appendChild(spanCustomMenu);
     }
 }));
+
+
+// Banka
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Menu - Banka"; },
+
+    analyze: function(page, context) {
+        if (!page.config.getRegent().getBoolean('dluh', false))
+            return false;
+        
+        context.linkBanka = $X('font/a[. = "Banka"]', page.rightMenu);
+        
+        return context.linkBanka != null;
+    },
+    
+    process: function(page, context) {
+        context.linkBanka.style.color = 'orange';
+    }
+}));

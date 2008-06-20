@@ -19,6 +19,12 @@ span
     font-size: small;
 }
 
+.validationError
+{
+    background-color: #FA4040;
+    border-color: #FA4040;
+}
+
 div.tooltip 
 {
     background-color: #0F0F0F;

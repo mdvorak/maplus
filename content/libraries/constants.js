@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const VERSION = "1.3";
+const VERSION = "1.3.1";
 
 const EXTENSION_NAME = "maplus";
 const EXTENSION_ID = "maplus@michal.dvorak";

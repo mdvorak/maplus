@@ -33,7 +33,8 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
+
+
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Banka - Splatka"; },
 
@@ -49,13 +50,73 @@ pageExtenders.add(PageExtender.create({
             console.debug("castka=%d", context.castka);
         }
         
-        return !isNaN(context.castka);
+        var pujceno = !isNaN(context.castka);
+        
+        if (pujceno) {
+            // Set bit
+            console.log("Mame pujceno!");
+            page.config.getRegent().setPref("dluh", true);
+        }
+        
+        return pujceno;
     },
 
     process: function(page, context) {
         Event.observe(context.splatka, 'blur', function() {
-                if (parseInt(this.value) > context.castka)
-                    this.value = context.castka;
-            });
+            if (parseInt(this.value) > context.castka)
+                this.value = context.castka;
+        });
     }
+}));
+
+
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Banka - Pujcka"; },
+
+    analyze: function(page, context) {
+        var formPujcit = $X('.//form[@action="banka.html" and .//input[@type="text" and @name="pujcka"]]', page.content);
+        
+        if (formPujcit != null) {
+            // Nemame pujceno, reset bit
+            console.log("Zadna pujcka");
+            page.config.getRegent().setPref("dluh", false);
+            
+            // Pridej handler na pujceni
+            var inputPujcka = $X('.//input[@type="text" and @name="pujcka"]', formPujcit);
+            
+            Event.observe(formPujcit, 'submit', function(event) {
+                console.debug("pujcka=%d", parseInt(inputPujcka.value));
+
+                if (parseInt(inputPujcka.value) > 0) {
+                    // Set bit
+                    page.config.getRegent().setPref("dluh", true);
+                }
+                else {
+                    // Neodesilej ani formular, nemuze to stejne projit
+                    Event.stop(event);
+                    inputPujcka.addClassName("validationError");
+                    inputPujcka.focus();
+                }
+            });
+            
+            return true;
+        }
+        
+        if ($X('.//font[contains(., "Vaše půjčka je splacena")]', page.content) != null) {
+            // Reset bit, pujcka vracena
+            console.log("Pujcka vracena!");
+            page.config.getRegent().setPref("dluh", false);
+            
+            // Redirect, at se zamezi refreshi (byt omylem, muze to stat docela dost)
+            setTimeout(function() {
+                document.location.href = MaPlus.buildUrl(page, "banka.html");
+            }, 3000);
+            
+            return true;
+        }
+    
+        return false;
+    },
+
+    process: null
 }));

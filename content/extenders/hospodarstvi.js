@@ -326,7 +326,7 @@ pageExtenders.add(PageExtender.create({
         
         // TODO Podle ceho se ridi jednotky se stejnou ini?
         poradi.sort(function(a, b) { 
-            var r = b.ini - a.ini;
+            let r = b.ini - a.ini;
             if (r == 0)
                 r = b.zkusenost - a.zkusenost; // TODO overit
             return r;
@@ -407,14 +407,14 @@ var SlozeniArmadyDialog = Class.create(Dialog, {
         }
         
         // Poradi utoku
-        var tbodyPoradiUtoku = $X('.//tbody[@id = "d_poradiUtoku"]', root);
-        var radky = new Array(this._poradi.length);
+        let tbodyPoradiUtoku = $X('.//tbody[@id = "d_poradiUtoku"]', root);
+        let radky = new Array(this._poradi.length);
 
         // Prvne vytvor prazdne bunky
-        for (var i = 0; i < this._poradi.length; i++) {
-            var tr = Element.create("tr");
+        for (let i = 0; i < this._poradi.length; i++) {
+            let tr = Element.create("tr");
             
-            for (var j = 0; j < 8; j++) {
+            for (let j = 0; j < 8; j++) {
                 tr.appendChild(Element.create("td"));
             }
             
@@ -423,12 +423,12 @@ var SlozeniArmadyDialog = Class.create(Dialog, {
         }
         
         // Pak dopln hodnoty
-        for (var kolo = 0; kolo < 3; kolo++) {
-            var radek = 0;
+        for (let kolo = 0; kolo < 3; kolo++) {
+            let radek = 0;
             
             this._poradi.each(function(data) {
                 if (data.phb == null || (3 - data.phb) <= kolo) {
-                    var tr = radky[radek++];
+                    let tr = radky[radek++];
                     
                     tr.cells[kolo * 3 + 0].innerHTML = '<span>' + data.jednotka + '\xA0\xA0</span>';
                     tr.cells[kolo * 3 + 1].innerHTML = '<span>' + data.ini + '\xA0\xA0</span>';
