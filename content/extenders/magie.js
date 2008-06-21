@@ -42,33 +42,39 @@ pageExtenders.add(PageExtender.create({
         context.tableKouzla = $X('.//table[contains(tbody/tr[2]/td[4]/font, "seslání")]', page.content);
         if (!context.tableKouzla)
             return false;
-            
+
         if (XPath.evalNumber('count(tbody/tr[@bgColor = "#303030"])', context.tableKouzla) == 0)
             return false;
-            
+
         context.tdBottom = $X('tbody/tr[last()]/td[2]', context.tableKouzla);
+
+        // Vytvor seznam popisku ke skryti, vcetne pozice
+        context.hiddenRows = new Array();
         
-        return (context.tdBottom != null);
+        $XL('tbody/tr[@bgcolor = "#303030" or not(@bgcolor)]', context.tableKouzla).each(function(tr) {
+            context.hiddenRows.push([tr, tr.nextSibling]);
+        });
+
+        return (context.tdBottom != null) && context.hiddenRows.length > 0;
     },
-    
+
     process: function(page, context) {
-        var tableKouzla = context.tableKouzla;
+        var tbodyKouzla = context.tableKouzla.tBodies[0];
         var hiddenRows = new Array();
-    
-        for (var i = 2; i < tableKouzla.rows.length - 1; i++) {
-            var row = tableKouzla.rows[i];
+
+        // Schovej popisky a uloz si kde byli
+        context.hiddenRows.each(function([tr, ]) {
+            tbodyKouzla.removeChild(tr);
+        });
+
+        // Obarvy viditelne radky
+        for (var i = 2; i < context.tableKouzla.rows.length - 1; i++) {
+            var tr = context.tableKouzla.rows[i];
             
-            // Radek s popiskem nebo meziradek, skryt oba
-            if (row.bgColor == "#303030" || row.bgColor == "") {
-                $(row).hide();
-                hiddenRows.push(row);
-            }
-            else {
-                if (i % 2) row.bgColor = "#000000";
-                else row.bgColor = "#1b1b1b";
-            }
+            if (i % 2) tr.bgColor = "#000000";
+            else tr.bgColor = "#1b1b1b";
         }
-        
+
         // Link na zobrazeni popisku
         var aZobrazPopisky = document.createElement("a");
         aZobrazPopisky.innerHTML = '<span class="small">Zobrazit popisky</small>';
@@ -76,11 +82,17 @@ pageExtenders.add(PageExtender.create({
         context.tdBottom.appendChild(aZobrazPopisky);
 
         Event.observe(aZobrazPopisky, 'click', function(event) {
-                hiddenRows.each(function(e) { $(e).show(); });
-                $(this).hide();
-                // Tohle donuti preklesleni tabulky takze se roztahne
-                tableKouzla.style.overflowX = "scroll"; 
-            }, false);
+            // Zobraz skryte radky
+            context.hiddenRows.each(function([tr, before]) {
+                tbodyKouzla.insertBefore(tr, before);
+            });
+            
+            // Skryt link
+            $(this).hide();
+            
+            // Tohle donuti preklesleni tabulky takze se roztahne
+            context.tableKouzla.style.overflowX = "scroll";
+        }, false);
     }
 }));
 

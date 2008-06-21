@@ -42,7 +42,7 @@ pageExtenders.add(PageExtender.create({
         page.hospodarstvi = {
             tableStavby: $X('table[1]', page.content),
             tableJednotky: $X('table[2]', page.content),
-            tablePrijem: $X('table[3]', page.content),
+            tablePrijem: $X('table[3]', page.content)
         };
         
         if (!page.hospodarstvi.tableStavby 
@@ -304,9 +304,12 @@ pageExtenders.add(PageExtender.create({
             if (parametry == null)
                 return; // continue;
             
+            if (jednotka.data.typ != parametry.typ)
+                console.warn("Nesouhlasi typ jednotky %s != %s", jednotka.data.typ, parametry.typ);
+            
             var oznaceni = String(parametry.druh[0] + parametry.typ[0]).toLowerCase();
             var phb = null;
-            if (parametry.typ == "Boj.") {
+            if (parametry.typ != "Str.") {
                 oznaceni += parametry.phb;
                 phb = parametry.phb;
             }
@@ -320,13 +323,15 @@ pageExtenders.add(PageExtender.create({
                 sila: jednotka.data.sila,
                 pocet: jednotka.data.pocet,
                 zkusenost: jednotka.data.zkusenost,
-                phb: phb
+                phb: phb,
+                druh: parametry.druh,
+                typ: parametry.typ
             });
         });
         
         // TODO Podle ceho se ridi jednotky se stejnou ini?
         poradi.sort(function(a, b) { 
-            let r = b.ini - a.ini;
+            var r = b.ini - a.ini;
             if (r == 0)
                 r = b.zkusenost - a.zkusenost; // TODO overit
             return r;
@@ -412,7 +417,7 @@ var SlozeniArmadyDialog = Class.create(Dialog, {
 
         // Prvne vytvor prazdne bunky
         for (let i = 0; i < this._poradi.length; i++) {
-            let tr = Element.create("tr");
+            var tr = Element.create("tr");
             
             for (let j = 0; j < 8; j++) {
                 tr.appendChild(Element.create("td"));
@@ -423,18 +428,23 @@ var SlozeniArmadyDialog = Class.create(Dialog, {
         }
         
         // Pak dopln hodnoty
+        console.group("Vytvari se sekce poradi utoku...");
         for (let kolo = 0; kolo < 3; kolo++) {
             let radek = 0;
             
             this._poradi.each(function(data) {
-                if (data.phb == null || (3 - data.phb) <= kolo) {
+                let t = data.phb == null || (3 - data.phb) <= kolo;
+                console.debug("zobrazit=%o kolo=%d radek=%d phb=%o jednotka=%s typ=%s", t, kolo, radek, data.phb, data.jednotka, data.typ);
+                
+                if (t) {
                     let tr = radky[radek++];
                     
                     tr.cells[kolo * 3 + 0].innerHTML = '<span>' + data.jednotka + '\xA0\xA0</span>';
                     tr.cells[kolo * 3 + 1].innerHTML = '<span>' + data.ini + '\xA0\xA0</span>';
-                }
+                } 
             });
         }
+        console.groupEnd();
         
         // Zavrit event handler
         var inputZavrit = $X('.//input[@id = "d_zavrit"]', root);

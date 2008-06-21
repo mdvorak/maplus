@@ -147,34 +147,43 @@ pageExtenders.add(PageExtender.create({
             return false;
         if (page.tableProvincie == null)
             return false;
-        
+
         context.tableProvincie = page.tableProvincie;
-        
-        var rozloha10 = page.provincie().rozloha * 10;
-        var poplimit = Math.floor(Math.log(0.1 + page.provincie().rozloha / 500) * 50000);
-        // console.debug("poplimit=%d", poplimit);
-                
+
+        var limit = {
+            zlato: (page.provincie().rozloha * 10),
+            populace: Math.floor(Math.log(0.1 + page.provincie().rozloha / 500) * 50000),
+            mana: 0.35,
+            tahy: 60
+        };
+
         // Koeficienty kolik chyby do ocekavaneho mnozstvi, 0 pokud nechyby nic
-        context.zbyva = Math.max(30 - page.provincie().zbyva, 0) / 30;
-        context.zlato = Math.max(rozloha10 - page.provincie().zlato, 0) / rozloha10;
-        context.populace = Math.max(poplimit - page.provincie().populace, 0) / poplimit;
-        
+        context.zbyva = Math.max(limit.tahy - page.provincie().zbyva, 0) / limit.tahy;
+        context.zlato = Math.max(limit.zlato - page.provincie().zlato, 0) / limit.zlato;
+        context.populace = Math.max(limit.populace - page.provincie().populace, 0) / limit.populace;
+        context.mana = page.provincie().mana / page.provincie().maxMana; // mana je specialni, tam jsou proste procenta
+
+        context.limit = limit;
+
         return context.zbyva > 0 || context.zlato > 0 || context.populace > 0;
     },
-    
+
     process: function(page, context) {
-        // TODO postupne obarvovani
         if (context.zbyva > 0) {
-            var c = Color.fromRange(context.zbyva, 0, 0.95, Color.Pickers.grayRed);
+            var c = Color.fromRange(context.zbyva, 0, 0.7, Color.Pickers.grayRed);
             $X('tbody/tr[td[1] = "zbývá:"]/td[2]', context.tableProvincie).style.color = c;
         }
         if (context.zlato > 0) {
-            var c = Color.fromRange(context.zlato, 0, 0.95, Color.Pickers.grayRed);
+            var c = Color.fromRange(context.zlato, 0, 0.8, Color.Pickers.grayRed);
             $X('tbody/tr[td[1] = "Zlato:"]/td[2]', context.tableProvincie).style.color = c;
         }
         if (context.populace > 0) {
-            var c = Color.fromRange(context.populace, 0, 0.95, Color.Pickers.grayRed);
+            var c = Color.fromRange(context.populace, 0, 0.8, Color.Pickers.grayRed);
             $X('tbody/tr[td[1] = "Populace:"]/td[2]', context.tableProvincie).style.color = c;
+        }
+        if (context.mana < context.limit.mana) {
+            var c = Color.fromRange(context.mana, context.limit.mana, 0.1, Color.Pickers.grayRed);
+            $X('tbody/tr[td[1] = "Mana:"]/td[2]', context.tableProvincie).style.color = c;
         }
     }
 }));
