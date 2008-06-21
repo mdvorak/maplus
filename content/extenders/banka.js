@@ -75,15 +75,15 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         var formPujcit = $X('.//form[@action="banka.html" and .//input[@type="text" and @name="pujcka"]]', page.content);
-        
+
         if (formPujcit != null) {
             // Nemame pujceno, reset bit
             console.log("Zadna pujcka");
             page.config.getRegent().setPref("dluh", false);
-            
+
             // Pridej handler na pujceni
             var inputPujcka = $X('.//input[@type="text" and @name="pujcka"]', formPujcit);
-            
+
             Event.observe(formPujcit, 'submit', function(event) {
                 console.debug("pujcka=%d", parseInt(inputPujcka.value));
 
@@ -98,25 +98,28 @@ pageExtenders.add(PageExtender.create({
                     inputPujcka.focus();
                 }
             });
-            
-            return true;
+
+            return false;
         }
-        
+
         if ($X('.//font[contains(., "Vaše půjčka je splacena")]', page.content) != null) {
             // Reset bit, pujcka vracena
             console.log("Pujcka vracena!");
             page.config.getRegent().setPref("dluh", false);
-            
-            // Redirect, at se zamezi refreshi (byt omylem, muze to stat docela dost)
-            setTimeout(function() {
-                document.location.href = MaPlus.buildUrl(page, "banka.html");
-            }, 3000);
-            
-            return true;
+
+            context.redirect = true;
         }
-    
-        return false;
+        else if ($X('.//font[contains(., "část půjčky byla splacena")]', page.content) != null) {
+            context.redirect = true;
+        }
+        
+        return context.redirect;
     },
 
-    process: null
+    process: function(page, context) {
+        // Redirect, at se zamezi refreshi (byt omylem, muze to stat docela dost)
+        setTimeout(function() {
+            document.location.href = MaPlus.buildUrl(page, "banka.html");
+        }, 3000);
+    }
 }));
