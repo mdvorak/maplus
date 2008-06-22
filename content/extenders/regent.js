@@ -165,7 +165,7 @@ pageExtenders.add(PageExtender.create({
 
         context.limit = limit;
 
-        return context.zbyva > 0 || context.zlato > 0 || context.populace > 0;
+        return context.zbyva > 0 || context.zlato > 0 || context.populace > 0 || context.mana < limit.mana;
     },
 
     process: function(page, context) {
