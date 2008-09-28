@@ -38,7 +38,14 @@
 Marshal.registerUrlCallValidator("^" + MELIOR_ANNIS_URL);
 
 var MaPlus = {
-    getDataDirectory: function() {
+    get AgeName() {
+        if (this._ageName == null) {
+            this._ageName = WebExtenderPreferences.getBranch().getCharPref("age_name");
+        }
+        return this._ageName;
+    },
+    
+    get DataDirectory() {
         var path = Components.classes["@mozilla.org/file/directory_service;1"]
                          .getService(Components.interfaces.nsIProperties)
                          .get("ProfD", Components.interfaces.nsIFile);
@@ -50,13 +57,6 @@ var MaPlus = {
         }
         
         return path;
-    },
-    
-    getAgeName: function() {
-        if (this._ageName == null) {
-            this._ageName = WebExtenderPreferences.getBranch().getCharPref("age_name");
-        }
-        return this._ageName;
     }
 };
 

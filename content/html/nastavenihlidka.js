@@ -43,7 +43,7 @@ window.NastaveniHlidka = {
         if (this._initialized)
             return;
         this._initialized = true;
-    
+        
         // Ziskej seznam alianci kde jsem clenem (ALIANCE_ID se plni v extenders/nastaveni.js)
         if (window.ALIANCE_ID == null || ALIANCE_ID.length == 0) {
             $('n_hlidka_content').innerHTML = '<span>Nejste v žádné alianci. Pokud s tím nesouhlasíte, navštivte menu Aliance.</span>';
@@ -61,13 +61,14 @@ window.NastaveniHlidka = {
             if (data == null || data.jmeno == null || data.jmeno.length == 0)
                 return; // continue;
                 
-            // TODO odstranit k 1.5.2008 - Zpetna kompatibilita
+            // odstranit k 1.5.2008 - Zpetna kompatibilita
+            /*
             var cfg = rootConfig.getPrefNode("hlidka", true).evalPrefNode('aliance[@jmeno = "' + data.jmeno + '"]');
             if (cfg != null) {
                 cfg.setAttribute("id", id);
                 cfg.setAttribute("jmeno", null);
             }
-            
+            */
             
             // Vytvor html
             if (!prvniAli) {
@@ -202,6 +203,10 @@ window.NastaveniHlidka = {
         var cfg = root.evalPrefNode('aliance[@id = "' + alianceId + '"]');
         if (cfg == null) {
             cfg = root.addPref("aliance");
+            
+            for (var f in cfg)
+                console.log("---> " + f);
+            
             cfg.setAttribute("id", alianceId);
         }
         

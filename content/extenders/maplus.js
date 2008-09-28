@@ -40,7 +40,7 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         var last = page.config.getAttribute("posledniVerzeNovinek");
-        
+
         if (last != VERSION) {
             page.config.setAttribute("posledniVerzeNovinek", VERSION);
             return true;
@@ -49,7 +49,7 @@ pageExtenders.add(PageExtender.create({
             return false;
         }
     },
-    
+
     process: function(page, context) {
         // Zobraz dialog s novinkama
         var dialog = new NovinkyDialog();

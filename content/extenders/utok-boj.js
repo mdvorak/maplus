@@ -136,7 +136,7 @@ pageExtenders.add(PageExtender.create({
         if (page.name != "utok.html")
             return false;
 
-        context.table = $X('.//table/tbody[tr[1 and td = "Pomoc aliance"]]/tr[2]/td/font/table', page.content);
+        context.table = $X('.//table/tbody[tr[1 and td = "Pomoc aliance"]]/tr[last()]/td//table', page.content);
         if (context.table == null)
             return false;
 

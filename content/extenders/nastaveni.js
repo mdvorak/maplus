@@ -103,6 +103,9 @@ pageExtenders.add(PageExtender.create({
 			        list.each(function(e) { e.onload(); });
 	                console.info("Nacitani dokonceno");
                 }
+                catch (ex) {
+                    alert(ex);
+                }
                 finally {   
                     console.groupEnd();
 	            }

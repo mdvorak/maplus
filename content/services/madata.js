@@ -36,16 +36,16 @@
 
 var MaData = {
     load: function() {
-        var path = MaPlus.getDataDirectory();
+        var path = MaPlus.DataDirectory;
         path.append("data.xml");
         this.data = XmlConfig.load(path, "data");
         
         // Zkontroluj vek
         this.vek = this.data.getPref("vek");
-        if (this.vek != MaPlus.getAgeName()) {
+        if (this.vek != MaPlus.AgeName) {
             // Pokud vek nesouhlasi, smazej ulozena data
             this.data = XmlConfig.createEmpty("data");
-            this.data.setPref("vek", MaPlus.getAgeName());
+            this.data.setPref("vek", MaPlus.AgeName);
         }
         
         this.seznamProvincii = this.data.getPrefNode("seznamProvincii", true);
@@ -56,7 +56,7 @@ var MaData = {
         if (!this.data)
             return;
     
-        var path = MaPlus.getDataDirectory();
+        var path = MaPlus.DataDirectory;
         path.append("data.xml");
         XmlConfig.save(path, this.data);
     },
@@ -64,7 +64,7 @@ var MaData = {
     clear_PROXY: Marshal.BY_VALUE,
     clear: function() {
         this.data = XmlConfig.createEmpty("data");
-        this.data.setPref("vek", MaPlus.getAgeName());
+        this.data.setPref("vek", MaPlus.AgeName);
         
         this.seznamProvincii = this.data.getPrefNode("seznamProvincii", true);
         this.seznamAlianci = this.data.getPrefNode("seznamAlianci", true);

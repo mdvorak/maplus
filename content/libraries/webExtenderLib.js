@@ -437,24 +437,24 @@ var PageExtenderCollection = Class.create({
         this._extenders = new Array();
         this._significantSize = 0;
     },
-    
+
     size: function() {
         return this._extenders.length;
     },
-    
+
     needsExecution: function() {
         return this._significantSize > 0;
     },
 
     add: function(extender, library) {
         if (extender == null) return;
-        
+
         this._extenders.push(extender);
-        
+
         if (!library)
             this._significantSize++;
     },
-    
+
     run: function(page) {
         try {
             console.group("Running %d extenders..", this._extenders.length);
@@ -463,54 +463,52 @@ var PageExtenderCollection = Class.create({
             var processList = new Array();
 
             // Analyze
-            this._extenders.each(function(e)
-                {
-                    try {
-                        console.group("Analyze '%s'...", e.getName());
-                        
-                        var context = new Object();
-                        if (e.analyze(page, context)) {
-                            if (e.process) {
-                                processList.push([e, context]);
-                                console.info("OK");
-                            }
-                            else {
-                                console.info("NoProcess");
-                            }
+            this._extenders.each(function(e) {
+                try {
+                    console.group("Analyze '%s'...", e.getName());
+
+                    var context = new Object();
+                    if (e.analyze(page, context)) {
+                        if (e.process) {
+                            processList.push([e, context]);
+                            console.info("OK");
                         }
-                        else 
-                            console.info("Failed");
+                        else {
+                            console.info("NoProcess");
+                        }
                     }
-                    catch (ex) {
-                        console.warn("Error");
-                        throw ex;
-                    }
-                    finally {
-                        console.groupEnd();
-                    }
-                });
-                
+                    else
+                        console.info("Failed");
+                }
+                catch (ex) {
+                    console.warn("Error");
+                    throw ex;
+                }
+                finally {
+                    console.groupEnd();
+                }
+            });
+
             // Process
-            processList.each(function(entry)
-                {
-                    var extender = entry[0];
-                    var context = entry[1];
-                    
-                    try {
-                        console.group("Process '%s'...", extender.getName());
-                        
-                        extender.process(page, context);
-                        console.info("OK");
-                    }
-                    catch (ex) {
-                        console.warn("Error");
-                        throw ex;
-                    }
-                    finally {
-                        console.groupEnd();
-                    }
-                });
-                
+            processList.each(function(entry) {
+                var extender = entry[0];
+                var context = entry[1];
+
+                try {
+                    console.group("Process '%s'...", extender.getName());
+
+                    extender.process(page, context);
+                    console.info("OK");
+                }
+                catch (ex) {
+                    console.warn("Error");
+                    throw ex;
+                }
+                finally {
+                    console.groupEnd();
+                }
+            });
+
             return true;
         }
         catch (ex) {
@@ -520,7 +518,7 @@ var PageExtenderCollection = Class.create({
             else {
                 if (!console.firebug) {
                     // This is for development
-                    // alert(ex.toString());
+                    alert(ex.toString());
                 }
                 else {
                     console.error("Unhandled exception occured during extenders execution:\n", ex.toString());
@@ -621,13 +619,20 @@ var MarshalException = Class.create(Exception, {
 /*** Logging ***/
 
 // Firebug console properties for version "1.05"
-const _FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
+var _FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
 
 if (!window.console || !console.firebug) {
     // Dummy object
-    var console = new Object();
-    
+    // (set it both to the current context and window, it seems, that under FF 3.0.3 they aren't same in extension context)
+    window.console = console = new Object();
+
     _FIREBUG_METHODS.each(function(p) {
-            console[p] = function() { };
-        });
+        console[p] = function() {
+            /*
+            if (document && document.body)
+                document.body.appendChild(Element.create("div", $A(arguments)));
+            */
+        };
+    });
 }
+

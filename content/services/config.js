@@ -41,16 +41,16 @@ XmlConfigNode.Extended.useExtension();
 
 // Validace na vek
 function ageValidator(root) {
-    if (root.getAttribute("vek") != null && root.getAttribute("vek") != MaPlus.getAgeName()) {
+    if (root.getAttribute("vek") != null && root.getAttribute("vek") != MaPlus.AgeName) {
         // Odstran veskera nastaveni
         while (root.firstChild != null)
             root.removeChild(root.firstChild);
     }
-    root.setAttribute("vek", MaPlus.getAgeName());
+    root.setAttribute("vek", MaPlus.AgeName);
 }
 
 // Vytvor a registruj sluzby
-var configManager = new XmlConfigManager(MaPlus.getDataDirectory(), CONFIG_ROOT_NAME, ageValidator);
+var configManager = new XmlConfigManager(MaPlus.DataDirectory, CONFIG_ROOT_NAME, ageValidator);
 var localConfigManager = new XmlConfigManager(null, CONFIG_ROOT_NAME);
 
 var plusConfigAutosave = PageExtender.create({

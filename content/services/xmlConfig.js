@@ -37,12 +37,12 @@
 /*** XmlConfig class ***/
 var XmlConfig = {
     DEFAULT_ROOT_NAME: "config",
- 
+
     createEmpty: function(rootName) {
         var doc = DocumentHelper.createDocument();
         var root = doc.createElement(rootName);
         doc.appendChild(root);
-        
+
         XmlConfig.extendNode(root);
         return root;
     },
@@ -52,44 +52,44 @@ var XmlConfig = {
             return node;
 
         Object.extend(node, XmlConfigNode.prototype);
-           
+
         node._configNodeInitialized = true;
         return node;
     },
-    
+
     load: function(path, rootName, initCallback) {
-        if (path == null) 
+        if (path == null)
             throw "path is null.";
-    
+
         if (rootName == null)
             rootName = XmlConfig.DEFAULT_ROOT_NAME;
-    
+
         var root = null;
-        
+
         try {
             var doc = FileIO.loadXmlFile(path);
-            
+
             root = XPath.evalSingle(rootName, doc);
             if (root == null)
                 dump(String.format("Root node '{0}' not found in the file '{1}'.", rootName, path));
-            
+
             XmlConfig.extendNode(root);
         }
         catch (e) {
             dump(String.format("Error loading file '{0}':\n{1}", path, e));
         }
-    
+
         if (root == null) {
             // File not found, create new dom
             root = XmlConfig.createEmpty(rootName);
         }
-        
+
         if (initCallback != null)
             initCallback(root);
-            
+
         return root;
     },
-    
+
     save: function(path, rootNode) {
         try {
             if (rootNode != null && rootNode.ownerDocument)
@@ -202,7 +202,7 @@ XmlConfigNode.Extension = Class.create({
 
 /*** XmlConfigNode.XPath class ***/
 XmlConfigNode.XPath = new XmlConfigNode.Extension();
- 
+
 XmlConfigNode.XPath.prototype = {
     evalPrefNode_PROXY: Marshal.BY_REF,
     evalPrefNode: function(xpath) {
@@ -217,22 +217,22 @@ XmlConfigNode.XPath.prototype = {
     evalPrefNodeList: function(xpath) {
         var result = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
         retval = new Array();
-        
+
         if (result != null) {
             for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
                 retval.push(XmlConfig.extendNode(i));
             }
         }
-        
+
         return retval;
     },
-    
+
     getPrefByName_PROXY: Marshal.BY_VALUE,
     getPrefByName: function(tagName, name, defaultValue) {
         var elem = this.evalPrefNode(tagName + '[@name = "' + name + '"]');
         return (elem != null) ? elem.textContent : defaultValue;
     },
-    
+
     setPrefByName_PROXY: Marshal.BY_VALUE,
     setPrefByName: function(tagName, name, value) {
         var elem = this.evalPrefNode(tagName + '[@name = "' + name + '"]');

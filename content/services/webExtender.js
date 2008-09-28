@@ -42,24 +42,24 @@ var ExtenderCollection = Class.create({
         this._cache = new Hash();
         this._validSites = new Array();
     },
-    
+
     _analyzeUrl: function(url) {
         if (url == null) throw new ArgumentNullException("url");
 
         var m = url.match(/^http:\/\/([\w.]+)(\/[*\w%.~\/]+)?(?:[?](.+))?$/);
         if (m == null) return null;
-        
+
         var site = m[1];
         var path = (m[2] != null) ? m[2] : "DEFAULT";
         var args = new Hash();
-        
+
         if (m[3] != null) {
             $A(m[3].match(/[^&=]+=[^&=]+/g)).each(function(a) {
                 var pair = a.split("=");
                 args[pair[0]] = pair[1];
             });
         }
-     
+
         return {
             site: site,
             path: path,
@@ -67,99 +67,99 @@ var ExtenderCollection = Class.create({
             args: args
         };
     },
-    
+
     add: function(url, extender, asLibrary) {
         if (extender == null) throw new ArgumentNullException("extender");
-        
+
         // Clear cache
         this._cache.remove();
-        
+
         // Because generic extenders are in different list, we needs to track the real order
         extender._ExtenderCollection_position = this._position++;
         extender._ExtenderCollection_library = asLibrary;
-        
+
         // Special case - generic extender
         if (url == "*") {
             this._generic.push(extender);
             this._validSites = null;
             return extender;
         }
-        
+
         var analyzedUrl = this._analyzeUrl(url);
         if (analyzedUrl == null)
             throw new ArgumentException("url", url, "Invalid url format.");
-    
+
         // Speed optimization
         if (this._validSites != null && this._validSites.indexOf(analyzedUrl.site) < 0) {
             this._validSites.push(analyzedUrl.site);
         }
-    
+
         // Add extender to the collection
         var site = this._siteMap[analyzedUrl.site];
         if (site == null) {
             site = new Hash();
             this._siteMap[analyzedUrl.site] = site;
         }
-        
+
         var extenders = site[analyzedUrl.path];
         if (extenders == null) {
             extenders = new Array();
             site[analyzedUrl.path] = extenders;
         }
-        
+
         extenders.push(extender);
         return extender;
     },
-    
+
     getList: function(url) {
         var analyzedUrl = this._analyzeUrl(url);
         if (analyzedUrl == null)
             return null;
-        
+
         // Speed optimization
         if (this._validSites != null && this._validSites.indexOf(analyzedUrl.site) < 0)
             return null;
-        
+
         var extenders = this._cache[analyzedUrl.address];
-        
-        if (extenders == null) {  
+
+        if (extenders == null) {
             var site = this._siteMap[analyzedUrl.site];
             if (site != null) {
                 // We need to sort extenders
                 var tmpList = new Array();
-                
+
                 // Add generic extenders
                 this._generic.each(function(e) { tmpList.add(e); });
-            
+
                 // Find all suitable extenders
                 site.keys().each(function(k) {
-                        var add = false;
-                        
-                        if (k == analyzedUrl.path) {
+                    var add = false;
+
+                    if (k == analyzedUrl.path) {
+                        add = true;
+                    }
+                    else if (k.endsWith("*")) {
+                        var partPath = k.replace(/[*]$/, "");
+                        if (k.startsWith(partPath)) {
                             add = true;
                         }
-                        else if (k.endsWith("*")) {
-                            var partPath = k.replace(/[*]$/, "");
-                            if (k.startsWith(partPath)) {
-                                add = true;
-                            }
-                        }
-                        
-                        if (add)
-                            site[k].each(function(e) { tmpList.push(e); });
-                    });
-                    
+                    }
+
+                    if (add)
+                        site[k].each(function(e) { tmpList.push(e); });
+                });
+
                 // Sort them
                 tmpList.sort(function(a, b) { return a._ExtenderCollection_position - b._ExtenderCollection_position; });
-                
+
                 // Create collection
                 extenders = new PageExtenderCollection();
                 tmpList.each(function(e) { extenders.add(e, e._ExtenderCollection_library); });
-                    
+
                 this._cache[analyzedUrl.address] = extenders;
             }
         }
-        
+
         return extenders;
     }
 });
@@ -379,78 +379,78 @@ Object.extend(Marshal, {
 
     initPage: function(page) {
         var _this = this;
-        
+
         page.document.addEventListener("MarshalMethodCall", function(event) { _this._methodCallHandler(event); }, false);
         page.document.addEventListener("MarshalGetProxyDefinition", function(event) { _this._getProxyDefinitionHandler(event); }, false);
     },
-    
+
     // Callback must be function(document, objectName) which must throw exception when call is invalid
     registerCallValidator: function(callback) {
-        if (callback == null) 
+        if (callback == null)
             throw new ArgumentNullException("callback");
         if (typeof callback != "function")
             throw new ArgumentException("callback", callback, "Argument is not a function.");
-            
+
         this._validators.push(callback);
     },
-    
+
     registerUrlCallValidator: function(pattern) {
         if (pattern == null)
             throw new ArgumentNullException("pattern");
-            
+
         this.registerCallValidator(function(doc) {
             if (!doc.location.href.match(pattern))
                 throw new InvalidOperationException("This call is not enabled by the host security.");
         });
     },
-    
+
     registerObject: function(name, obj) {
         if (obj == this)
             throw new ArgumentException("obj", null, "Invalid operation.");
-        
+
         this._objects.register(name, obj);
     },
-    
+
     _methodCallHandler: function(event) {
         var elem = event.originalTarget;
-        
+
         try {
             var objectName = elem.getAttribute("objectName");
             var methodName = elem.getAttribute("methodName");
             var resultName = elem.getAttribute("resultName");
             var argsStr = elem.getAttribute("arguments");
-            
+
             if (objectName == null)
                 throw new MarshalException("Missing object name.", objectName, methodName);
             if (!/^[\w_$]+$/.test(methodName))
                 throw new MarshalException("Invalid method name.", objectName, methodName);
-            
+
             this._validateCall(elem.ownerDocument, objectName);
-            
+
             // Special case
             if (objectName == "Marshal" && methodName == "getDocumentReference") {
                 this._processResult(elem, Marshal.BY_REF, elem.ownerDocument);
                 return;
             }
-            
+
             // Continue normal execution
             var obj = this._objects.getObject(elem.ownerDocument, objectName, false);
             if (obj == null)
                 throw new MarshalException("Object is not registered.", objectName, methodName);
-            
+
             var method = obj[methodName];
             if (method == null || typeof method != "function")
                 throw new MarshalException("Method not found.", objectName, methodName);
-                
+
             var methodType = this._getMethodType(obj, methodName);
             if (methodType == 0)
                 throw new MarshalException("Method cannot be marshaled.", objectName, methodName);
-            
+
             // Create argument array
             var args = new Array();
             if (argsStr != null && !argsStr.empty()) {
                 var objects = this._objects;
-            
+
                 var transportArgs = argsStr.evalJSON();
                 transportArgs.each(function(a) {
                     if (a.reference != null)
@@ -459,20 +459,20 @@ Object.extend(Marshal, {
                         args.push(a.value);
                 });
             }
-  
+
             // Call method
             var retval = method.apply(obj, args);
-            
+
             if (!this._processResult(elem, methodType, retval))
                 throw new MarshalException(String.format("Invalid method marshal type ({0}).", methodType), objectName, methodName);
-                
+
             // Everything gone just fine
         }
         catch (e) {
             elem.setAttribute("exception", Object.toJSON(e));
         }
     },
-    
+
     _processResult: function(elem, methodType, retval) {
         if (retval != null) {
             // Process result
@@ -480,62 +480,62 @@ Object.extend(Marshal, {
                 case Marshal.BY_VALUE:
                     elem.setAttribute("retval", Object.toJSON(retval));
                     return true;
-                
+
                 case Marshal.BY_REF:
                     var objectId = this._objects.getName(elem.ownerDocument, retval);
                     var def = this._createProxyDefinition(retval);
-                    
+
                     var reference = {
                         objectId: objectId,
                         proxyDefinition: def
                     };
-                    
+
                     elem.setAttribute("reference", Object.toJSON(reference));
                     return true;
-                    
+
                 case Marshal.BY_REF_ARRAY:
                     if (!(retval instanceof Array))
                         throw new MarshalException("Returned object is not an array.", objectName, methodName);
-                
+
                     var objects = new Array();
-                
+
                     for (var i = 0; i < retval.length; i++) {
                         var obj = retval[i];
                         var objectId = this._objects.getName(elem.ownerDocument, obj);
                         var def = this._createProxyDefinition(obj);
-                        
+
                         var reference = {
                             objectId: objectId,
                             proxyDefinition: def
                         };
-                        
+
                         objects.push(reference);
                     }
-                
+
                     elem.setAttribute("list", Object.toJSON(objects));
                     return true;
-                    
+
                 default:
                     return false;
             }
         }
-        
+
         // else no retval
         return true;
     },
-    
+
     _getProxyDefinitionHandler: function(event) {
         try {
             var elem = event.originalTarget;
             var objectName = elem.getAttribute("objectName");
-            
+
             if (objectName == null)
                 throw new MarshalException("Missing object name.");
-                
+
             this._validateCall(elem.ownerDocument, objectName);
 
             var obj = this._objects.getObject(elem.ownerDocument, objectName, true);
-            
+
             var def = this._createProxyDefinition(obj);
             elem.setAttribute("proxyDefinition", Object.toJSON(def));
         }
@@ -543,27 +543,37 @@ Object.extend(Marshal, {
             elem.setAttribute("exception", Object.toJSON(e));
         }
     },
-    
+
     _validateCall: function(doc, objectName) {
         // No validators means disabled validation
-         
+
         this._validators.each(function(v) {
             v.call(null, doc, objectName);
         });
     },
-    
+
     _createProxyDefinition: function(obj) {
         var def = {
             methods: new Array()
         };
-        
+
+        // FF 3.0.3 - Initialize the fields first, dunno why it does that,
+        // but until first called, getAttribute is not in the member list
+        // for DOM nodes
+        for (var f in obj) {
+            if (f.endsWith(Marshal.PROXY_SUFFIX)) {
+                var methodName = f.replace(new RegExp(Marshal.PROXY_SUFFIX + "$"), "");
+                var tmp = obj[methodName];
+            }
+        }
+
         for (var f in obj) {
             if (typeof obj[f] == "function") {
                 var type = this._getMethodType(obj, f);
                 var cached = this._isMethodCached(obj, f);
-            
+
                 if (type != Marshal.NONE) {
-                    def.methods.push({ 
+                    def.methods.push({
                         name: f,
                         type: type,
                         cached: cached
@@ -571,33 +581,33 @@ Object.extend(Marshal, {
                 }
             }
         }
-        
+
         return def;
     },
 
     _getMethodType: function(obj, methodName) {
-        var attr = obj[methodName + this.PROXY_SUFFIX];
-        
+        var attr = obj[methodName + Marshal.PROXY_SUFFIX];
+
         switch (attr) {
             case null:
                 return Marshal.DEFAULT;
-            
+
             case Marshal.BY_VALUE:
                 return Marshal.BY_VALUE;
-                
+
             case Marshal.BY_REF:
                 return Marshal.BY_REF;
-                
+
             case Marshal.BY_REF_ARRAY:
                 return Marshal.BY_REF_ARRAY;
-                
+
             default:
                 return Marshal.NONE;
         }
     },
-    
+
     _isMethodCached: function(obj, methodName) {
-        return !! obj[methodName + this.PROXY_CACHED_SUFFIX];
+        return !!obj[methodName + Marshal.PROXY_CACHED_SUFFIX];
     }
 });
 
