@@ -536,56 +536,63 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Posta - Dulezitost zpravy"; },
 
     analyze: function(page, context) {
-    	if (page.posta == null || page.posta.zpravy == null)
+        if (page.posta == null || page.posta.zpravy == null)
             return false;
-            
-		return true;
+
+        return true;
     },
-    
+
     process: function(page, context) {
-		page.posta.zpravy.each(function(zprava) {
-			if (zprava.dulezitost != null) {
-			
-				switch (zprava.dulezitost) {
-					case "dulezite":
-						zprava.trHeader.className += " zprava_dulezita";
-						break;
+        page.posta.zpravy.each(function(zprava) {
+            if (zprava.dulezitost != null) {
+                updateLinks = function(className) {
+                    if (zprava.linkOd != null) zprava.linkOd.className += " " + className;
+                    if (zprava.linkOdpovedet != null) zprava.linkOdpovedet.className += " " + className;
+                    if (zprava.linkPredat != null) zprava.linkPredat.className += " " + className;
+                    if (zprava.linkOdpovedetVsem != null) zprava.linkOdpovedetVsem.className += " " + className;
+                };
 
-					case "spam":
-						zprava.trHeader.className += " zprava_spam_" + zprava.typ;
-						zprava.element.className += " zprava_spam";
-						if (zprava.linkOd != null) zprava.linkOd.className += " zprava_spam";
-						if (zprava.linkOdpovedet != null) zprava.linkOdpovedet.className += " zprava_spam";
-						if (zprava.linkPredat != null) zprava.linkPredat.className += " zprava_spam";
-						if (zprava.linkOdpovedetVsem != null) zprava.linkOdpovedetVsem.className += " zprava_spam";
-						break;
+                switch (zprava.dulezitost) {
+                    case "dulezite":
+                        // 28.9.2008 - specialni barva pro dulezite soukrome zpravy
+                        if (zprava.typ == "soukroma") {
+                            zprava.trHeader.className += " zprava_dulezita_soukroma";
+                            updateLinks("zprava_dulezita_soukroma");
+                        }
+                        else {
+                            zprava.trHeader.className += " zprava_dulezita";
+                        }
+                        break;
 
-					case "bestiar":
-						zprava.trHeader.className += " zprava_bestiar";
-						break;
-				
-				    case "bug":
-				        zprava.trHeader.className += " zprava_bug";
-				        if (zprava.linkOd != null) zprava.linkOd.className += " zprava_bug";
-						if (zprava.linkOdpovedet != null) zprava.linkOdpovedet.className += " zprava_bug";
-						if (zprava.linkPredat != null) zprava.linkPredat.className += " zprava_bug";
-						if (zprava.linkOdpovedetVsem != null) zprava.linkOdpovedetVsem.className += " zprava_bug";
-						break;
-						
-					default:
-						console.log("Neznama dulezitost zpravy %d: %s", zprava.id, zprava.dulezitost);
-						return;
-				}
-				
-				// Najdi textovy element ktery obsahuje dulezitost
-				var textNode = zprava.fontText;
-				while (textNode != null && textNode.nodeType != 3)
-				    textNode = textNode.firstChild;
-				
-				// Odstran popisek dulezitosti
-				if (textNode != null) {
+                    case "spam":
+                        zprava.trHeader.className += " zprava_spam_" + zprava.typ;
+                        zprava.element.className += " zprava_spam";
+                        updateLinks("zprava_spam");
+                        break;
+
+                    case "bestiar":
+                        zprava.trHeader.className += " zprava_bestiar";
+                        break;
+
+                    case "bug":
+                        zprava.trHeader.className += " zprava_bug";
+                        updateLinks("zprava_bug");
+                        break;
+
+                    default:
+                        console.log("Neznama dulezitost zpravy %d: %s", zprava.id, zprava.dulezitost);
+                        return;
+                }
+
+                // Najdi textovy element ktery obsahuje dulezitost
+                var textNode = zprava.fontText;
+                while (textNode != null && textNode.nodeType != 3)
+                    textNode = textNode.firstChild;
+
+                // Odstran popisek dulezitosti
+                if (textNode != null) {
                     textNode.nodeValue = textNode.nodeValue.replace(Posta.DULEZITOST_REGEX, "");
-                    
+
                     // Odstran prebytecne newline
                     if (textNode.nodeValue == "") {
                         var parent = textNode.parentNode;
@@ -594,8 +601,8 @@ pageExtenders.add(PageExtender.create({
                             parent.removeChild(parent.firstChild);
                     }
                 }
-			}
-		});
+            }
+        });
     }
 }));
 

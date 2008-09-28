@@ -186,6 +186,9 @@ pageExtenders.add(PageExtender.create({
 
         // Okraje
         TableHelper.thinBorders(context.table);
+        
+        // Center tabulku (nutne od veku 6.2)
+        context.table.parentNode.setAttribute("align", "center");
     }
 }));
 

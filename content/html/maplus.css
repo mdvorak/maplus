@@ -207,6 +207,7 @@ table.thinBorders > tbody > tr:first-child > td
 /* Styly zprav */
 
 .zprava_dulezita { background-color: #700000; }
+.zprava_dulezita_soukroma { background-color: #50C000; color: black; }
 .zprava_bestiar { background-color: #013000; }
 .zprava_spam { }
 .zprava_spam_verejna { background-color: #160A31; }
