@@ -110,7 +110,7 @@ TabManager.prototype = {
             header.className = "tabActive";
             body.style.display = "";
             header.setAttribute("active", true);
-            console.debug("Switched to tab '%s'", title);
+            logger().debug("Switched to tab '%s'", title);
         });
 
         tabs.push({

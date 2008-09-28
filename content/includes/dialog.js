@@ -61,7 +61,7 @@ var Dialog = Class.create({
         if (this._created)
             this.destroy();
         
-        console.debug("Creating dialog %o...", this);
+        logger().debug("Creating dialog %o...", this);
         
         var destructors = new Array();
         
@@ -151,7 +151,7 @@ var Dialog = Class.create({
         if (this._visible)
             throw new Error("Visible dialog cannot be destroyed.");
             
-        console.debug("Destroying dialog %o...", this);
+        logger().debug("Destroying dialog %o...", this);
         
         this._created = false;
         
@@ -173,7 +173,7 @@ var Dialog = Class.create({
         if (!this._created)
             this.create();
         
-        console.debug("Showing dialog %o...", this);
+        logger().debug("Showing dialog %o...", this);
         
         // Show content
         this._producer(true);
@@ -188,16 +188,16 @@ var Dialog = Class.create({
             return;
             
         try {
-            console.debug("Validating dialog %o with return value %o...", this, returnValue);
+            logger().debug("Validating dialog %o with return value %o...", this, returnValue);
             this.validate(returnValue);
         }
         catch (ex) {
-            console.log("Dialog %o validation with return value %o failed: %o", this, returnValue, ex);
+            logger().log("Dialog %o validation with return value %o failed: %o", this, returnValue, ex);
             this._onValidationError(ex);
             return false;
         }
         
-        console.debug("Hiding dialog %o with return value %o...", this, returnValue);
+        logger().debug("Hiding dialog %o with return value %o...", this, returnValue);
         
         // Hide content
         this._producer(false);

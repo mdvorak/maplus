@@ -296,7 +296,7 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG && !noLog)
-                console.debug("XPath.evaluate('%s', %o, %d): %o", xpath, context, resultType, retval);
+                logger().debug("XPath.evaluate('%s', %o, %d): %o", xpath, context, resultType, retval);
         }
     },
     
@@ -320,7 +320,7 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG)
-                console.debug("XPath.evalList('%s', %o): %o", xpath, context, retval);
+                logger().debug("XPath.evalList('%s', %o): %o", xpath, context, retval);
         }
     },
     
@@ -337,7 +337,7 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG)
-                console.debug("XPath.evalSingle('%s', %o): %o", xpath, context, retval);
+                logger().debug("XPath.evalSingle('%s', %o): %o", xpath, context, retval);
         }
     },
     
@@ -354,7 +354,7 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG)
-                console.debug("XPath.evalString('%s', %o): %o", xpath, context, retval);
+                logger().debug("XPath.evalString('%s', %o): %o", xpath, context, retval);
         }
     },
     
@@ -371,7 +371,7 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG)
-                console.debug("XPath.evalNumber('%s', %o): %o", xpath, context, retval);
+                logger().debug("XPath.evalNumber('%s', %o): %o", xpath, context, retval);
         }
     }
 };
@@ -457,35 +457,35 @@ var PageExtenderCollection = Class.create({
 
     run: function(page) {
         try {
-            console.group("Running %d extenders..", this._extenders.length);
-            console.time("Extenders finished in");
+            logger().group("Running %d extenders..", this._extenders.length);
+            logger().time("Extenders finished in");
 
             var processList = new Array();
 
             // Analyze
             this._extenders.each(function(e) {
                 try {
-                    console.group("Analyze '%s'...", e.getName());
+                    logger().group("Analyze '%s'...", e.getName());
 
                     var context = new Object();
                     if (e.analyze(page, context)) {
                         if (e.process) {
                             processList.push([e, context]);
-                            console.info("OK");
+                            logger().info("OK");
                         }
                         else {
-                            console.info("NoProcess");
+                            logger().info("NoProcess");
                         }
                     }
                     else
-                        console.info("Failed");
+                        logger().info("Failed");
                 }
                 catch (ex) {
-                    console.warn("Error");
+                    logger().warn("Error");
                     throw ex;
                 }
                 finally {
-                    console.groupEnd();
+                    logger().groupEnd();
                 }
             });
 
@@ -495,17 +495,17 @@ var PageExtenderCollection = Class.create({
                 var context = entry[1];
 
                 try {
-                    console.group("Process '%s'...", extender.getName());
+                    logger().group("Process '%s'...", extender.getName());
 
                     extender.process(page, context);
-                    console.info("OK");
+                    logger().info("OK");
                 }
                 catch (ex) {
-                    console.warn("Error");
+                    logger().warn("Error");
                     throw ex;
                 }
                 finally {
-                    console.groupEnd();
+                    logger().groupEnd();
                 }
             });
 
@@ -513,22 +513,25 @@ var PageExtenderCollection = Class.create({
         }
         catch (ex) {
             if (ex instanceof AbortException) {
-                console.debug(ex.toString());
+                logger().debug(ex.toString());
             }
             else {
-                if (!console.firebug) {
-                    // This is for development
-                    alert(ex.toString());
+                var str = "Unhandled exception occured during extenders execution:\n" + ex.toString() + "\n\n" + ex.stack;
+            
+                if (!logger().firebug) {
+                    // Pouze pro vyvoj
+                    // Ne ze by bylo spatny nevedet o chybe, ale bezne uzivatele to bude akorat otravovat...
+                    // alert(str);
                 }
                 else {
-                    console.error("Unhandled exception occured during extenders execution:\n", ex.toString());
+                    logger().error(str);
                 }
             }
             return false;
         }
         finally {
-            console.timeEnd("Extenders finished in");
-            console.groupEnd();
+            logger().timeEnd("Extenders finished in");
+            logger().groupEnd();
         }
     }
 });
@@ -617,22 +620,37 @@ var MarshalException = Class.create(Exception, {
 });
 
 /*** Logging ***/
+function _findConsole() {
+    // Firebug console properties for version "1.05"
+    var FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
 
-// Firebug console properties for version "1.05"
-var _FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
-
-if (!window.console || !console.firebug) {
-    // Dummy object
-    // (set it both to the current context and window, it seems, that under FF 3.0.3 they aren't same in extension context)
-    window.console = console = new Object();
-
-    _FIREBUG_METHODS.each(function(p) {
-        console[p] = function() {
+    try {
+        // Return existing
+        if (console.firebug)
+            return console;
+    }
+    catch(ex) {
+    }
+    
+    // Create dummy
+    var tmp = new Object();
+    
+    FIREBUG_METHODS.each(function(p) {
+        tmp[p] = function() {
             /*
             if (document && document.body)
                 document.body.appendChild(Element.create("div", $A(arguments)));
             */
         };
     });
+    
+    return tmp;
 }
 
+// Duvod pro jsem to nakonec udelal takto je ten, ze nenarazim ani pri chybe na nezmenitelny getter
+function logger() {
+    if (window._logger == null) {
+        window._logger = _findConsole();
+    }
+    return window._logger;
+}

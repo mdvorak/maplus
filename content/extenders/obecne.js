@@ -75,7 +75,7 @@ pageExtenders.add(PageExtender.create({
     },
     
     _naplnSeznam: function(page, select) {
-        console.group("Vytvareni seznamu spolualiancniku");
+        logger().group("Vytvareni seznamu spolualiancniku");
         try {
             var vsichni = new Array();
             
@@ -120,10 +120,10 @@ pageExtenders.add(PageExtender.create({
             
             select.selectedIndex = 0;
             
-            console.log("Dokonceno (%d)", vsichni.length);
+            logger().log("Dokonceno (%d)", vsichni.length);
         }
         finally {
-            console.groupEnd();
+            logger().groupEnd();
         }
     }
 }));

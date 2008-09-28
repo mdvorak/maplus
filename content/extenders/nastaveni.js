@@ -99,27 +99,27 @@ pageExtenders.add(PageExtender.create({
 		    // Load a save funkce ktere nactou/ulozi vsechny elementy
 		    var load = function() {
 	            try {
-	                console.group("Nacita se nastaveni do ovladacich prvku..");
+	                logger().group("Nacita se nastaveni do ovladacich prvku..");
 			        list.each(function(e) { e.onload(); });
-	                console.info("Nacitani dokonceno");
+	                logger().info("Nacitani dokonceno");
                 }
                 catch (ex) {
                     alert(ex);
                 }
                 finally {   
-                    console.groupEnd();
+                    logger().groupEnd();
 	            }
 		    };
     			
 		    var save = function() {
 	            try {
-	                console.group("Uklada se nastaveni..");
+	                logger().group("Uklada se nastaveni..");
 			        list.each(function(e) { e.onsave(); });
 			        page.config.save();
-			        console.info("Ulozeni probehlo uspesne.");
+			        logger().info("Ulozeni probehlo uspesne.");
 			    }
                 finally {   
-                    console.groupEnd();
+                    logger().groupEnd();
 	            }
 		    };
     			
@@ -158,7 +158,7 @@ pageExtenders.add(PageExtender.create({
 		        if (!confirm('Opravdu chcete tato nastavení smazat?'))
 		            return;
 		    
-		        console.info("Vymazavam nastaveni...");
+		        logger().info("Vymazavam nastaveni...");
 		        
 		        if ($('cpd_maplus').checked) {
 		            page.localConfig.clearChildNodes();
@@ -173,7 +173,7 @@ pageExtenders.add(PageExtender.create({
 		            MaData.clear(); // Vymaze data a ulozi soubor
 		        }
 		        
-		        console.log("Nastaveni vymazano.");
+		        logger().log("Nastaveni vymazano.");
 		        page.config.save();
 		        
 		        // Nacti nove hodnoty

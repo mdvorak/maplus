@@ -65,7 +65,7 @@ pageExtenders.add(PageExtender.create({
         jednotky.manyCelkem = parseFloat(XPath.evalString('td[6]/font', trJednotkyCelkem));
         jednotky.popCelkem = parseFloat(XPath.evalString('td[7]/font', trJednotkyCelkem));
         
-        console.debug("Jednotky za tah: sila=%d pocet=%d zlata=%f many=%f pop=%f", jednotky.silaCelkem, jednotky.pocetCelkem, jednotky.zlataCelkem, jednotky.manyCelkem, jednotky.popCelkem);
+        logger().debug("Jednotky za tah: sila=%d pocet=%d zlata=%f many=%f pop=%f", jednotky.silaCelkem, jednotky.pocetCelkem, jednotky.zlataCelkem, jednotky.manyCelkem, jednotky.popCelkem);
         
         for (var i = 1; i < jednotkyRows.length; i++) {
             if (jednotkyRows[i].cells.length < 10 || jednotkyRows[i].cells[0].textContent == "Jednotka")
@@ -105,11 +105,11 @@ pageExtenders.add(PageExtender.create({
             row.data.maxSila = Math.floor(100 * row.data.sila / row.data.zkusenost);
             
             jednotky.push(row);
-            console.log("Stack jmeno=%s zkusenost=%f\% phb=%d druh=%s typ=%s sila=%d pocet=%d zlata=%d many=%d pop=%d", row.data.jmeno, row.data.zkusenost, row.data.phb, row.data.druh, row.data.typ, row.data.sila, row.data.pocet, row.data.zlata, row.data.many, row.data.pop);
+            logger().log("Stack jmeno=%s zkusenost=%f\% phb=%d druh=%s typ=%s sila=%d pocet=%d zlata=%d many=%d pop=%d", row.data.jmeno, row.data.zkusenost, row.data.phb, row.data.druh, row.data.typ, row.data.sila, row.data.pocet, row.data.zlata, row.data.many, row.data.pop);
         }
         
         page.hospodarstvi.jednotky = jednotky;
-        console.debug("Pocet stacku: %d", jednotky.length);
+        logger().debug("Pocet stacku: %d", jednotky.length);
         
         return true;
     },
@@ -140,7 +140,7 @@ pageExtenders.add(PageExtender.create({
         var mestaPocet = parseInt(XPath.evalString('tbody/tr[4]/td[2]/font', page.hospodarstvi.tableStavby));
         context.pomer = farmyPocet / mestaPocet;
         
-        console.debug("farmy=%d, mesta=%d, pomer=%f", farmyPocet, mestaPocet, context.pomer);
+        logger().debug("farmy=%d, mesta=%d, pomer=%f", farmyPocet, mestaPocet, context.pomer);
         return !isNaN(context.pomer);
     },
 
@@ -305,7 +305,7 @@ pageExtenders.add(PageExtender.create({
                 return; // continue;
             
             if (jednotka.data.typ != parametry.typ)
-                console.warn("Nesouhlasi typ jednotky %s != %s", jednotka.data.typ, parametry.typ);
+                logger().warn("Nesouhlasi typ jednotky %s != %s", jednotka.data.typ, parametry.typ);
             
             var oznaceni = String(parametry.druh[0] + parametry.typ[0]).toLowerCase();
             var phb = null;
@@ -428,13 +428,13 @@ var SlozeniArmadyDialog = Class.create(Dialog, {
         }
         
         // Pak dopln hodnoty
-        console.group("Vytvari se sekce poradi utoku...");
+        logger().group("Vytvari se sekce poradi utoku...");
         for (let kolo = 0; kolo < 3; kolo++) {
             let radek = 0;
             
             this._poradi.each(function(data) {
                 let t = data.phb == null || (3 - data.phb) <= kolo;
-                console.debug("zobrazit=%o kolo=%d radek=%d phb=%o jednotka=%s typ=%s", t, kolo, radek, data.phb, data.jednotka, data.typ);
+                logger().debug("zobrazit=%o kolo=%d radek=%d phb=%o jednotka=%s typ=%s", t, kolo, radek, data.phb, data.jednotka, data.typ);
                 
                 if (t) {
                     let tr = radky[radek++];
@@ -444,7 +444,7 @@ var SlozeniArmadyDialog = Class.create(Dialog, {
                 } 
             });
         }
-        console.groupEnd();
+        logger().groupEnd();
         
         // Zavrit event handler
         var inputZavrit = $X('.//input[@id = "d_zavrit"]', root);

@@ -115,7 +115,7 @@ pageExtenders.add(PageExtender.create({
                 controls.selectAliance.value = odpoved.aliance;
             }
             else {
-                console.log("Nenalezena zprava %s v cache.", page.arguments["odpoved"]);
+                logger().log("Nenalezena zprava %s v cache.", page.arguments["odpoved"]);
             }
             
             // Odskrtni prilozeni podpisu
@@ -127,7 +127,7 @@ pageExtenders.add(PageExtender.create({
         // Psani zpravy bestiare
         if (parseBoolean(page.arguments["zamluvene_jednotky"])) {
             var vybraneJednotky = Marshal.callMethod("VybraneJednotky", "get", [page.id]).getList();
-            console.debug("Vybranych jednotek: %d", vybraneJednotky.length);
+            logger().debug("Vybranych jednotek: %d", vybraneJednotky.length);
             
             // Sestav text
             var text = "";
@@ -285,7 +285,7 @@ pageExtenders.add(PageExtender.create({
                 Posta.zjistiDulezitost(zprava);
             }
             
-            console.info("Zprava %d: od=%d typ=%s dulezitost=%s, delka=%d cas=%s", zprava.id, zprava.od, zprava.typ, zprava.dulezitost, zprava.text.length, zprava.cas.toLocaleString());
+            logger().info("Zprava %d: od=%d typ=%s dulezitost=%s, delka=%d cas=%s", zprava.id, zprava.od, zprava.typ, zprava.dulezitost, zprava.text.length, zprava.cas.toLocaleString());
             
             zpravy.push(zprava);
             
@@ -354,7 +354,7 @@ pageExtenders.add(PageExtender.create({
                 // Data
                 var jmenoAliance = zprava.text.match(Posta.POSTA_V_RAMCI_ALIANCE_REGEX)[1];
                 if (!jmenoAliance) {
-	                // console.debug("text:\n", zprava.text);
+	                // logger().debug("text:\n", zprava.text);
                 }
                 
                 var aliance = alianceCache[jmenoAliance];
@@ -386,7 +386,7 @@ pageExtenders.add(PageExtender.create({
                     zprava.linkOdpovedetVsem = linkOdpovedetVsem;
                 }
                 else {
-                    console.debug("Nenalezeno id aliance %o", jmenoAliance);
+                    logger().debug("Nenalezeno id aliance %o", jmenoAliance);
                 }
             }
             
@@ -580,7 +580,7 @@ pageExtenders.add(PageExtender.create({
                         break;
 
                     default:
-                        console.log("Neznama dulezitost zpravy %d: %s", zprava.id, zprava.dulezitost);
+                        logger().log("Neznama dulezitost zpravy %d: %s", zprava.id, zprava.dulezitost);
                         return;
                 }
 
@@ -653,7 +653,7 @@ pageExtenders.add(PageExtender.create({
     	        zprava.dlouha = true;
     	        zprava.zlom = zlom;
     	    
-    	    	console.log("Zprava %d je dlouha (%d radku).", zprava.id, zprava.radku);
+    	    	logger().log("Zprava %d je dlouha (%d radku).", zprava.id, zprava.radku);
     	    }
     	});
     },
@@ -685,7 +685,7 @@ pageExtenders.add(PageExtender.create({
             var stari = (aktualniCas - zprava.cas.getTime());
             
             if (zprava.dulezitost == "bestiar" && stari > maxStariBestiar) {
-                console.log("Zprava %d vyprsela a bude skryta.", zprava.id);
+                logger().log("Zprava %d vyprsela a bude skryta.", zprava.id);
                 
                 zprava.skryta = true;
                 context.skryt.push(zprava);
@@ -693,14 +693,14 @@ pageExtenders.add(PageExtender.create({
             else if (zprava.dulezitost == "spam" && stari > maxStariSpamu && zprava.radku > 3) {
                 zprava.zlom = $X('br[2]');
                 if (zprava.zlom != null) {
-                    console.log("Zprava %d vyprsela a bude sbalena.", zprava.id);
+                    logger().log("Zprava %d vyprsela a bude sbalena.", zprava.id);
                     
                     zprava.balici = true;
                     context.sbalit.push(zprava);
                 }
             }
             else if (zprava.dlouha) {
-                console.log("Zprava %d je prilis dlouha a bude sbalena.", zprava.id);
+                logger().log("Zprava %d je prilis dlouha a bude sbalena.", zprava.id);
                 
                 zprava.balici = true;
                 context.sbalit.push(zprava);
@@ -732,7 +732,7 @@ pageExtenders.add(PageExtender.create({
             skryteElementy.push(zprava.element);
             zprava.element.style.display = "none";
             
-            console.log("Skryta zprava %d", zprava.id);
+            logger().log("Skryta zprava %d", zprava.id);
         });
         
         context.sbalit.each(function(zprava) {
@@ -779,7 +779,7 @@ pageExtenders.add(PageExtender.create({
 			header.insertBefore(document.createTextNode("\xA0"), header.firstChild);
 			header.insertBefore(linkHeaderRozbalit, header.firstChild);
 			
-            console.log("Sbalena zprava %d", zprava.id);
+            logger().log("Sbalena zprava %d", zprava.id);
     	});
     	
     	if (skryteElementy.length > 0) {
@@ -791,7 +791,7 @@ pageExtenders.add(PageExtender.create({
     	    Event.observe(linkZobrazit, "click", function(event) {
     	        skryteElementy.each(function(i) { i.style.display = ""; });
     	        upozorneni.style.display = "none";
-    	        console.log("Skryté zprávy byly zobrazeny.");
+    	        logger().log("Skryté zprávy byly zobrazeny.");
     	    });
         }
     }

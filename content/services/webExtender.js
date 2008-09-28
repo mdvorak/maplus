@@ -686,10 +686,12 @@ var ExtenderManager = {
     
     // Called directly by WebExtender
     finalizePage: function(page) {
-        Script.execute(page.document, "(" + function() {
+        // Thanks to timeout, all queued javascripts will finish first
+        // That's needed especially for the firebug
+        Script.execute(page.document, "setTimeout(" + function() {
                 var page = new Page();
                 pageExtenders.run(page);
-            } + ")();");
+            } + ", 1);");
     }
 }
 

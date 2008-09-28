@@ -58,9 +58,9 @@ pageExtenders.add(PageExtender.create({
         };
         
         if (!isNaN(page.regent.id) && page.regent.id != page.id)
-            console.error("Id z analyzy stranky (%d) a regenta (%d) se nerovnaji!", page.id, page.regent.id);
+            logger().error("Id z analyzy stranky (%d) a regenta (%d) se nerovnaji!", page.id, page.regent.id);
         
-        console.info("%s, %s (%d) [%s, %s]", page.regent.jmeno, page.regent.provincie, page.regent.id, page.regent.povolani, page.regent.barva);
+        logger().info("%s, %s (%d) [%s, %s]", page.regent.jmeno, page.regent.provincie, page.regent.id, page.regent.povolani, page.regent.barva);
         return true;
     },
     
@@ -85,7 +85,7 @@ pageExtenders.add(PageExtender.create({
             if (data != -1)
                 return data;
         
-            console.group("Zjistovani dat o provincii..");
+            logger().group("Zjistovani dat o provincii..");
             try {
                 // Analyzuj
                 var p = {
@@ -118,20 +118,20 @@ pageExtenders.add(PageExtender.create({
                 
                 // Debug hlaska
                 data = p;
-                console.info("Provincie zlato=%d, mana=%d/%d, populace=%d, rozloha=%d/%d, sila=%d, prot=%o", p.zlato, p.mana, p.maxMana, p.populace, p.volnych, p.rozloha, p.sila, p.protV > 0);
+                logger().info("Provincie zlato=%d, mana=%d/%d, populace=%d, rozloha=%d/%d, sila=%d, prot=%o", p.zlato, p.mana, p.maxMana, p.populace, p.volnych, p.rozloha, p.sila, p.protV > 0);
                 return p;
             }
             catch (ex) {
-                console.error(ex);
+                logger().error(ex);
                 data = null;
                 return null;
             }
             finally {
-                console.groupEnd();
+                logger().groupEnd();
             }
         }
         
-        console.debug("Informace o provincii budou zjisteny az budou potreba.");
+        logger().debug("Informace o provincii budou zjisteny az budou potreba.");
         return true;
     },
     

@@ -179,7 +179,7 @@ Tooltip.Methods = {
         var width = Math.min(dims.width, windowWidth);
         var height = Math.min(dims.height, windowHeight);
         
-        console.debug("Tooltip windowWidth=%d windowHeight=%d width=%d height=%d window.scrollX=%d window.scrollY=%d", windowWidth, windowHeight, width, height, window.scrollX, window.scrollY);
+        logger().debug("Tooltip windowWidth=%d windowHeight=%d width=%d height=%d window.scrollX=%d window.scrollY=%d", windowWidth, windowHeight, width, height, window.scrollX, window.scrollY);
         
         this.style.maxWidth = windowWidth;
         this.style.maxHeight = windowHeight;

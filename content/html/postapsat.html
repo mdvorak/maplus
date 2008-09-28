@@ -49,7 +49,7 @@ window.DulezitostZpravy = {
             input.checked = true;
         }
         else {
-            console.debug("Nepodporovana dulezitost: %s", value);
+            logger().debug("Nepodporovana dulezitost: %s", value);
             this._unsupportedValue = value;
             
             $XL('//input[@name = "dulezitostZpravy"]').each(function(e) {

@@ -196,7 +196,7 @@ var Marshal = {
             throw new ArgumentException("args", args, "Arguments must be an array.");
             
         var callID = objectName + "." + methodName + "(" + args.join(", ") + ")";
-        console.log("Marshal: Calling cached method %s", callID);
+        logger().log("Marshal: Calling cached method %s", callID);
         
         var result = Marshal._callCache[callID];
         if (result == null) {
@@ -241,19 +241,19 @@ var Marshal = {
     // TODO: Do it better
     _debug: function() {
         if (window.MARSHAL_DEBUG >= 2)
-            console.debug.apply(console, arguments);
+            logger().debug.apply(logger(), arguments);
     },
     
     _group: function() {
         if (window.MARSHAL_DEBUG >= 2)
-            console.group.apply(console, arguments);
+            logger().group.apply(logger(), arguments);
         else if (window.MARSHAL_DEBUG >= 1)
-            console.debug.apply(console, arguments);
+            logger().debug.apply(logger(), arguments);
     },
     
     _groupEnd: function() {
         if (window.MARSHAL_DEBUG >= 2)
-            console.groupEnd.apply(console, arguments);
+            logger().groupEnd.apply(logger(), arguments);
     }
 };
 

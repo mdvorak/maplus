@@ -43,7 +43,7 @@ pageExtenders.add(PageExtender.create({
         
         context.url = unescape(page.arguments["url"]);
         if (context.url.search("http://") != 0) {
-            console.error("Nepovolena adresa: %s", context.url);
+            logger().error("Nepovolena adresa: %s", context.url);
             return false;
         }
         
@@ -70,7 +70,7 @@ pageExtenders.add(PageExtender.create({
                     div.style.height = (size.height + 15) + "px";
             }
             catch (ex) {
-                console.warn("Nepodarilo se ziskat velikost dokumentu v iframu: %o", ex);
+                logger().warn("Nepodarilo se ziskat velikost dokumentu v iframu: %o", ex);
             }
         });
         

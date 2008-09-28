@@ -172,7 +172,7 @@ pageExtenders.add(PageExtender.create({
         if (parseInt(config.getAttribute("pocet")) == selectJednotka.options.length)
             return true;
         
-        console.debug("Probiha refresh rekrutovatelnych jednotek..");
+        logger().debug("Probiha refresh rekrutovatelnych jednotek..");
         config.clearChildNodes();
         
         for (var i = 0; i < selectJednotka.options.length; i++) {

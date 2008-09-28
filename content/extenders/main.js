@@ -76,7 +76,7 @@ pageExtenders.add(PageExtender.create({
         // pokud mame plno taky nepokracovat
         chyby = Math.max(chyby, 0);
         
-        console.debug("dnesPribudeTahu=%d zbyva=%d tahZaSec=%d chyby=%d", dnesPribudeTahu, zbyva, tahZaSec, chyby);        
+        logger().debug("dnesPribudeTahu=%d zbyva=%d tahZaSec=%d chyby=%d", dnesPribudeTahu, zbyva, tahZaSec, chyby);        
         
         // Vypocet
         var plnoZaSec = (chyby - 1) * 720 + tahZaSec; // 720s = 12m

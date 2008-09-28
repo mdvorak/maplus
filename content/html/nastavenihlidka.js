@@ -176,7 +176,7 @@ window.NastaveniHlidka = {
                     config.setPref("zobrazitNastaveni", null);
                 }
                 
-                console.debug('Hlidka "%s": url=%o login=%o', data.jmeno, inputAdresa.value, inputLogin.value);
+                logger().debug('Hlidka "%s": url=%o login=%o', data.jmeno, inputAdresa.value, inputLogin.value);
             };
         });
     },
@@ -205,7 +205,7 @@ window.NastaveniHlidka = {
             cfg = root.addPref("aliance");
             
             for (var f in cfg)
-                console.log("---> " + f);
+                logger().log("---> " + f);
             
             cfg.setAttribute("id", alianceId);
         }

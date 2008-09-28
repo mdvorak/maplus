@@ -146,7 +146,7 @@ pageExtenders.add(PageExtender.create({
                 if (id != null && data.id != id) {
                     data = null;
                     jsData = null;
-                    console.warn("Na radku %d se nerovna ID z jsData a z linku (id=%d data.id=%d).", i, id, data.id);
+                    logger().warn("Na radku %d se nerovna ID z jsData a z linku (id=%d data.id=%d).", i, id, data.id);
                 }
             }
 
@@ -189,13 +189,13 @@ pageExtenders.add(PageExtender.create({
                 row.data.popTU = parseFloat((row.data.pocet * (stats.popTU / koef)).toFixed(1));
             }
             else {
-                console.warn("Nenalezeny informace o jednotce %s.", row.jmeno);
+                logger().warn("Nenalezeny informace o jednotce %s.", row.jmeno);
             }
             
             // Je stack bidnuty?
             row.bidnuto = (row.element.getAttribute("bgcolor") == BESTIAR_BARVA_BID);
             
-            console.log("stack id=%d jmeno=%o pocet=%d zkusenost=%f bidnuto=%o", row.data.id, row.data.jmeno, row.data.pocet, row.data.zkusenost, row.bidnuto);
+            logger().log("stack id=%d jmeno=%o pocet=%d zkusenost=%f bidnuto=%o", row.data.id, row.data.jmeno, row.data.pocet, row.data.zkusenost, row.bidnuto);
             bestiar.table.data.push(row);
             
             if (row.bidnuto) {
@@ -262,7 +262,7 @@ pageExtenders.add(PageExtender.create({
             rows.push(data);
         }
         
-        console.info("JS data analyzovany (%d zaznamu).", rows.length);
+        logger().info("JS data analyzovany (%d zaznamu).", rows.length);
         return rows;
     }
 }));
@@ -298,7 +298,7 @@ pageExtenders.add(PageExtender.create({
        
         var sloupce = page.bestiar.sloupce;
         
-        console.debug("Zobrazene sloupce: %o", sloupce);
+        logger().debug("Zobrazene sloupce: %o", sloupce);
         
         // Skryte puvodni sloupce
         var skryteSloupce = new Array();
@@ -308,7 +308,7 @@ pageExtenders.add(PageExtender.create({
             });
         
         context.skryteSloupce = skryteSloupce;
-        console.debug("Skryte sloupce: %o", skryteSloupce);
+        logger().debug("Skryte sloupce: %o", skryteSloupce);
         
         return true;
     },
@@ -397,7 +397,7 @@ pageExtenders.add(PageExtender.create({
                     chybejiciSloupce.push(s.jmeno);
             });
         context.chybejiciSloupce = chybejiciSloupce;
-        console.debug("Chybejici sloupce: %o", chybejiciSloupce);
+        logger().debug("Chybejici sloupce: %o", chybejiciSloupce);
         
         // Vytvor tooltip pouze pokud nejaka informace chyby
         if (context.chybejiciSloupce.length > 0 
@@ -412,7 +412,7 @@ pageExtenders.add(PageExtender.create({
                     html += '<td><span>#{' + s + '}</span></td></tr>';
                 });
             html += '</table>';
-            // console.debug("Chybejici sloupce template:\n", html);
+            // logger().debug("Chybejici sloupce template:\n", html);
             
             context.chybejiciTemplate = new Template(html);
         }
@@ -444,13 +444,13 @@ pageExtenders.add(PageExtender.create({
                 Event.observe(row.linkNabidka, 'click', function() {
                     if (!zamluveno) {
                         vybrane.add(row.data, row.description);
-                        console.log("Jednotka pridana mezi vybrane: %d", row.data.id);
+                        logger().log("Jednotka pridana mezi vybrane: %d", row.data.id);
                         
                         row.element.setAttribute("bgcolor", BESTIAR_BARVA_ZAMLUVENO);
                         zamluveno = true;
                     }
                     else {
-                        console.log("Jednotka odstranena z vybranych: %d", row.data.id);
+                        logger().log("Jednotka odstranena z vybranych: %d", row.data.id);
                         vybrane.remove([row.data.id]);
                         
                         row.element.setAttribute("bgcolor", "black");
@@ -542,7 +542,7 @@ pageExtenders.add(PageExtender.create({
                 
                 // DEBUG
                 if (content.tagName != "FONT")
-                    console.warn("Neocekavany tag");
+                    logger().warn("Neocekavany tag");
                     
                 // Predpokladejme ze jmeno je prvni
                 var elemJmeno = content.firstChild;
@@ -685,7 +685,7 @@ pageExtenders.add(PageExtender.create({
             if (row.data.id in vybraneMap) {
                 jednotky.add(row.data, row.description);
             
-                console.log("Vybrana jednotka: %d", row.data.id);
+                logger().log("Vybrana jednotka: %d", row.data.id);
                 context.list.push(row);
                 
                 // Odstran ze seznamu
@@ -706,7 +706,7 @@ pageExtenders.add(PageExtender.create({
         
         // Odstran neexistujici jednotky
         if (vybraneMap.size() > 0) {
-            console.debug("Odstranuji se: %o", vybraneMap.keys());
+            logger().debug("Odstranuji se: %o", vybraneMap.keys());
             jednotky.remove($A(vybraneMap.keys()));
         }
         
@@ -792,7 +792,7 @@ pageExtenders.add(PageExtender.create({
             list.push(i);
         });        
         
-        console.debug("Rules: %o", context.rules);
+        logger().debug("Rules: %o", context.rules);
         
         return true;
     },

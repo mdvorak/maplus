@@ -50,7 +50,7 @@ pageExtenders.add(PageExtender.create({
         if (!page.id || isNaN(page.id))
             throw new AbortException("Id nenalezeno.");
             
-        console.info("page id=%d, code=%s, ftc=%s", page.id, page.code, page.ftc);
+        logger().info("page id=%d, code=%s, ftc=%s", page.id, page.code, page.ftc);
         
         // Najdi zakladni strukturu stranky
         page.topTable = XPath.evalSingle('/html/body/center/table[1]', page.document);
@@ -68,7 +68,7 @@ pageExtenders.add(PageExtender.create({
         var casStr = XPath.evalString('/html/body/center/table[4]/tbody/tr/td/font');
         page.cas = Date.parse(casStr);
         
-        console.info("page cas=%s", new Date(page.cas).toLocaleString());
+        logger().info("page cas=%s", new Date(page.cas).toLocaleString());
         
         return true;
     },
@@ -88,8 +88,8 @@ pageExtenders.add(PageExtender.create({
         // Form input (toto by nemelo byt nikdy potreba ale proc to tu nenechat?)
         if (!value) {
             var e = XPath.evalSingle('//input[@name = "' + name + '"]', page.document);
-            if (e)
-                value = elem.value;
+            if (e != null)
+                value = e.value;
         }
         
         return value;

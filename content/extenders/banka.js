@@ -47,14 +47,14 @@ pageExtenders.add(PageExtender.create({
         var m;
         if ((m = popis.match(/\s(\d+)\szl/)) != null) {
             context.castka = parseInt(m[1]);
-            console.debug("castka=%d", context.castka);
+            logger().debug("castka=%d", context.castka);
         }
         
         var pujceno = !isNaN(context.castka);
         
         if (pujceno) {
             // Set bit
-            console.log("Mame pujceno!");
+            logger().log("Mame pujceno!");
             page.config.getRegent().setPref("dluh", true);
         }
         
@@ -78,14 +78,14 @@ pageExtenders.add(PageExtender.create({
 
         if (formPujcit != null) {
             // Nemame pujceno, reset bit
-            console.log("Zadna pujcka");
+            logger().log("Zadna pujcka");
             page.config.getRegent().setPref("dluh", false);
 
             // Pridej handler na pujceni
             var inputPujcka = $X('.//input[@type="text" and @name="pujcka"]', formPujcit);
 
             Event.observe(formPujcit, 'submit', function(event) {
-                console.debug("pujcka=%d", parseInt(inputPujcka.value));
+                logger().debug("pujcka=%d", parseInt(inputPujcka.value));
 
                 if (parseInt(inputPujcka.value) > 0) {
                     // Set bit
@@ -104,7 +104,7 @@ pageExtenders.add(PageExtender.create({
 
         if ($X('.//font[contains(., "Vaše půjčka je splacena")]', page.content) != null) {
             // Reset bit, pujcka vracena
-            console.log("Pujcka vracena!");
+            logger().log("Pujcka vracena!");
             page.config.getRegent().setPref("dluh", false);
 
             context.redirect = true;

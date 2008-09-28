@@ -49,17 +49,17 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         try {
-            console.group("Rozdane utoky");
+            logger().group("Rozdane utoky");
             vypis.rozdaneUtoky = this._zpracujTabulku(vypis.tableRozdane);
         } 
-        finally { console.groupEnd(); }
+        finally { logger().groupEnd(); }
         try {
-            console.group("Branene utoky");
+            logger().group("Branene utoky");
             vypis.braneneUtoky = this._zpracujTabulku(vypis.tableBranene);
         } 
-        finally { console.groupEnd(); }
+        finally { logger().groupEnd(); }
         
-        console.debug("Utoky rozdane=%d branene=%d", vypis.rozdaneUtoky.length, vypis.braneneUtoky.length);
+        logger().debug("Utoky rozdane=%d branene=%d", vypis.rozdaneUtoky.length, vypis.braneneUtoky.length);
         
         return true;
     },
@@ -121,7 +121,7 @@ pageExtenders.add(PageExtender.create({
             row.utok = utok;
             utoky.push(utok);
             
-            console.log("Utok id=%d cas=%d sila=%d uroven=%f\% typ=%s status=%s vysledek=%f:%f", utok.id, utok.cas, utok.sila, utok.uroven, utok.typ, utok.status, utok.ztratyUtocnik, utok.ztratyObrance);
+            logger().log("Utok id=%d cas=%d sila=%d uroven=%f\% typ=%s status=%s vysledek=%f:%f", utok.id, utok.cas, utok.sila, utok.uroven, utok.typ, utok.status, utok.ztratyUtocnik, utok.ztratyObrance);
         }
         
         return utoky;
@@ -336,7 +336,7 @@ pageExtenders.add(PageExtender.create({
             var presnyCas = new Date(new Date().getTime() + vyprsiZaMinut * 60 * 1000);
             presnyCas.setSeconds(0, 0);
             
-            console.debug("cas=%d, vyprsi=%d, presny cas=%o", utok.cas, vyprsiZaMinut, presnyCas);
+            logger().debug("cas=%d, vyprsi=%d, presny cas=%o", utok.cas, vyprsiZaMinut, presnyCas);
             
             // Vytvor text podle doby
             var text = "Útok vyprší " + timeFromNow(presnyCas);

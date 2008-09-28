@@ -74,7 +74,7 @@ pageExtenders.add(PageExtender.create({
                     MaData.aktualizujAlianci(jmeno, id, presvedceni);
                 }
                 
-                console.debug("Jsem clenem alianci: %o", aliance);
+                logger().debug("Jsem clenem alianci: %o", aliance);
                 aliConfig.clearChildNodes();
                 aliance.each(function(id) {
                     aliConfig.addPref("id", id);
@@ -104,7 +104,7 @@ pageExtenders.add(PageExtender.create({
                 
                 if (nejsemClenem != null) {
                     page.config.getRegent().getPrefNode("aliance", true).clearChildNodes();
-                    console.debug("Nejsem clenem zadne aliance.");
+                    logger().debug("Nejsem clenem zadne aliance.");
                 }
             }
         }
@@ -295,7 +295,7 @@ pageExtenders.add(PageExtender.create({
             // Pro hlidku
             var sila = parseInt(tr.cells[3].textContent.replace(/^\s*Síla\s+P.s*/, ""));
             
-            console.log("Clen aliance: id=%d regent=%s provincie=%s sila=%d", id, regent, provincie, sila);
+            logger().log("Clen aliance: id=%d regent=%s provincie=%s sila=%d", id, regent, provincie, sila);
             page.aliance.clenove.push({
                 id: id,
                 regent: regent,
@@ -391,7 +391,7 @@ pageExtenders.add(PageExtender.create({
             // Pro hlidku
             var sila = parseInt(tr.cells[6].textContent);
             
-            console.log("Clen aliance: id=%d regent=%s provincie=%s sila=%d povolani=%d", id, regent, provincie, sila, povolani);
+            logger().log("Clen aliance: id=%d regent=%s provincie=%s sila=%d povolani=%d", id, regent, provincie, sila, povolani);
             page.aliance.clenove.push({
                 id: id,
                 regent: regent,
@@ -587,7 +587,7 @@ pageExtenders.add(PageExtender.create({
         if (page.aliance == null || page.aliance.clenove.length == 0)
             return false;
         if (isNaN(page.cas)) {
-            console.error("Neni znam cas MA.");
+            logger().error("Neni znam cas MA.");
             return false;
         }        
         
@@ -652,7 +652,7 @@ pageExtenders.add(PageExtender.create({
                     iframe.style.height = (size.height + 15) + "px";
             }
             catch (ex) {
-                console.warn("Nepodarilo se ziskat velikost dokumentu v iframu: %o", ex);
+                logger().warn("Nepodarilo se ziskat velikost dokumentu v iframu: %o", ex);
             }
         });
         
@@ -708,12 +708,12 @@ pageExtenders.add(PageExtender.create({
     
     odeslatHlidku: function(page, url, login, targetFrame, progressElement, scroll) {
         if (page.aliance.hlidka > 0) {
-            console.warn("Hlidka jiz odeslana (stav=%d)", page.aliance.hlidka);
+            logger().warn("Hlidka jiz odeslana (stav=%d)", page.aliance.hlidka);
             return;
         }
                 
         page.aliance.hlidka = 1;
-        console.debug("Vytvareni formulare hlidky..");
+        logger().debug("Vytvareni formulare hlidky..");
         
         if (progressElement != null)
             progressElement.innerHTML = "Probíhá odesílání hlídky. Čekejte..."
@@ -735,7 +735,7 @@ pageExtenders.add(PageExtender.create({
         for (var i = 0; i < page.aliance.clenove.length; i++) {
             var data = page.aliance.clenove[i];
             if (isNaN(data.id) || isNaN(data.sila)) {
-                console.warn("Pozor: nepouzitelny zaznam (id=%d sila=%d)", data.id, data.sila);
+                logger().warn("Pozor: nepouzitelny zaznam (id=%d sila=%d)", data.id, data.sila);
                 continue;
             }
             
@@ -747,7 +747,7 @@ pageExtenders.add(PageExtender.create({
         // Reakce na nacteni framu
         Event.observe(targetFrame, "load", function(event) {
             page.aliance.hlidka = 2;
-            console.info("Hlidka dokoncena");
+            logger().info("Hlidka dokoncena");
             
             if (progressElement != null)
                 progressElement.innerHTML = "Hlídka dokončena";
@@ -757,7 +757,7 @@ pageExtenders.add(PageExtender.create({
         });
         
         // Odesli form
-        console.info("Odesilani hlidky..");
+        logger().info("Odesilani hlidky..");
         form.submit();
     }
 }));

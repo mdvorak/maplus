@@ -67,7 +67,7 @@ pageExtenders.add(PageExtender.create({
     analyze: function(page, context) {
         var cfg = page.config.getPrefNode("hits", true);
         var hits = Marshal.callMethod("ConfigHelperService", "addHit", [cfg]);
-        console.log("Hits: %d", hits); 
+        logger().log("Hits: %d", hits); 
         return true;
     },
     

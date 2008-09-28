@@ -313,7 +313,7 @@ var PersistentElements = {
         
         // Set current value
         if (value != null) {
-            console.debug("Setting field '%s' value to %o", name, value);
+            logger().debug("Setting field '%s' value to %o", name, value);
         
             check.setState(Checkbox.STATE_CHECKED);
             element.value = value;
@@ -323,7 +323,7 @@ var PersistentElements = {
                 Event.dispatch(element, "change");
             }
             catch (ex) {
-                console.warn("Error invoking change event on control %o:\r\n%o", element, ex);
+                logger().warn("Error invoking change event on control %o:\r\n%o", element, ex);
             }
         }
         
