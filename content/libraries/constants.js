@@ -43,8 +43,8 @@ const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
 const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
 const CHROME_CONTENT_URL = CHROME_URL + "content/";
 
-const ADMIN_ID = 1482; // Moje id
-const ADMIN_ID_AGE = "6.1"; // Jmeno veku pro ktere je ID platne
+const ADMIN_ID = 1277; // Moje id
+const ADMIN_ID_AGE = "6.2"; // Jmeno veku pro ktere je ID platne
 
 // Custom constants
 const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
