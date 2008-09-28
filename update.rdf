@@ -7,14 +7,14 @@
       <RDF:Seq>
         <RDF:li>
           <RDF:Description>
-            <em:version>1.3.1</em:version>
+            <em:version>1.3.2</em:version>
             <em:targetApplication>
               <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>2.0</em:minVersion>
                 <em:maxVersion>3.*</em:maxVersion>
                 <em:updateLink>http://maplus.xf.cz/maplus.xpi</em:updateLink>
-                <em:updateHash>sha512:CB44350577522F58D99811B0975A7DFC608592D8F08AD553D18642A8EE7EE698F142EDA1D16110FF3B71A5A35FAF47494E191F62BC338208ABEE58DA20B16868</em:updateHash>
+                <em:updateHash>sha512:EA4CDA74B56A50DC8202CE557FBFA6076B565C12A3B95826190E13BE4761D011DE9745F58A19607329C10064A95CAAD3A6DFC0CCD50D36EE532271D21588943B</em:updateHash>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>
