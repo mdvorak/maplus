@@ -52,14 +52,17 @@ var Jednotky = {
         if (jmeno == null)
             return null;
         
+        // TODO stahni data o jednotkach
+        
         // Nacti data pokud se tak jeste nestalo
-        if (!this.data) {
+        if (this.data == null) {
             this.data = this.load() || this.NO_DATA;
         }
         
         // Pokud data nejsou k dispozici vrat null
-        if (this.data == this.NO_DATA)
+        if (this.data == this.NO_DATA) {        
             return null;
+        }
     
         // Pokus se najit jednotku
         var jednotka = this.data.evalPrefNode('jednotka[jmeno = "' + jmeno + '"]');

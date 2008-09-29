@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const VERSION = "1.3.2";
+const VERSION = "1.3.3";
 
 const EXTENSION_NAME = "maplus";
 const EXTENSION_ID = "maplus@michal.dvorak";
@@ -43,10 +43,10 @@ const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
 const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
 const CHROME_CONTENT_URL = CHROME_URL + "content/";
 
-const ADMIN_ID = 1277; // Moje id
-const ADMIN_ID_AGE = "6.2"; // Jmeno veku pro ktere je ID platne
-
 // Custom constants
+const MAPLUS_INFO_FILENAME = "maplus-info.xml";
+const MAPLUS_INFO_URL = "http://maplus.xf.cz/" + MAPLUS_INFO_FILENAME;
+
 const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
 
 const DEN_MINUT = 24 * 60; // Den ma celkem minut..

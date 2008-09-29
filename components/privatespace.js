@@ -71,7 +71,7 @@ PrivateSpace.prototype = {
             try {
                 jssubscriptLoader.loadSubScript(services[i]);
             }
-            catch(ex) { alert(services[i] + ":\n" + ex); }
+            catch(ex) { alert(services[i] + ":\n" + ex + "\n\n" + ex.stack); }
         }
         
         // Load includes

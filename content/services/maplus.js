@@ -39,10 +39,13 @@ Marshal.registerUrlCallValidator("^" + MELIOR_ANNIS_URL);
 
 var MaPlus = {
     get AgeName() {
+        return MaPlusInfo.vek();
+        /*
         if (this._ageName == null) {
             this._ageName = WebExtenderPreferences.getBranch().getCharPref("age_name");
         }
         return this._ageName;
+        */
     },
     
     get DataDirectory() {

@@ -33,6 +33,8 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
+ 
+var MaPlusInfo = Marshal.getObjectProxy("MaPlusInfo");
 
 pageExtenders.add(PageExtender.create({
     getName: function() { return "MaPlus - Nastaveni"; },
@@ -68,12 +70,34 @@ pageExtenders.add(PageExtender.create({
         window.initNastaveni = function() {
             window.initNastaveni = null;
             
-            // Zobraz id admina
-            if (ADMIN_ID != null) {
-                adminLink = Element.create("a", ADMIN_ID, {href: MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: ADMIN_ID, dulezitost: "bug"})});
-                $('plus_mikeeId').appendChild(adminLink);
-                $('plus_vek').innerHTML = ADMIN_ID_AGE;
+            // Zobraz kontakt na admina
+            var admin = MaPlusInfo.admin();
+            var kontantNastaven = false;
+            
+            if (admin.id != null) {
+                var adminLink = Element.create("a", admin.id, {href: MaPlus.buildUrl(page, "posta.html", {posta: "napsat", komu: admin.id, dulezitost: "bug"})});
+                $('plus_kontakt').appendChild(adminLink);
+                
+                if (admin.jmeno != null)
+                    $('plus_kontakt').appendChild(document.createTextNode(" (" + admin.jmeno + ")"));
+                    
+                kontantNastaven = true;
             }
+            if (admin.email != null) {
+                if (kontantNastaven)
+                    $('plus_kontakt').appendChild(document.createTextNode(" nebo na "));
+            
+                var adminLink = Element.create("a", admin.email, {href: "mailto:" + admin.email});
+                $('plus_kontakt').appendChild(adminLink);
+                kontantNastaven = true;
+            }
+            
+            if (!kontantNastaven) {
+                $('plus_kontakt').appendChild(Element.create("i", "[došlo k chybě]"));
+            }
+            
+            // Zobraz oznaceni veku
+            $('plus_vekId').innerHTML = MaPlusInfo.vek();
             
             // Inicializace vlastnich linku
             window.NastaveniVlastniLinky.initPage(page);

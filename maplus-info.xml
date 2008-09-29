@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<maplus>
+  <config>
+    <vek>6.2</vek>
+    <admin>
+      <id proVek="6.2">1277</id>
+      <jmeno>Mikee</jmeno>
+      <email>mikee2185@gmail.com</email>
+    </admin>
+    <jednotky>http://maplus.xf.cz/jednotky/j20080705.xml</jednotky>
+  </config>
+</maplus>

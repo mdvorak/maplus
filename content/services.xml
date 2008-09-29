@@ -17,6 +17,7 @@
   <script src="services/jednotky.js" />
   <script src="services/madata.js" />
   <script src="services/bestiar.js" />
+  <script src="services/maplus-info.js" />
 
   <script src="services/default.js" />
   
