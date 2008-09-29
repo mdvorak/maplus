@@ -556,13 +556,18 @@ var ScriptExtender = Class.create(PageExtender, {
     getName: function() {
         return String.format("ScriptExtender[{0}, {1}]", this._src, this._type);
     },
+
+    analyze: function(page, context) {
+        context.head = XPath.evalSingle('/html/head', page.document);
+        return (context.head != null);
+    },
     
     process: function(page, context) {
         var e = page.document.createElement("script");
         e.setAttribute("type", this._type);
         e.setAttribute("src", this._src);
         e.setAttribute("charset", this._charset);
-        page.document.body.appendChild(e);
+        context.head.appendChild(e);
     }
 });
 

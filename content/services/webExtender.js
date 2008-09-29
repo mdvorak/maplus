@@ -252,18 +252,22 @@ var WebExtender = {
 var Script = Object.extend(Script || {}, {
     DEFAULT_CHARSET: "UTF-8",
 
+    _documentHeader: function(doc) {
+        return XPath.evalSingle('/html/head', doc);
+    },
+
     executeFile: function(doc, src, type, charset) {
         if (doc == null) throw new ArgumentNullException("doc");
         if (src == null) throw new ArgumentNullException("src");
         if (type == null) type = "text/javascript";
         if (charset == null) charset = Script.DEFAULT_CHARSET;
-        
+
         var e = doc.createElement("script");
         e.setAttribute("type", type);
         e.setAttribute("src", src);
         e.setAttribute("charset", charset);
-        
-        doc.body.appendChild(e);
+
+        Script._documentHeader(doc).appendChild(e);
     },
 
     execute: function(doc, code, type, charset) {
@@ -271,13 +275,13 @@ var Script = Object.extend(Script || {}, {
         if (code == null) throw new ArgumentNullException("code");
         if (type == null) type = "text/javascript";
         if (charset == null) charset = Script.DEFAULT_CHARSET;
-        
+
         var e = doc.createElement("script");
         e.setAttribute("type", type);
         e.setAttribute("charset", charset);
         e.innerHTML = code;
-        
-        doc.body.appendChild(e);
+
+        Script._documentHeader(doc).appendChild(e);
     }
 });
 
