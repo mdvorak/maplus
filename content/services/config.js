@@ -41,12 +41,17 @@ XmlConfigNode.Extended.useExtension();
 
 // Validace na vek
 function ageValidator(root) {
-    if (root.getAttribute("vek") != null && root.getAttribute("vek") != MaPlus.AgeName) {
-        // Odstran veskera nastaveni
-        while (root.firstChild != null)
-            root.removeChild(root.firstChild);
+    if (MaPlus.AgeName != null) {
+        if (root.getAttribute("vek") != null && root.getAttribute("vek") != MaPlus.AgeName) {
+            // Odstran veskera nastaveni
+            while (root.firstChild != null)
+                root.removeChild(root.firstChild);
+        }
+        root.setAttribute("vek", MaPlus.AgeName);
     }
-    root.setAttribute("vek", MaPlus.AgeName);
+    else {
+        logger().warn("Upozorneni: Jmeno veku neni zname, nebude ulozeno v nastaveni.");
+    }
 }
 
 // Vytvor a registruj sluzby

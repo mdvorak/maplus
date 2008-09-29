@@ -42,7 +42,10 @@ var MaData = {
         
         // Zkontroluj vek
         this.vek = this.data.getPref("vek");
-        if (this.vek != MaPlus.AgeName) {
+        
+        // Pozn: Kasli na to pokud neni vek znamy, kvuli chybe prece vse nezahodime ne?
+        // Zahodit to muzeme pozdeji... :)
+        if (MaPlus.AgeName != null && this.vek != MaPlus.AgeName) {
             // Pokud vek nesouhlasi, smazej ulozena data
             this.data = XmlConfig.createEmpty("data");
             this.data.setPref("vek", MaPlus.AgeName);
