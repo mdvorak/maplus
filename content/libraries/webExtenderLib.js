@@ -624,38 +624,3 @@ var MarshalException = Class.create(Exception, {
     }
 });
 
-/*** Logging ***/
-function _findConsole() {
-    // Firebug console properties for version "1.05"
-    var FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
-
-    try {
-        // Return existing
-        if (console.firebug)
-            return console;
-    }
-    catch(ex) {
-    }
-    
-    // Create dummy
-    var tmp = new Object();
-    
-    FIREBUG_METHODS.each(function(p) {
-        tmp[p] = function() {
-            /*
-            if (document && document.body)
-                document.body.appendChild(Element.create("div", $A(arguments)));
-            */
-        };
-    });
-    
-    return tmp;
-}
-
-// Duvod pro jsem to nakonec udelal takto je ten, ze nenarazim ani pri chybe na nezmenitelny getter
-function logger() {
-    if (window._logger == null) {
-        window._logger = _findConsole();
-    }
-    return window._logger;
-}

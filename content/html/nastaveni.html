@@ -368,7 +368,7 @@
             <col width="80" />
         </colgroup>
         <tbody>
-            <script type="text/javascript">
+            <script type="text/javascript">//<![CDATA[
             window.NastaveniBestiar = {
                 init: function(select) {
                     select = $(select);
@@ -412,7 +412,7 @@
                     }
                 }
             };
-            </script>
+            //]]></script>
             <tr>
                 <td colspan="2">
                     <span>Vybrané sloupce</span>
@@ -464,7 +464,7 @@
                 
                 <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
             </td>
-            <script type="text/javascript">
+            <script type="text/javascript">//<![CDATA[
                 NastaveniBestiar.init('plus_bestiarSloupce');
             
                 // Skupiny
@@ -490,7 +490,7 @@
                 Event.observe('plus_bestiarPuvodni', 'click', function() {
                     bestairSloupceSkupina(function(s) { return BestiarSloupce.jePuvodni(s); });
                 });
-            </script>
+            //]]></script>
         </tbody>
     </table>
     <script type="text/javascript">

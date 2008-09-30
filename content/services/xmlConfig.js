@@ -96,7 +96,7 @@ var XmlConfig = {
                 FileIO.saveXmlFile(path, rootNode.ownerDocument);
         }
         catch (e) {
-            dump(String.format("Error saving file '{0}':\n{1}", path, e));
+            logger.error(String.format("Error saving file '{0}':\n{1}", path, e));
         }
     }
 };

@@ -83,7 +83,8 @@ var FileIO = {
     },
 
     loadXmlFile: function(file) {
-        if (file == null) throw new ArgumentNullException("file");
+        if (file == null)
+            throw new ArgumentNullException("file");
         
         var url = this._getFileUrl(file);
         return this.loadXml(url);
@@ -101,6 +102,92 @@ var FileIO = {
         foStream.init(file, -1, 0640, 0);   // (file, access -1=default, perm, 0)
         serializer.serializeToStream(dom, foStream, ""); 
         foStream.close();
+        
+        logger().debug("Xml file %s saved.", file.path);
+    },
+    
+    /**
+     * Pokusi se nacist soubor z disku, pokud neexistuje tak z webu a ulozi ho na disk.
+     * Pro overwrite == true, vzdy se stahuje soubor z webu, a az kdyz neexistuje, tak zkousi
+     * cache. Pokud se ho podari stahnout, prepise cache vzdy.
+     * 
+     * @return Vraci strukturu { document, source }, kde source je bud "cache" nebo "url".
+     */
+    loadCachedXml: function(url, cachePath, overwrite) {
+        if (url == null)
+            throw new ArgumentNullException("url");
+        if (cachePath == null)
+            throw new ArgumentNullException("cachePath");
+    
+        var filename = (url.match(/\/([^\/]+)$/) || [])[1];
+        if (filename == null)
+            throw new ArgumentException("url", "Unable to extract filename from the url.");
+            
+        logger().debug("Extracted filename=%s", filename);
+        
+        var file = cachePath.clone();
+        file.append(filename);
+        var doc = null;
+        
+        // Pokus se nacist soubor z disku
+        if (!overwrite && file.exists() && file.isFile()) {
+            try {
+                doc = FileIO.loadXmlFile(file);
+                
+                // Soubor nacten z cache
+                if (doc != null) {
+                    logger().info("File %s loaded from cache.", url);
+                    return {
+                        document: doc,
+                        source: "cache"
+                    };
+                }
+            }
+            catch (ex) {
+                // Ignoruj
+            }
+        }
+        
+        // Z webu
+        try {
+            doc = FileIO.loadXml(url);
+            
+            // Soubor nacten z webu
+            if (doc != null) {
+                logger().info("File %s succesfully loaded from web. Updating cache...", url);
+                
+                // Uloz soubor do cache. Budto neexistuje, nebo je necitelny, nebo je overwrite true.
+                try {
+                    FileIO.saveXmlFile(file, doc);
+                    logger().debug("Cache updated.");
+                }
+                catch (ex) {
+                    logger().warn("Unable to store file %s into cache:\n%s", url, ex);
+                }
+                
+                return {
+                    document: doc,
+                    source: "url"
+                };
+            }
+        }
+        catch (ex) {
+        }
+        
+        // Tohle uz zalogujem, web request selhal
+        logger().warn("Unable to load file %s, trying cache...", url);
+        
+        if (file.exists() && file.isFile()) {
+            doc = FileIO.loadXmlFile(file);
+        }
+        else {
+            logger().warn("File %s doesn't exist in the cache.", url);            
+        }
+        
+        return {
+            document: doc,
+            source: (doc != null ? "cache" : null)
+        };
     },
     
     getExtensionDirectory: function() {
@@ -140,13 +227,13 @@ var WebExtenderPreferences = {
 
     getMarshalDebug: function() {
         if (this._debug_marshal == null)
-            this._debug_marshal = this.getBranch().getIntPref("debug_marshal");
+            this._debug_marshal = WebExtenderPreferences.getBranch().getIntPref("debug_marshal");
         return this._debug_marshal;
     },
 
     getXPathDebug: function() {
         if (this._debug_xpath == null)
-            this._debug_xpath = this.getBranch().getIntPref("debug_xpath");
+            this._debug_xpath = WebExtenderPreferences.getBranch().getIntPref("debug_xpath");
         return this._debug_xpath;
     }
 };

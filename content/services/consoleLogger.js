@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Michal Dvorak.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2008
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -34,22 +34,58 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const VERSION = "1.3.3";
+var _logger;
 
-const EXTENSION_NAME = "maplus";
-const EXTENSION_ID = "maplus@michal.dvorak";
-const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
+function logger() {
+    if (_logger == null) {
+        _logger = _findConsole();
+    }
+    return _logger;
+}
 
-const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
-const CHROME_CONTENT_URL = CHROME_URL + "content/";
+function _findConsole() {
+    var logCallback = null;
+    
+    var loggingEnabled = WebExtenderPreferences.getBranch().getBoolPref("debug_extension")
+    
+    if (loggingEnabled) {
+        try {
+            var svc = Components.classes["@mozilla.org/consoleservice;1"].
+                                 getService(Components.interfaces.nsIConsoleService);
+                                 
+            if (typeof svc.logStringMessage == "function") {
+                logCallback = function() {
+                    var args = $A(arguments);
+                    var format = args.shift();
+                    
+                    if (format == null)
+                        return;
+                    
+                    // Simple formatting
+                    var index = 0;
+                    var msg = format.replace(/%\w/g, function(str, offset, s) {
+                        return args[index++];
+                    });
+                    
+                    svc.logStringMessage(msg);
+                }
+            }
+        }
+        catch(ex) {
+        }
+    }
+    
+    // Dummy
+    if (logCallback == null) {
+        logCallback = function() { }
+    }
+    
+    // Create logger
+    var tmp = new Object();
 
-// Firebug console properties for version "1.05", logger must implement 'em
-const FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
-
-// Custom constants
-const MAPLUS_INFO_FILENAME = "maplus-info.xml";
-const MAPLUS_INFO_URL = "http://maplus.xf.cz/" + MAPLUS_INFO_FILENAME;
-
-const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
-
-const DEN_MINUT = 24 * 60; // Den ma celkem minut..
+    FIREBUG_METHODS.each(function(p) {
+        tmp[p] = logCallback;
+    });
+    
+    return tmp;
+}

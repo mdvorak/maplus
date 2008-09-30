@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Michal Dvorak.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2008
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -34,22 +34,28 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const VERSION = "1.3.3";
+function logger() {
+    if (window._logger == null) {
+        window._logger = _findConsole();
+    }
+    return window._logger;
+}
 
-const EXTENSION_NAME = "maplus";
-const EXTENSION_ID = "maplus@michal.dvorak";
-const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
-
-const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
-const CHROME_CONTENT_URL = CHROME_URL + "content/";
-
-// Firebug console properties for version "1.05", logger must implement 'em
-const FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
-
-// Custom constants
-const MAPLUS_INFO_FILENAME = "maplus-info.xml";
-const MAPLUS_INFO_URL = "http://maplus.xf.cz/" + MAPLUS_INFO_FILENAME;
-
-const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
-
-const DEN_MINUT = 24 * 60; // Den ma celkem minut..
+function _findConsole() {
+    try {
+        // Return existing
+        if (console.firebug)
+            return console;
+    }
+    catch(ex) {
+    }
+    
+    // Create dummy
+    var tmp = new Object();
+    
+    FIREBUG_METHODS.each(function(p) {
+        tmp[p] = function() { };
+    });
+    
+    return tmp;
+}
