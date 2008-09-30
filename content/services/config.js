@@ -43,9 +43,16 @@ XmlConfigNode.Extended.useExtension();
 function ageValidator(root) {
     if (MaPlus.AgeName != null) {
         if (root.getAttribute("vek") != null && root.getAttribute("vek") != MaPlus.AgeName) {
-            // Odstran veskera nastaveni
-            while (root.firstChild != null)
-                root.removeChild(root.firstChild);
+            var q = "Byla detekovana zmena veku. Chcete smazat Vase nastaveni?";
+            q += "\nTento dialog se jiz vickrat nezobrazi. Smazat nastaveni je mozne manualne v nastaveni.";
+            
+            var r = PromptService.confirm(q);
+            
+            if (r) {
+                // Odstran veskera nastaveni
+                while (root.firstChild != null)
+                    root.removeChild(root.firstChild);
+            }
         }
         root.setAttribute("vek", MaPlus.AgeName);
     }

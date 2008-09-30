@@ -179,6 +179,7 @@ var FileIO = {
         
         if (file.exists() && file.isFile()) {
             doc = FileIO.loadXmlFile(file);
+            logger().info("File %s loaded from the cache.", url);            
         }
         else {
             logger().warn("File %s doesn't exist in the cache.", url);            
@@ -235,5 +236,25 @@ var WebExtenderPreferences = {
         if (this._debug_xpath == null)
             this._debug_xpath = WebExtenderPreferences.getBranch().getIntPref("debug_xpath");
         return this._debug_xpath;
+    }
+};
+
+/*** PromptService class ***/
+var PromptService = {
+    _getService: function() {
+        var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+                                .getService(Components.interfaces.nsIPromptService);
+     
+        return prompts;
+    },
+    
+    alert: function() {
+        var prompts = PromptService._getService();
+        prompts.alert.apply(prompts, [null, "Melior Annis Plus"].concat($A(arguments)));
+    },
+    
+    confirm: function() {
+        var prompts = PromptService._getService();
+        return prompts.confirm.apply(prompts, [null, "Melior Annis Plus"].concat($A(arguments)));
     }
 };

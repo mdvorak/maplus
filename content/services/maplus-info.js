@@ -86,6 +86,7 @@ var MaPlusInfo = {
             }
             
             logger().info("Nacteno " + MAPLUS_INFO_FILENAME + ": vek=%s admin.id=%s admin.email=%s jednotky=%s", MaPlusInfo._vek, MaPlusInfo._admin.id, MaPlusInfo._admin.email, MaPlusInfo._jednotky);
+            logger().debug("Pristi refresh bude %s", new Date(MaPlusInfo._nextRefresh));
         }
         catch (ex) {
             var err = "Nepodarilo se zadnym zpusobem ziskat " + MAPLUS_INFO_FILENAME +":\n" + ex;
@@ -93,7 +94,7 @@ var MaPlusInfo = {
             
             // Otravuj uzivatele jen jednou za otevreni okna
             if (!MaPlusInfo._userWarned) {
-                alert(err);
+                PromptService.alert(err + "\n\n" + "Nektere informace nebudou k dispozici.");
                 MaPlusInfo._userWarned = true;
             }
         }
