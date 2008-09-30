@@ -912,9 +912,9 @@
     <zvt>1</zvt>
     <ini>-3</ini>
     <realIni>9</realIni>
-    <zlataTU>0.000</zlataTU>
-    <manyTU>0.000</manyTU>
-    <popTU>0.000</popTU>
+    <zlataTU>0</zlataTU>
+    <manyTU>0</manyTU>
+    <popTU>0</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Zombie</jmeno>
@@ -929,8 +929,8 @@
     <ini>-5</ini>
     <realIni>5</realIni>
     <zlataTU>0.09</zlataTU>
-    <manyTU>0.000</manyTU>
-    <popTU>0.000</popTU>
+    <manyTU>0</manyTU>
+    <popTU>0</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Stín</jmeno>
@@ -960,9 +960,9 @@
     <zvt>0</zvt>
     <ini>-1</ini>
     <realIni>17</realIni>
-    <zlataTU>0.220</zlataTU>
-    <manyTU>0.850</manyTU>
-    <popTU>0.100</popTU>
+    <zlataTU>0.22</zlataTU>
+    <manyTU>0.85</manyTU>
+    <popTU>0.1</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Fext</jmeno>
@@ -978,7 +978,7 @@
     <realIni>29</realIni>
     <zlataTU>0.86</zlataTU>
     <manyTU>2.48</manyTU>
-    <popTU>0.30</popTU>
+    <popTU>0.3</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Spektra</jmeno>
@@ -994,7 +994,7 @@
     <realIni>30</realIni>
     <zlataTU>1.57</zlataTU>
     <manyTU>2.54</manyTU>
-    <popTU>0.50</popTU>
+    <popTU>0.5</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Banshee</jmeno>
@@ -1008,9 +1008,9 @@
     <zvt>-1</zvt>
     <ini>1</ini>
     <realIni>25</realIni>
-    <zlataTU>2.20</zlataTU>
-    <manyTU>10.20</manyTU>
-    <popTU>0.80</popTU>
+    <zlataTU>2.2</zlataTU>
+    <manyTU>10.2</manyTU>
+    <popTU>0.8</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Mumie</jmeno>
@@ -1024,9 +1024,9 @@
     <zvt>3</zvt>
     <ini>-1</ini>
     <realIni>18</realIni>
-    <zlataTU>3.40</zlataTU>
-    <manyTU>6.00</manyTU>
-    <popTU>1.10</popTU>
+    <zlataTU>3.4</zlataTU>
+    <manyTU>6</manyTU>
+    <popTU>1.1</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Lich</jmeno>
@@ -1040,9 +1040,9 @@
     <zvt>-3</zvt>
     <ini>0</ini>
     <realIni>21</realIni>
-    <zlataTU>10.000</zlataTU>
-    <manyTU>26.000</manyTU>
-    <popTU>2.000</popTU>
+    <zlataTU>10</zlataTU>
+    <manyTU>26</manyTU>
+    <popTU>2</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Fantóm</jmeno>
@@ -1056,9 +1056,9 @@
     <zvt>2</zvt>
     <ini>-4</ini>
     <realIni>8</realIni>
-    <zlataTU>0.000</zlataTU>
+    <zlataTU>0</zlataTU>
     <manyTU>0.03</manyTU>
-    <popTU>0.000</popTU>
+    <popTU>0</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Přízrak</jmeno>
@@ -1072,9 +1072,9 @@
     <zvt>-1</zvt>
     <ini>2</ini>
     <realIni>27</realIni>
-    <zlataTU>0.620</zlataTU>
-    <manyTU>0.000</manyTU>
-    <popTU>0.000</popTU>
+    <zlataTU>0.62</zlataTU>
+    <manyTU>0</manyTU>
+    <popTU>0</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Rarach</jmeno>
@@ -1089,8 +1089,8 @@
     <ini>2</ini>
     <realIni>27</realIni>
     <zlataTU>1.13</zlataTU>
-    <manyTU>0.000</manyTU>
-    <popTU>0.10</popTU>
+    <manyTU>0</manyTU>
+    <popTU>0.1</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Děs</jmeno>
@@ -1120,9 +1120,9 @@
     <zvt>1</zvt>
     <ini>4</ini>
     <realIni>33</realIni>
-    <zlataTU>1.60</zlataTU>
+    <zlataTU>1.6</zlataTU>
     <manyTU>3.96</manyTU>
-    <popTU>0.40</popTU>
+    <popTU>0.4</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Noční můra</jmeno>
@@ -1138,7 +1138,7 @@
     <realIni>14</realIni>
     <zlataTU>2.05</zlataTU>
     <manyTU>3.05</manyTU>
-    <popTU>0.40</popTU>
+    <popTU>0.4</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Hrůza</jmeno>
@@ -1152,9 +1152,9 @@
     <zvt>-2</zvt>
     <ini>1</ini>
     <realIni>24</realIni>
-    <zlataTU>4.20</zlataTU>
-    <manyTU>6.000</manyTU>
-    <popTU>1.10</popTU>
+    <zlataTU>4.2</zlataTU>
+    <manyTU>6</manyTU>
+    <popTU>1.1</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Tempest</jmeno>
@@ -1168,9 +1168,9 @@
     <zvt>-3</zvt>
     <ini>-1</ini>
     <realIni>18</realIni>
-    <zlataTU>8.40</zlataTU>
-    <manyTU>10.00</manyTU>
-    <popTU>1.50</popTU>
+    <zlataTU>8.4</zlataTU>
+    <manyTU>10</manyTU>
+    <popTU>1.5</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Dračí démon</jmeno>
@@ -1184,9 +1184,9 @@
     <zvt>1</zvt>
     <ini>5</ini>
     <realIni>36</realIni>
-    <zlataTU>16.50</zlataTU>
-    <manyTU>14.00</manyTU>
-    <popTU>2.20</popTU>
+    <zlataTU>16.5</zlataTU>
+    <manyTU>14</manyTU>
+    <popTU>2.2</popTU>
   </jednotka>
   <jednotka>
     <jmeno>Gremlin</jmeno>
