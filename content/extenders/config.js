@@ -108,6 +108,16 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Konfigurace"; },
 
     analyze: function(page) {
+        // Vydej pokyn k aktualizaci maplus-info
+        if (new Date().getSeconds() % 3 == 0) {
+            // Pozn: Nekontroluj to zbytecne casto, kazda treti sekunda staci :) (Je to blbost ale mne se libi :P)
+            try {
+                Marshal.callMethod("MaPlusInfo", "considerReloading", []);
+            }
+            catch (ex) { }
+        }
+    
+        // Ziskej nody konfigu
         page.config = PlusConfig.getConfig(page.id);
         page.localConfig = PlusConfig.getLocalConfig(page.id);
         

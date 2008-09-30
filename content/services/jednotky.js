@@ -36,13 +36,40 @@
 
 var Jednotky = {
     NO_DATA: "NO_DATA",
-
+    
+    reload: function() {
+        this.data = null;
+    },
+    
     load: function() {
-        try { 
-            var doc = FileIO.loadXml(CHROME_CONTENT_URL + "data/jednotky.xml");
-            return XmlConfig.extendNode($X("jednotky", doc));
+        var root = null;
+        
+        try {
+            var url = MaPlusInfo.jednotky();
+            
+            if (url == null) {
+                // Info neni nacteno, no co se da delat...
+                logger().error("MaPlusInfo neni nacteno nebo chyby udaj o jednotkach. Data nejsou nacteny.");
+                return null;
+            }
+            
+            var res = FileIO.loadCachedXml(url, MaPlus.DataDirectory, false);
+            
+            if (res.document != null) {
+                root = XmlConfig.extendNode($X("jednotky", res.document));
+                logger().info("Jednotky uspesne nacteny z %s.", res.source);
+            }
         }
-        catch(e) {
+        catch(ex) {
+            logger().warn("Neocekavana chyba pri nacitani jednotek:\n" + ex + "\n\n" + ex.stack);
+        }
+        
+        return root;
+    },
+    
+    _loadIfNeeded: function() {
+        if (this.data == null) {
+            this.data = this.load() || this.NO_DATA;
         }
     },
     
@@ -52,12 +79,8 @@ var Jednotky = {
         if (jmeno == null)
             return null;
         
-        // TODO stahni data o jednotkach
-        
         // Nacti data pokud se tak jeste nestalo
-        if (this.data == null) {
-            this.data = this.load() || this.NO_DATA;
-        }
+        this._loadIfNeeded();
         
         // Pokud data nejsou k dispozici vrat null
         if (this.data == this.NO_DATA) {        
@@ -91,3 +114,6 @@ var Jednotky = {
 };
 
 Marshal.registerObject("Jednotky", Jednotky);
+
+// Vynut si znovunacteni jednotek
+MaPlusInfo.registerReloadedListener(function() { Jednotky.reload(); });

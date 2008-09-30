@@ -12,13 +12,13 @@
   <!-- Custom services -->
   <script src="services/password.js" />
   <script src="libraries/classlib.js" />
+  <script src="services/maplus-info.js" />
   <script src="services/maplus.js" />
   <script src="services/config.js" />
   <script src="services/datacache.js" />
   <script src="services/jednotky.js" />
   <script src="services/madata.js" />
   <script src="services/bestiar.js" />
-  <script src="services/maplus-info.js" />
 
   <script src="services/default.js" />
   

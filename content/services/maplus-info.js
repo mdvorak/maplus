@@ -34,9 +34,15 @@
 * 
 * ***** END LICENSE BLOCK ***** */
 
+// V minutach
+var SHORT_RELOAD_INTERVAL = 60;
+var LONG_RELOAD_INTERVAL = DEN_MINUT;
+
+
 var MaPlusInfo = {
     _nextRefresh: null,
     _userWarned: false,
+    _reloaded: new Array(),
 
     _vek: null,
     _admin: {
@@ -78,11 +84,11 @@ var MaPlusInfo = {
             // Jestlize je source "cache", znamena to ze url byla nedostupna, a zkusime to dotahnout za hodku znova
             if (result.source == "url") {
                 // Refresh za 24 hod (udaj je v ms)
-                MaPlusInfo._nextRefresh = new Date().getTime() + DEN_MINUT * 60000;
+                MaPlusInfo._nextRefresh = new Date().getTime() + LONG_RELOAD_INTERVAL * 60000;
             }
             else {
                 // Refresh za 1 hod (udaj je v ms)
-                MaPlusInfo._nextRefresh = new Date().getTime() + 60 * 60000;
+                MaPlusInfo._nextRefresh = new Date().getTime() + SHORT_RELOAD_INTERVAL * 60000;
             }
             
             logger().info("Nacteno " + MAPLUS_INFO_FILENAME + ": vek=%s admin.id=%s admin.email=%s jednotky=%s", MaPlusInfo._vek, MaPlusInfo._admin.id, MaPlusInfo._admin.email, MaPlusInfo._jednotky);
@@ -98,12 +104,34 @@ var MaPlusInfo = {
                 MaPlusInfo._userWarned = true;
             }
         }
+        
+        // Vyvolej udalost
+        for (var i = 0; i < MaPlusInfo._reloaded.length; i++) {
+            try {
+                MaPlusInfo._reloaded[i].call();
+            }
+            catch (ex) {
+                logger().error("Error during MaPlusInfo.reloaded callback:\n" + ex + "\n\n" + ex.stack);
+            }
+        }
     },
 
     _loadIfNeeded: function() {
         if (MaPlusInfo._nextRefresh == null || MaPlusInfo._nextRefresh < new Date().getTime()) {
             MaPlusInfo.load();
         }
+    },
+    
+    registerReloadedListener: function(callback) {
+        if (typeof callback != "function")
+            throw new ArgumentException("callback", "Parameter must be a function.");
+            
+        MaPlusInfo._reloaded.push(callback);
+    },
+    
+    considerReloading_PROXY: Marshal.BY_VALUE,
+    considerReloading: function() {
+        MaPlusInfo._loadIfNeeded();
     },
 
     vek_PROXY: Marshal.BY_VALUE,
