@@ -383,7 +383,6 @@ var LinkEditors = {
         }
     },
     
-    
     // Vychozi
     "default": {
         title: "Vlastní",

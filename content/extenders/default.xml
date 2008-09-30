@@ -38,6 +38,7 @@
     <script url="#{melior}/budovy.html" name="budovy.js" type="application/javascript;version=1.7" />
     <script url="#{melior}/multifunc.html" name="vyhledavani.js" />
     <script url="#{melior}/main.html" name="main.js" />
+    <script url="#{melior}/help.html" name="help.js" />
 
     <!-- Zobrazeni externiho linku v obsahu -->
     <script url="#{melior}/main.html" name="externilink.js" />
