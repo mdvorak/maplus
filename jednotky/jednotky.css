@@ -1,0 +1,102 @@
+﻿
+body
+{
+	font-family: arial ce,arial,helvetica ce,helvetica;
+	color: silver;
+	background-color: black;
+}
+
+span 
+{
+    font-size: small;
+}
+
+/* Druh a typ */
+.druhPoz { color: green; }
+.druhLet { color: lightblue; }
+.typBoj { color: orange; }
+.typStr { color: lightyellow; }
+
+/* Barvy phb */
+.phb1 { color: WhiteSmoke; }
+.phb2 { color: Yellow; }
+.phb3 { color: Red; }
+
+/* Barvy attributu */
+.attr
+{
+    width: 20px;
+    text-align: center;
+}
+
+.attr5 { background-color: #207020; }
+.attr4 { background-color: #206020; }
+.attr3 { background-color: #205020; }
+.attr2 { background-color: #204020; }
+.attr1 { background-color: #203020; }
+.attr0 { background-color: #202020; }
+.attr-1 { background-color: #302020; }
+.attr-2 { background-color: #402020; }
+.attr-3 { background-color: #502020; }
+.attr-4 { background-color: #602020; }
+.attr-5 { background-color: #702020; }
+
+
+/* Persvedceni */
+
+.c_C, .c_M, .c_B, .c_S, .c_Z, .c_N, .c_F {
+	border: 1px solid grey;
+	font-size: 10px;
+}
+.c_C {
+	background-color:black;
+}
+.c_M {
+	background-color:navy;
+}
+.c_B {
+	background-color:#C8C8C8;
+	border:1px solid black;
+	color:black;
+}
+.c_S {
+	background-color:gray;
+}
+.c_Z {
+	background-color:green;
+}
+.c_F {
+	background-color:#62006B;
+}
+.c_N {
+	border:1px solid grey;
+}
+
+
+/* Tabulky */
+
+table th
+{
+	text-align: left;
+}
+
+table.thinBorders
+{
+	empty-cells: show;
+}
+
+table.thinBorders > tbody > tr > td
+{
+    border-right-style: none;
+    border-bottom-style: none;
+}
+
+table.thinBorders > tbody > tr > td:first-child
+{
+    border-left-style: none;
+}
+
+table.thinBorders > tbody > tr:first-child > td
+{
+    border-top-style: none;
+}
