@@ -14,7 +14,7 @@
                 <em:minVersion>2.0</em:minVersion>
                 <em:maxVersion>3.*</em:maxVersion>
                 <em:updateLink>http://maplus.xf.cz/maplus.xpi</em:updateLink>
-                <em:updateHash>sha512:1E12D8081348EEFD1C1B4D4A27A2D39402C86A5A22FC40C42319A9CC9A2750A6893986FE6D6DA9175F5DC830D41F6F90D34841EA263142D578B76C6EA9904CB2</em:updateHash>
+                <em:updateHash>sha512:B689ACBB5121B9E6704F78CBBB5A3F60C7B0AC7887AF9191E5DCC411529AB5369788D0877009CDA5000DEB01CA9FF728D5C0B06963AD024BC5E6B5B938FDFF9B</em:updateHash>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>

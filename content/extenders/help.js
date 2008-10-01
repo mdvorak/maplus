@@ -46,18 +46,20 @@ pageExtenders.add(PageExtender.create({
         if (context.before == null)
             return false;
         
-        // context.url = Marshal.callMethod("MaPlusInfo", "jednotky", []);
-        // context.target = "_blank";
-        context.url = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: "jednotky"});
+        context.url = Marshal.callMethod("MaPlusInfo", "jednotky", []);
+        context.target = "_blank";
+        context.local = MaPlus.buildUrl(page, "main.html", {plus: "openurl", url: "jednotky"});
         
-        if (context.url == null)
+        if (context.url == null || context.local == null)
             return false;
         
         return true;
     },
     
     process: function(page, context) {
-        var elem = Element.create("a", '<span>Informace o jednotkách podle MA+</span>', {href: context.url, target: context.target});
+        var onclick = "if (event.ctrlKey) return; document.location.href = '" + context.local + "'; return false;";
+        var elem = Element.create("a", '<span>Informace o jednotkách podle MA+</span>', {onclick: onclick, href: context.url, target: context.target});
+    
         page.content.insertBefore(Element.create("br"), context.before);
         page.content.insertBefore(elem, context.before);
     }
