@@ -16,11 +16,6 @@ table td
 	padding: 1pt 2pt 1pt 2pt;
 }
 
-table tr.even
-{
-	background-color: #202020;
-}
-
 /* Druh a typ */
 .druhPoz { color: green; }
 .druhLet { color: lightblue; }
@@ -54,7 +49,7 @@ table tr.even
 
 /* Barva */
 
-td.barva, td.realIni
+td.barva, td.realIni, td.phb
 {
 	text-align: center;
 }

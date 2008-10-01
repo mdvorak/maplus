@@ -165,6 +165,8 @@
   </xsl:template>
 
   <xsl:template match="phb">
+    <xsl:attribute name="class">phb</xsl:attribute>
+    
     <span>
       <xsl:attribute name="class">
         <xsl:text>phb</xsl:text>

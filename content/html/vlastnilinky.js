@@ -307,12 +307,14 @@ var LinkEditorDialog = Class.create(Dialog, {
         spanEditor.innerHTML = this._editor.title;
         // Nastav vychozi text
         inputText.value = this._editor.defaultText || "";
-        // Zobraz externi check
-        if (this._editorName == "default") {
+        // Zobraz specificke veci
+        if (this._editor.showExternal) {
             $XL('.//*[@class = "externi"]', root).each(function(i) { i.style.display = ""; });
+        }
+        if (this._editor.external) {
             inputExterni.checked = true;
         }
-        else if (this._editorName == "text") {
+        if (this._editor.disableConfirm) {
             $XL('.//*[@class = "nourl"]', root).each(function(i) { i.style.display = "none"; });
         }
         

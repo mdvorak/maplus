@@ -38,6 +38,9 @@ var LinkEditors = {
     "text": {
         title: "Text",
         defaultText: "-",
+        disableConfirm: true,
+        showExternal: false,
+        external: false,
         
         create: function(parent, dataConfig) {
             parent.innerHTML = '<span class="small">Pro prázdný řádek použijte "-" (bez uvozovek).</span>';
@@ -323,6 +326,8 @@ var LinkEditors = {
     "odehrat": {
         title: "Odehrát",
         defaultText: "",
+        showExternal: false,
+        external: false,
         
         create: function(parent, dataConfig) {
             var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
@@ -387,6 +392,8 @@ var LinkEditors = {
     "default": {
         title: "Vlastní",
         defaultText: "",
+        showExternal: true,
+        external: true,
         
         create: function(parent, dataConfig) {
             var html = '<table cellpadding="0" cellspacing="0" style="width: 100%;">' +
