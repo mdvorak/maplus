@@ -57,11 +57,18 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        var onclick = "if (event.ctrlKey) return; document.location.href = '" + context.local + "'; return false;";
-        var elem = Element.create("a", '<span>Informace o jednotkách podle MA+</span>', {onclick: onclick, href: context.url, target: context.target});
+        var elem = Element.create("a", '<span>Informace o jednotkách podle MA+</span>', {href: context.url, target: context.target});
     
         page.content.insertBefore(Element.create("br"), context.before);
         page.content.insertBefore(elem, context.before);
+        
+        Event.observe(elem, "click", function(event) {
+            if (event.ctrlKey)
+                return;
+                
+            document.location.href = context.local;
+            Event.stop(event);
+        });
     }
 }));
 
