@@ -8,10 +8,11 @@
         <title>Melior Annis Plus - Jednotky</title>
         <link rel="stylesheet" href="jednotky.css" type="text/css" />
       </head>
-      <body>
-        <div>Tohle bude dodelano casem :) Mikee</div>
+      <body style="text-align: center;">
+        <h3>Melior Annis Plus</h3>
+        <div>Souhrnné informace o jednotkách. Jakékoliv chyby hlašte správci Melior Annis Plus.</div>
         <br />
-        <table class="thinBorders" cellspacing="0" border="1">
+        <table class="thinBorders" align="center" style="text-align: left;" cellspacing="0">
           <thead>
             <tr>
               <th>
@@ -30,19 +31,19 @@
                 <span>Druh</span>
               </th>
               <th>
-                <span>Pohyb</span>
+                <span>Phb</span>
               </th>
               <th>
-                <span>Damage</span>
+                <span>Dmg</span>
               </th>
               <th>
-                <span>Brnění</span>
+                <span>Brn</span>
               </th>
               <th>
-                <span>Životy</span>
+                <span>Zvt</span>
               </th>
               <th>
-                <span>Iniciativa</span>
+                <span>Ini</span>
               </th>
               <th>
                 <span>Abs Ini</span>
@@ -54,7 +55,7 @@
                 <span>Many/TU</span>
               </th>
               <th>
-                <span>Populace/TU</span>
+                <span>Pop/TU</span>
               </th>
             </tr>
           </thead>
@@ -69,85 +70,180 @@
   <xsl:template match="jednotka">
     <tr>
       <td>
-        <span>
-          <xsl:value-of select="jmeno" />
-        </span>
+        <xsl:apply-templates select="jmeno" />
       </td>
       <td>
-        <span>
-          <xsl:value-of select="pwr" />
-        </span>
-      </td>
-      <td style="text-align: center;">
-        <xsl:variable name="barva" select="barva"/>
-        <span class="c_{$barva}">
-          <xsl:text>&#xA0;</xsl:text>
-          <xsl:value-of select="barva" />
-          <xsl:text>&#xA0;</xsl:text>
-        </span>
+        <xsl:apply-templates select="pwr" />
       </td>
       <td>
-        <xsl:variable name="typ" select="substring(typ, 1, 3)"/>
-        <span class="typ{$typ}">
-          <xsl:value-of select="typ" />
-        </span>
+        <xsl:apply-templates select="barva" />
       </td>
       <td>
-        <xsl:variable name="druh" select="substring(druh, 1, 3)"/>
-        <span class="druh{$druh}">
-          <xsl:value-of select="druh" />
-        </span>
+        <xsl:apply-templates select="typ" />
       </td>
       <td>
-        <xsl:variable name="phb" select="phb"/>
-        <span class="phb{$phb}">
-          <xsl:value-of select="phb" />
-        </span>
-      </td>
-      <xsl:variable name="dmg" select="dmg"/>
-      <td class="attr attr{$dmg}">
-        <span>
-          <xsl:value-of select="dmg" />
-        </span>
-      </td>
-      <xsl:variable name="brn" select="brn"/>
-      <td class="attr attr{$brn}">
-        <span>
-          <xsl:value-of select="brn" />
-        </span>
-      </td>
-      <xsl:variable name="zvt" select="zvt"/>
-      <td class="attr attr{$zvt}">
-        <span>
-          <xsl:value-of select="zvt" />
-        </span>
-      </td>
-      <xsl:variable name="ini" select="ini"/>
-      <td class="attr attr{$ini}">
-        <span>
-          <xsl:value-of select="ini" />
-        </span>
-      </td>
-      <td style="text-align: center;">
-        <span>
-          <xsl:value-of select="realIni" />
-        </span>
+        <xsl:apply-templates select="druh" />
       </td>
       <td>
-        <span>
-          <xsl:value-of select="zlataTU" />
-        </span>
+        <xsl:apply-templates select="phb" />
       </td>
       <td>
-        <span>
-          <xsl:value-of select="manyTU" />
-        </span>
+        <xsl:apply-templates select="dmg" />
       </td>
       <td>
-        <span>
-          <xsl:value-of select="popTU" />
-        </span>
+        <xsl:apply-templates select="brn" />
+      </td>
+      <td>
+        <xsl:apply-templates select="zvt" />
+      </td>
+      <td>
+        <xsl:apply-templates select="ini" />
+      </td>
+      <td>
+        <xsl:apply-templates select="realIni" />
+      </td>
+      <td>
+        <xsl:apply-templates select="zlataTU" />
+      </td>
+      <td>
+        <xsl:apply-templates select="manyTU" />
+      </td>
+      <td>
+        <xsl:apply-templates select="popTU" />
       </td>
     </tr>
+  </xsl:template>
+
+
+  <xsl:template match="jmeno">
+    <span>
+      <xsl:value-of select="." />
+    </span>
+  </xsl:template>
+
+  <xsl:template match="pwr">
+    <span>
+      <xsl:value-of select="." />
+    </span>
+  </xsl:template>
+
+  <xsl:template match="barva">
+    <xsl:attribute name="class">barva</xsl:attribute>
+
+    <span>
+      <xsl:attribute name="class">
+        <xsl:text>c_</xsl:text>
+        <xsl:value-of select="." />
+      </xsl:attribute>
+
+      <xsl:text>&#xA0;</xsl:text>
+      <xsl:value-of select="." />
+      <xsl:text>&#xA0;</xsl:text>
+    </span>
+  </xsl:template>
+
+  <xsl:template match="typ">
+    <span>
+      <xsl:attribute name="class">
+        <xsl:text>typ</xsl:text>
+        <xsl:value-of select="substring(., 1, 3)" />
+      </xsl:attribute>
+
+      <xsl:value-of select="." />
+    </span>
+  </xsl:template>
+
+  <xsl:template match="druh">
+    <span>
+      <xsl:attribute name="class">
+        <xsl:text>druh</xsl:text>
+        <xsl:value-of select="substring(., 1, 3)" />
+      </xsl:attribute>
+
+      <xsl:value-of select="." />
+    </span>
+  </xsl:template>
+
+  <xsl:template match="phb">
+    <span>
+      <xsl:attribute name="class">
+        <xsl:text>phb</xsl:text>
+        <xsl:value-of select="." />
+      </xsl:attribute>
+
+      <xsl:value-of select="." />
+    </span>
+  </xsl:template>
+
+  <xsl:template name="attr">
+    <xsl:attribute name="class">
+      <xsl:text>attr </xsl:text>
+      <xsl:text>attr</xsl:text>
+      <xsl:value-of select="." />
+    </xsl:attribute>
+
+    <span>
+      <xsl:value-of select="." />
+    </span>
+  </xsl:template>
+
+  <xsl:template match="dmg">
+    <xsl:call-template name="attr" />
+  </xsl:template>
+
+  <xsl:template match="brn">
+    <xsl:call-template name="attr" />
+  </xsl:template>
+
+  <xsl:template match="zvt">
+    <xsl:call-template name="attr" />
+  </xsl:template>
+
+  <xsl:template match="ini">
+    <xsl:call-template name="attr" />
+  </xsl:template>
+
+  <xsl:template match="realIni">
+    <xsl:attribute name="class">realIni</xsl:attribute>
+
+    <span>
+      <xsl:attribute name="style">
+        <xsl:variable name="koeficient" select="(. - 5) div 30" />
+        <xsl:variable name="r" select="floor(225 * (1 - $koeficient) * 2)" />
+        <xsl:variable name="g" select="floor(220 * $koeficient * 2)" />
+
+        <xsl:text>color: rgb(</xsl:text>
+        <xsl:value-of select="($r &lt; 250) * $r + ($r &gt; 250) * 250"/>
+        <xsl:text>, </xsl:text>
+        <xsl:value-of select="($g &lt; 240) * $g + ($g &gt; 240) * 240"/>
+        <xsl:text>, </xsl:text>
+        <xsl:value-of select="30"/>
+        <xsl:text>);</xsl:text>
+      </xsl:attribute>
+
+      <xsl:value-of select="." />
+    </span>
+  </xsl:template>
+
+  <xsl:template name="upkeep">
+    <span>
+      <xsl:if test=". = 0">
+        <xsl:attribute name="style">color: grey;</xsl:attribute>
+      </xsl:if>
+
+      <xsl:value-of select="." />
+    </span>
+  </xsl:template>
+
+  <xsl:template match="zlataTU">
+    <xsl:call-template name="upkeep" />
+  </xsl:template>
+
+  <xsl:template match="manyTU">
+    <xsl:call-template name="upkeep" />
+  </xsl:template>
+
+  <xsl:template match="popTU">
+    <xsl:call-template name="upkeep" />
   </xsl:template>
 </xsl:stylesheet>

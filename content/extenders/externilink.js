@@ -42,6 +42,12 @@ pageExtenders.add(PageExtender.create({
             return false;
         
         context.url = unescape(page.arguments["url"]);
+        
+        // Specialni pripad
+        if (context.url == "jednotky") {
+            context.url = Marshal.callMethod("MaPlusInfo", "jednotky", []);
+        }
+        
         if (context.url.search("http://") != 0) {
             logger().error("Nepovolena adresa: %s", context.url);
             return false;
@@ -67,7 +73,7 @@ pageExtenders.add(PageExtender.create({
                 var docref = Marshal.getDocumentReference();
                 var size = Marshal.callMethod("FrameHelper", "getFrameContentSize", [docref, iframe.id]);
                 if (size.height > 0)
-                    div.style.height = (size.height + 15) + "px";
+                    div.style.height = (size.height + 30) + "px";
             }
             catch (ex) {
                 logger().warn("Nepodarilo se ziskat velikost dokumentu v iframu: %o", ex);

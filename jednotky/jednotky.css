@@ -11,6 +11,16 @@ span
     font-size: small;
 }
 
+table td
+{
+	padding: 1pt 2pt 1pt 2pt;
+}
+
+table tr.even
+{
+	background-color: #202020;
+}
+
 /* Druh a typ */
 .druhPoz { color: green; }
 .druhLet { color: lightblue; }
@@ -25,7 +35,7 @@ span
 /* Barvy attributu */
 .attr
 {
-    width: 20px;
+    width: 1.8em;
     text-align: center;
 }
 
@@ -42,7 +52,12 @@ span
 .attr-5 { background-color: #702020; }
 
 
-/* Persvedceni */
+/* Barva */
+
+td.barva, td.realIni
+{
+	text-align: center;
+}
 
 .c_C, .c_M, .c_B, .c_S, .c_Z, .c_N, .c_F {
 	border: 1px solid grey;
@@ -80,9 +95,10 @@ table th
 	text-align: left;
 }
 
-table.thinBorders
+table.thinBorders, table.thinBorders td, table.thinBorders th
 {
 	empty-cells: show;
+	border: solid 1px grey;
 }
 
 table.thinBorders > tbody > tr > td

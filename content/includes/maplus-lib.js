@@ -104,21 +104,21 @@ var Color = {
 
 Color.Pickers = {
     redGreen: function(colors) {
-        colors.red = Math.min(250, 225 * (1 - colors.koeficient) * 2);
-        colors.green = Math.min(240, 220 * colors.koeficient * 2);
+        colors.red = Math.max(0, Math.min(250, 225 * (1 - colors.koeficient) * 2));
+        colors.green = Math.max(0, Math.min(240, 220 * colors.koeficient * 2));
         colors.blue = 30; 
     },
 
     blueWhite: function(colors) {
-        colors.red = Math.min(240, 240 * colors.koeficient);
-        colors.green = Math.max(40, Math.min(240, 240 * colors.koeficient));
+        colors.red = Math.max(0, Math.min(240, 240 * colors.koeficient));
+        colors.green = Math.max(0, Math.max(40, Math.min(240, 240 * colors.koeficient)));
         colors.blue = 240; 
     },
   
     grayGold: function(colors) {
-        colors.red = 200 + Math.min(55, 55 * colors.koeficient); 
-        colors.green = 200 + Math.min(15, 15 * colors.koeficient); ;
-        colors.blue = Math.min(200, 200 * (1 - colors.koeficient)); 
+        colors.red = Math.max(0, 200 + Math.min(55, 55 * colors.koeficient)); 
+        colors.green = Math.max(0, 200 + Math.min(15, 15 * colors.koeficient)); ;
+        colors.blue = Math.max(0, Math.min(200, 200 * (1 - colors.koeficient))); 
     },
     
     whiteBrown: function(colors) {
