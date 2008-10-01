@@ -536,68 +536,6 @@ var PageExtenderCollection = Class.create({
     }
 });
 
-
-/*** Custom extender classes ***/
-
-var ScriptExtender = Class.create(PageExtender, {
-    DEFAULT_TYPE: "text/javascript",
-    DEFAULT_CHARSET: "UTF-8",
-
-    initialize: function($super, src, type, charset) {
-        $super();
-    
-        if (src == null)
-            throw new ArgumentNullException("src");
-        this._src = src;
-        this._type = (type != null ? type : this.DEFAULT_TYPE);
-        this._charset = (charset != null) ? charset : this.DEFAULT_CHARSET;
-    },
-    
-    getName: function() {
-        return String.format("ScriptExtender[{0}, {1}]", this._src, this._type);
-    },
-
-    analyze: function(page, context) {
-        context.head = XPath.evalSingle('/html/head', page.document);
-        return (context.head != null);
-    },
-    
-    process: function(page, context) {
-        var e = page.document.createElement("script");
-        e.setAttribute("type", this._type);
-        e.setAttribute("src", this._src);
-        e.setAttribute("charset", this._charset);
-        context.head.appendChild(e);
-    }
-});
-
-var StyleExtender = Class.create(PageExtender, {
-    initialize: function($super, src) {
-        $super();
-        
-        if (src == null)
-            throw new ArgumentNullException("src");
-        this._src = src;
-    },
-
-    getName: function() {
-        return String.format("StyleExtender[{0}]", this._src);
-    },
-
-    analyze: function(page, context) {
-        context.head = XPath.evalSingle('/html/head', page.document);
-        return (context.head != null);
-    },
-    
-    process: function(page, context) {
-        var e = page.document.createElement("link");
-        e.setAttribute("rel", "stylesheet");
-        e.setAttribute("type", "text/css");
-        e.setAttribute("href", this._src);
-        context.head.appendChild(e);
-    }
-});
-
 /*** MarshalException ***/
 var MarshalException = Class.create(Exception, {
     initialize: function($super, message, objectName, methodName, innerException) {
