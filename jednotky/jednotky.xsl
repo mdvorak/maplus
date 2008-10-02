@@ -2,62 +2,18 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="html" indent="yes" />
 
-  <xsl:template match="jednotky">
+  <xsl:template match="/jednotky">
     <html>
       <head>
         <title>Melior Annis Plus - Jednotky</title>
         <link rel="stylesheet" href="jednotky.css" type="text/css" />
       </head>
       <body style="text-align: center;">
-        <h3>Melior Annis Plus</h3>
-        <div>Souhrnné informace o jednotkách. Jakékoliv chyby hlašte správci Melior Annis Plus.</div>
+        <xsl:call-template name="summary" />
         <br />
         <table class="thinBorders" align="center" style="text-align: left;" cellspacing="0">
           <thead>
-            <tr>
-              <th>
-                <span>Jméno</span>
-              </th>
-              <th>
-                <span>Pwr</span>
-              </th>
-              <th>
-                <span>Barva</span>
-              </th>
-              <th>
-                <span>Typ</span>
-              </th>
-              <th>
-                <span>Druh</span>
-              </th>
-              <th>
-                <span>Phb</span>
-              </th>
-              <th>
-                <span>Dmg</span>
-              </th>
-              <th>
-                <span>Brn</span>
-              </th>
-              <th>
-                <span>Zvt</span>
-              </th>
-              <th>
-                <span>Ini</span>
-              </th>
-              <th>
-                <span>Abs Ini</span>
-              </th>
-              <th>
-                <span>Zlata/TU</span>
-              </th>
-              <th>
-                <span>Many/TU</span>
-              </th>
-              <th>
-                <span>Pop/TU</span>
-              </th>
-            </tr>
+            <xsl:call-template name="hlavicka" />
           </thead>
           <tbody>
             <xsl:apply-templates />
@@ -65,6 +21,58 @@
         </table>
       </body>
     </html>
+  </xsl:template>
+
+  <xsl:template name="summary">
+    <h3>Melior Annis Plus</h3>
+    <div>Souhrnné informace o jednotkách. Jakékoliv chyby hlašte správci Melior Annis Plus.</div>
+  </xsl:template>
+
+  <xsl:template name="hlavicka">
+    <tr>
+      <th>
+        <span>Jméno</span>
+      </th>
+      <th>
+        <span>Pwr</span>
+      </th>
+      <th>
+        <span>Barva</span>
+      </th>
+      <th>
+        <span>Typ</span>
+      </th>
+      <th>
+        <span>Druh</span>
+      </th>
+      <th>
+        <span>Phb</span>
+      </th>
+      <th>
+        <span>Dmg</span>
+      </th>
+      <th>
+        <span>Brn</span>
+      </th>
+      <th>
+        <span>Zvt</span>
+      </th>
+      <th>
+        <span>Ini</span>
+      </th>
+      <th>
+        <span>Abs Ini</span>
+      </th>
+      <th>
+        <span>Zlata/TU</span>
+      </th>
+      <th>
+        <span>Many/TU</span>
+      </th>
+      <th>
+        <span>Pop/TU</span>
+      </th>
+    </tr>
   </xsl:template>
 
   <xsl:template match="jednotka">
@@ -166,7 +174,7 @@
 
   <xsl:template match="phb">
     <xsl:attribute name="class">phb</xsl:attribute>
-    
+
     <span>
       <xsl:attribute name="class">
         <xsl:text>phb</xsl:text>

@@ -140,6 +140,16 @@ pageExtenders.add(PageExtender.create({
             controls.inputPodpis.checked = false;
         }
         
+        // Nahrazeni xml sekvenci
+        var unescapeXml = function(text) {
+            text = text.replace(/&amp;/g, "&");
+            text = text.replace(/&#(\d+);/g, function(str, code) {
+                return String.fromCharCode(code);
+            });
+            
+            return text;
+        };
+        
         // Odeslani posty
         var pripravZpravu = function(event) {
             // Odstraneni newline na zacatku a konci textu pri odeslani
@@ -162,6 +172,9 @@ pageExtenders.add(PageExtender.create({
                     text = "#!" + d + "\n" + text;
                 }
             }
+            
+            // Nahrazeni xml sekvenci
+            text = unescapeXml(text);
             
             controls.textareaZprava.value = text;
         };
@@ -188,6 +201,7 @@ pageExtenders.add(PageExtender.create({
             var newText = "\n" + Posta.ODDELOVAC + "\n";
             newText += "Psal " + unescape(psal) + ":\n\n";
             newText += controls.textareaZprava.defaultValue.replace(/\n{2}/g, "\n");
+            newText = unescapeXml(newText);
             
             controls.textareaZprava.value = newText;
             
@@ -279,7 +293,7 @@ pageExtenders.add(PageExtender.create({
             zprava.psal = trHeader.cells[0].textContent.replace(/\s+\(/g, " (");
             zprava.id = (zprava.linkPredat != null) ? parseInt(zprava.linkPredat.href.match(/\bpredat=(\d+)\b/)[1]) : null;
             zprava.cas = this._parseDate(zprava.fontCas.textContent);
-            zprava.text = zprava.fontText.innerHTML.replace(/<br\/?>/g, "\n").stripTags();
+            zprava.text = zprava.fontText.innerHTML.replace(/<br\/?>/g, "\n").replace(/&amp;/g, "&").stripTags();
             
             if (zprava.typ != "posel") {
                 Posta.zjistiDulezitost(zprava);
@@ -485,6 +499,50 @@ pageExtenders.add(PageExtender.create({
         });
     }
 }));
+
+
+// Unescape xml sekvenci
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Posta - Unescape"; },
+
+    analyze: function(page, context) {
+        if (page.posta == null || page.posta.zpravy == null)
+            return false;
+
+        return page.posta.config.getBoolean("unescape", true);
+    },
+    
+    process: function(page, context) {
+        var regex = /&(?:amp;)?#(\d+);/g;
+        
+        var found;
+        function regexReplacer(str, code) {
+            found = true;
+            return String.fromCharCode(parseInt(code));
+        }
+        
+        page.posta.zpravy.each(function(zprava) {
+            // Needituj zpravy z bestiare ani posla
+            if (zprava.dulezitost == "bestiar" || zprava.typ == "posel")
+                return; //continue;
+
+            // Neloguj to
+            var snapshot = XPath.evaluate('.//text()', zprava.fontText, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, true);
+            
+            for (var i = 0; i < snapshot.snapshotLength; i++) {
+                var element = snapshot.snapshotItem(i);
+                
+                found = false;
+                var newValue = element.nodeValue.replace(regex, regexReplacer);
+                
+                if (found) {
+                    element.nodeValue = newValue;
+                }
+            }
+        });
+    }
+}));
+
 
 // Roztahovani posty
 pageExtenders.add(PageExtender.create({
