@@ -100,7 +100,7 @@ var MaData = {
                 presvedceni: provi.getPref("presvedceni"),
                 aliance: (aliance != ZADNA_ALIANCE ? aliance : null),
                 alianceZnama: (aliance != null),
-                update: new Date(provi.getAttribute("update"))
+                update: new Date(parseInt(provi.getAttribute("update")))
             };
         }
         
@@ -138,7 +138,7 @@ var MaData = {
                 provi.setPref("tajna", aliance);
         }
         
-        provi.setAttribute("update", new Date());
+        provi.setAttribute("update", new Date().getTime());
     },
     
     // Vraci array id
@@ -189,7 +189,7 @@ var MaData = {
                 jmeno: ali.getPref("jmeno"),
                 presvedceni: ali.getPref("presvedceni"),
                 typ: ali.getPref("typ"),
-                update: new Date(ali.getAttribute("update"))
+                update: new Date(parseInt(ali.getAttribute("update")))
             };
         }
         
@@ -230,7 +230,7 @@ var MaData = {
         if (presvedceni && presvedceni != "") ali.setPref("presvedceni", presvedceni);
         if (typ != null) ali.setPref("typ", typ);
         
-        ali.setAttribute("update", new Date());
+        ali.setAttribute("update", new Date().getTime());
     },
     
     // Pro moznost upozorneni ze je seznam zastaraly

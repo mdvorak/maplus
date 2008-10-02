@@ -27,7 +27,7 @@ window.Poznamky = {
         var poznamky = $('plus_poznamky');
         if (radku >= 1)
             poznamky.setAttribute("rows", radku);
-        poznamky.value = value || "";
+        poznamky.value = (value || "").replace(/^\s+|\s+$/g, "");
 
         if (onchange) {
             Event.observe(poznamky, "change", onchange);

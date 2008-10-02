@@ -100,7 +100,7 @@ var FileIO = {
                                  .createInstance(Components.interfaces.nsIFileOutputStream);
                        
         foStream.init(file, -1, 0640, 0);   // (file, access -1=default, perm, 0)
-        serializer.serializeToStream(dom, foStream, ""); 
+        serializer.serializeToStream(dom, foStream, "utf-8");  // Use always utf-8
         foStream.close();
         
         logger().debug("Xml file %s saved.", file.path);

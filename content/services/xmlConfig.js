@@ -40,6 +40,11 @@ var XmlConfig = {
 
     createEmpty: function(rootName) {
         var doc = DocumentHelper.createDocument();
+        
+        // Pridej xml direktivu
+        doc.appendChild(doc.createProcessingInstruction("xml", 'version="1.0" encoding="utf-8"'));
+        
+        // Korenovy element
         var root = doc.createElement(rootName);
         doc.appendChild(root);
 
@@ -156,7 +161,24 @@ XmlConfigNode.prototype = {
         var elem = (name ? this.getPrefNode(name) : this);
         if (elem == null)
             elem = this.addPref(name);
-        elem.textContent = (value != null ? value : ""); // Lepsi prazdny string nez undefined
+            
+        if (value != null) {
+            // Beztak bude ulozeny jako string...
+            value = String(value);
+        
+            // Pokud string obsahuje neco nepekneho, ulozime ho jako CDATA
+            if (value.match(/[\<\>\[\]\&]/) == null) {
+                elem.textContent = value;
+            }
+            else {
+                elem.clearChildNodes();
+                elem.appendChild(elem.ownerDocument.createCDATASection(value));
+            }
+        }
+        else {
+            elem.textContent = ""; // Lepsi prazdny string nez undefined
+        }
+
         return value;
     },
     
