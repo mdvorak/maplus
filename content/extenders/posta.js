@@ -513,12 +513,17 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-        var regex = /&(?:amp;)?#(\d+);/g;
+        var regexAmp = /&amp;/g;
+        var regexNum = /&#(\d+);/g;
         
         var found;
         function regexReplacer(str, code) {
             found = true;
-            return String.fromCharCode(parseInt(code));
+            
+            if (str == "&amp;")
+                return "&";
+            else
+                return String.fromCharCode(parseInt(code));
         }
         
         page.posta.zpravy.each(function(zprava) {
@@ -533,7 +538,8 @@ pageExtenders.add(PageExtender.create({
                 var element = snapshot.snapshotItem(i);
                 
                 found = false;
-                var newValue = element.nodeValue.replace(regex, regexReplacer);
+                var newValue = element.nodeValue.replace(regexAmp, regexReplacer);
+                newValue = newValue.replace(regexNum, regexReplacer);
                 
                 if (found) {
                     element.nodeValue = newValue;
