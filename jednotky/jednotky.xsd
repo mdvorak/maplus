@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://maplus.xf.cz/jednotky"
+           xmlns:t="http://maplus.xf.cz/transform" 
+           targetNamespace="http://maplus.xf.cz/jednotky"
+           attributeFormDefault="unqualified" elementFormDefault="qualified">
+
+  <xs:import namespace="http://maplus.xf.cz/transform" />
+  
+  <xs:simpleType name="attribute">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:byte">
+          <xs:minInclusive value="-5" />
+          <xs:maxInclusive value="5" />
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="?" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:simpleType name="nonNegativeDecimal">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="typ">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Boj." />
+      <xs:enumeration value="Str." />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="druh">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Poz." />
+      <xs:enumeration value="Let." />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="barva">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="M" />
+      <xs:enumeration value="B" />
+      <xs:enumeration value="Z" />
+      <xs:enumeration value="C" />
+      <xs:enumeration value="S" />
+      <xs:enumeration value="F" />
+      <xs:enumeration value="N" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="phb">
+    <xs:restriction base="xs:unsignedByte">
+      <xs:maxInclusive value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:element name="jednotky">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element name="jednotka">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="jmeno" type="xs:string" />
+              <xs:element name="pwr" type="nonNegativeDecimal" />
+              <xs:element name="barva" type="barva" />
+              <xs:element name="typ" type="typ" />
+              <xs:element name="druh" type="druh" />
+              <xs:element name="phb" type="phb" />
+              <xs:element name="dmg" type="attribute" />
+              <xs:element name="brn" type="attribute" />
+              <xs:element name="zvt" type="attribute" />
+              <xs:element name="ini" type="attribute" />
+              <xs:element name="realIni" type="xs:unsignedByte" />
+              <xs:element name="zlataTU" type="nonNegativeDecimal" />
+              <xs:element name="manyTU" type="nonNegativeDecimal" />
+              <xs:element name="popTU" type="nonNegativeDecimal" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+
+      <xs:attribute ref="t:stylesheet" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

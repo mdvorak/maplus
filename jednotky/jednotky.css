@@ -4,16 +4,40 @@ body
 	font-family: arial ce,arial,helvetica ce,helvetica;
 	color: silver;
 	background-color: black;
+	text-align: center;
 }
 
 span 
 {
-    font-size: small;
+    font-size: 0.8em;
+}
+
+table
+{
+    margin-left: auto; 
+    margin-right: auto;
+    text-align: left;
 }
 
 table td
 {
-	padding: 1pt 2pt 1pt 2pt;
+	padding: 2pt 2pt 1pt 2pt;
+}
+
+a, a:visited
+{
+	color: silver;
+	text-decoration: none;
+}
+
+a:hover
+{
+	text-decoration: underline;
+}
+
+a.sorted
+{
+	color: white;
 }
 
 /* Druh a typ */
@@ -83,17 +107,12 @@ td.barva, td.realIni, td.phb
 }
 
 
-/* Tabulky */
-
-table th
-{
-	text-align: left;
-}
+/* Okraje */
 
 table.thinBorders, table.thinBorders td, table.thinBorders th
 {
 	empty-cells: show;
-	border: solid 1px grey;
+	border: solid 1px #505050;
 }
 
 table.thinBorders > tbody > tr > td
