@@ -247,9 +247,17 @@
         <xsl:variable name="g" select="floor(220 * $koeficient * 2)" />
 
         <xsl:text>color: rgb(</xsl:text>
-        <xsl:value-of select="($r &lt; 250) * $r + ($r &gt; 250) * 250"/>
+        <xsl:call-template name="between">
+          <xsl:with-param name="value" select="$r" />
+          <xsl:with-param name="min" select="0" />
+          <xsl:with-param name="max" select="250" />
+        </xsl:call-template>
         <xsl:text>, </xsl:text>
-        <xsl:value-of select="($g &lt; 240) * $g + ($g &gt; 240) * 240"/>
+        <xsl:call-template name="between">
+          <xsl:with-param name="value" select="$g" />
+          <xsl:with-param name="min" select="0" />
+          <xsl:with-param name="max" select="240" />
+        </xsl:call-template>
         <xsl:text>, </xsl:text>
         <xsl:value-of select="30"/>
         <xsl:text>);</xsl:text>
@@ -257,6 +265,15 @@
 
       <xsl:value-of select="." />
     </span>
+  </xsl:template>
+
+  <xsl:template name="between">
+    <xsl:param name="value" />
+    <xsl:param name="min" />
+    <xsl:param name="max" />
+
+    <xsl:variable name="tmp" select="($value &lt; $max) * $value + ($value &gt; $max) * $max" />
+    <xsl:value-of select="($value &gt; $min) * $value + ($value &lt; $min) * $min" />
   </xsl:template>
 
   <xsl:template name="upkeep">
