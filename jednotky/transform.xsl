@@ -151,7 +151,7 @@
           
           function createElement(tagName, innerHtml, attributes, doc) {
               if (tagName == null)
-                  throw new ArgumentNullException("tagName");
+                  throw new Error("tagName");
           
               if (doc == null) doc = document;
               var e = doc.createElement(tagName);
