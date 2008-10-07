@@ -1,106 +1,117 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- ***** BEGIN LICENSE BLOCK *****
-  -   Version: MPL 1.1/GPL 2.0/LGPL 2.1
-  -
-  - The contents of this file are subject to the Mozilla Public License Version
-  - 1.1 (the "License"); you may not use this file except in compliance with
-  - the License. You may obtain a copy of the License at
-  - http://www.mozilla.org/MPL/
-  - 
-  - Software distributed under the License is distributed on an "AS IS" basis,
-  - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
-  - for the specific language governing rights and limitations under the
-  - License.
-  -
-  - The Original Code is Melior Annis Plus.
-  -
-  - The Initial Developer of the Original Code is
-  - Michal Dvorak.
-  - Portions created by the Initial Developer are Copyright (C) 2008
-  - the Initial Developer. All Rights Reserved.
-  -
-  - Contributor(s):
-  -
-  - Alternatively, the contents of this file may be used under the terms of
-  - either the GNU General Public License Version 2 or later (the "GPL"), or
-  - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
-  - in which case the provisions of the GPL or the LGPL are applicable instead
-  - of those above. If you wish to allow use of your version of this file only
-  - under the terms of either the GPL or the LGPL, and not to allow others to
-  - use your version of this file under the terms of the MPL, indicate your
-  - decision by deleting the provisions above and replace them with the notice
-  - and other provisions required by the GPL or the LGPL. If you do not delete
-  - the provisions above, a recipient may use your version of this file under
-  - the terms of any one of the MPL, the GPL or the LGPL.
-  - 
-  - ***** END LICENSE BLOCK ***** -->
-<xsl:stylesheet version="1.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:config="http://maplus.xf.cz/jednotky-transform"
-                xmlns:j="http://maplus.xf.cz/jednotky"
-                exclude-result-prefixes="config">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="html" indent="yes" />
 
+  <xsl:param name="sorting" />
+  <xsl:param name="sort" />
+  <xsl:param name="order" />
   <xsl:param name="baseUrl" />
-  <xsl:param name="sort">none</xsl:param>
-  <xsl:param name="order">ascending</xsl:param>
 
-  <xsl:variable name="tabulka" select="document('')/xsl:stylesheet/config:tabulka" />
-
-  <config:tabulka>
-    <config:sloupec name="jmeno" title="Jméno" data-type="text" />
-    <config:sloupec name="pwr" title="Pwr" data-type="number" />
-    <config:sloupec name="barva" title="Barva" data-type="text" />
-    <config:sloupec name="typ" title="Typ" data-type="text" />
-    <config:sloupec name="druh" title="Druh" data-type="text" />
-    <config:sloupec name="phb" title="Phb" data-type="number" />
-    <config:sloupec name="dmg" title="Dmg" data-type="number" />
-    <config:sloupec name="brn" title="Brn" data-type="number" />
-    <config:sloupec name="zvt" title="Zvt" data-type="number" />
-    <config:sloupec name="ini" title="Ini" data-type="number" />
-    <config:sloupec name="realIni" title="Abs Ini" data-type="number" />
-    <config:sloupec name="zlataTU" title="Zlata/TU" data-type="number" />
-    <config:sloupec name="manyTU" title="Many/TU" data-type="number" />
-    <config:sloupec name="popTU" title="Pop/TU" data-type="number" />
-  </config:tabulka>
-
-  <xsl:template match="j:jednotky">
+  <xsl:template match="/jednotky">
     <html>
       <head>
         <title>Melior Annis Plus - Jednotky</title>
-
-        <!-- Pozn: Barva tady specifikovana se prepise *.css, ale aby nam tam neproblikavala bila... -->
-        <style type="text/css">
-          <![CDATA[
-          body {
-            background-color: black;
-          }
-          ]]>
-        </style>
         <link rel="stylesheet" href="jednotky.css" type="text/css" />
       </head>
-      <body>
+      <body style="text-align: center;">
         <xsl:call-template name="summary" />
         <br />
-        <table class="thinBorders" cellspacing="0">
+        <xsl:if test="$sorting = 'true'">
+          <div style="text-align: right;">Vychozí řazení</div>
+        </xsl:if>
+        <table class="thinBorders" align="center" style="text-align: left;" cellspacing="0">
           <thead>
-            <xsl:call-template name="header" />
+            <xsl:call-template name="hlavicka" />
           </thead>
           <tbody>
-            <!-- Ziskej datovy typ -->
-            <xsl:variable name="sort-type" select="$tabulka/config:sloupec[@name = $sort]/@data-type" />
-
-            <!-- Pokud neni znam datovy typ, sloupec neumime seradit... -->
             <xsl:choose>
-              <xsl:when test="boolean($sort-type)">
-                <!-- Razeni -->
-                <xsl:apply-templates select="j:jednotka">
-                  <xsl:sort select="j:*[local-name() = $sort]" lang="cs" order="{$order}" data-type="{$sort-type}" />
+              <!-- Jmeno -->
+              <xsl:when test="$sort = 'jmeno'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="jmeno" order="{$order}" lang="cs" case-order="upper-first" />
                 </xsl:apply-templates>
               </xsl:when>
+              <!-- Pwr -->
+              <xsl:when test="$sort = 'pwr'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="pwr" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Barva -->
+              <xsl:when test="$sort = 'barva'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="barva" order="{$order}" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Typ -->
+              <xsl:when test="$sort = 'typ'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="typ" order="{$order}" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Druh -->
+              <xsl:when test="$sort = 'druh'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="druh" order="{$order}" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Phb -->
+              <xsl:when test="$sort = 'phb'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="phb" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Dmg -->
+              <xsl:when test="$sort = 'dmg'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="dmg" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Brn -->
+              <xsl:when test="$sort = 'brn'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="brn" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Zvt -->
+              <xsl:when test="$sort = 'zvt'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="zvt" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Ini -->
+              <xsl:when test="$sort = 'ini'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="ini" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Abs Ini -->
+              <xsl:when test="$sort = 'realIni'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="realIni" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- ZlataTU -->
+              <xsl:when test="$sort = 'zlataTU'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="zlataTU" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- ManaTU -->
+              <xsl:when test="$sort = 'manyTU'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="manyTU" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- popTU -->
+              <xsl:when test="$sort = 'popTU'">
+                <xsl:apply-templates select="jednotka">
+                  <xsl:sort select="popTU" order="{$order}" data-type="number" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <!-- Bez razeni -->
               <xsl:otherwise>
-                <!-- Bez razeni -->
-                <xsl:apply-templates select="j:jednotka" />
+                <xsl:apply-templates select="jednotka" />
               </xsl:otherwise>
             </xsl:choose>
           </tbody>
@@ -114,32 +125,106 @@
     <div>Souhrnné informace o jednotkách. Jakékoliv chyby hlašte správci Melior Annis Plus.</div>
   </xsl:template>
 
-  <xsl:template name="header">
+  <xsl:template name="hlavicka">
     <tr>
-      <xsl:for-each select="$tabulka/config:sloupec">
-        <th>
-          <xsl:call-template name="title">
-            <xsl:with-param name="name" select="@name" />
-            <xsl:with-param name="text" select="@title" />
-            <xsl:with-param name="sortable" select="boolean(@data-type)" />
-          </xsl:call-template>
-        </th>
-      </xsl:for-each>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">jmeno</xsl:with-param>
+          <xsl:with-param name="text">Jméno</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">pwr</xsl:with-param>
+          <xsl:with-param name="text">Pwr</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">barva</xsl:with-param>
+          <xsl:with-param name="text">Barva</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">typ</xsl:with-param>
+          <xsl:with-param name="text">Typ</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">druh</xsl:with-param>
+          <xsl:with-param name="text">Druh</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">phb</xsl:with-param>
+          <xsl:with-param name="text">Phb</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">dmg</xsl:with-param>
+          <xsl:with-param name="text">Dmg</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">brn</xsl:with-param>
+          <xsl:with-param name="text">Brn</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">zvt</xsl:with-param>
+          <xsl:with-param name="text">Zvt</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">ini</xsl:with-param>
+          <xsl:with-param name="text">Ini</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">realIni</xsl:with-param>
+          <xsl:with-param name="text">Abs Ini</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">zlataTU</xsl:with-param>
+          <xsl:with-param name="text">Zlata/TU</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">manyTU</xsl:with-param>
+          <xsl:with-param name="text">Many/TU</xsl:with-param>
+        </xsl:call-template>
+      </th>
+      <th>
+        <xsl:call-template name="sloupec">
+          <xsl:with-param name="name">popTU</xsl:with-param>
+          <xsl:with-param name="text">Pop/TU</xsl:with-param>
+        </xsl:call-template>
+      </th>
     </tr>
   </xsl:template>
 
-  <xsl:template name="title">
+  <xsl:template name="sloupec">
     <xsl:param name="name" />
     <xsl:param name="text" />
-    <xsl:param name="sortable" />
 
     <span>
       <xsl:choose>
-        <xsl:when test="$sortable">
+        <xsl:when test="$sorting = 'true'">
           <a>
             <xsl:attribute name="href">
               <xsl:value-of select="$baseUrl" />
-              <xsl:text>?sort=</xsl:text>
+              <xsl:text>&amp;sort=</xsl:text>
               <xsl:value-of select="$name" />
               <xsl:text>&amp;order=</xsl:text>
 
@@ -153,10 +238,6 @@
               </xsl:choose>
             </xsl:attribute>
 
-            <xsl:if test="$sort = $name">
-              <xsl:attribute name="class">sorted</xsl:attribute>
-            </xsl:if>
-
             <xsl:value-of select="$text" />
           </a>
         </xsl:when>
@@ -167,34 +248,75 @@
     </span>
   </xsl:template>
 
-  <xsl:template match="j:jednotka">
+  <xsl:template match="jednotka">
     <tr>
-      <xsl:variable name="jednotka" select="." />
-
-      <xsl:for-each select="$tabulka/config:sloupec">
-        <xsl:variable name="config" select="." />
-
-        <td>
-          <xsl:apply-templates select="$jednotka/j:*[local-name() = $config/@name]" />
-        </td>
-      </xsl:for-each>
+      <td>
+        <xsl:apply-templates select="jmeno" />
+      </td>
+      <td>
+        <xsl:apply-templates select="pwr" />
+      </td>
+      <td>
+        <xsl:apply-templates select="barva" />
+      </td>
+      <td>
+        <xsl:apply-templates select="typ" />
+      </td>
+      <td>
+        <xsl:apply-templates select="druh" />
+      </td>
+      <td>
+        <xsl:apply-templates select="phb" />
+      </td>
+      <td>
+        <xsl:apply-templates select="dmg" />
+      </td>
+      <td>
+        <xsl:apply-templates select="brn" />
+      </td>
+      <td>
+        <xsl:apply-templates select="zvt" />
+      </td>
+      <td>
+        <xsl:apply-templates select="ini" />
+      </td>
+      <td>
+        <xsl:apply-templates select="realIni" />
+      </td>
+      <td>
+        <xsl:apply-templates select="zlataTU" />
+      </td>
+      <td>
+        <xsl:apply-templates select="manyTU" />
+      </td>
+      <td>
+        <xsl:apply-templates select="popTU" />
+      </td>
+      <!--
+      <td>
+        <xsl:call-template name="upkeepNaSilu">
+          <xsl:with-param name="pwr" select="pwr" />
+          <xsl:with-param name="upkeep" select="zlataTU" />
+        </xsl:call-template>
+      </td>
+      -->
     </tr>
   </xsl:template>
 
 
-  <xsl:template match="j:jmeno">
+  <xsl:template match="jmeno">
     <span>
       <xsl:value-of select="." />
     </span>
   </xsl:template>
 
-  <xsl:template match="j:pwr">
+  <xsl:template match="pwr">
     <span>
       <xsl:value-of select="." />
     </span>
   </xsl:template>
 
-  <xsl:template match="j:barva">
+  <xsl:template match="barva">
     <xsl:attribute name="class">barva</xsl:attribute>
 
     <span>
@@ -209,7 +331,7 @@
     </span>
   </xsl:template>
 
-  <xsl:template match="j:typ">
+  <xsl:template match="typ">
     <span>
       <xsl:attribute name="class">
         <xsl:text>typ</xsl:text>
@@ -220,7 +342,7 @@
     </span>
   </xsl:template>
 
-  <xsl:template match="j:druh">
+  <xsl:template match="druh">
     <span>
       <xsl:attribute name="class">
         <xsl:text>druh</xsl:text>
@@ -231,7 +353,7 @@
     </span>
   </xsl:template>
 
-  <xsl:template match="j:phb">
+  <xsl:template match="phb">
     <xsl:attribute name="class">phb</xsl:attribute>
 
     <span>
@@ -256,23 +378,23 @@
     </span>
   </xsl:template>
 
-  <xsl:template match="j:dmg">
+  <xsl:template match="dmg">
     <xsl:call-template name="attr" />
   </xsl:template>
 
-  <xsl:template match="j:brn">
+  <xsl:template match="brn">
     <xsl:call-template name="attr" />
   </xsl:template>
 
-  <xsl:template match="j:zvt">
+  <xsl:template match="zvt">
     <xsl:call-template name="attr" />
   </xsl:template>
 
-  <xsl:template match="j:ini">
+  <xsl:template match="ini">
     <xsl:call-template name="attr" />
   </xsl:template>
 
-  <xsl:template match="j:realIni">
+  <xsl:template match="realIni">
     <xsl:attribute name="class">realIni</xsl:attribute>
 
     <span>
@@ -282,17 +404,9 @@
         <xsl:variable name="g" select="floor(220 * $koeficient * 2)" />
 
         <xsl:text>color: rgb(</xsl:text>
-        <xsl:call-template name="between">
-          <xsl:with-param name="value" select="$r" />
-          <xsl:with-param name="min" select="0" />
-          <xsl:with-param name="max" select="250" />
-        </xsl:call-template>
+        <xsl:value-of select="($r &lt; 250) * $r + ($r &gt; 250) * 250"/>
         <xsl:text>, </xsl:text>
-        <xsl:call-template name="between">
-          <xsl:with-param name="value" select="$g" />
-          <xsl:with-param name="min" select="0" />
-          <xsl:with-param name="max" select="240" />
-        </xsl:call-template>
+        <xsl:value-of select="($g &lt; 240) * $g + ($g &gt; 240) * 240"/>
         <xsl:text>, </xsl:text>
         <xsl:value-of select="30"/>
         <xsl:text>);</xsl:text>
@@ -300,15 +414,6 @@
 
       <xsl:value-of select="." />
     </span>
-  </xsl:template>
-
-  <xsl:template name="between">
-    <xsl:param name="value" />
-    <xsl:param name="min" />
-    <xsl:param name="max" />
-
-    <xsl:variable name="tmp" select="($value &lt; $max) * $value + ($value &gt; $max) * $max" />
-    <xsl:value-of select="($value &gt; $min) * $value + ($value &lt; $min) * $min" />
   </xsl:template>
 
   <xsl:template name="upkeep">
@@ -321,15 +426,15 @@
     </span>
   </xsl:template>
 
-  <xsl:template match="j:zlataTU">
+  <xsl:template match="zlataTU">
     <xsl:call-template name="upkeep" />
   </xsl:template>
 
-  <xsl:template match="j:manyTU">
+  <xsl:template match="manyTU">
     <xsl:call-template name="upkeep" />
   </xsl:template>
 
-  <xsl:template match="j:popTU">
+  <xsl:template match="popTU">
     <xsl:call-template name="upkeep" />
   </xsl:template>
 
