@@ -35,7 +35,7 @@
   - the terms of any one of the MPL, the GPL or the LGPL.
   - 
   - ***** END LICENSE BLOCK ***** -->
-<jednotky xmlns="http://maplus.xf.cz/jednotky">
+<jednotky>
   <jednotka>
     <jmeno>Kobold</jmeno>
     <pwr>0.56</pwr>
