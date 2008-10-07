@@ -37,6 +37,13 @@
 var Jednotky = {
     NO_DATA: "NO_DATA",
     
+    _resolver: function(prefix) {
+        if (prefix == "j")
+            return "http://maplus.xf.cz/jednotky";
+        else
+            return null;
+    },
+    
     reload: function() {
         this.data = null;
     },
@@ -56,7 +63,11 @@ var Jednotky = {
             var res = FileIO.loadCachedXml(url, MaPlus.DataDirectory, false);
             
             if (res.document != null) {
-                root = XmlConfig.extendNode($X("jednotky", res.document));
+                root = $X("j:jednotky", res.document, Jednotky._resolver);
+                
+                if (root == null)
+                    throw new Error("Nepodarilo se najit korenovy element.");
+                
                 logger().info("Jednotky uspesne nacteny z %s.", res.source);
             }
         }
@@ -88,24 +99,24 @@ var Jednotky = {
         }
     
         // Pokus se najit jednotku
-        var jednotka = this.data.evalPrefNode('jednotka[jmeno = "' + jmeno + '"]');
+        var jednotka = $X('j:jednotka[j:jmeno = "' + jmeno + '"]', this.data, Jednotky._resolver);
 
         if (jednotka) {
             return {
                 jmeno: jmeno,
-                pwr: jednotka.getNumber("pwr"),
-                barva: jednotka.getPref("barva"),
-                typ: jednotka.getPref("typ"),
-                druh: jednotka.getPref("druh"),
-                phb: jednotka.getNumber("phb"),
-                dmg: jednotka.getNumber("dmg", 0),
-                brn: jednotka.getNumber("brn", 0),
-                zvt: jednotka.getNumber("zvt", 0),
-                ini: jednotka.getNumber("ini", 0),
-                realIni: jednotka.getNumber("realIni"),
-                zlataTU: jednotka.getNumber("zlataTU", 0),
-                manyTU: jednotka.getNumber("manyTU", 0),
-                popTU: jednotka.getNumber("popTU", 0)
+                pwr: XPath.evalNumber("j:pwr", jednotka, Jednotky._resolver),
+                barva: XPath.evalString("j:barva", jednotka, Jednotky._resolver),
+                typ: XPath.evalString("j:typ", jednotka, Jednotky._resolver),
+                druh: XPath.evalString("j:druh", jednotka, Jednotky._resolver),
+                phb: XPath.evalNumber("j:phb", jednotka, Jednotky._resolver),
+                dmg: XPath.evalNumber("j:dmg", jednotka, Jednotky._resolver) || 0,
+                brn: XPath.evalNumber("j:brn", jednotka, Jednotky._resolver) || 0,
+                zvt: XPath.evalNumber("j:zvt", jednotka, Jednotky._resolver) || 0,
+                ini: XPath.evalNumber("j:ini", jednotka, Jednotky._resolver) || 0,
+                realIni: XPath.evalNumber("j:realIni", jednotka, Jednotky._resolver),
+                zlataTU: XPath.evalNumber("j:zlataTU", jednotka, Jednotky._resolver) || 0,
+                manyTU: XPath.evalNumber("j:manyTU", jednotka, Jednotky._resolver) || 0,
+                popTU: XPath.evalNumber("j:popTU", jednotka, Jednotky._resolver) || 0
             };
         }
         

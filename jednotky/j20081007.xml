@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<?transform-stylesheet href="jednotky.xsl" ?>
 <?xml-stylesheet type="text/xsl" href="transform.xsl" ?>
 <!-- ***** BEGIN LICENSE BLOCK *****
   -   Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -35,9 +36,7 @@
   - the terms of any one of the MPL, the GPL or the LGPL.
   - 
   - ***** END LICENSE BLOCK ***** -->
-<jednotky xmlns="http://maplus.xf.cz/jednotky"
-          xmlns:t="http://maplus.xf.cz/transform"
-          t:stylesheet="jednotky.xsl">
+<jednotky xmlns="http://maplus.xf.cz/jednotky">
   <jednotka>
     <jmeno>Kobold</jmeno>
     <pwr>0.56</pwr>

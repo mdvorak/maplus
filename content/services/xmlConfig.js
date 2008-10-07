@@ -227,8 +227,8 @@ XmlConfigNode.XPath = new XmlConfigNode.Extension();
 
 XmlConfigNode.XPath.prototype = {
     evalPrefNode_PROXY: Marshal.BY_REF,
-    evalPrefNode: function(xpath) {
-        var elem = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
+    evalPrefNode: function(xpath, namespaceResolver) {
+        var elem = this.ownerDocument.evaluate(xpath, this, namespaceResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
         if (elem != null) {
             XmlConfig.extendNode(elem);
         }
@@ -236,8 +236,8 @@ XmlConfigNode.XPath.prototype = {
     },
 
     evalPrefNodeList_PROXY: Marshal.BY_REF_ARRAY,
-    evalPrefNodeList: function(xpath) {
-        var result = this.ownerDocument.evaluate(xpath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+    evalPrefNodeList: function(xpath, namespaceResolver) {
+        var result = this.ownerDocument.evaluate(xpath, this, namespaceResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
         retval = new Array();
 
         if (result != null) {

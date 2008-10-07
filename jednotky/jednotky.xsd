@@ -1,12 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns="http://maplus.xf.cz/jednotky"
-           xmlns:t="http://maplus.xf.cz/transform" 
            targetNamespace="http://maplus.xf.cz/jednotky"
            attributeFormDefault="unqualified" elementFormDefault="qualified">
 
-  <xs:import namespace="http://maplus.xf.cz/transform" />
-  
   <xs:simpleType name="attribute">
     <xs:union>
       <xs:simpleType>
@@ -85,8 +82,6 @@
           </xs:complexType>
         </xs:element>
       </xs:choice>
-
-      <xs:attribute ref="t:stylesheet" use="required" />
     </xs:complexType>
   </xs:element>
 </xs:schema>

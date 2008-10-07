@@ -468,7 +468,7 @@ pageExtenders.add(PageExtender.create({
             var test = false;
             
             // Neloguj to
-            var snapshot = XPath.evaluate('.//text()', zprava.fontText, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, true);
+            var snapshot = XPath.evaluate('.//text()', zprava.fontText, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, true);
             
             for (var i = 0; i < snapshot.snapshotLength; i++) {
                 var element = snapshot.snapshotItem(i);
@@ -532,7 +532,7 @@ pageExtenders.add(PageExtender.create({
                 return; //continue;
 
             // Neloguj to
-            var snapshot = XPath.evaluate('.//text()', zprava.fontText, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, true);
+            var snapshot = XPath.evaluate('.//text()', zprava.fontText, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, true);
             
             for (var i = 0; i < snapshot.snapshotLength; i++) {
                 var element = snapshot.snapshotItem(i);

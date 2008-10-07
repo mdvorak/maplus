@@ -34,38 +34,71 @@
   - the terms of any one of the MPL, the GPL or the LGPL.
   - 
   - ***** END LICENSE BLOCK ***** -->
-<xsl:stylesheet version="1.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:t="http://maplus.xf.cz/transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="html" indent="yes"/>
 
+  <!-- 
+  Note: The target stylesheet is read from the processing instruction:
+  <?transform-stylesheet href="XSLT URL" ?>
+  -->
+  
   <xsl:template match="/">
-    <xsl:variable name="stylesheet" select="*/@t:stylesheet" />
-
     <html>
       <head>
-        <script src="prototype.js" type="text/javascript"></script>
         <script type="text/javascript">
-          window.stylesheetUrl = '<xsl:value-of select="$stylesheet" />';
+          // It's easier to match it in javascript than xsl
+          var instruction = '<xsl:value-of select="processing-instruction('transform-stylesheet')"/>';
+          window.stylesheetUrl = (instruction.match(/\bhref="([^"]+)"/) || [])[1];
         </script>
         <script type="text/javascript">
           <![CDATA[
+          function transform() {
+            try {
+              var baseUrl = document.location.href.replace(document.location.search, "");
+              
+              // Validate
+              if (baseUrl.length == 0)
+                throw new Error("Unable to extract baseUrl.");
+              if (window.stylesheetUrl == null || window.stylesheetUrl.length == 0)
+                throw new Error("Stylesheet hasn't been specified.");
+
+              // Extract url parameters
+              var args = parseParameters(document.location.search);
+              
+              args["href"] = document.location.href;
+              args["baseUrl"] = baseUrl;
+              
+              // Process
+              var html = transformToHtml(baseUrl, window.stylesheetUrl, args);
+              
+              // Generate new document contents
+              // IMPORTANT: Some of the events, like body.onload, aren't executed on Mozilla!!!
+              // Don't use them!
+              document.open();
+              document.writeln(html);    
+              document.close();
+            }
+            catch (ex) {
+              document.body.appendChild(document.createTextNode("Error occured during dynamic xsl processing:"));
+              document.body.appendChild(document.createElement("br"));
+              document.body.appendChild(document.createTextNode(ex.message || ex));
+            }
+          }
+          
           function transformToHtml(xmlUrl, xslUrl, args) {
             // Mozilla-like
             if (window.XSLTProcessor != null) {
-              var requestOptions = {
-                contentType: "text/xml",
-                method: "get",
-                asynchronous: false
+              var loadDoc = function(url) {
+                var req = new XMLHttpRequest();
+                req.open("GET", url, false);
+                
+                req.send(null);
+                return req.responseXML;
               };
               
-              // Load XSL
-              var xslRequest = new Ajax.Request(xslUrl, requestOptions);
-              var xsl = xslRequest.transport.responseXML;
-
-              // Load xml itself
-              var xmlRequest = new Ajax.Request(xmlUrl, requestOptions);
-              var xml = xmlRequest.transport.responseXML;
+              // Load XSL and XML
+              var xsl = loadDoc(xslUrl);
+              var xml = loadDoc(xmlUrl);
               
               // Prepare processor
               var processor = new XSLTProcessor();
@@ -79,16 +112,14 @@
               var output = processor.transformToDocument(xml);
               
               // Special handling - Hide body
+              // Note: Reason for this is that FF showed page content before css was loaded,
+              // and therefore ugly screen redrawing occured
               var body = output.documentElement.getElementsByTagName("body")[0];
               body.style.visibility = 'hidden';
               
-              // Show body after document is loaded
-              // NOTE: onload handler is not executed!!!
-              var onload = output.createElement("script");
-              onload.setAttribute("type", "text/javascript");
-              onload.textContent = "document.body.style.visibility = 'visible';";
-              
-              body.appendChild(onload);
+              // Show body again, after document is loaded
+              var show = "document.body.style.visibility = 'visible';";
+              body.appendChild(createElement("script", show, {type: "text/javascript"}, output));
               
               // Convert to html
               return "<html>" + output.documentElement.innerHTML + "</html>";
@@ -130,35 +161,40 @@
             }
           }
           
-          function transform() {
-            try {
-              var baseUrl = document.location.href.replace(document.location.search, "");
+          function createElement(tagName, innerHtml, attributes, doc) {
+              if (tagName == null)
+                  throw new ArgumentNullException("tagName");
+          
+              if (doc == null) doc = document;
+              var e = doc.createElement(tagName);
               
-              // Validate
-              if (baseUrl.length == 0)
-                throw new Error("Unable to extract baseUrl.");
-              if (window.stylesheetUrl == null || window.stylesheetUrl.length == 0)
-                throw new Error("Stylesheet hasn't been specified.");
-
-              // Extract url parameters
-              var args = document.location.search.toQueryParams();
-
-              args["href"] = document.location.href;
-              args["baseUrl"] = baseUrl;
+              if (attributes != null) {
+                  for (var i in attributes) {
+                      e.setAttribute(i, (attributes[i] != null) ? attributes[i] : "");
+                  }
+              }
               
-              // Process
-              var html = transformToHtml(baseUrl, window.stylesheetUrl, args);
+              if (innerHtml != null) {
+                  e.innerHTML = innerHtml;
+              }
               
-              // Generate new document contents
-              document.open();
-              document.writeln(html);
-              document.close();
+              return e;
+          }
+          
+          function parseParameters(search) {
+            // Split them - this is needed beacuse of javascript regexp api limitations
+            var pairs = search.match(/[/?&][^=&]+=[^=&]*/g) || [];
+            
+            var args = {};
+            
+            // Parse single parameter pairs
+            for (var i = 0; i < pairs.length; i++) {
+              var m = decodeURI(pairs[i]).match(/^[/?&]([^=&]+)=([^=&]*)$/) || [];
+              
+              args[m[1]] = m[2];
             }
-            catch (ex) {
-              document.body.appendChild(document.createTextNode("Error occured during dynamic xsl processing:"));
-              document.body.appendChild(document.createElement("br"));
-              document.body.appendChild(document.createTextNode(ex.message || ex));
-            }
+            
+            return args;
           }
           ]]>
         </script>

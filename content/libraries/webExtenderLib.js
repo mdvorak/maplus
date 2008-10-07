@@ -276,7 +276,7 @@ XPathException.DEFAULT_MESSAGE = "Error evaluating XPath expression.";
 
 /*** XPath class ***/
 var XPath = {
-    evaluate: function(xpath, context, resultType, noLog) {
+    evaluate: function(xpath, context, namespaceResolver, resultType, noLog) {
         var retval;
         try {
             if (xpath == null) return null;
@@ -287,7 +287,7 @@ var XPath = {
                 context = $(context);
             
             var doc = (context.ownerDocument != null) ? context.ownerDocument : context;
-            retval = doc.evaluate(xpath, context, null, resultType, null);
+            retval = doc.evaluate(xpath, context, namespaceResolver, resultType, null);
             return retval;
         }
         catch (ex) {
@@ -296,14 +296,14 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG && !noLog)
-                logger().debug("XPath.evaluate('%s', %o, %d): %o", xpath, context, resultType, retval);
+                logger().debug("XPath.evaluate('%s', %o, %o, %d): %o", xpath, context, namespaceResolver, resultType, retval);
         }
     },
     
-    evalList: function(xpath, context) {
+    evalList: function(xpath, context, namespaceResolver) {
         var retval;
         try {
-            var result = this.evaluate(xpath, context, XPathResult.ORDERED_NODE_ITERATOR_TYPE, true);
+            var result = this.evaluate(xpath, context, namespaceResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, true);
             retval = new Array();
             
             if (result != null) {
@@ -320,14 +320,14 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG)
-                logger().debug("XPath.evalList('%s', %o): %o", xpath, context, retval);
+                logger().debug("XPath.evalList('%s', %o, %o): %o", xpath, context, namespaceResolver, retval);
         }
     },
     
-    evalSingle: function(xpath, context) {
+    evalSingle: function(xpath, context, namespaceResolver) {
         var retval;
         try {
-            var result = this.evaluate(xpath, context, XPathResult.FIRST_ORDERED_NODE_TYPE, true);
+            var result = this.evaluate(xpath, context, namespaceResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, true);
             retval = (result != null) ? $(result.singleNodeValue) : null;
             return retval;
         }
@@ -337,14 +337,14 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG)
-                logger().debug("XPath.evalSingle('%s', %o): %o", xpath, context, retval);
+                logger().debug("XPath.evalSingle('%s', %o, %o): %o", xpath, context, namespaceResolver, retval);
         }
     },
     
-    evalString: function(xpath, context) {
+    evalString: function(xpath, context, namespaceResolver) {
         var retval;
         try {
-            var result = this.evaluate(xpath, context, XPathResult.STRING_TYPE, true);
+            var result = this.evaluate(xpath, context, namespaceResolver, XPathResult.STRING_TYPE, true);
             retval = (result != null) ? result.stringValue : null;
             return retval;
         }
@@ -354,14 +354,14 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG)
-                logger().debug("XPath.evalString('%s', %o): %o", xpath, context, retval);
+                logger().debug("XPath.evalString('%s', %o, %o): %o", xpath, context, namespaceResolver, retval);
         }
     },
     
-    evalNumber: function(xpath, context) {
+    evalNumber: function(xpath, context, namespaceResolver) {
         var retval;
         try {
-            var result = this.evaluate(xpath, context, XPathResult.NUMBER_TYPE, true);
+            var result = this.evaluate(xpath, context, namespaceResolver, XPathResult.NUMBER_TYPE, true);
             retval = (result != null) ? result.numberValue : null;
             return retval;
         }
@@ -371,17 +371,17 @@ var XPath = {
         }
         finally {
             if (window.XPATH_DEBUG)
-                logger().debug("XPath.evalNumber('%s', %o): %o", xpath, context, retval);
+                logger().debug("XPath.evalNumber('%s', %o, %o): %o", xpath, context, namespaceResolver, retval);
         }
     }
 };
 
-function $X(xpath, context) {
-    return XPath.evalSingle(xpath, context);
+function $X(xpath, context, namespaceResolver) {
+    return XPath.evalSingle(xpath, context, namespaceResolver);
 }
 
-function $XL(xpath, context) {
-    return XPath.evalList(xpath, context);
+function $XL(xpath, context, namespaceResolver) {
+    return XPath.evalList(xpath, context, namespaceResolver);
 }
 
 /*** Page class ***/

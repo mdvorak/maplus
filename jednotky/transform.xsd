@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="http://maplus.xf.cz/transform"
-           targetNamespace="http://maplus.xf.cz/transform"
-           attributeFormDefault="qualified"
-           elementFormDefault="qualified">
-  <xs:attribute name="stylesheet" type="xs:string" />
-</xs:schema>
