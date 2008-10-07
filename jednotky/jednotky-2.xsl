@@ -69,7 +69,7 @@
       <head>
         <title>Melior Annis Plus - Jednotky</title>
 
-        <!-- Pozn: Barva tady specifikovana se prepise *.css, ale aby nam tam neproblikavala bila... -->
+        <!-- Pozn: Barva tady specifikovana se prepise v css, ale aby nam tam neproblikavala bila... -->
         <style type="text/css">
           <![CDATA[
           body {
