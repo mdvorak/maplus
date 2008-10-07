@@ -79,6 +79,7 @@
               document.close();
             }
             catch (ex) {
+              document.body.style.color = 'red';
               document.body.appendChild(document.createTextNode("Error occured during dynamic xsl processing:"));
               document.body.appendChild(document.createElement("br"));
               document.body.appendChild(document.createTextNode(ex.message || ex));
