@@ -177,9 +177,9 @@
             
             // Parse single parameter pairs
             for (var i = 0; i < pairs.length; i++) {
-              var m = decodeURI(pairs[i]).match(/^[/?&]([^=&]+)=([^=&]*)$/) || [];
+              var m = pairs[i].match(/^[/?&]([^=&]+)=([^=&]*)$/) || [];
               
-              args[m[1]] = m[2];
+              args[decodeURI(m[1])] = decodeURI(m[2]);
             }
             
             return args;

@@ -308,7 +308,7 @@
     <xsl:param name="max" />
 
     <xsl:variable name="tmp" select="($value &lt; $max) * $value + ($value &gt; $max) * $max" />
-    <xsl:value-of select="($value &gt; $min) * $value + ($value &lt; $min) * $min" />
+    <xsl:value-of select="($tmp &gt; $min) * $tmp + ($tmp &lt; $min) * $min" />
   </xsl:template>
 
   <xsl:template name="upkeep">
