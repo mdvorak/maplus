@@ -77,6 +77,7 @@ var FileIO = {
                             .createInstance()
                             .QueryInterface(Components.interfaces.nsIXMLHttpRequest);
         req.open("GET", url, false); 
+        req.setRequestHeader("Cache-Control", "no-cache"); // U souboru a chromu by to nemelo nic delat
         req.send(null);
         
         return req.responseXML;
