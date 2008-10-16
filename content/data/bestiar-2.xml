@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- ***** BEGIN LICENSE BLOCK *****
+  -   Version: MPL 1.1/GPL 2.0/LGPL 2.1
+  -
+  - The contents of this file are subject to the Mozilla Public License Version
+  - 1.1 (the "License"); you may not use this file except in compliance with
+  - the License. You may obtain a copy of the License at
+  - http://www.mozilla.org/MPL/
+  - 
+  - Software distributed under the License is distributed on an "AS IS" basis,
+  - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+  - for the specific language governing rights and limitations under the
+  - License.
+  -
+  - The Original Code is Melior Annis Plus.
+  -
+  - The Initial Developer of the Original Code is
+  - Michal Dvorak.
+  - Portions created by the Initial Developer are Copyright (C) 2008
+  - the Initial Developer. All Rights Reserved.
+  -
+  - Contributor(s):
+  -
+  - Alternatively, the contents of this file may be used under the terms of
+  - either the GNU General Public License Version 2 or later (the "GPL"), or
+  - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+  - in which case the provisions of the GPL or the LGPL are applicable instead
+  - of those above. If you wish to allow use of your version of this file only
+  - under the terms of either the GPL or the LGPL, and not to allow others to
+  - use your version of this file under the terms of the MPL, indicate your
+  - decision by deleting the provisions above and replace them with the notice
+  - and other provisions required by the GPL or the LGPL. If you do not delete
+  - the provisions above, a recipient may use your version of this file under
+  - the terms of any one of the MPL, the GPL or the LGPL.
+  - 
+  - ***** END LICENSE BLOCK ***** -->
+<aukce>
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.jmeno, stack2.jmeno)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.jmeno, stack1.jmeno)]]></rule>
+    <rule type="filter" text="Moje barva"><![CDATA[stack.barva == regent.barva]]></rule>
+    <rule type="filter" text="Neutrální"><![CDATA[stack.barva == 'N']]></rule>
+    <rule type="filter" text="Moje a N barva"><![CDATA[stack.barva == regent.barva || stack.barva == 'N']]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.pocet, stack2.pocet)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.pocet, stack1.pocet)]]></rule>
+    <rule type="filter" text="&gt; 2000"><![CDATA[stack.pocet >= 2000]]></rule>
+    <rule type="filter" text="&gt; 5000"><![CDATA[stack.pocet >= 5000]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.zkusenost, stack2.zkusenost)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.zkusenost, stack1.zkusenost)]]></rule>
+    <rule type="filter" text="&gt; 40%"><![CDATA[stack.zkusenost >= 0.40]]></rule>
+    <rule type="filter" text="&gt; 60%"><![CDATA[stack.zkusenost >= 0.60]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.silaJednotky, stack2.silaJednotky)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.silaJednotky, stack1.silaJednotky)]]></rule>
+    <rule type="filter" text="&lt;= 50"><![CDATA[stack.silaJednotky <= 50]]></rule>
+    <rule type="filter" text="&gt; 50"><![CDATA[stack.silaJednotky > 50]]></rule>
+    <rule type="filter" text="&gt; 120"><![CDATA[stack.silaJednotky > 120]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.ini, stack2.ini)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.ini, stack1.ini)]]></rule>
+    <rule type="filter" text="&gt; 10"><![CDATA[stack.ini > 10]]></rule>
+    <rule type="filter" text="&gt; 20"><![CDATA[stack.ini > 20]]></rule>
+    <rule type="filter" text="&gt; 30"><![CDATA[stack.ini > 30]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="filter" text="Pozemní"><![CDATA[stack.druh == 'Poz.']]></rule>
+    <rule type="filter" text="Letecké"><![CDATA[stack.druh == 'Let.']]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="filter" text="Bojové"><![CDATA[stack.typ == 'Boj.']]></rule>
+    <rule type="filter" text="Střelecké"><![CDATA[stack.typ == 'Str.']]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.phb, stack2.phb)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.phb, stack1.phb)]]></rule>
+    <rule type="filter" text="Max 1"><![CDATA[stack.phb <= 1]]></rule>
+    <rule type="filter" text="Max 2"><![CDATA[stack.phb <= 2]]></rule>
+    <rule type="filter" text="Min 2"><![CDATA[stack.phb >= 2]]></rule>
+    <rule type="filter" text="Min 3"><![CDATA[stack.phb >= 3]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="filter" text="Pozemní Střelecké"><![CDATA[stack.druh == 'Poz.' && stack.typ == 'Str.']]></rule>
+    <rule type="filter" text="Letecké Střelecké"><![CDATA[stack.druh == 'Let.' && stack.typ == 'Str.']]></rule>
+    <rule type="filter" text="Pozemní Bojové Vše"><![CDATA[stack.druh == 'Poz.' && stack.typ == 'Boj.']]></rule>
+    <rule type="filter" text="Letecké Bojové Vše"><![CDATA[stack.druh == 'Let.' && stack.typ == 'Boj.']]></rule>
+    <rule type="filter" text="Pozemní Bojové 1"><![CDATA[stack.druh == 'Poz.' && stack.typ == 'Boj.' && stack.phb == 1]]></rule>
+    <rule type="filter" text="Pozemní Bojové 2"><![CDATA[stack.druh == 'Poz.' && stack.typ == 'Boj.' && stack.phb == 2]]></rule>
+    <rule type="filter" text="Pozemní Bojové 3"><![CDATA[stack.druh == 'Poz.' && stack.typ == 'Boj.' && stack.phb == 3]]></rule>
+    <rule type="filter" text="Letecké Bojové 1"><![CDATA[stack.druh == 'Let.' && stack.typ == 'Boj.' && stack.phb == 1]]></rule>
+    <rule type="filter" text="Letecké Bojové 2"><![CDATA[stack.druh == 'Let.' && stack.typ == 'Boj.' && stack.phb == 2]]></rule>
+    <rule type="filter" text="Letecké Bojové 3"><![CDATA[stack.druh == 'Let.' && stack.typ == 'Boj.' && stack.phb == 3]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.silaStacku, stack2.silaStacku)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.silaStacku, stack1.silaStacku)]]></rule>
+    <rule type="filter" text="&lt; 2000"><![CDATA[stack.silaStacku < 2000]]></rule>
+    <rule type="filter" text="&gt; 2000"><![CDATA[stack.silaStacku > 2000]]></rule>
+    <rule type="filter" text="&gt; 10000"><![CDATA[stack.silaStacku > 10000]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.maxSilaStacku, stack2.maxSilaStacku)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.maxSilaStacku, stack1.maxSilaStacku)]]></rule>
+    <rule type="filter" text="&lt; 5000"><![CDATA[stack.maxSilaStacku < 2000]]></rule>
+    <rule type="filter" text="&gt; 5000"><![CDATA[stack.maxSilaStacku > 2000]]></rule>
+    <rule type="filter" text="&gt; 20000"><![CDATA[stack.maxSilaStacku > 10000]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.zlataTU, stack2.zlataTU)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.zlataTU, stack1.zlataTU)]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.manyTU, stack2.manyTU)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.manyTU, stack1.manyTU)]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.popTU, stack2.popTU)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.popTU, stack1.popTU)]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.cenaZaSilu, stack2.cenaZaSilu)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.cenaZaSilu, stack1.cenaZaSilu)]]></rule>
+    <rule type="filter" text="&lt; 15"><![CDATA[stack.cenaZaSilu <= 15]]></rule>
+    <rule type="filter" text="&lt; 30"><![CDATA[stack.cenaZaSilu <= 30]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.cas, stack2.cas)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.cas, stack1.cas)]]></rule>
+    <rule type="filter" text="&lt; 10 min"><![CDATA[stack.cas <= 600 || isNaN(stack.cas)]]></rule>
+  </rulelist>
+
+  <rulelist>
+    <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.nabidka, stack2.nabidka)]]></rule>
+    <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.nabidka, stack1.nabidka)]]></rule>
+    <rule type="filter" text="Pouze na co mám"><![CDATA[stack.nabidka < provincie.zlato]]></rule>
+  </rulelist>
+</aukce>

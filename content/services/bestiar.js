@@ -38,7 +38,7 @@
 var BestiarFiltry = {
     _load: function() {
         try {
-            this.data = FileIO.loadXml(CHROME_CONTENT_URL + "data/bestiar.xml");
+            this.data = FileIO.loadXml(CHROME_CONTENT_URL + "data/bestiar-2.xml");
         }
         catch (e) {
             dump("Nepodarilo se nacist filtry bestiare:\n" + e);
@@ -66,8 +66,8 @@ var BestiarFiltry = {
             var rule = {
                 name: name,
                 type: i.getAttribute("type"),
-                condition: i.getAttribute("condition"),
-                title: i.textContent
+                condition: i.textContent,
+                title: i.getAttribute("text")
             };
             arr.push(rule);
         }
