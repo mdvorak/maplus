@@ -141,10 +141,16 @@ var BestiarColumnStyle = {
         td.className = (data.typ == "Str.") ? "typStr" : "typBoj"
     },
     cas: function(td, data) {
-        if (!isNaN(data.cas))
+        if (!isNaN(data.cas)) {
             td.innerHTML = '<span>&#xA0;' + formatTime(data.cas) + '&#xA0;</span>';
-        else
+            
+            // Pozn: cas je v sekundach
+            var sold = new Date().getTime() + data.cas * 1000;
+            td.title = "Predpokládaný čas prodeje je " + timeFromNow(new Date(sold), true);
+        }
+        else {
             td.innerHTML = '<span>&#xA0;---&#xA0;</span>';
+        }
     },
     phb: function(td, data) {
         td.innerHTML = '<span>' + (data.phb || '?') + '</span>';

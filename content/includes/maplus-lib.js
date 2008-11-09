@@ -414,7 +414,7 @@ var TableHelper = {
     }
 };
 
-function timeFromNow(presnyCas) {
+function timeFromNow(presnyCas, vlozSekundy) {
     const NAZVY_DNU = ["v pondělí", "v úterý", "ve středu", "ve čtvrtek", "v pátek", "v sobotu", "v neděli"];
 
     // Pomocne promenne
@@ -446,6 +446,10 @@ function timeFromNow(presnyCas) {
     
     // Pridej cas v den utoku
     text += "v " + presnyCas.getHours() + ":" + presnyCas.getMinutes().toPaddedString(2);
+    
+    if (vlozSekundy)
+        text += ":" + presnyCas.getSeconds().toPaddedString(2);
+    
     text += " (" + presnyCas.toLocaleString().replace(/\s+\d+:\d+:\d+$/, "") + ")";
     
     return text;
