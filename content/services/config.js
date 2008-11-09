@@ -42,7 +42,8 @@ XmlConfigNode.Extended.useExtension();
 // Validace na vek
 function ageValidator(root) {
     if (MaPlus.AgeName != null) {
-        if (root.getAttribute("vek") != null && root.getAttribute("vek") != MaPlus.AgeName) {
+        var vek = root.getAttribute("vek");
+        if (vek != null && vek.length > 0 && vek != MaPlus.AgeName) {
             var q = "Byla detekovana zmena veku. Chcete smazat Vase nastaveni?";
             q += "\nTento dialog se jiz vickrat nezobrazi. Smazat nastaveni je mozne manualne v nastaveni.";
             
@@ -170,7 +171,16 @@ var ConfigExporter = {
             file.leafName += ".xml";
         }
         
+        // Pri exportu odstran oznaceni veku
+        var vek = config.getAttribute("vek");
+        config.setAttribute("vek", "");
+        
+        // Uloz
         XmlConfig.save(file, config);
+        
+        // Znovu nastav vek
+        config.setAttribute("vek", vek);
+        
         PromptService.alert("Nastaveni exportovano do souboru " + file.path);
         return true;
     },
