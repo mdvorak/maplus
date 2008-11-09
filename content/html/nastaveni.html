@@ -12,7 +12,7 @@
     <div><img height="20" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></div>
 
     <!-- Vytvoreni containeru pro taby -->
-    <div id="n_container" style="text-align: left; width: 460px;"></div>
+    <div id="n_container" style="text-align: left; width: 560px;"></div>
     <script type="text/javascript">
     window.nastaveniManager = new TabManager('n_container');
     </script>
@@ -588,6 +588,94 @@
     
     nastaveniManager.addTab("FAQ", "n_faq");
     </script>
+    
+    <!-- Spravovat -->
+    <table id="n_admin" cellpadding="0" cellspacing="0" style="display: none;">
+        <colgroup>
+            <col width="140" />
+            <col width="80" />
+            <col width="10" />
+            <col width="140" />
+            <col width="80" />
+        </colgroup>
+        <tbody>
+            <!-- Import/Export -->
+            <tr>
+                <td colspan="5">
+                    <span style="font-weight: bold;">Import/Export Vašeho nastavení</span>
+                </td>
+            </tr>
+            <tr><td><img height="15" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+            <tr>
+                <td colspan="5">
+                    <input id="n_export" type="button" value="Exportovat" />
+                    <img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" />
+                    <input id="n_import" type="button" value="Importovat" />
+                </td>
+            </tr>
+            <tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+            <tr>
+                <td colspan="5"><span class="small dark">(import smaže aktuální nastavení)</span></td>
+            </tr>
+                
+            <!-- Smazat nastaveni -->
+            <tr><td><img height="30" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+            
+            <tr>
+                <td colspan="5">
+                    <span style="font-weight: bold;">Smazat nastavení Melior Annis Plus</span>
+                </td>
+            </tr>
+            <tr><td><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+            <tr>
+                <td colspan="2">
+                <span title="Týká se všech provincií na tomto počítači.">
+                    <input id="cpd_data" type="checkbox" />&#xA0;Zaznamenaná data o provinciích
+                </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                <span><input id="cpd_maplus" type="checkbox" />&#xA0;Nastavení této provincie</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><span><input id="cpd_utok" type="checkbox" checked="checked" />&#xA0;Přednastavení útoku</span></td>
+            </tr>
+            <tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
+            <tr>
+                <td colspan="2">
+                    <span><input id="plus_clearConfig" type="button" value=" Smazat " /></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <script type="text/javascript">
+    nastaveniManager.addTab("Spravovat", "n_admin");
+    
+    Event.observe("n_export", "click", function(event) {
+        try {
+            Marshal.callMethod("ConfigExporter", "doexport", [PlusConfig.getConfigName(window.PAGE_ID)]);
+        }
+        catch (ex) {
+            alert("Unable to export settings.\n" + ex);
+        }
+    });
+    
+    Event.observe("n_import", "click", function(event) {
+        try {
+            var r = Marshal.callMethod("ConfigExporter", "doimport", [PlusConfig.getConfigName(window.PAGE_ID)]);
+            
+            if (r) {
+                // Refresh
+                document.location.href = document.location.href + "&random=" + Math.random();
+            }
+        }
+        catch (ex) {
+            alert("Unable to import settings.\n" + ex);
+        }
+    });
+    </script>
 
     <!-- O Aplikaci -->
     <table id="n_about" cellpadding="0" cellspacing="0" style="display: none;">
@@ -610,34 +698,6 @@
                     <br />
                     Bugy hlašte na <span id="plus_kontakt"><!-- Nastaveno v nastaveni.js --></span>.
                 </span>
-                </td>
-            </tr>
-            
-            <tr><td><img height="30" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-            
-            <tr>
-                <td>
-                    <span style="font-weight: bold;">Smazat nastavení Melior Annis Plus</span>
-                </td>
-            </tr>
-            <tr><td><img height="5" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-            <tr>
-                <td>
-                <span title="Týká se všech provincií na tomto počítači.">
-                    <input id="cpd_data" type="checkbox" />&#xA0;Zaznamenaná data o provinciích
-                </span>
-                </td>
-            </tr>
-            <tr>
-                <td><span><input id="cpd_maplus" type="checkbox" />&#xA0;Nastavení této provincie</span></td>
-            </tr>
-            <tr>
-                <td><span><input id="cpd_utok" type="checkbox" checked="checked" />&#xA0;Přednastavení útoku</span></td>
-            </tr>
-            <tr><td><img height="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td></tr>
-            <tr>
-                <td>
-                    <span><input id="plus_clearConfig" type="button" value=" Smazat " /></span>
                 </td>
             </tr>
         </tbody>

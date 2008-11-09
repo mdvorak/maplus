@@ -259,3 +259,63 @@ var PromptService = {
         return prompts.confirm.apply(prompts, [null, "Melior Annis Plus"].concat($A(arguments)));
     }
 };
+
+/*** FilePicker class ***/
+const nsIFilePicker = Components.interfaces.nsIFilePicker
+
+var FilePicker = {
+    // Constants
+    modeOpen: nsIFilePicker.modeOpen,
+    modeSave: nsIFilePicker.modeSave,
+    modeGetFolder: nsIFilePicker.modeGetFolder,
+    modeOpenMultiple: nsIFilePicker.modeOpenMultiple,
+    returnOK: nsIFilePicker.returnOK,
+    returnCancel: nsIFilePicker.returnCancel,
+    returnReplace: nsIFilePicker.returnReplace,
+    filterAll: nsIFilePicker.filterAll,
+    filterHTML: nsIFilePicker.filterHTML,
+    filterText: nsIFilePicker.filterText,
+    filterImages: nsIFilePicker.filterImages,
+    filterXML: nsIFilePicker.filterXML,
+    filterXUL: nsIFilePicker.filterXUL,
+    filterApps: nsIFilePicker.filterApps,
+
+    createDialog: function(win, title, mode, filters) {
+        if (win == null) {
+            var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+                               .getService(Components.interfaces.nsIWindowMediator);
+            win = wm.getMostRecentWindow("navigator:browser");
+        }
+    
+        var fp = Components.classes["@mozilla.org/filepicker;1"]
+	                       .createInstance(nsIFilePicker);
+        
+        fp.init(win, title, mode);
+        fp.appendFilters(filters);
+        return fp;
+    },
+    
+    openFileDialog: function(win, title, filters) {
+        var fp = FilePicker.createDialog(win, title, FilePicker.modeOpen, filters);
+        var r = fp.show();
+        
+        if (r == FilePicker.returnOK) {
+            return fp.file;
+        }
+        else {
+            return null;
+        }
+    },
+    
+    saveFileDialog: function(win, title, filters) {
+        var fp = FilePicker.createDialog(win, title, FilePicker.modeSave, filters);
+        var r = fp.show();
+        
+        if (r == FilePicker.returnOK || r == FilePicker.returnReplace) {
+            return fp.file;
+        }
+        else {
+            return null;
+        }
+    }
+}

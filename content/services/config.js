@@ -148,3 +148,63 @@ var HlidkaHeslo = {
 };
 
 Marshal.registerObject("HlidkaHeslo", HlidkaHeslo);
+
+
+
+// Import/Export
+var ConfigExporter = {
+    doexport_PROXY: Marshal.BY_VALUE,
+    doexport: function(name) {
+        // Get the xml
+        var config = configManager.getConfig(name, true);
+
+        if (config == null)
+            throw new ArgumentException("Config " + name + " not found.");
+        
+        // Ask for path
+        var file = FilePicker.saveFileDialog(null, null, FilePicker.filterXML);
+        if (file == null)
+            return false;
+            
+        if (!file.leafName.match(/[.]\w+$/)) {
+            file.leafName += ".xml";
+        }
+        
+        XmlConfig.save(file, config);
+        PromptService.alert("Nastaveni exportovano do souboru " + file.path);
+        return true;
+    },
+    
+    doimport_PROXY: Marshal.BY_VALUE,
+    doimport: function(name) {
+        if (!PromptService.confirm("Prosim zavrete vsechny ostatni taby/okna s Melior Annis, nez budete pokracovat."))
+            return false;
+    
+        // Ask for path
+        var file = FilePicker.openFileDialog(null, null, FilePicker.filterAll);
+        if (file == null)
+            return false;
+    
+        if (!file.isFile())
+            throw new Exception(file.path + " neni soubor.");
+    
+        // Odstran aktualne nactena data
+        configManager.removeFromCache(name);
+        var target = configManager.getConfigPath(name);
+        
+        // Smaz
+        if (target.exists())
+            target.remove(false);
+        
+        // Zkopiruj
+        file.copyTo(target.parent, target.leafName);
+        
+        // Nacti nove nastaveni
+        configManager.getConfig(name, false);
+        
+        PromptService.alert("Nastaveni importovano ze souboru " + file.path);
+        return true;
+    }
+};
+
+Marshal.registerObject("ConfigExporter", ConfigExporter);
