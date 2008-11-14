@@ -41,7 +41,7 @@ var BestiarFiltry = {
             this.data = FileIO.loadXml(CHROME_CONTENT_URL + "data/bestiar-2.xml");
         }
         catch (e) {
-            dump("Nepodarilo se nacist filtry bestiare:\n" + e);
+            logger().error("Nepodarilo se nacist filtry bestiare:\n" + e);
         }
     },
     

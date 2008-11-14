@@ -137,7 +137,10 @@ pageExtenders.add(PageExtender.create({
             
             controls.textareaZprava.defaultValue = text;
             controls.textareaZprava.value = text;
-            controls.inputPodpis.checked = false;
+            
+            if (controls.inputPodpis != null)
+                controls.inputPodpis.checked = false;
+            vypnoutPodpis = true;
         }
         
         // Nahrazeni xml sekvenci

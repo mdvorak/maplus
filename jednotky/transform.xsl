@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- ***** BEGIN LICENSE BLOCK *****
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by

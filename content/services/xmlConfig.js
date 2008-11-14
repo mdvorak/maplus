@@ -76,12 +76,12 @@ var XmlConfig = {
 
             root = XPath.evalSingle(rootName, doc);
             if (root == null)
-                dump(String.format("Root node '{0}' not found in the file '{1}'.", rootName, path));
+                logger().warn(String.format("Root node '{0}' not found in the file '{1}'.", rootName, path));
 
             XmlConfig.extendNode(root);
         }
         catch (e) {
-            dump(String.format("Error loading file '{0}':\n{1}", path, e));
+            logger().error(String.format("Error loading file '{0}':\n{1}", path, e));
         }
 
         if (root == null) {
@@ -101,7 +101,7 @@ var XmlConfig = {
                 FileIO.saveXmlFile(path, rootNode.ownerDocument);
         }
         catch (e) {
-            logger.error(String.format("Error saving file '{0}':\n{1}", path, e));
+            logger().error(String.format("Error saving file '{0}':\n{1}", path, e));
         }
     }
 };
@@ -372,8 +372,13 @@ var XmlConfigManager = Class.create({
     },
     
     saveAll_PROXY: Marshal.BY_VALUE,
-    saveAll: function(name) {
+    saveAll: function() {
         var _this = this;
         this._cache.keys().each(function(e) { _this.saveConfig(e); });
+    },
+    
+    removeFromCache: function(name) {
+        name = String(name);
+        this._cache[name] = null;
     }
 });
