@@ -87,7 +87,7 @@ pageExtenders.add(PageExtender.create({
         
         // Form input (toto by nemelo byt nikdy potreba ale proc to tu nenechat?)
         if (!value) {
-            var e = XPath.evalSingle('//input[@name = "' + name + '"]', page.document);
+            e = XPath.evalSingle('//input[@name = "' + name + '"]', page.document);
             if (e != null)
                 value = e.value;
         }
