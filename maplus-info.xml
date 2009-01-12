@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <maplus>
   <config>
-    <vek>6.2</vek>
+    <vek>6.3</vek>
     <admin>
-      <id proVek="6.2">1277</id>
+      <id proVek="6.3">1772</id>
       <jmeno>Mikee</jmeno>
       <email>mikee2185@gmail.com</email>
     </admin>

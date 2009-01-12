@@ -124,7 +124,7 @@ pageExtenders.add(PageExtender.create({
         if (typStranky != "vypis_alianci")
             return false;
 
-        var tableAliance = $X('font[2]/table', page.content);
+        var tableAliance = $X('font[contains(b, "Výpis")]/table', page.content);
         if (tableAliance == null)
             return false;
 
