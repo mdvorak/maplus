@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="utf-8"?>
 <?transform-stylesheet href="jednotky-2.xsl" ?>
 <?xml-stylesheet type="text/xsl" href="transform.xsl" ?>
@@ -241,7 +240,7 @@
     <brn>1</brn>
     <zvt>0</zvt>
     <ini>1</ini>
-    <realIni>0</realIni>
+    <realIni>25</realIni>
     <zlataTU>1.125</zlataTU>
     <manyTU>1.8</manyTU>
     <popTU>0</popTU>
@@ -289,7 +288,7 @@
     <brn>1</brn>
     <zvt>2</zvt>
     <ini>0</ini>
-    <realIni>0</realIni>
+    <realIni>21</realIni>
     <zlataTU>6.3</zlataTU>
     <manyTU>8.55</manyTU>
     <popTU>0</popTU>
