@@ -836,6 +836,8 @@ pageExtenders.add(PageExtender.create({
                 });
             }
         });
+        
+        logger().debug("Headers found: %d", context.headers.length);
     
     	// Zpracovani hlavicky
     	var createRulesTooltipHtml = this._createRulesTooltipHtml;

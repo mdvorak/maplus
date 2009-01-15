@@ -35,7 +35,7 @@
   - 
   - ***** END LICENSE BLOCK ***** -->
 <aukce>
-  <rulelist>
+  <rulelist name="jmeno">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.jmeno, stack2.jmeno)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.jmeno, stack1.jmeno)]]></rule>
     <rule type="filter" text="Moje barva"><![CDATA[stack.barva == regent.barva]]></rule>
@@ -43,21 +43,21 @@
     <rule type="filter" text="Moje a N barva"><![CDATA[stack.barva == regent.barva || stack.barva == 'N']]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="pocet">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.pocet, stack2.pocet)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.pocet, stack1.pocet)]]></rule>
     <rule type="filter" text="&gt; 2000"><![CDATA[stack.pocet >= 2000]]></rule>
     <rule type="filter" text="&gt; 5000"><![CDATA[stack.pocet >= 5000]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="zkusenost">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.zkusenost, stack2.zkusenost)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.zkusenost, stack1.zkusenost)]]></rule>
     <rule type="filter" text="&gt; 40%"><![CDATA[stack.zkusenost >= 0.40]]></rule>
     <rule type="filter" text="&gt; 60%"><![CDATA[stack.zkusenost >= 0.60]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="silaJednotky">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.silaJednotky, stack2.silaJednotky)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.silaJednotky, stack1.silaJednotky)]]></rule>
     <rule type="filter" text="&lt;= 50"><![CDATA[stack.silaJednotky <= 50]]></rule>
@@ -65,7 +65,7 @@
     <rule type="filter" text="&gt; 120"><![CDATA[stack.silaJednotky > 120]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="ini">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.ini, stack2.ini)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.ini, stack1.ini)]]></rule>
     <rule type="filter" text="&gt; 10"><![CDATA[stack.ini > 10]]></rule>
@@ -73,17 +73,17 @@
     <rule type="filter" text="&gt; 30"><![CDATA[stack.ini > 30]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="druh">
     <rule type="filter" text="Pozemní"><![CDATA[stack.druh == 'Poz.']]></rule>
     <rule type="filter" text="Letecké"><![CDATA[stack.druh == 'Let.']]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="typ">
     <rule type="filter" text="Bojové"><![CDATA[stack.typ == 'Boj.']]></rule>
     <rule type="filter" text="Střelecké"><![CDATA[stack.typ == 'Str.']]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="phb">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.phb, stack2.phb)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.phb, stack1.phb)]]></rule>
     <rule type="filter" text="Max 1"><![CDATA[stack.phb <= 1]]></rule>
@@ -92,7 +92,7 @@
     <rule type="filter" text="Min 3"><![CDATA[stack.phb >= 3]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="typKratce">
     <rule type="filter" text="Pozemní Střelecké"><![CDATA[stack.druh == 'Poz.' && stack.typ == 'Str.']]></rule>
     <rule type="filter" text="Letecké Střelecké"><![CDATA[stack.druh == 'Let.' && stack.typ == 'Str.']]></rule>
     <rule type="filter" text="Pozemní Bojové Vše"><![CDATA[stack.druh == 'Poz.' && stack.typ == 'Boj.']]></rule>
@@ -105,7 +105,7 @@
     <rule type="filter" text="Letecké Bojové 3"><![CDATA[stack.druh == 'Let.' && stack.typ == 'Boj.' && stack.phb == 3]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="silaStacku">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.silaStacku, stack2.silaStacku)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.silaStacku, stack1.silaStacku)]]></rule>
     <rule type="filter" text="&lt; 2000"><![CDATA[stack.silaStacku < 2000]]></rule>
@@ -113,7 +113,7 @@
     <rule type="filter" text="&gt; 10000"><![CDATA[stack.silaStacku > 10000]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="maxSilaStacku">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.maxSilaStacku, stack2.maxSilaStacku)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.maxSilaStacku, stack1.maxSilaStacku)]]></rule>
     <rule type="filter" text="&lt; 5000"><![CDATA[stack.maxSilaStacku < 2000]]></rule>
@@ -121,35 +121,35 @@
     <rule type="filter" text="&gt; 20000"><![CDATA[stack.maxSilaStacku > 10000]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="zlataTU">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.zlataTU, stack2.zlataTU)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.zlataTU, stack1.zlataTU)]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="manyTU">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.manyTU, stack2.manyTU)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.manyTU, stack1.manyTU)]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="popTU">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.popTU, stack2.popTU)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.popTU, stack1.popTU)]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="cenaZaSilu">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.cenaZaSilu, stack2.cenaZaSilu)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.cenaZaSilu, stack1.cenaZaSilu)]]></rule>
     <rule type="filter" text="&lt; 15"><![CDATA[stack.cenaZaSilu <= 15]]></rule>
     <rule type="filter" text="&lt; 30"><![CDATA[stack.cenaZaSilu <= 30]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="cas">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.cas, stack2.cas)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.cas, stack1.cas)]]></rule>
     <rule type="filter" text="&lt; 10 min"><![CDATA[stack.cas <= 600 || isNaN(stack.cas)]]></rule>
   </rulelist>
 
-  <rulelist>
+  <rulelist name="nabidka">
     <rule type="sort" text="Vzestupně"><![CDATA[Object.compare(stack1.nabidka, stack2.nabidka)]]></rule>
     <rule type="sort" text="Sestupně"><![CDATA[Object.compare(stack2.nabidka, stack1.nabidka)]]></rule>
     <rule type="filter" text="Pouze na co mám"><![CDATA[stack.nabidka < provincie.zlato]]></rule>

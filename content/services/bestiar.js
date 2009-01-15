@@ -85,7 +85,7 @@ var BestiarFiltry = {
         var cacheName = "_all_" + type;
         var json = this[cacheName];
         
-        if (arr == null) {
+        if (json == null) {
             var path = '/aukce/rulelist[@name]';
             
             var rulelists = this.data.evaluate(path, this.data, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);

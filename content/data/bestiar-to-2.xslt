@@ -10,6 +10,10 @@
 
   <xsl:template match="rulelist">
     <rulelist>
+      <xsl:attribute name="name">
+        <xsl:value-of select="@name" />
+      </xsl:attribute>
+      
       <xsl:apply-templates />
     </rulelist>
   </xsl:template>

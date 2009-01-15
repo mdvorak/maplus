@@ -146,6 +146,7 @@ pageExtenders.add(PageExtender.create({
         // Nahrazeni xml sekvenci
         var unescapeXml = function(text) {
             text = text.replace(/&amp;/g, "&");
+            text = text.replace(/&nbsp;/g, " ");
             text = text.replace(/&#(\d+);/g, function(str, code) {
                 return String.fromCharCode(code);
             });
@@ -577,24 +578,15 @@ pageExtenders.add(PageExtender.create({
     },
     
     process: function(page, context) {
-    	// Nastav vsem scroll
+    	// Nastav vsem scroll a max sirku
+    	var width = parseInt(window.innerWidth * 0.68);
+    	
     	context.sirokeZpravy.each(function(zprava) {
     	    var container = zprava.fontText.parentNode;
-    	    var div = Element.create("div", null, {style: "overflow-x: scroll;"});
     	    
-    	    div.appendChild(zprava.fontText);
-    	    container.appendChild(div);
-    	    
-    		zprava.divText = div;
+    	    container.style.overflowX = "auto";
+    	    container.style.maxWidth = width + "px";
     	});
-    	
-    	// Pak auto
-    	context.sirokeZpravy.each(function(zprava) {
-    		zprava.divText.style.overflowX = 'auto';
-    	});
-    	
-    	// Dodatek: Tenhle postup donuti FF prekreslit dane elementy, a zobrazi scrollbary pouze
-    	// u opravdu sirokych zprav
     }
 }));
 
