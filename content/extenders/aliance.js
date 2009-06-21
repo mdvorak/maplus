@@ -793,3 +793,19 @@ pageExtenders.add(PageExtender.create({
         });
     }
 }));
+
+
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Aliance - Formatovani formularu s pakty"; },
+
+    analyze: function(page, context) {
+        context.forms = $XL('.//form[@action = "aliance.html"]', page.content);
+        return context.forms > 0;
+    },
+
+    process: function(page, context) {
+        context.forms.each(function(f) {
+            f.style.margin = '0px';
+        });
+    }
+}));
