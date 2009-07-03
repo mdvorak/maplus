@@ -5,7 +5,7 @@
  * 1.1 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  * http://www.mozilla.org/MPL/
- * 
+ *
  * Software distributed under the License is distributed on an "AS IS" basis,
  * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
  * for the specific language governing rights and limitations under the
@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Michal Dvorak.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2009
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -31,25 +31,27 @@
  * and other provisions required by the GPL or the LGPL. If you do not delete
  * the provisions above, a recipient may use your version of this file under
  * the terms of any one of the MPL, the GPL or the LGPL.
- * 
+ *
  * ***** END LICENSE BLOCK ***** */
 
-const VERSION = "1.3.12"; // Pozn: Tahle verze je pouzivana pouze pro zobrazovani novinek
+var LoginPagePrefs = {
+    getPrefs_PROXY: Marshal.BY_VALUE,
+    getPrefs: function() {
+        var branch = WebExtenderPreferences.getBranch();
+        
+        return {
+            kontrola_cookies: branch.getBoolPref("login_cookies"),
+            kontrola_ip: branch.getBoolPref("login_check_ip")
+        };
+    },
 
-const EXTENSION_NAME = "maplus";
-const EXTENSION_ID = "maplus@michal.dvorak";
-const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
+    setPrefs_PROXY: Marshal.BY_VALUE,
+    setPrefs: function(kontrola_cookies, kontrola_ip) {
+        var branch = WebExtenderPreferences.getBranch();
 
-const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
-const CHROME_CONTENT_URL = CHROME_URL + "content/";
+        branch.setBoolPref("login_cookies", !!kontrola_cookies);
+        branch.setBoolPref("login_check_ip", !!kontrola_ip);
+    }
+};
 
-// Firebug console properties for version "1.05", logger must implement 'em
-const FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
-
-// Custom constants
-const MAPLUS_INFO_FILENAME = "maplus-info.xml";
-const MAPLUS_INFO_URL = "http://maplus.xf.cz/" + MAPLUS_INFO_FILENAME;
-
-const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
-
-const DEN_MINUT = 24 * 60; // Den ma celkem minut..
+Marshal.registerObject("LoginPagePrefs", LoginPagePrefs);

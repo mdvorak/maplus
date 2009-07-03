@@ -33,7 +33,49 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
+
+// Login page
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Login Page"; },
+
+    analyze: function(page, context) {
+        if (page.name != "login.html")
+            return false;
+
+        // Najdi checkboxy
+        context.kontrola_cookies = $X('//input[@name = "kontrola_cookies"]');
+        context.kontrola_ip = $X('//input[@name = "kontrola_ip"]');
+        context.use_jvs_speeder = $X('//input[@name = "use_jvs_speeder"]');
+
+        // Zpracuj - process by se nikdy nezavolal
+
+         // Javascript potrebujeme! :)
+        if (context.use_jvs_speeder) {
+            context.use_jvs_speeder.checked = true;
+            context.use_jvs_speeder.disabled = true;
+        }
+
+        // Nastav druhe dva checkboxy
+        var prefs = Marshal.callMethod("LoginPagePrefs", "getPrefs", []);
+        if (context.kontrola_cookies && context.kontrola_ip && prefs) {
+            context.kontrola_cookies.checked = prefs.kontrola_cookies;
+            context.kontrola_ip.checked = prefs.kontrola_ip;
+
+            var changeHandler = function() {
+                logger().debug("checkbox changed");
+                Marshal.callMethod("LoginPagePrefs", "setPrefs", [context.kontrola_cookies.checked, context.kontrola_ip.checked]);
+            };
+
+            Event.observe(context.kontrola_cookies, "change", changeHandler);
+            Event.observe(context.kontrola_ip, "change", changeHandler);
+        }
+
+        return true;
+    },
+
+    process: null
+}));
+
 // Analyzuj rozlozeni stranky
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Analyza stranky"; },
