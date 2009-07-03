@@ -561,22 +561,14 @@ Object.extend(Marshal, {
             methods: new Array()
         };
 
-        // FF 3.0.3 - Initialize the fields first, dunno why it does that,
-        // but until first called, getAttribute is not in the member list
-        // for DOM nodes
-        for (var f in obj) {
-            if (f.endsWith(Marshal.PROXY_SUFFIX)) {
-                var methodName = f.replace(new RegExp(Marshal.PROXY_SUFFIX + "$"), "");
-                var tmp = obj[methodName];
-            }
-        }
-
+        // Find all methods and add them to definition
         for (var f in obj) {
             if (typeof obj[f] == "function") {
                 var type = this._getMethodType(obj, f);
                 var cached = this._isMethodCached(obj, f);
 
                 if (type != Marshal.NONE) {
+                    // Method is marshalled, add it
                     def.methods.push({
                         name: f,
                         type: type,
