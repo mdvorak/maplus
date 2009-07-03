@@ -45,21 +45,24 @@ var XmlConfig = {
         doc.appendChild(doc.createProcessingInstruction("xml", 'version="1.0" encoding="utf-8"'));
         
         // Korenovy element
-        var root = doc.createElement(rootName);
-        doc.appendChild(root);
+        var rootElem = doc.createElement(rootName);
+        doc.appendChild(rootElem);
 
-        XmlConfig.extendNode(root);
-        return root;
+        return XmlConfig.createNode(rootElem);
     },
 
-    extendNode: function(node) {
-        if (node == null || node._configNodeInitialized)
-            return node;
+    createNode: function(domNode) {
+        if (domNode == null)
+            return null;
 
-        Object.extend(node, XmlConfigNode.prototype);
+        var n = domNode._configNodeCached;
 
-        node._configNodeInitialized = true;
-        return node;
+        if (n == null) {
+            n = new XmlConfigNode(domNode);
+            domNode._configNodeCached = n;
+        }
+
+        return n;
     },
 
     load: function(path, rootName, initCallback) {
@@ -74,11 +77,11 @@ var XmlConfig = {
         try {
             var doc = FileIO.loadXmlFile(path);
 
-            root = XPath.evalSingle(rootName, doc);
-            if (root == null)
-                logger().warn(String.format("Root node '{0}' not found in the file '{1}'.", rootName, path));
+            var rootElem = XPath.evalSingle(rootName, doc);
+            if (rootElem == null)
+                throw new Error(String.format("Root node '{0}' not found in the file '{1}'.", rootName, path));
 
-            XmlConfig.extendNode(root);
+            root = XmlConfig.createNode(rootElem);
         }
         catch (e) {
             logger().error(String.format("Error loading file '{0}':\n{1}", path, e));
@@ -108,27 +111,42 @@ var XmlConfig = {
  
 
 /*** XmlConfigNode class ***/
-var XmlConfigNode = new Object();
- 
-XmlConfigNode.prototype = {
+var XmlConfigNode = Class.create({
+    target: null,
+    ownerDocument: null,
+
+    initialize: function(target) {
+        if (target == null)
+            throw new ArgumentNullException("target");
+
+        this.target = target;
+        this.ownerDocument = target.ownerDocument;
+    },
+
     getName_PROXY: Marshal.BY_VALUE,
     getName: function() {
-        return this.tagName;
+        return this.target.tagName;
     },
 
     getAttribute_PROXY: Marshal.BY_VALUE,
+    getAttribute: function(name) {
+        return this.target.getAttribute(name);
+    },
+
     setAttribute_PROXY: Marshal.BY_VALUE,
+    setAttribute: function(name, value) {
+        return this.target.setAttribute(name, value);
+    },
 
     addPref_PROXY: Marshal.BY_REF,
     addPref: function(name, value) {
         var elem = this.ownerDocument.createElement(name);
         
-        this.appendChild(elem);
+        this.target.appendChild(elem);
         if (value != null)
             elem.textContent = value;
         
-        XmlConfig.extendNode(elem);
-        return elem;
+        return XmlConfig.createNode(elem);
     },
 
     getPrefNode_PROXY: Marshal.BY_REF,
@@ -136,31 +154,31 @@ XmlConfigNode.prototype = {
         if (!name || !name.match(/^[\w_.:-]+$/))
             throw "Name contains invalid characters.";
         
-        var elem = this.ownerDocument.evaluate(name, this, null, XPathResult.ANY_TYPE, null).iterateNext();
+        var elem = this.ownerDocument.evaluate(name, this.target, null, XPathResult.ANY_TYPE, null).iterateNext();
 
         if (elem == null && create) {
-            elem = this.addPref(name);
+            return this.addPref(name);
         }
         else if (elem != null) {
-            XmlConfig.extendNode(elem);
+            return XmlConfig.createNode(elem);
         }
         
-        return elem;
+        return null;
     },
     
     getPref_PROXY: Marshal.BY_VALUE,
     getPref: function(name, defaultValue) {
         // Use this when no name where specified
-        var elem = (name != null ? this.getPrefNode(name) : this);
-        return elem  != null ? elem.textContent : defaultValue;
+        var n = (name != null ? this.getPrefNode(name) : this);
+        return n != null ? n.target.textContent : defaultValue;
     },
     
     setPref_PROXY: Marshal.BY_VALUE,
     setPref: function(name, value) {
         // Use this when no name where specified
-        var elem = (name ? this.getPrefNode(name) : this);
-        if (elem == null)
-            elem = this.addPref(name);
+        var n = (name ? this.getPrefNode(name) : this);
+        if (n == null)
+            n = this.addPref(name);
             
         if (value != null) {
             // Beztak bude ulozeny jako string...
@@ -168,15 +186,15 @@ XmlConfigNode.prototype = {
         
             // Pokud string obsahuje neco nepekneho, ulozime ho jako CDATA
             if (value.match(/[\<\>\[\]\&]/) == null) {
-                elem.textContent = value;
+                n.target.textContent = value;
             }
             else {
-                elem.clearChildNodes();
-                elem.appendChild(elem.ownerDocument.createCDATASection(value));
+                n.clearChildNodes();
+                n.target.appendChild(n.ownerDocument.createCDATASection(value));
             }
         }
         else {
-            elem.textContent = ""; // Lepsi prazdny string nez undefined
+            n.target.textContent = ""; // Lepsi prazdny string nez undefined
         }
 
         return value;
@@ -197,16 +215,16 @@ XmlConfigNode.prototype = {
     
     removePrefNode_PROXY: Marshal.BY_REF,
     removePrefNode: function(prefNode) {
-        return this.removeChild(prefNode);
+        return this.target.removeChild(prefNode);
     },
 
     clearChildNodes_PROXY: Marshal.BY_VALUE,
     clearChildNodes: function() {
-        while (this.firstChild) {
-            this.removeChild(this.firstChild);
+        while (this.target.firstChild) {
+            this.target.removeChild(this.target.firstChild);
         }
     }
-};
+});
 
 XmlConfigNode.Extension = Class.create({
     initialize: function() {
@@ -228,21 +246,22 @@ XmlConfigNode.XPath = new XmlConfigNode.Extension();
 XmlConfigNode.XPath.prototype = {
     evalPrefNode_PROXY: Marshal.BY_REF,
     evalPrefNode: function(xpath, namespaceResolver) {
-        var elem = this.ownerDocument.evaluate(xpath, this, namespaceResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
-        if (elem != null) {
-            XmlConfig.extendNode(elem);
-        }
-        return elem;
+        var elem = this.ownerDocument.evaluate(xpath, this.target, namespaceResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
+
+        if (elem != null)
+            return XmlConfig.createNode(elem);
+        else
+            return null;
     },
 
     evalPrefNodeList_PROXY: Marshal.BY_REF_ARRAY,
     evalPrefNodeList: function(xpath, namespaceResolver) {
-        var result = this.ownerDocument.evaluate(xpath, this, namespaceResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-        retval = new Array();
+        var result = this.ownerDocument.evaluate(xpath, this.target, namespaceResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        var retval = new Array();
 
         if (result != null) {
             for (var i = result.iterateNext(); i != null; i = result.iterateNext()) {
-                retval.push(XmlConfig.extendNode(i));
+                retval.push(XmlConfig.createNode(i));
             }
         }
 
@@ -251,24 +270,24 @@ XmlConfigNode.XPath.prototype = {
 
     getPrefByName_PROXY: Marshal.BY_VALUE,
     getPrefByName: function(tagName, name, defaultValue) {
-        var elem = this.evalPrefNode(tagName + '[@name = "' + name + '"]');
-        return (elem != null) ? elem.textContent : defaultValue;
+        var n = this.evalPrefNode(tagName + '[@name = "' + name + '"]');
+        return (n != null) ? n.target.textContent : defaultValue;
     },
 
     setPrefByName_PROXY: Marshal.BY_VALUE,
     setPrefByName: function(tagName, name, value) {
-        var elem = this.evalPrefNode(tagName + '[@name = "' + name + '"]');
+        var n = this.evalPrefNode(tagName + '[@name = "' + name + '"]');
         if (value != null) {
-            if (elem == null) {
-                elem = this.addPref(tagName, value);
-                elem.setAttribute("name", name);
+            if (n == null) {
+                n = this.addPref(tagName, value);
+                n.setAttribute("name", name);
             }
             else {
-                elem.textContent = value;
+                n.target.textContent = value;
             }
         }
-        else if (elem != null) {
-            this.removeChild(elem);
+        else if (n != null) {
+            this.target.removeChild(n.target);
         }
         return value;
     }
@@ -280,34 +299,34 @@ XmlConfigNode.Extended = new XmlConfigNode.Extension();
 XmlConfigNode.Extended.prototype = {
     insertPref_PROXY: Marshal.BY_REF,
     insertPref: function(name, value, before) {
+        var beforeElem = before.target;
         var elem = this.ownerDocument.createElement(name);
         
-        this.insertBefore(elem, before);
+        this.target.insertBefore(elem, beforeElem);
         if (value != null)
             elem.textContent = value;
         
-        XmlConfig.extendNode(elem);
-        return elem;
+        return XmlConfig.createNode(elem);
     },
     
     getFirstChild_PROXY: Marshal.BY_REF,
     getFirstChild: function() {
-        return XmlConfig.extendNode(this.firstChild);
+        return XmlConfig.createNode(this.target.firstChild);
     },
     
     getLastChild_PROXY: Marshal.BY_REF,
     getLastChild: function() {
-        return XmlConfig.extendNode(this.lastChild);
+        return XmlConfig.createNode(this.target.lastChild);
     },
     
     getNextSibling_PROXY: Marshal.BY_REF,
     getNextSibling: function() {
-        return XmlConfig.extendNode(this.nextSibling);
+        return XmlConfig.createNode(this.target.nextSibling);
     },
     
     getPreviousSibling_PROXY: Marshal.BY_REF,
     getPreviousSibling: function() {
-        return XmlConfig.extendNode(this.previousSibling);
+        return XmlConfig.createNode(this.target.previousSibling);
     }
 };
 
