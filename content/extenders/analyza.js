@@ -39,7 +39,8 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Login Page"; },
 
     analyze: function(page, context) {
-        if (page.name != "login.html")
+        logger().debug(page.name);
+        if (page.name != "login.html" && page.name != "" && page.name != null)
             return false;
 
         // Najdi checkboxy
