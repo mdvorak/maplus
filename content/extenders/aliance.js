@@ -800,7 +800,7 @@ pageExtenders.add(PageExtender.create({
 
     analyze: function(page, context) {
         context.forms = $XL('.//form[@action = "aliance.html"]', page.content);
-        return context.forms > 0;
+        return context.forms.length > 0;
     },
 
     process: function(page, context) {
