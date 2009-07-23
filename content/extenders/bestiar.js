@@ -192,9 +192,12 @@ pageExtenders.add(PageExtender.create({
                 logger().warn("Nenalezeny informace o jednotce %s.", row.jmeno);
             }
             
+            // Puvodni barva
+            row.bgcolor = row.element.getAttribute("bgcolor") || "";
+
             // Je stack bidnuty?
-            row.bidnuto = (row.element.getAttribute("bgcolor") == BESTIAR_BARVA_BID);
-            
+            row.bidnuto = (row.bgcolor == BESTIAR_BARVA_BID);
+
             logger().log("stack id=%d jmeno=%o pocet=%d zkusenost=%f bidnuto=%o", row.data.id, row.data.jmeno, row.data.pocet, row.data.zkusenost, row.bidnuto);
             bestiar.table.data.push(row);
             
@@ -453,7 +456,7 @@ pageExtenders.add(PageExtender.create({
                         logger().log("Jednotka odstranena z vybranych: %d", row.data.id);
                         vybrane.remove([row.data.id]);
                         
-                        row.element.setAttribute("bgcolor", "black");
+                        row.element.setAttribute("bgcolor", row.bgcolor);
                         zamluveno = false;
                     }
                 });
