@@ -1,4 +1,4 @@
-﻿/* ***** BEGIN LICENSE BLOCK *****
+/* ***** BEGIN LICENSE BLOCK *****
  *   Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -195,4 +195,8 @@ var BestiarColumnStyle = {
     popTU: function(td, data) {
         td.style.color = Color.fromRange(data.popTU, 400, 5, Color.Pickers.grayBrown);
     }
+};
+
+var SmilesBackground = {
+    ")": 'background: transparent;'
 };

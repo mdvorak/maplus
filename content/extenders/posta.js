@@ -438,18 +438,22 @@ pageExtenders.add(PageExtender.create({
 
 // Aktivni linky
 pageExtenders.add(PageExtender.create({
-    getName: function() { return "Posta - Aktivni url"; },
+    getName: function() { return "Posta - Aktivni url / Smiles"; },
 
     analyze: function(page, context) {
         if (page.posta == null || page.posta.zpravy == null)
             return false;
 
-        return page.posta.config.getBoolean("linky", true);
+        context.linksEnabled = page.posta.config.getBoolean("linky", true);
+        context.smilesEnabled = page.posta.config.getBoolean("smiles", false);
+
+        return context.linksEnabled || context.smilesEnabled;
     },
     
     process: function(page, context) {
         var linkRegex = /http(?:s?):\/\/\S+?(?=\s|$|<)/g;
         var idRegex = /\((\d{4,6})\)|\b(ID|[FBMCZS])\s*(\d{4,6})\b/g;
+        var smilesRegex = /:-?([\/\\|S]|\)+|\(+)/g;
         
         var found = false;
         var linkReplacer = function(str) {
@@ -462,6 +466,14 @@ pageExtenders.add(PageExtender.create({
                 return '(<a href="javascript://" playerid="' + p1 + '">' + p1 + '</a>)'
             else 
                 return p2 + ' <a href="javascript://" playerid="' + p3 + '">' + p3 + '</a>'
+        };
+        var smilesReplacer = function(str, p1) {
+            var backStyle = SmilesBackground[p1[0]];
+            if (backStyle == null)
+                return str;
+
+            found = true;
+            return '<div style="' + backStyle + ' width: 16px; height: 16px;"></div>';
         };
     
         page.posta.zpravy.each(function(zprava) {
@@ -480,12 +492,19 @@ pageExtenders.add(PageExtender.create({
                 // Mensi workaround (found se nasetuje replacerem)
                 found = false;
                 var text = element.nodeValue;
-                
-                // Linky
-                text = text.replace(linkRegex, linkReplacer);
-                // Aktivni id ve zpravach 
-                text = text.replace(idRegex, idReplacer);
-            
+
+                if (context.linksEnabled) {
+                    // Linky
+                    text = text.replace(linkRegex, linkReplacer);
+                    // Aktivni id ve zpravach
+                    text = text.replace(idRegex, idReplacer);
+                }
+                // Smiles vynechame pro zpravy posla
+                if (context.smilesEnabled && zprava.dulezitost != "posel") {
+                    // Smiles
+                    text = text.replace(smilesRegex, smilesReplacer);
+                }
+
                 if (found) {
                     var font = Element.create("font", text);
                     element.parentNode.replaceChild(font, element);
