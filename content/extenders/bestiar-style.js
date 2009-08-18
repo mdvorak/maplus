@@ -196,7 +196,3 @@ var BestiarColumnStyle = {
         td.style.color = Color.fromRange(data.popTU, 400, 5, Color.Pickers.grayBrown);
     }
 };
-
-var SmilesBackground = {
-    ")": 'background: transparent;'
-};

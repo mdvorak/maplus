@@ -50,6 +50,10 @@ var Posta = {
     }
 }
 
+var SmilesBackground = {
+    ")": 'background: transparent;'
+};
+
 // Psani nove zpravy
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Posta - Psat"; },

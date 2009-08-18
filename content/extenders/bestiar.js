@@ -449,14 +449,16 @@ pageExtenders.add(PageExtender.create({
                         vybrane.add(row.data, row.description);
                         logger().log("Jednotka pridana mezi vybrane: %d", row.data.id);
                         
-                        row.element.setAttribute("bgcolor", BESTIAR_BARVA_ZAMLUVENO);
+                        // row.element.setAttribute("bgcolor", BESTIAR_BARVA_ZAMLUVENO);
+                        row.element.className = "vybranaJednotka";
                         zamluveno = true;
                     }
                     else {
                         logger().log("Jednotka odstranena z vybranych: %d", row.data.id);
                         vybrane.remove([row.data.id]);
                         
-                        row.element.setAttribute("bgcolor", row.bgcolor);
+                        // row.element.setAttribute("bgcolor", row.bgcolor);
+                        row.element.className = "";
                         zamluveno = false;
                     }
                 });
@@ -748,10 +750,12 @@ pageExtenders.add(PageExtender.create({
      
         // Uprav pozadi
         context.list.each(function(row) {
-            if (!row.bidnuto)
-                row.element.setAttribute("bgcolor", BESTIAR_BARVA_ZAMLUVENO);
+            if (!row.bidnuto) {
+                // row.element.setAttribute("bgcolor", BESTIAR_BARVA_ZAMLUVENO);
+                row.element.className = "vybranaJednotka";
+            }
         });
-        
+
         // Link pro odeslani zamluvenych jednotek
         var trLast = $X('tbody/tr[last()]', page.bestiar.elements.tableNakup);
         

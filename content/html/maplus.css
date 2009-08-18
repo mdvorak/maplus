@@ -111,6 +111,15 @@ span.kolo
 	color: white;
 }
 
+tr.vybranaJednotka
+{
+    background-image: url("img/best_vyber.png");
+    background-position: right top;
+    background-repeat: repeat-y;
+    -moz-background-size: 100% 100%; 
+    background-size: 100% 100%;
+}
+
 /* FAQ */
 
 #faq, #faq a, #faq div
