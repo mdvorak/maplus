@@ -113,7 +113,7 @@ pageExtenders.add(PageExtender.create({
             });
             
         var enabled = page.config.getEnabled();
-        link.updateText(enabled);
+        //link.updateText(enabled);
         aNastaveni.style.display = (enabled ? '' : 'none');
         
         aNastaveni.href = MaPlus.buildUrl(page, "main.html", { plus: "nastaveni" });

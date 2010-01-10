@@ -38,7 +38,7 @@ const VERSION = "1.3.13"; // Pozn: Tahle verze je pouzivana pouze pro zobrazovan
 
 const EXTENSION_NAME = "maplus";
 const EXTENSION_ID = "maplus@michal.dvorak";
-const MELIOR_ANNIS_URL = "http://meliorannis.idnes.cz";
+const MELIOR_ANNIS_URL = "http://www.meliorannis.com";
 
 const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
 const CHROME_CONTENT_URL = CHROME_URL + "content/";

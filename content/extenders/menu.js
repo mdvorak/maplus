@@ -34,6 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+/*
 // Vypis utoku 2
 pageExtenders.add(PageExtender.create({
     getName: function() { return "Menu - Vypis Utoku 2"; },
@@ -59,6 +60,7 @@ pageExtenders.add(PageExtender.create({
         link.parentNode.insertBefore(br, detail);
     }    
 }));
+*/
 
 // Linky na aliance
 pageExtenders.add(PageExtender.create({
