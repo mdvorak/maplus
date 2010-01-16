@@ -269,7 +269,8 @@ pageExtenders.add(PageExtender.create({
         page.aliance = {
             id: idAliance,
             jmeno: jmenoAliance,
-            clenove: new Array()
+            clenove: new Array(),
+            novackovska: (idAliance < 0)
         }
 
         // Projdi cleny
@@ -371,11 +372,12 @@ pageExtenders.add(PageExtender.create({
         page.aliance = {
             id: idAliance,
             jmeno: jmenoAliance,
-            clenove: new Array()
+            clenove: new Array(),
+            novackovska: (idAliance < 0)
         }
 
         // Vytvor seznam radku se clenama
-        var offset = (idAliance < 0) ? 0 : 1; // Novackovska ali (< 0) tam nema ten novy status
+        var offset = page.aliance.novackovska ? 0 : 1; // Novackovska ali (< 0) tam nema ten novy status
 
         rows.each(function(tr) {
             var link = $X('td[' + (offset + 3) + ']/font/a', tr);
@@ -429,10 +431,10 @@ pageExtenders.add(PageExtender.create({
         context.clenove = new Array();
         var rows = $XL('table[2]/tbody/tr[position() > 1 and count(td) >= 7]', page.content);
 
-        var offset = (page.aliance.id < 0) ? 0 : 1; // Novackovska ali (< 0) tam nema ten novy status
+        context.offset = page.aliance.novackovska ? 0 : 1; // Novackovska ali (< 0) tam nema ten novy status
 
         rows.each(function(tr) {
-            var link = $X('td[' + (offset + 3) + ']/font/a', tr);
+            var link = $X('td[' + (context.offset + 3) + ']/font/a', tr);
             var id = parseInt(link.textContent);
             if (isNaN(id))
                 return; // continue;
@@ -455,7 +457,7 @@ pageExtenders.add(PageExtender.create({
         // Pridej checkboxy k jednotlivym clenum
         context.clenove.each(function(row) {
             var fontId = row.link.parentNode;
-            var tdJmeno = row.element.cells[4];
+            var tdJmeno = row.element.cells[context.offset + 3];
 
             // Napsat checkbox
             var check = Element.create("input", null, { type: "checkbox", style: "margin-top: 0px; margin-bottom: 1px" });
@@ -470,7 +472,7 @@ pageExtenders.add(PageExtender.create({
 
         // Novy radek
         var tr = context.tbody.insertBefore(Element.create("tr"), context.trComment);
-        tr.appendChild(Element.create("td", null, { colspan: 4 }));
+        tr.appendChild(Element.create("td", null, { colspan: context.offset + 3 }));
 
         var spanNapsat = tr.appendChild(Element.create("td", null, { colspan: 4 }))
                            .appendChild(Element.create("span"));
