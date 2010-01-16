@@ -58,7 +58,7 @@ pageExtenders.add(PageExtender.create({
                     if (nastavit == null)
                         return false;
 
-                    var m = nastavit.href.match(/&aliance=nastavit_(\d+)/);
+                    var m = nastavit.href.match(/&aliance=nastavit_(-?\d+)/);
                     var id = (m != null) ? m[1] : null;
 
                     // Id nenalezeno, tohle by sice nemelo nastat ale..
@@ -135,7 +135,7 @@ pageExtenders.add(PageExtender.create({
                 continue;
 
             var id = aVypis.getAttribute("href");
-            if (id) id = id.match(/&aliance=vypis_clenu_v_ally_(\d+)\b/);
+            if (id) id = id.match(/&aliance=vypis_clenu_v_ally_(-?\d+)\b/);
             if (id) id = parseInt(id[1]);
 
             if (id && !isNaN(id)) {
@@ -169,7 +169,7 @@ pageExtenders.add(PageExtender.create({
             return false;
 
         var jmenoAliance = XPath.evalString('font/i', page.content);
-        var idAliance = page.arguments["aliance"].match(/vypis_clenu_v_ally_(\d+)$/);
+        var idAliance = page.arguments["aliance"].match(/vypis_clenu_v_ally_(-?\d+)$/);
         if (idAliance) idAliance = parseInt(idAliance[1]);
 
         if (!jmenoAliance || !idAliance || isNaN(idAliance))
@@ -239,7 +239,7 @@ pageExtenders.add(PageExtender.create({
 
         // Analyza
         var jmenoAliance = XPath.evalString('font[1]', page.content);
-        var idAliance = parseInt(typStranky.match(/(?:vypsat_(\d+))?/)[1]);
+        var idAliance = parseInt(typStranky.match(/(?:vypsat_(-?\d+))?/)[1]);
 
         if (jmenoAliance == null || jmenoAliance.blank())
             return false;
@@ -341,7 +341,7 @@ pageExtenders.add(PageExtender.create({
         // Zjisit jaka aliance to je
         var jmenoAliance = null;
         var presvedceni = null;
-        var idAliance = parseInt(typStranky.match(/(?:nastavit_(\d+))?/)[1]);
+        var idAliance = parseInt(typStranky.match(/(?:nastavit_(-?\d+))?/)[1]);
 
         if (!isNaN(idAliance)) {
             var aliance = MaData.najdiAlianci(null, idAliance);
@@ -375,21 +375,23 @@ pageExtenders.add(PageExtender.create({
         }
 
         // Vytvor seznam radku se clenama
+        var offset = (idAliance < 0) ? 0 : 1; // Novackovska ali (< 0) tam nema ten novy status
+
         rows.each(function(tr) {
-            var link = $X('td[3]/font/a', tr);
+            var link = $X('td[' + (offset + 3) + ']/font/a', tr);
             var id = parseInt(link.textContent);
             if (isNaN(id))
                 return; // continue;
 
-            var regent = tr.cells[3].textContent.replace(/\s+$/, "");
-            var provincie = tr.cells[4].textContent.replace(/\s+$/, "");
-            var povolani = tr.cells[5].textContent.replace(/\s+$/, "");
+            var regent = tr.cells[offset + 3].textContent.replace(/\s+$/, "");
+            var provincie = tr.cells[offset + 4].textContent.replace(/\s+$/, "");
+            var povolani = tr.cells[offset + 5].textContent.replace(/\s+$/, "");
 
             clenovePuvodni = clenovePuvodni.without(id);
             MaData.aktualizujProvincii(id, regent, provincie, povolani, presvedceni, jmenoAliance);
 
             // Pro hlidku
-            var sila = parseInt(tr.cells[6].textContent);
+            var sila = parseInt(tr.cells[offset + 6].textContent);
 
             logger().log("Clen aliance: id=%d regent=%s provincie=%s sila=%d povolani=%d", id, regent, provincie, sila, povolani);
             page.aliance.clenove.push({
@@ -427,8 +429,10 @@ pageExtenders.add(PageExtender.create({
         context.clenove = new Array();
         var rows = $XL('table[2]/tbody/tr[position() > 1 and count(td) >= 7]', page.content);
 
+        var offset = (page.aliance.id < 0) ? 0 : 1; // Novackovska ali (< 0) tam nema ten novy status
+
         rows.each(function(tr) {
-            var link = $X('td[3]/font/a', tr);
+            var link = $X('td[' + (offset + 3) + ']/font/a', tr);
             var id = parseInt(link.textContent);
             if (isNaN(id))
                 return; // continue;
@@ -451,7 +455,7 @@ pageExtenders.add(PageExtender.create({
         // Pridej checkboxy k jednotlivym clenum
         context.clenove.each(function(row) {
             var fontId = row.link.parentNode;
-            var tdJmeno = row.element.cells[3];
+            var tdJmeno = row.element.cells[4];
 
             // Napsat checkbox
             var check = Element.create("input", null, { type: "checkbox", style: "margin-top: 0px; margin-bottom: 1px" });
@@ -466,7 +470,7 @@ pageExtenders.add(PageExtender.create({
 
         // Novy radek
         var tr = context.tbody.insertBefore(Element.create("tr"), context.trComment);
-        tr.appendChild(Element.create("td", null, { colspan: 3 }));
+        tr.appendChild(Element.create("td", null, { colspan: 4 }));
 
         var spanNapsat = tr.appendChild(Element.create("td", null, { colspan: 4 }))
                            .appendChild(Element.create("span"));
@@ -594,11 +598,6 @@ pageExtenders.add(PageExtender.create({
 
         // Zjisti url hlidky
         var cfg = page.config.getPrefNode("hlidka", true).evalPrefNode('aliance[@id = "' + page.aliance.id + '"]');
-        // odstranit k 1.5.2008 - Zpetna kompatibilita
-        /* if (cfg == null)
-        cfg = page.config.getPrefNode("hlidka", true).evalPrefNode('aliance[@jmeno = "' + page.aliance.jmeno + '"]')
-        */
-
         if (cfg == null)
             return false;
 

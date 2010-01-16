@@ -237,6 +237,12 @@ var WebExtenderPreferences = {
         if (this._debug_xpath == null)
             this._debug_xpath = WebExtenderPreferences.getBranch().getIntPref("debug_xpath");
         return this._debug_xpath;
+    },
+    
+    getPatchDelay: function() {
+        if (this._patch_delay == null)
+            this._patch_delay = WebExtenderPreferences.getBranch().getIntPref("patch_delay");
+        return this._patch_delay;
     }
 };
 

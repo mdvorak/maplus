@@ -93,6 +93,8 @@
   </rulelist>
 
   <rulelist name="typKratce">
+    <rule type="filter" text="Pozemní Vše"><![CDATA[stack.druh == 'Poz.']]></rule>
+    <rule type="filter" text="Letecké Vše"><![CDATA[stack.druh == 'Let.']]></rule>
     <rule type="filter" text="Pozemní Střelecké"><![CDATA[stack.druh == 'Poz.' && stack.typ == 'Str.']]></rule>
     <rule type="filter" text="Letecké Střelecké"><![CDATA[stack.druh == 'Let.' && stack.typ == 'Str.']]></rule>
     <rule type="filter" text="Pozemní Bojové Vše"><![CDATA[stack.druh == 'Poz.' && stack.typ == 'Boj.']]></rule>

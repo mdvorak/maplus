@@ -39,7 +39,7 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Obrana - Tabulka"; },
 
     analyze: function(page, context) {
-        page.tableObrana = $X('form/font/table/tbody/tr/td/table[tbody/tr[td = "* u ID paktáře znamená, že má do obrany nastaven můj pakt."]]', page.content);
+        page.tableObrana = $X('form/font/table/tbody/tr/td/table[tbody/tr[contains(td, "ID paktáře znamená, že má do obrany nastaven můj pakt.")]]', page.content);
         return (page.tableObrana != null);
     },
     

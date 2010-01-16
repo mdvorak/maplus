@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const VERSION = "1.3.13"; // Pozn: Tahle verze je pouzivana pouze pro zobrazovani novinek
+const VERSION = "1.3.15"; // Pozn: Tahle verze je pouzivana pouze pro zobrazovani novinek
 
 const EXTENSION_NAME = "maplus";
 const EXTENSION_ID = "maplus@michal.dvorak";

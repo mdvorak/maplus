@@ -52,9 +52,9 @@ function _findConsole() {
     
     // Create dummy
     var tmp = new Object();
-    
+
     FIREBUG_METHODS.each(function(p) {
-        tmp[p] = function() { };
+        tmp[p] = function() { /* document.body.appendChild(Element.create('div', arguments[0] + " @@ " + arguments[1])); */ };
     });
     
     return tmp;

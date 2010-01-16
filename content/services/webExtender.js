@@ -667,7 +667,8 @@ var ExtenderManager = {
         // Set debugging options
         var debugging = "// " + EXTENSION_ID + "\n" +
                         "window.MARSHAL_DEBUG = " + WebExtenderPreferences.getMarshalDebug() + ";\n" +
-                        "window.XPATH_DEBUG = " + WebExtenderPreferences.getXPathDebug() + ";";
+                        "window.XPATH_DEBUG = " + WebExtenderPreferences.getXPathDebug() + ";\n" +
+                        "window.PATCH_DELAY = " + WebExtenderPreferences.getPatchDelay() + ";";
         Script.execute(page.document, debugging);
         
         // Insert libraries
@@ -687,7 +688,7 @@ var ExtenderManager = {
         Script.execute(page.document, "setTimeout(" + function() {
                 var page = new Page();
                 pageExtenders.run(page);
-            } + ", 1);");
+            } + ", window.PATCH_DELAY);");
     }
 }
 
