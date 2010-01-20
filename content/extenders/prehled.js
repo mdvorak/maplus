@@ -105,7 +105,7 @@ pageExtenders.add(PageExtender.create({
                     break;
                     
                 default:
-                    logger().warning("Neznamy typ prehledu: %s", context.typ);
+                    logger().warn("Neznamy typ prehledu: %s", context.typ);
                     return false;
             }
             

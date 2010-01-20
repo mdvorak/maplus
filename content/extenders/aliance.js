@@ -377,9 +377,9 @@ pageExtenders.add(PageExtender.create({
         }
 
         // Vytvor seznam radku se clenama
-        var offset = page.aliance.novackovska ? 0 : 1; // Novackovska ali (< 0) tam nema ten novy status
-
         rows.each(function(tr) {
+            var offset = tr.cells[0].className == 'online_status' ? 1 : 0;
+        
             var link = $X('td[' + (offset + 3) + ']/font/a', tr);
             var id = parseInt(link.textContent);
             if (isNaN(id))
@@ -431,7 +431,7 @@ pageExtenders.add(PageExtender.create({
         context.clenove = new Array();
         var rows = $XL('table[2]/tbody/tr[position() > 1 and count(td) >= 7]', page.content);
 
-        context.offset = page.aliance.novackovska ? 0 : 1; // Novackovska ali (< 0) tam nema ten novy status
+        context.offset = (rows.length > 0 && rows[0].cells[0].className == 'online_status') ? 1 : 0;
 
         rows.each(function(tr) {
             var link = $X('td[' + (context.offset + 3) + ']/font/a', tr);

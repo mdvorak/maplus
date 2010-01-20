@@ -521,7 +521,7 @@ var PageExtenderCollection = Class.create({
                 if (!logger().firebug) {
                     // Pouze pro vyvoj
                     // Ne ze by bylo spatny nevedet o chybe, ale bezne uzivatele to bude akorat otravovat...
-                    alert(str);
+                    // alert(str);
                 }
                 else {
                     logger().error(str);

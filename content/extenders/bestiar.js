@@ -190,6 +190,12 @@ pageExtenders.add(PageExtender.create({
             }
             else {
                 logger().warn("Nenalezeny informace o jednotce %s.", row.jmeno);
+                row.data.phb = "";
+                row.data.ini = "";
+                row.data.typKratce = (row.data.druh[0] || "") + (row.data.typ[0] || "") + "?";
+                row.data.zlataTU = "";
+                row.data.manyTU = ""
+                row.data.popTU = "";
             }
             
             // Puvodni barva
@@ -257,8 +263,8 @@ pageExtenders.add(PageExtender.create({
             data.pocet = parseInt(m[5]);
             data.zkusenost = parseFloat(m[6]) / 100;
             data.silaJednotky = parseFloat(m[7]);
-            data.druh = m[8];
-            data.typ = m[9];
+            data.druh = m[8] || "";
+            data.typ = m[9] || "";
             data.cas = parseTime(m[10]);
             data.nabidka = parseInt(m[11]);
             
@@ -427,6 +433,8 @@ pageExtenders.add(PageExtender.create({
         var vybrane = page.bestiar.vybraneJednotky;
         
         // Zpracuj tabulku
+        page.bestiar.elements.tableData.className = "bestiarJednotky";
+        
         for (let i = 0; i < page.bestiar.table.data.length; i++) {
             let row = page.bestiar.table.data[i];
         
