@@ -119,6 +119,11 @@ tr.vybranaJednotka
     background-size: 100% 100%;
 }
 
+.armada_podpora 
+{
+    color: #DD0000;
+}
+
 /* FAQ */
 
 #faq, #faq a, #faq div

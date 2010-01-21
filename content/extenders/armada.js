@@ -192,3 +192,73 @@ pageExtenders.add(PageExtender.create({
     
     process: null
 }));
+
+
+// Obarveni, ktera podpora patri kam
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Armada - Podpory"; },
+
+    analyze: function(page, context) {
+        context.verejna = new Array();
+        context.tajna = new Array();
+
+        $XL('form//table/tbody/tr[3]/td[2]', page.content).each(function(td) { context.verejna.push(td); });
+        $XL('form//table/tbody/tr[3]/td[3]', page.content).each(function(td) { context.verejna.push(td); });
+        $XL('form//table/tbody/tr[position() > 3]/td[12]', page.content).each(function(td) { context.verejna.push(td); });
+        $XL('form//table/tbody/tr[position() > 3]/td[13]', page.content).each(function(td) { context.verejna.push(td); });
+
+        $XL('form//table/tbody/tr[3]/td[4]', page.content).each(function(td) { context.tajna.push(td); });
+        $XL('form//table/tbody/tr[3]/td[5]', page.content).each(function(td) { context.tajna.push(td); });
+        $XL('form//table/tbody/tr[position() > 3]/td[14]', page.content).each(function(td) { context.tajna.push(td); });
+        $XL('form//table/tbody/tr[position() > 3]/td[15]', page.content).each(function(td) { context.tajna.push(td); });
+
+        context.verejnaObrana = $XL('form//table/tbody/tr[position() > 3]/td[12]//input', page.content);
+        context.verejnaUtok = $XL('form//table/tbody/tr[position() > 3]/td[13]//input', page.content);
+        context.tajnaObrana = $XL('form//table/tbody/tr[position() > 3]/td[14]//input', page.content);
+        context.tajnaUtok = $XL('form//table/tbody/tr[position() > 3]/td[15]//input', page.content);
+
+        return context.verejna.length > 0 || context.tajna > 0;
+    },
+
+    process: function(page, context) {
+        context.verejna.each(function(td) {
+            td.className += " p_a_verejna";
+        });
+        context.tajna.each(function(td) {
+            td.className += " p_a_tajna";
+        });
+
+        try {
+            this._oznacNejvetsi(context.verejnaObrana);
+            this._oznacNejvetsi(context.verejnaUtok);
+            this._oznacNejvetsi(context.tajnaObrana);
+            this._oznacNejvetsi(context.tajnaUtok);
+        }
+        catch (ex) {
+            // Moc si tu neverim, at to nepada
+            logger().error(ex);
+        }
+    },
+
+    _oznacNejvetsi: function(arr) {
+        if (arr.lenght < 1)
+            return;
+
+        arr.sort(function(a, b) {
+            var value1 = parseInt(a.value);
+            var value2 = parseInt(b.value);
+
+            return value2 - value1;
+        });
+
+        arr.shift().className += "armada_podpora";
+
+        if (arr.length < 1)
+            return;
+
+        var v = parseInt(arr[0].value);
+        while (arr.length > 0 && parseInt(arr[0].value) == v) {
+            arr.shift().className += "armada_podpora";
+        }
+    }
+}));
