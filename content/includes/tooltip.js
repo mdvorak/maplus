@@ -44,12 +44,12 @@ var Tooltip = {
     _library: new Hash(),
 
     // Creates tooltip element
-    create: function(html, className, hideOnClick) {    
+    create: function(html, className, hideOnClick) {
         var tooltip = document.createElement('div');
 
         if (className)
             tooltip.className = className;
-        
+
         tooltip.style.display = 'none';
         tooltip.style.position = 'absolute';
         tooltip.style.left = '-500px';
@@ -59,11 +59,11 @@ var Tooltip = {
             if (Object.isElement(html))
                 tooltip.appendChild(html);
             else
-                tooltip.innerHTML = html;                
+                tooltip.innerHTML = html;
         }
-        
+
         var tracker = 0;
-             
+
         Event.observe(tooltip, 'mouseout', function(e) {
             if (e.pageX < this.offsetLeft || e.pageX >= (this.offsetLeft + this.offsetWidth)
                     || e.pageY < this.offsetTop || e.pageY >= (this.offsetTop + this.offsetHeight)) {
@@ -76,43 +76,43 @@ var Tooltip = {
                 }, 250);
             }
         });
-        
+
         Event.observe(tooltip, 'mouseover', function(e) {
             ++tracker;
         });
-        
-        if (hideOnClick) 
+
+        if (hideOnClick)
             Event.observe(tooltip, 'click', function() { this.hideTooltip(); }, false);
-            
+
         Element.extend(tooltip);
         Object.extend(tooltip, Tooltip.Methods);
-        
+
         document.body.appendChild(tooltip);
         return tooltip;
     },
-    
+
     getTooltip: function(tooltip) {
-        if (!tooltip) 
+        if (!tooltip)
             throw new ArgumentNullException("tooltip");
-        
+
         if (!Object.isElement(tooltip)) {
             var name = String(tooltip);
             tooltip = this._library[name];
-            
+
             if (!tooltip) {
                 var callback = this._callbacks[name];
                 if (!callback)
                     throw new ArgumentException("tooltip", tooltip, "No tooltip of that name registered.");
-                    
+
                 tooltip = callback();
                 if (!tooltip || !tooltip.ownerDocument)
                     throw new Exception(String.format("Callback for tooltip '{0}' did not returned element.", name));
-                
+
                 tooltip.setAttribute("tooltipName", name); //Debug
                 this._library[name] = tooltip;
             }
         }
-        
+
         return tooltip;
     },
 
@@ -125,45 +125,45 @@ var Tooltip = {
             throw new ArgumentException("createCallback", createCallback, "Callback must be a function.");
         if (this._callbacks[name])
             throw new ArgumentException("name", name, "Callback of that name is already registered.");
-            
+
         this._callbacks[name] = createCallback;
     },
-    
+
     isRegistered: function(name) {
         if (!name || name.empty())
             throw new ArgumentNullException("name");
-            
+
         return (this._callbacks[name] != null);
     },
-    
+
     // Shows tooltip and prevents showing multiple tooltips at one time.
     show: function(event, tooltip) {
         tooltip = this.getTooltip(tooltip);
-        
+
         Tooltip.hide();
-        
+
         var _this = this;
         tooltip.onHide = function() {
             _this._currentTooltip = null;
         };
-            
+
         this._currentTooltip = tooltip;
         tooltip.showHandler(event);
     },
-    
+
     hide: function() {
         if (this._currentTooltip) {
             this._currentTooltip.hideTooltip();
             this._currentTooltip = null;
         }
     },
-    
+
     attach: function(link, tooltip) {
         if (!link) throw new ArgumentNullException("link");
         if (!tooltip) throw new ArgumentNullException("tooltip");
-        
-        Event.observe(link, "click", function(event) { 
-            Tooltip.show(event, tooltip); 
+
+        Event.observe(link, "click", function(event) {
+            Tooltip.show(event, tooltip);
         }, false);
     }
 };

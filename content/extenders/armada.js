@@ -202,25 +202,32 @@ pageExtenders.add(PageExtender.create({
         context.verejna = new Array();
         context.tajna = new Array();
 
-        $XL('form//table/tbody/tr[3]/td[2]', page.content).each(function(td) { context.verejna.push(td); });
-        $XL('form//table/tbody/tr[3]/td[3]', page.content).each(function(td) { context.verejna.push(td); });
-        $XL('form//table/tbody/tr[position() > 3]/td[12]', page.content).each(function(td) { context.verejna.push(td); });
-        $XL('form//table/tbody/tr[position() > 3]/td[13]', page.content).each(function(td) { context.verejna.push(td); });
+        var table = $X('form/table[1]', page.content);
+        if (table == null)
+            return false;
 
-        $XL('form//table/tbody/tr[3]/td[4]', page.content).each(function(td) { context.tajna.push(td); });
-        $XL('form//table/tbody/tr[3]/td[5]', page.content).each(function(td) { context.tajna.push(td); });
-        $XL('form//table/tbody/tr[position() > 3]/td[14]', page.content).each(function(td) { context.tajna.push(td); });
-        $XL('form//table/tbody/tr[position() > 3]/td[15]', page.content).each(function(td) { context.tajna.push(td); });
+        $XL('tbody/tr[3]/td[2]', table).each(function(td) { context.verejna.push(td); });
+        $XL('tbody/tr[3]/td[3]', table).each(function(td) { context.verejna.push(td); });
+        $XL('tbody/tr[position() > 3]/td[12]', table).each(function(td) { context.verejna.push(td); });
+        $XL('tbody/tr[position() > 3]/td[13]', table).each(function(td) { context.verejna.push(td); });
 
-        context.verejnaObrana = $XL('form//table/tbody/tr[position() > 3]/td[12]//input', page.content);
-        context.verejnaUtok = $XL('form//table/tbody/tr[position() > 3]/td[13]//input', page.content);
-        context.tajnaObrana = $XL('form//table/tbody/tr[position() > 3]/td[14]//input', page.content);
-        context.tajnaUtok = $XL('form//table/tbody/tr[position() > 3]/td[15]//input', page.content);
+        $XL('tbody/tr[3]/td[4]', table).each(function(td) { context.tajna.push(td); });
+        $XL('tbody/tr[3]/td[5]', table).each(function(td) { context.tajna.push(td); });
+        $XL('tbody/tr[position() > 3]/td[14]', table).each(function(td) { context.tajna.push(td); });
+        $XL('tbody/tr[position() > 3]/td[15]', table).each(function(td) { context.tajna.push(td); });
 
+        context.verejnaObrana = $XL('tbody/tr[position() > 3]/td[12]//input', table);
+        context.verejnaUtok = $XL('tbody/tr[position() > 3]/td[13]//input', table);
+        context.tajnaObrana = $XL('tbody/tr[position() > 3]/td[14]//input', table);
+        context.tajnaUtok = $XL('tbody/tr[position() > 3]/td[15]//input', table);
+
+        context.table = table;
         return context.verejna.length > 0 || context.tajna > 0;
     },
 
     process: function(page, context) {
+        context.table.className += " armada_podpory";
+
         context.verejna.each(function(td) {
             td.className += " p_a_verejna";
         });
@@ -251,14 +258,17 @@ pageExtenders.add(PageExtender.create({
             return value2 - value1;
         });
 
-        arr.shift().className += "armada_podpora";
+        if (parseInt(arr[0].value) > 0) {
+            arr[0].className += "vybrana";
+        }
+        arr.shift();
 
         if (arr.length < 1)
             return;
 
         var v = parseInt(arr[0].value);
-        while (arr.length > 0 && parseInt(arr[0].value) == v) {
-            arr.shift().className += "armada_podpora";
+        while (v > 0 && arr.length > 0 && parseInt(arr[0].value) == v) {
+            arr.shift().className += "vybrana";
         }
     }
 }));

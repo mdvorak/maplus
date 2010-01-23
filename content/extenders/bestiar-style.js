@@ -146,7 +146,7 @@ var BestiarColumnStyle = {
             
             // Pozn: cas je v sekundach
             var sold = new Date().getTime() + data.cas * 1000;
-            td.title = "Predpokládaný čas prodeje je " + timeFromNow(new Date(sold), true);
+            td.title = "Předpokládaný čas prodeje je " + timeFromNow(new Date(sold), true);
         }
         else {
             td.innerHTML = '<span>&#xA0;---&#xA0;</span>';

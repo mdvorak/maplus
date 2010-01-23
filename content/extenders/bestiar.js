@@ -617,6 +617,7 @@ pageExtenders.add(PageExtender.create({
     process: function(page, context) {
         // Start timer
         var _this = this;
+        _this._updateTime(context);
         context.timer = setInterval(function() { _this._updateTime(context); }, 1000);
     },
     
@@ -855,11 +856,14 @@ pageExtenders.add(PageExtender.create({
         logger().debug("Headers found: %d", context.headers.length);
     
     	// Zpracovani hlavicky
+    	var temneBarvy = page.config.getBoolean("temneBarvy", true);
     	var createRulesTooltipHtml = this._createRulesTooltipHtml;
+    	var recolorTable = this._recolorTable;
+    	var _this = this;
     
         context.headers.each(function(h) {
             // Vytvor tooltip
-            var linkTooltip = createRulesTooltipHtml(table, context.config, h, page.regent, page.provincie());
+            var linkTooltip = createRulesTooltipHtml.call(_this, table, context.config, h, page.regent, page.provincie(), temneBarvy);
             
             // Uprav hlavicku
             var b = $X('span/b', h.cell);
@@ -884,6 +888,8 @@ pageExtenders.add(PageExtender.create({
             for (let i in Rules) {
                 Rules[i](table, null, page.regent, page.provincie());
             }
+            
+            recolorTable(table, temneBarvy);
         });
         
         tdNastaveniFiltru.appendChild(linkZrusFiltry);
@@ -892,17 +898,26 @@ pageExtenders.add(PageExtender.create({
         tdNastaveniFiltru.appendChild(Element.create("br"));
         
         // Aplikuj aktualni filtry
+        var isSorted = false;
+        
         for (let i in Rules) {
-            if (typeof Rules[i] == "function" && context.config.hasRules(i))
+            if (typeof Rules[i] == "function" && context.config.hasRules(i)) {
                 Rules[i](table, context.config.createRuleSet(i), page.regent, page.provincie());
+                isSorted = true;
+            }
         }
         
         if (context.config.hasRules("filter"))
             $('plus_filterAktivovan').style.display = '';
+            
+        if (isSorted) {
+            recolorTable(table, temneBarvy);            
+        }
     },
     
-    _createRulesTooltipHtml: function(table, config, header, regent, provincie) {
+    _createRulesTooltipHtml: function(table, config, header, regent, provincie, temneBarvy) {
         var link = Element.create("a", header.title, {href: "javascript://"});
+    	var recolorTable = this._recolorTable;
         
         var tooltipName = "header_" + header.name;
         if (!Tooltip.isRegistered(tooltipName)) {
@@ -942,6 +957,9 @@ pageExtenders.add(PageExtender.create({
                             
                             if (r.type == "filter")
                                 $('plus_filterAktivovan').style.display = (rules.length > 0) ? '' : 'none';
+                                
+                            // Aktualizuj barvy radku
+                            recolorTable(table, temneBarvy);
                         });
                         
                         // Mezera
@@ -954,5 +972,17 @@ pageExtenders.add(PageExtender.create({
      
         Tooltip.attach(link, tooltipName);
         return link; 
+    },
+    
+    _recolorTable: function(table, temneBarvy) {
+        var highlightColor = temneBarvy ? "#1b1b1b" : "#303030";
+        var toggle = true;
+
+        for (let rowi = 1; rowi < table.rows.length; rowi++) {
+            if (table.rows[rowi].style.display != "none") {
+                table.rows[rowi].setAttribute("bgcolor", toggle ? highlightColor : "#000000");
+                toggle = !toggle;
+            }
+        }
     }
 }));

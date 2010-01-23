@@ -119,11 +119,6 @@ tr.vybranaJednotka
     background-size: 100% 100%;
 }
 
-.armada_podpora 
-{
-    color: #DD0000;
-}
-
 /* FAQ */
 
 #faq, #faq a, #faq div
@@ -257,4 +252,29 @@ table.thinBorders > tbody > tr:first-child > td
 {
 	background-color: black;
 	border: solid 2px lightgray;
+}
+
+a
+{
+    border: solid 1px transparent;
+}
+
+a:focus
+{
+    border: solid 1px gold;
+}
+
+.armada_podpory input
+{
+    color: #404040;
+}
+
+.armada_podpory input.vybrana
+{
+    color: #000000;
+}
+
+.bestiarJednotky a 
+{
+    border-width: 0px;
 }
