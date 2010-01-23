@@ -159,8 +159,8 @@ pageExtenders.add(PageExtender.create({
                 data.pocet = parseInt(row.columns["pocet"].textContent);
                 data.zkusenost = parseFloat(row.columns["zkusenost"].textContent) / 100;
                 data.silaJednotky = parseFloat(row.columns["silaJednotky"].textContent);
-                data.druh = row.columns["druh"].textContent.replace(/\s+$/, "");
-                data.typ = row.columns["typ"].textContent.replace(/\s+$/, "");
+                data.druh = row.columns["druh"].textContent.replace(/\s+$/, "") || "";
+                data.typ = row.columns["typ"].textContent.replace(/\s+$/, "") || "";
                 data.cas = parseTime(row.columns["cas"].textContent.replace(/\s+$/, ""));
                 data.nabidka = parseInt(row.columns["nabidka"].textContent);   
             }
@@ -169,6 +169,7 @@ pageExtenders.add(PageExtender.create({
             
             // Max sila stacku
             row.data.maxSilaStacku = parseInt(row.data.pocet * row.data.silaJednotky);
+            if (isNaN(row.data.maxSilaStacku)) row.data.maxSilaStacku = "??.??";
             // Sila stacku
             row.data.silaStacku = parseInt(row.data.maxSilaStacku * row.data.zkusenost);
             // Cena za 1 sily
@@ -180,7 +181,7 @@ pageExtenders.add(PageExtender.create({
                 row.data.phb = stats.phb;
                 row.data.ini = stats.realIni;
                 // Typ zkracene
-                row.data.typKratce = row.data.druh[0] + row.data.typ[0] + (row.data.typ != "Str." ? row.data.phb : "");
+                row.data.typKratce = (row.data.druh[0] || "") + (row.data.typ[0] || "") + (row.data.typ != "Str." ? row.data.phb : "");
                 
                 // Vezmi v uvahu barvu
                 var koef = (row.data.barva == page.regent.barva) ? 1.5 : 1.0;
@@ -189,10 +190,10 @@ pageExtenders.add(PageExtender.create({
                 row.data.popTU = parseFloat((row.data.pocet * (stats.popTU / koef)).toFixed(1));
             }
             else {
-                logger().warn("Nenalezeny informace o jednotce %s.", row.jmeno);
+                logger().warn("Nenalezeny informace o jednotce " + row.jmeno);
                 row.data.phb = "";
                 row.data.ini = "";
-                row.data.typKratce = (row.data.druh[0] || "") + (row.data.typ[0] || "") + "?";
+                row.data.typKratce = (row.data.druh[0] || "") + (row.data.typ[0] || "");
                 row.data.zlataTU = "";
                 row.data.manyTU = ""
                 row.data.popTU = "";
@@ -976,11 +977,15 @@ pageExtenders.add(PageExtender.create({
     
     _recolorTable: function(table, temneBarvy) {
         var highlightColor = temneBarvy ? "#1b1b1b" : "#303030";
+        var validColors = [null, "#000000", "#303030", "#1b1b1b"];
         var toggle = true;
 
         for (let rowi = 1; rowi < table.rows.length; rowi++) {
-            if (table.rows[rowi].style.display != "none") {
-                table.rows[rowi].setAttribute("bgcolor", toggle ? highlightColor : "#000000");
+            var r = table.rows[rowi];
+            var bgcolor = r.getAttribute("bgcolor");
+            
+            if (r.style.display != "none" && validColors.indexOf(bgcolor) > -1) {
+                r.setAttribute("bgcolor", toggle ? highlightColor : "#000000");
                 toggle = !toggle;
             }
         }

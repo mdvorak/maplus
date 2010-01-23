@@ -161,8 +161,8 @@ var BestiarColumnStyle = {
         var druhClass = (data.druh == "Let.") ? "druhLet" : "druhPoz";
         var typClass = (data.typ == "Str.") ? "typStr" : "typBoj"
         
-        var html = '<span class="' + druhClass + '">&#xA0;' + data.druh[0] + '</span>';
-        html += '<span class="' + typClass + '">' + data.typ[0] + '</span>';
+        var html = '<span class="' + druhClass + '">&#xA0;' + (data.druh[0] || "") + '</span>';
+        html += '<span class="' + typClass + '">' + (data.typ[0] || "") + '</span>';
         if (data.typ != "Str.")
             html += '<span class="phb' + data.phb + '">' + data.phb + '</span>';
         html += '<span>&#xA0;</span>';
