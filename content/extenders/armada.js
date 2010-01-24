@@ -222,6 +222,8 @@ pageExtenders.add(PageExtender.create({
         context.tajnaUtok = $XL('tbody/tr[position() > 3]/td[15]//input', table);
 
         context.table = table;
+        context.submit = $X('tbody/tr//input[@type = "submit"]', table);
+
         return context.verejna.length > 0 || context.tajna > 0;
     },
 
@@ -234,6 +236,10 @@ pageExtenders.add(PageExtender.create({
         context.tajna.each(function(td) {
             td.className += " p_a_tajna";
         });
+
+        if (context.submit != null) {
+            context.submit.className += " submit";
+        }
 
         try {
             this._oznacNejvetsi(context.verejnaObrana);
@@ -259,7 +265,7 @@ pageExtenders.add(PageExtender.create({
         });
 
         if (parseInt(arr[0].value) > 0) {
-            arr[0].className += "vybrana";
+            arr[0].className += " vybrana";
         }
         arr.shift();
 
@@ -268,7 +274,7 @@ pageExtenders.add(PageExtender.create({
 
         var v = parseInt(arr[0].value);
         while (v > 0 && arr.length > 0 && parseInt(arr[0].value) == v) {
-            arr.shift().className += "vybrana";
+            arr.shift().className += " vybrana";
         }
     }
 }));

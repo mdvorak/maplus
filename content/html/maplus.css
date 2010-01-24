@@ -269,6 +269,11 @@ a:focus
     color: #404040;
 }
 
+.armada_podpory input.submit 
+{
+    color: #000000;
+}
+
 .armada_podpory input.vybrana
 {
     color: #000000;
