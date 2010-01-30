@@ -913,3 +913,26 @@ pageExtenders.add(PageExtender.create({
         page.content.appendChild(Element.create("div", context.ovladaniHtml));
     }
 }));
+
+pageExtenders.add(PageExtender.create({
+    getName: function() { return "Posta - Vyber Prectenych"; },
+
+    analyze: function(page, context) {
+        context.and_or = document.getElementsByName("and_or")[0];
+
+        return context.and_or != null;
+    },
+
+    process: function(page, context) {
+        // Listener na udalost
+        Event.observe(context.and_or.form, "submit", function(event) {
+            page.config.getPrefNode("posta", true).setPref("filter_prectene", context.and_or.value);
+        });
+
+        // A ulozena hodnota
+        var value = page.config.getPrefNode("posta", true).getPref("filter_prectene");
+        if (value != null && value.length > 0) {
+            context.and_or.value = value;
+        }
+    }
+}));
