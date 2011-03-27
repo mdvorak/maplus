@@ -678,7 +678,7 @@ var ExtenderManager = {
         }
         
         Marshal.initPage(page);
-        Script.execute(page.document, "var pageExtenders = new PageExtenderCollection();");
+        Script.executeFile(page.document, "chrome://maplus/content/pageInit.js");
     },
     
     // Called directly by WebExtender

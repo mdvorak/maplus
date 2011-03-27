@@ -33,12 +33,9 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
-
-const nsISupports = Components.interfaces.nsISupports;
-
-const CLASS_ID = Components.ID("8edb4553-cfa1-4ded-8d2c-efb7e70dbc2b");
-const CLASS_NAME = "Private Javascript Namespace";
-const CONTRACT_ID = "@michal.dvorak/privatespace_maplus;1";
+ 
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+const CI = Components.interfaces, CC = Components.classes, CR = Components.results;
 
 const CONTENT_URL = "chrome://maplus/content/";
 
@@ -46,20 +43,24 @@ function PrivateSpace() {
   this.wrappedJSObject = this;
 }
 
-var alert = function() { }
+function alert(msg) {
+  CC["@mozilla.org/embedcomp/prompt-service;1"]
+    .getService(CI.nsIPromptService)
+    .alert(null, "MAPlus alert", msg);
+}
 
-// This is the implementation of your component.
 PrivateSpace.prototype = {
+    classDescription: "Private Javascript Namespace",
+    classID:          Components.ID("{8edb4553-cfa1-4ded-8d2c-efb7e70dbc2b}"),
+    contractID:       "@michal.dvorak/privatespace_maplus;1",
+
     initialize: function(win)
     {
         if (this._initialized)
             return;
+        this._initialized = true;
 
-        // Only for debugging
-        alert = function() { win.alert.apply(win, arguments); };
-        
-        var jssubscriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
-                                          .getService(Components.interfaces.mozIJSSubScriptLoader);
+        var jssubscriptLoader = CC["@mozilla.org/moz/jssubscript-loader;1"].getService(CI.mozIJSSubScriptLoader);
 
         // Loads helper script with methods for loading JS files and
         // setup in XPCOM environment
@@ -79,8 +80,6 @@ PrivateSpace.prototype = {
         for (var i = 0; i < libraries.length; i++) {
             ExtenderManager.include(libraries[i]);
         }
-        
-        this._initialized = true;
     },
     
     registerWindow: function(win) {
@@ -90,61 +89,21 @@ PrivateSpace.prototype = {
         // Must be loaded by services.xml
         WebExtender.init(win);
     },
-
-    // for nsISupports
+    
+     // for nsISupports
     QueryInterface: function(aIID)
     {
         // add any other interfaces you support here
-        if (!aIID.equals(nsISupports))
-            throw Components.results.NS_ERROR_NO_INTERFACE;
+        if (!aIID.equals(CI.nsISupports))
+            throw CR.NS_ERROR_NO_INTERFACE;
         return this;
     }
+};
+
+if (XPCOMUtils.generateNSGetFactory) {
+  // Firefox >= 4
+  var NSGetFactory = XPCOMUtils.generateNSGetFactory([PrivateSpace]);
+} else {
+  // Firefox <= 3.6.*
+  var NSGetModule = XPCOMUtils.generateNSGetModule([PrivateSpace]);
 }
-
-//=================================================
-// Note: You probably don't want to edit anything
-// below this unless you know what you're doing.
-//
-// Factory
-var PrivateSpaceFactory = {
-  singleton: null,
-  createInstance: function (aOuter, aIID)
-  {
-    if (aOuter != null)
-      throw Components.results.NS_ERROR_NO_AGGREGATION;
-    if (this.singleton == null)
-      this.singleton = new PrivateSpace();
-    return this.singleton.QueryInterface(aIID);
-  }
-};
-
-// Module
-var PrivateSpaceModule = {
-  registerSelf: function(aCompMgr, aFileSpec, aLocation, aType)
-  {
-    aCompMgr = aCompMgr.QueryInterface(Components.interfaces.nsIComponentRegistrar);
-    aCompMgr.registerFactoryLocation(CLASS_ID, CLASS_NAME, CONTRACT_ID, aFileSpec, aLocation, aType);
-  },
-
-  unregisterSelf: function(aCompMgr, aLocation, aType)
-  {
-    aCompMgr = aCompMgr.QueryInterface(Components.interfaces.nsIComponentRegistrar);
-    aCompMgr.unregisterFactoryLocation(CLASS_ID, aLocation);        
-  },
-  
-  getClassObject: function(aCompMgr, aCID, aIID)
-  {
-    if (!aIID.equals(Components.interfaces.nsIFactory))
-      throw Components.results.NS_ERROR_NOT_IMPLEMENTED;
-
-    if (aCID.equals(CLASS_ID))
-      return PrivateSpaceFactory;
-
-    throw Components.results.NS_ERROR_NO_INTERFACE;
-  },
-
-  canUnload: function(aCompMgr) { return true; }
-};
-
-//module initialization
-function NSGetModule(aCompMgr, aFileSpec) { return PrivateSpaceModule; }

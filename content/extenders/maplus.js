@@ -93,7 +93,7 @@ pageExtenders.add(PageExtender.create({
         div.style.top = "10px";
         div.style.display = 'block';
         div.style.position = "absolute";
-        
+
         document.body.appendChild(div);
         
         var link = $X('.//a[@id = "plus_enable"]', div);

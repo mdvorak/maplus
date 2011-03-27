@@ -10,7 +10,7 @@
   <!-- Custom libraries -->
   <script src="libraries/classlib.js" />
   <script src="includes/tooltip.js" />
-  <script src="includes/checkbox.js" />d
+  <script src="includes/checkbox.js" />
   <script src="includes/dialog.js" />
   <script src="includes/maplus-lib.js" />
 

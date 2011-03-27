@@ -2,3 +2,6 @@ content	maplus	content/
 content	maplus	content/ contentaccessible=yes
 skin	maplus	classic/1.0	skin/
 overlay	chrome://browser/content/browser.xul	chrome://maplus/content/firefoxOverlay.xul
+
+component  {8edb4553-cfa1-4ded-8d2c-efb7e70dbc2b} components/privatespace.js
+contract   @michal.dvorak/privatespace_maplus;1 {8edb4553-cfa1-4ded-8d2c-efb7e70dbc2b}

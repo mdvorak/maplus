@@ -389,8 +389,8 @@ pageExtenders.add(PageExtender.create({
                     aliance: (aliance != null) ? aliance.id : null,
                     text: zprava.text.replace(Posta.POSTA_V_RAMCI_ALIANCE_REGEX, "")
                 };
-                
-                if (data.aliance != null) {           
+
+                if (data.aliance != null && zprava.linkPredat != null) {           
                     // Vytvor link
                     var linkOdpovedetVsem = Element.create("a", "Odpovědět všem");
                     linkOdpovedetVsem.href = MaPlus.buildUrl(page, "posta.html", { posta: "posta_v_ally", odpoved: zprava.id, dulezitost: zprava.dulezitost });
@@ -749,26 +749,26 @@ pageExtenders.add(PageExtender.create({
     getName: function() { return "Posta - Skryt/sbalit neaktualni zpravy"; },
 
     analyze: function(page, context) {
-    	if (page.posta == null || page.posta.zpravy == null)
+        if (page.posta == null || page.posta.zpravy == null)
             return false;
         if (page.posta.zpravy.length == 0)
             return false;
-        
+
         var aktualniCas = new Date().getTime();
-        var maxStariSpamu = page.posta.config.getNumber("maxStariSpamu", 90*60) * 1000; // default=90min
-        var maxStariBestiar = page.posta.config.getNumber("maxStariBestiar", 45*60) * 1000; // default=45min
-        
+        var maxStariSpamu = page.posta.config.getNumber("maxStariSpamu", 90 * 60) * 1000; // default=90min
+        var maxStariBestiar = page.posta.config.getNumber("maxStariBestiar", 45 * 60) * 1000; // default=45min
+
         context.skryt = new Array();
         context.sbalit = new Array();
-        
+
         var predchoziZprava = null;
-        
+
         page.posta.zpravy.each(function(zprava) {
             var stari = (aktualniCas - zprava.cas.getTime());
-            
+
             if (zprava.dulezitost == "bestiar" && stari > maxStariBestiar) {
                 logger().log("Zprava %d vyprsela a bude skryta.", zprava.id);
-                
+
                 zprava.skryta = true;
                 context.skryt.push(zprava);
             }
@@ -776,32 +776,32 @@ pageExtenders.add(PageExtender.create({
                 zprava.zlom = $X('br[2]');
                 if (zprava.zlom != null) {
                     logger().log("Zprava %d vyprsela a bude sbalena.", zprava.id);
-                    
+
                     zprava.balici = true;
                     context.sbalit.push(zprava);
                 }
             }
             else if (zprava.dlouha) {
                 logger().log("Zprava %d je prilis dlouha a bude sbalena.", zprava.id);
-                
+
                 zprava.balici = true;
                 context.sbalit.push(zprava);
             }
-            
+
             // TODO sblizit zpravy spamu
-            
+
             predchoziZprava = zprava;
         });
-        
-		return true;
+
+        return true;
     },
-    
+
     process: function(page, context) {
         var skryteElementy = new Array();
-    
+
         context.skryt.each(function(zprava) {
             var parent = zprava.element.parentNode;
-            
+
             // Odstran volne radky za zpravou
             var elem = zprava.element.nextSibling;
             while (elem != null && elem.tagName == "BR") {
@@ -809,72 +809,74 @@ pageExtenders.add(PageExtender.create({
                 elem.style.display = "none";
                 elem = elem.nextSibling;
             }
-            
+
             // Odstran samotnou zpravu
             skryteElementy.push(zprava.element);
             zprava.element.style.display = "none";
-            
+
             logger().log("Skryta zprava %d", zprava.id);
         });
-        
+
         context.sbalit.each(function(zprava) {
-    		var zlom = zprava.zlom;
-    		
-    		// Link v hlavicce
-    		var linkHeaderRozbalit = Element.create("a", "Rozbalit", {href: "javascript://"});
-			
-    		// Rozdel telo zpravy
-    		var divZbytek = Element.create("div", null, {style: "display: none;"});
-    		while(zlom.nextSibling) {
-    		    divZbytek.appendChild(zlom.nextSibling);
-    		}    		
-    		
-    		// Link Rozbalit pod zpravou
-    		var divRozbalit = Element.create("div", '...........&#xA0;&#xA0;');
-    		var linkRozbalit = Element.create("a", '<i style="color: yellow;">Zobrazit celou zprávu</i></a>', {href: "javascript://"});
-    		divRozbalit.appendChild(linkRozbalit);
-    		
-    		// Eventy
-    		var toggle = function(event) {
-    			if (divZbytek.style.display == "none") {
-    				// Zobrazit
-    				divZbytek.style.display = "";
-    				divRozbalit.style.display = "none";
-    				linkHeaderRozbalit.innerHTML = "Sbalit";
-    			}
-    			else {
-    				// Skryt
-    				divZbytek.style.display = "none";
-    				divRozbalit.style.display = "";
-    				linkHeaderRozbalit.innerHTML = "Rozbalit";
-    			}
-    		};
-    		
-    		Event.observe(linkHeaderRozbalit, 'click', toggle);
-    		Event.observe(linkRozbalit, 'click', toggle);
-    		
-    		// Zobraz
-    		zprava.fontText.appendChild(divZbytek);
-    		zprava.fontText.appendChild(divRozbalit);
-    		
-    		var header = zprava.linkPredat.parentNode;
-			header.insertBefore(document.createTextNode("\xA0"), header.firstChild);
-			header.insertBefore(linkHeaderRozbalit, header.firstChild);
-			
-            logger().log("Sbalena zprava %d", zprava.id);
-    	});
-    	
-    	if (skryteElementy.length > 0) {
-    	    var text = 'Některým zprávám (' + context.skryt.length + ') vypršela platnost a byly skryty.'
+            var zlom = zprava.zlom;
+
+            // Link v hlavicce
+            var linkHeaderRozbalit = Element.create("a", "Rozbalit", { href: "javascript://" });
+
+            // Rozdel telo zpravy
+            var divZbytek = Element.create("div", null, { style: "display: none;" });
+            while (zlom.nextSibling) {
+                divZbytek.appendChild(zlom.nextSibling);
+            }
+
+            // Link Rozbalit pod zpravou
+            var divRozbalit = Element.create("div", '...........&#xA0;&#xA0;');
+            var linkRozbalit = Element.create("a", '<i style="color: yellow;">Zobrazit celou zprávu</i></a>', { href: "javascript://" });
+            divRozbalit.appendChild(linkRozbalit);
+
+            // Eventy
+            var toggle = function(event) {
+                if (divZbytek.style.display == "none") {
+                    // Zobrazit
+                    divZbytek.style.display = "";
+                    divRozbalit.style.display = "none";
+                    linkHeaderRozbalit.innerHTML = "Sbalit";
+                }
+                else {
+                    // Skryt
+                    divZbytek.style.display = "none";
+                    divRozbalit.style.display = "";
+                    linkHeaderRozbalit.innerHTML = "Rozbalit";
+                }
+            };
+
+            Event.observe(linkHeaderRozbalit, 'click', toggle);
+            Event.observe(linkRozbalit, 'click', toggle);
+
+            // Zobraz
+            zprava.fontText.appendChild(divZbytek);
+            zprava.fontText.appendChild(divRozbalit);
+
+            if (zprava.linkPredat != null) {
+                var header = zprava.linkPredat.parentNode;
+                header.insertBefore(document.createTextNode("\xA0"), header.firstChild);
+                header.insertBefore(linkHeaderRozbalit, header.firstChild);
+
+                logger().log("Sbalena zprava %d", zprava.id);
+            }
+        });
+
+        if (skryteElementy.length > 0) {
+            var text = 'Některým zprávám (' + context.skryt.length + ') vypršela platnost a byly skryty.'
     	             + ' Klikněte <a id="plus_zobrazitZpravy" href="javascript://">zde</a> pro jejich zobrazení.';
-    	    var upozorneni = MaPlusMenu.zobrazUpozorneni(text);
-    	    
-    	    var linkZobrazit = $('plus_zobrazitZpravy');
-    	    Event.observe(linkZobrazit, "click", function(event) {
-    	        skryteElementy.each(function(i) { i.style.display = ""; });
-    	        upozorneni.style.display = "none";
-    	        logger().log("Skryté zprávy byly zobrazeny.");
-    	    });
+            var upozorneni = MaPlusMenu.zobrazUpozorneni(text);
+
+            var linkZobrazit = $('plus_zobrazitZpravy');
+            Event.observe(linkZobrazit, "click", function(event) {
+                skryteElementy.each(function(i) { i.style.display = ""; });
+                upozorneni.style.display = "none";
+                logger().log("Skryté zprávy byly zobrazeny.");
+            });
         }
     }
 }));
