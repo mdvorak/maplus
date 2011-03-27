@@ -51,7 +51,7 @@ window.NastaveniHlidka = {
         }
         
         // Html hlidky pro jednu alianci
-        var hlidkaHtml = Chrome.loadText("html/nastavenihlidka.html");
+        var hlidkaHtml = Chrome.loadHtml("html/nastavenihlidka.html");
         var prvniAli = true;
         
         // Vytvor kod pro vsechny aliance

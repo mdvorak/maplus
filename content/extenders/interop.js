@@ -33,10 +33,22 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
+
 var Chrome = {
     loadText: function(path, cached) {
         return (cached ? Marshal.callCachedMethod : Marshal.callMethod)("Chrome", "loadText", [path]);
+    },
+
+    /**
+     * Vrati nacteny html element.
+     */
+    loadHtml: function(path, cached) {
+        var raw = Chrome.loadText(path, cached);
+        
+        if (raw)
+            return document.createRange().createContextualFragment(raw);
+        else
+            return null;
     }
 };
 

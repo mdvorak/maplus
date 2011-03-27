@@ -83,7 +83,7 @@ pageExtenders.add(PageExtender.create({
         controls.form = controls.textareaZprava.form        
         context.controls = controls;
         
-        context.extendHtml = Chrome.loadText("html/postapsat.html");
+        context.extendHtmlElem = Chrome.loadHtml("html/postapsat.html");
         return true;
     },
     
@@ -222,9 +222,9 @@ pageExtenders.add(PageExtender.create({
         // Dulezitost
         var vybranaDulezitost = function() { return null; }
         
-        if (context.extendHtml != null) {
+        if (context.extendHtmlElem != null) {
             // Pridej na spravne misto
-            var spanDulezitost = Element.create("span", context.extendHtml);
+            var spanDulezitost = context.extendHtmlElem;
             
             var elem = controls.inputOdeslat.nextSibling;
             if (elem != null) {
@@ -892,8 +892,8 @@ pageExtenders.add(PageExtender.create({
         if (page.posta.zpravy.length == 0)
             return false;
         
-        context.ovladaniHtml = Chrome.loadText("html/postaovladani.html");
-        if (context.ovladaniHtml == null)
+        context.ovladaniElem = Chrome.loadHtml("html/postaovladani.html");
+        if (context.ovladaniElem == null)
             return false;
         
 		return true;
@@ -912,7 +912,7 @@ pageExtenders.add(PageExtender.create({
 		
         // TODO
         
-        page.content.appendChild(Element.create("div", context.ovladaniHtml));
+        page.content.appendChild(context.ovladaniElem);
     }
 }));
 

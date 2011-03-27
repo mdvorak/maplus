@@ -45,6 +45,7 @@
 
     <!-- Nastaveni -->
     <script url="#{melior}/main.html" name="bestiar-style.js" />
+    <script url="#{melior}/main.html" name="tabmanager.js" />
     <script url="#{melior}/main.html" name="nastaveni.js" />
 
     <!-- Post processing -->

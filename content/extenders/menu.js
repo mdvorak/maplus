@@ -135,14 +135,12 @@ pageExtenders.add(PageExtender.create({
         if (!context.kalkulacka.getBoolean("zobrazit", true))
             return false;
     
-        context.kalkulackaHtml = Chrome.loadText("html/kalkulacka.html");
+        context.kalkulackaElem = Chrome.loadHtml("html/kalkulacka.html");
         return (context.kalkulackaHtml != null);
     },
     
     process: function(page, context) {
-        var div = document.createElement("div");
-        div.innerHTML = context.kalkulackaHtml;
-        page.leftMenu.appendChild(div);
+        page.leftMenu.appendChild(context.kalkulackaElem);
 
         var cfg = page.localConfig.getPrefNode("kalkulacka", true);
         // Definovano v html
@@ -163,14 +161,12 @@ pageExtenders.add(PageExtender.create({
         if (!context.poznamky.getBoolean("zobrazit", true))
             return false;
     
-        context.poznamkyHtml = Chrome.loadText("html/poznamky.html");
-        return (context.poznamkyHtml != null);
+        context.poznamkyElem = Chrome.loadHtml("html/poznamky.html");
+        return (context.poznamkyElem != null);
     },
     
     process: function(page, context) {
-        var div = document.createElement("div");
-        div.innerHTML = context.poznamkyHtml;
-        page.leftMenu.appendChild(div);
+        page.leftMenu.appendChild(context.poznamkyElem);
 
         var cfg = context.poznamky;
         var tracker = 0;

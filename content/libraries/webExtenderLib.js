@@ -157,7 +157,10 @@ Object.extend(Element, {
             }
         }
         
-        if (innerHtml != null) {
+        if (innerHtml instanceof Node) {
+            e.appendChild(innerHtml);
+        }
+        else if (innerHtml != null) {
             e.innerHTML = innerHtml;
         }
         

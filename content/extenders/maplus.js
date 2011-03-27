@@ -82,57 +82,56 @@ pageExtenders.add(PageExtender.create({
         // Tohle je vyjimka: aby se neprovadela zbytecne analyza pro vsechny extendery
         // a pritom se vzdy zobrazilo menu, je jeho zobrazeni uz v analyze, kde je taky
         // vyhozena vyjimka AbortException pokud je plus zakazano.
-    
-        context.html = Chrome.loadText("html/maplus.html");
-        if (!context.html)
+
+        var htmlElem = Chrome.loadHtml("html/maplus.html");
+        if (!htmlElem)
             throw new Exception("Unable to load maplus.html");
-        
+
         var div = document.createElement("div");
-        div.innerHTML = context.html;
         div.style.left = "10px";
         div.style.top = "10px";
         div.style.display = 'block';
         div.style.position = "absolute";
+        div.appendChild(htmlElem);
 
         document.body.appendChild(div);
-        
+
         var link = $X('.//a[@id = "plus_enable"]', div);
-        if (!link) 
+        if (!link)
             throw new Exception(String.format("Unable to find 'plus_enable' link."));
-            
+
         var aNastaveni = $X('.//a[@id = "plus_nastaveni"]', div);
-        if (aNastaveni == null) 
+        if (aNastaveni == null)
             throw new Exception(String.format("Unable to find 'plus_nastaveni' link."));
-        
-        Event.observe(link, "click", function(event) 
-            {
-                var value = !page.config.getEnabled();
-                page.config.setPref("enabled", value);
-                link.updateText(value); // Defined in 'maplus.htm'
-                aNastaveni.style.display = (value ? '' : 'none');
-            });
-            
+
+        Event.observe(link, "click", function(event) {
+            var value = !page.config.getEnabled();
+            page.config.setPref("enabled", value);
+            link.updateText(value); // Defined in 'maplus.htm'
+            aNastaveni.style.display = (value ? '' : 'none');
+        });
+
         var enabled = page.config.getEnabled();
         //link.updateText(enabled);
         aNastaveni.style.display = (enabled ? '' : 'none');
-        
+
         aNastaveni.href = MaPlus.buildUrl(page, "main.html", { plus: "nastaveni" });
-        
+
         // Stop execution
         if (!enabled)
             throw new AbortException("MaPlus is disabled.");
-        
+
         // Zobraz upozorneni na vypis seznamu alianci
         if (page.name != "aliance.html" && page.arguments["aliance"] != "vypis_alianci") {
             if (MaData.getStariSeznamuAlianci() > MAX_STARI_SEZNAMU_ALIANCI) {
-                var text = '<span class="maplusUpozorneni">Prosím navštivte <a href="' + MaPlus.buildUrl(page, "aliance.html", {aliance: "vypis_alianci"}) + '" class="maplusUpozorneni">výpis aliancí</a></span>';
+                var text = '<span class="maplusUpozorneni">Prosím navštivte <a href="' + MaPlus.buildUrl(page, "aliance.html", { aliance: "vypis_alianci" }) + '" class="maplusUpozorneni">výpis aliancí</a></span>';
                 MaPlusMenu.zobrazUpozorneni(text);
             }
         }
 
         return true;
     },
-    
+
     process: function(page, context) {
         // Aby se nesralo v urcitych mistech formatovani
         if (page.content)
@@ -146,8 +145,8 @@ pageExtenders.add(PageExtender.create({
 var NovinkyDialog = Class.create(Dialog, {
     _createContentElement: function() {
         var dialog = this;
-        var html = Chrome.loadText("html/novinky.html");
-        var root = Element.create("div", html, {"class": "dialog"});
+        var elem = Chrome.loadHtml("html/novinky.html");
+        var root = Element.create("div", elem, {"class": "dialog"});
         
         var inputZavrit = $X('.//input[@id = "d_zavritNovinky"]', root);
         Event.observe(inputZavrit, "click", function(event) {

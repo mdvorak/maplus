@@ -43,8 +43,8 @@ pageExtenders.add(PageExtender.create({
         if (page.arguments["plus"] != "nastaveni")
             return false;
             
-        context.html = Chrome.loadText("html/nastaveni.html");   
-        if (!context.html)
+        context.htmlElem = Chrome.loadHtml("html/nastaveni.html");   
+        if (!context.htmlElem)
         	throw new Exception("Nepodarilo se nacist 'nastaveni.html'.");
         
         return true;
@@ -206,8 +206,7 @@ pageExtenders.add(PageExtender.create({
         };
         
         // Zobraz html (cimz se spusti i vyse definovana funkce)
-        var div = Element.create("div", context.html);
         page.content.innerHTML = '';
-        page.content.appendChild(div);
+        page.content.appendChild(context.htmlElem);
     }
 }));

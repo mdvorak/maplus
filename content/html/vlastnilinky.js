@@ -240,7 +240,7 @@ window.NastaveniVlastniLinky = {
 /*** SelectLinkDialog class ***/
 var SelectLinkDialog = Class.create(Dialog, {
     _createContentElement: function() {
-        var html = Chrome.loadText("html/newlinkdialog.html", true);
+        var html = Chrome.loadHtml("html/newlinkdialog.html", true);
         var root = Element.create("div", html, {class: "dialog"});
         
         var dialog = this;
@@ -292,7 +292,7 @@ var LinkEditorDialog = Class.create(Dialog, {
     _createContentElement: function() {
         var _this = this;
     
-        var html = Chrome.loadText("html/linkeditor.html", true);
+        var html = Chrome.loadHtml("html/linkeditor.html", true);
         var root = Element.create("div", html, {class: "dialog", style: "width: 465px;"});
     
         // Ziskej elementy

@@ -354,8 +354,9 @@ var SlozeniArmadyDialog = Class.create(Dialog, {
         var dialog = this;
         var s = this._slozeni;
         
-        var html = Chrome.loadText("html/slozeniarmady.html");
-        var root = Element.create("div", html, {"class": "dialog"});
+        var html = Chrome.loadHtml("html/slozeniarmady.html");
+        var root = Element.create("div", null, {"class": "dialog"});
+        root.appendChild(html);
         
         // Zobraz data
         var format = function(value) {
