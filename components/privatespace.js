@@ -33,7 +33,7 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  * 
  * ***** END LICENSE BLOCK ***** */
- 
+
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 const CI = Components.interfaces, CC = Components.classes, CR = Components.results;
 
@@ -56,16 +56,16 @@ PrivateSpace.prototype = {
 
     initialize: function(win)
     {
-        if (this._initialized)
+        if (PrivateSpace._initialized)
             return;
-        this._initialized = true;
+        PrivateSpace._initialized = true;
 
         var jssubscriptLoader = CC["@mozilla.org/moz/jssubscript-loader;1"].getService(CI.mozIJSSubScriptLoader);
 
         // Loads helper script with methods for loading JS files and
         // setup in XPCOM environment
         jssubscriptLoader.loadSubScript(CONTENT_URL + "componentHelper.js");
-        alert("services");
+
         // Load services from definition (method defined in componentHelper.js)
         var services = loadFileListDefinition(CONTENT_URL + "services.xml", CONTENT_URL);
         for (var i = 0; i < services.length; i++) {
@@ -74,22 +74,22 @@ PrivateSpace.prototype = {
             }
             catch(ex) { alert(services[i] + ":\n" + ex + "\n\n" + ex.stack); }
         }
-        
+
         // Load includes
         var libraries = loadFileListDefinition(CONTENT_URL + "includes.xml", CONTENT_URL);
         for (var i = 0; i < libraries.length; i++) {
             ExtenderManager.include(libraries[i]);
         }
     },
-    
+
     registerWindow: function(win) {
         if (!this._initialized)
             return;
-    
+
         // Must be loaded by services.xml
         WebExtender.init(win);
     },
-    
+
      // for nsISupports
     QueryInterface: function(aIID)
     {
