@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const CONFIG_ROOT_NAME = "prefs";
+var CONFIG_ROOT_NAME = "prefs";
 
 XmlConfigNode.XPath.useExtension();
 XmlConfigNode.Extended.useExtension();

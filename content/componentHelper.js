@@ -35,19 +35,19 @@
  * ***** END LICENSE BLOCK ***** */
 
 // Dummy objects for prototype, etc..
-const HTMLElement = function() { }
+var HTMLElement = function() {};
 HTMLElement.prototype = {
     appendChild: function() { return new HTMLElement(); }
 };
-const document = {
+var document = {
     createElement: function() { return new HTMLElement(); },
     createTextNode: function() { return new HTMLElement(); }
 };
-const window = { document: document };
-const navigator = { userAgent: "Gecko" };
+var window = { document: document };
+var navigator = { userAgent: "Gecko" };
 
-const nsIDOMXPathResult = Components.interfaces.nsIDOMXPathResult;
-const XPathResult = nsIDOMXPathResult;
+var nsIDOMXPathResult = Components.interfaces.nsIDOMXPathResult;
+var XPathResult = nsIDOMXPathResult;
 
 
 /**

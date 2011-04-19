@@ -50,7 +50,7 @@ div.helpTooltip
 
 div.helpTooltip > span
 {
-	font-family: Tahoma;
+	font-family: Tahoma, sans-serif;
 	font-size: 0.7em;
 }
 
@@ -72,7 +72,7 @@ tr.noLinkUnderstrike a.helpLink
 
 img.link
 {
-	border-width: 0px;
+	border-width: 0;
 	padding-top: 1px;
 	vertical-align: middle;
 }
@@ -112,10 +112,7 @@ span.kolo
 
 tr.vybranaJednotka
 {
-    background-image: url("img/best_vyber.png");
-    background-position: right top;
-    background-repeat: repeat-y;
-    -moz-background-size: 100% 100%; 
+    background: url("img/best_vyber.png") repeat-y right top;
     background-size: 100% 100%;
 }
 
@@ -226,18 +223,14 @@ table.thinBorders > tbody > tr:first-child > td
 /* Nastaveni */
 .tabHeader
 {
-    border-color: #2A2A2A;
-    border-style: solid;
-    border-top-width: 0px;
-    border-left-width: 0px;
-    border-right-width: 0px;
+    border: 0 solid #2A2A2A;
     border-bottom-width: 2px;
     font-weight: bold;
 }
 
 .tabInactive
 {
-    color: lightgray;
+    color: #d3d3d3;
     text-decoration: none;
 }
 
@@ -251,7 +244,7 @@ table.thinBorders > tbody > tr:first-child > td
 .dialog
 {
 	background-color: black;
-	border: solid 2px lightgray;
+	border: solid 2px #d3d3d3;
 }
 
 a
@@ -261,7 +254,7 @@ a
 
 a:focus
 {
-    border: solid 1px gold;
+    border: solid 1px #ffd700;
 }
 
 .armada_podpory input
@@ -281,5 +274,5 @@ a:focus
 
 .bestiarJednotky a 
 {
-    border-width: 0px;
+    border-width: 0;
 }

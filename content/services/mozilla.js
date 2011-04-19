@@ -267,7 +267,7 @@ var PromptService = {
 };
 
 /*** FilePicker class ***/
-const nsIFilePicker = Components.interfaces.nsIFilePicker
+var nsIFilePicker = Components.interfaces.nsIFilePicker
 
 var FilePicker = {
     // Constants

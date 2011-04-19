@@ -34,22 +34,22 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-const VERSION = "1.4pre1"; // Pozn: Tahle verze je pouzivana pouze pro zobrazovani novinek
+var VERSION = "1.4.0"; // Pozn: Tahle verze je pouzivana pouze pro zobrazovani novinek
 
-const EXTENSION_NAME = "maplus";
-const EXTENSION_ID = "maplus@michal.dvorak";
-const MELIOR_ANNIS_URL = "http://www.meliorannis.com";
+var EXTENSION_NAME = "maplus";
+var EXTENSION_ID = "maplus@michal.dvorak";
+var MELIOR_ANNIS_URL = "http://www.meliorannis.com";
 
-const CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
-const CHROME_CONTENT_URL = CHROME_URL + "content/";
+var CHROME_URL = "chrome://" + EXTENSION_NAME + "/";
+var CHROME_CONTENT_URL = CHROME_URL + "content/";
 
 // Firebug console properties for version "1.05", logger must implement 'em
-const FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
+var FIREBUG_METHODS = ["log","debug","info","warn","error","assert","dir","dirxml","trace","group","groupEnd","time","timeEnd","profile","profileEnd","count"];
 
 // Custom constants
-const MAPLUS_INFO_FILENAME = "maplus-info.xml";
-const MAPLUS_INFO_URL = "http://maplus.xf.cz/" + MAPLUS_INFO_FILENAME;
+var MAPLUS_INFO_FILENAME = "maplus-info.xml";
+var MAPLUS_INFO_URL = "http://maplus.xf.cz/" + MAPLUS_INFO_FILENAME;
 
-const ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
+var ZADNA_ALIANCE = "##ZADNA_ALIANCE##";
 
-const DEN_MINUT = 24 * 60; // Den ma celkem minut..
+var DEN_MINUT = 24 * 60; // Den ma celkem minut..

@@ -65,7 +65,7 @@ PrivateSpace.prototype = {
         // Loads helper script with methods for loading JS files and
         // setup in XPCOM environment
         jssubscriptLoader.loadSubScript(CONTENT_URL + "componentHelper.js");
-         
+        alert("services");
         // Load services from definition (method defined in componentHelper.js)
         var services = loadFileListDefinition(CONTENT_URL + "services.xml", CONTENT_URL);
         for (var i = 0; i < services.length; i++) {
