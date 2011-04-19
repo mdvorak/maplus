@@ -83,7 +83,7 @@ PrivateSpace.prototype = {
     },
 
     registerWindow: function(win) {
-        if (!this._initialized)
+        if (!PrivateSpace._initialized)
             return;
 
         // Must be loaded by services.xml
