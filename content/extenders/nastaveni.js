@@ -62,7 +62,17 @@ pageExtenders.add(PageExtender.create({
         window.ALIANCE_ID = new Array();
         page.config.evalPrefNodeList('regent/aliance/id').each(function(i) {
             window.ALIANCE_ID.push(i.getNumber());
-        });     
+        });
+
+        // Nacteme pozadovane JS
+        [
+            "html/linkeditors.js",
+            "html/vlastnilinky.js",
+            "html/nastavenihlidka.js"
+        ].each(function(path) {
+            var js = Chrome.loadText(path);
+            document.head.appendChild(Element.create("script", js, {type: "text/javascript", charset: "UTF-8"}));
+        });
         
         var dialogNovinky = new NovinkyDialog();
         

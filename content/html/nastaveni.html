@@ -171,9 +171,6 @@
             </tr>
             <tr>
                 <td colspan="5">
-                    <script type="text/javascript" src="chrome://maplus/content/html/linkeditors.js" charset="UTF-8"></script>
-                    <script type="text/javascript" src="chrome://maplus/content/html/vlastnilinky.js" charset="UTF-8"></script>
-                    
                     <!-- Seznam linku -->
                     <table cellpadding="0" cellspacing="0" style="width: 460px;">
                         <colgroup>
@@ -418,7 +415,8 @@
                     <br />
                     <select id="plus_bestiarSloupce" size="10" multiple="multiple" style="width: 140px; text-align: left;"
                         onload="NastaveniBestiar.onload(this, this.config);"
-                        onsave="NastaveniBestiar.onsave(this, this.config);" />
+                        onsave="NastaveniBestiar.onsave(this, this.config);">
+                    </select>
                 </td>
                 
                 <td><img width="10" src="chrome://maplus/content/html/img/empty.bmp" alt="" /></td>
@@ -572,7 +570,6 @@
         <input type="hidden" value="" onload="NastaveniHlidka.onload(this.config);" 
                                       onsave="NastaveniHlidka.onsave(this.config);" />
     </div>
-    <script src="chrome://maplus/content/html/nastavenihlidka.js" type="text/javascript" charset="UTF-8"></script>
     <script type="text/javascript">
     nastaveniManager.addTab("Hlídka", "n_hlidka");
     </script>
@@ -649,7 +646,7 @@
             </tr>
         </tbody>
     </table>
-    <script type="text/javascript">
+    <script type="text/javascript">//<![CDATA[
     nastaveniManager.addTab("Spravovat", "n_admin");
     
     Event.observe("n_export", "click", function(event) {
@@ -674,7 +671,7 @@
             alert("Unable to import settings.\n" + ex);
         }
     });
-    </script>
+    //]]></script>
 
     <!-- O Aplikaci -->
     <table id="n_about" cellpadding="0" cellspacing="0" style="display: none;">

@@ -412,6 +412,7 @@ Object.extend(Marshal, {
         if (obj == this)
             throw new ArgumentException("obj", null, "Invalid operation.");
 
+        logger().log("Marshal: Registering object " + name);
         this._objects.register(name, obj);
     },
 
