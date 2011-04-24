@@ -275,7 +275,7 @@ pageExtenders.add(PageExtender.create({
         if (page.arguments["posta"] != null && page.arguments["posta"] != "nova")
             return false;
             
-        var tableZpravyList = $XL('form/table[@bgcolor = "#202020"]', page.content);
+        var tableZpravyList = $XL('form/table[@bgcolor = "202020"]', page.content);
         var zpravy = new Array();
         
         var tajnaOznacena = false;

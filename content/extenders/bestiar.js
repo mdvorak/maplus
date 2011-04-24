@@ -769,7 +769,7 @@ pageExtenders.add(PageExtender.create({
         // Link pro odeslani zamluvenych jednotek
         var trLast = $X('tbody/tr[last()]', page.bestiar.elements.tableNakup);
         
-        var trOdeslat = Element.create("tr", null, {bgcolor: "#505050"});
+        var trOdeslat = Element.create("tr", null, {bgcolor: "505050"});
         var tdOdeslat = trOdeslat.appendChild(Element.create("td", null, {colspan: "3", style: "text-align: center;"}));
         var spanOdeslat = tdOdeslat.appendChild(Element.create("span", '<br />'));
         
@@ -976,8 +976,8 @@ pageExtenders.add(PageExtender.create({
     },
     
     _recolorTable: function(table, temneBarvy) {
-        var highlightColor = temneBarvy ? "#1b1b1b" : "#303030";
-        var validColors = [null, "#000000", "#303030", "#1b1b1b"];
+        var highlightColor = temneBarvy ? "1b1b1b" : "303030";
+        var validColors = [null, "000000", "303030", "1b1b1b"];
         var toggle = true;
 
         for (let rowi = 1; rowi < table.rows.length; rowi++) {
@@ -985,7 +985,7 @@ pageExtenders.add(PageExtender.create({
             var bgcolor = r.getAttribute("bgcolor");
             
             if (r.style.display != "none" && validColors.indexOf(bgcolor) > -1) {
-                r.setAttribute("bgcolor", toggle ? highlightColor : "#000000");
+                r.setAttribute("bgcolor", toggle ? highlightColor : "000000");
                 toggle = !toggle;
             }
         }

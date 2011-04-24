@@ -60,11 +60,11 @@ pageExtenders.add(PageExtender.create({
     
     process: function(page, context) {
         // Barvy tabulek
-        $XL('//tr[@bgcolor = "#303030"]').each(function(e) { e.bgColor = "#1b1b1b" }); // Tohle musi byt prvni
-        $XL('//table[@bgcolor = "#505050"]').each(function(e) { e.bgColor = "#303030" });
-        $XL('//tr[@bgcolor = "#505050"]').each(function(e) { e.bgColor = "#303030" });
-        $XL('//td[@bgcolor = "#505050"]').each(function(e) { e.bgColor = "#303030" });
-        $XL('//tr[@bgcolor = "#404040"]').each(function(e) { e.bgColor = "#2b2b2b" });
+        $XL('//tr[@bgcolor = "303030"]').each(function(e) { e.bgColor = "1b1b1b" }); // Tohle musi byt prvni
+        $XL('//table[@bgcolor = "505050"]').each(function(e) { e.bgColor = "303030" });
+        $XL('//tr[@bgcolor = "505050"]').each(function(e) { e.bgColor = "303030" });
+        $XL('//td[@bgcolor = "505050"]').each(function(e) { e.bgColor = "303030" });
+        $XL('//tr[@bgcolor = "404040"]').each(function(e) { e.bgColor = "2b2b2b" });
 
         // Rohy tabulek
         updateImgs(MELIOR_ANNIS_URL + "/html/img/rohy/ld.jpg", CHROME_CONTENT_URL + "html/img/rohy/ld.png");

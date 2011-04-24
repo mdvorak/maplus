@@ -145,7 +145,7 @@ pageExtenders.add(PageExtender.create({
     },
 
     process: function(page, context) {
-        var html = '<tr bgcolor="#303030"><td><span>Farem na město</span></td><td align="center"><span>' + context.pomer.toFixed(1) + '</span></td><td colspan="2"/><tr>';
+        var html = '<tr bgcolor="303030"><td><span>Farem na město</span></td><td align="center"><span>' + context.pomer.toFixed(1) + '</span></td><td colspan="2"/><tr>';
         new Insertion.After(page.hospodarstvi.tableStavby.rows[3], html);
     }
 }));

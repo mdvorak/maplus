@@ -43,7 +43,7 @@ pageExtenders.add(PageExtender.create({
         if (!context.tableKouzla)
             return false;
 
-        if (XPath.evalNumber('count(tbody/tr[@bgColor = "#303030"])', context.tableKouzla) == 0)
+        if (XPath.evalNumber('count(tbody/tr[@bgColor = "303030"])', context.tableKouzla) == 0)
             return false;
 
         context.tdBottom = $X('tbody/tr[last()]/td[2]', context.tableKouzla);
@@ -51,7 +51,7 @@ pageExtenders.add(PageExtender.create({
         // Vytvor seznam popisku ke skryti, vcetne pozice
         context.hiddenRows = new Array();
         
-        $XL('tbody/tr[@bgcolor = "#303030" or not(@bgcolor)]', context.tableKouzla).each(function(tr) {
+        $XL('tbody/tr[@bgcolor = "303030" or not(@bgcolor)]', context.tableKouzla).each(function(tr) {
             context.hiddenRows.push([tr, tr.nextSibling]);
         });
 
@@ -71,8 +71,8 @@ pageExtenders.add(PageExtender.create({
         for (var i = 2; i < context.tableKouzla.rows.length - 1; i++) {
             var tr = context.tableKouzla.rows[i];
             
-            if (i % 2) tr.bgColor = "#000000";
-            else tr.bgColor = "#1b1b1b";
+            if (i % 2) tr.bgColor = "000000";
+            else tr.bgColor = "1b1b1b";
         }
 
         // Link na zobrazeni popisku
