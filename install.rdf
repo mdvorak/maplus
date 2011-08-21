@@ -4,7 +4,7 @@
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="maplus@michal.dvorak"
-                   em:version="1.4.1"
+                   em:version="1.4.2"
                    em:type="2"
                    em:name="Melior Annis Plus"
                    em:description="Vylepseni pro hru Melior Annis."
@@ -18,5 +18,5 @@
   <RDF:Description RDF:about="rdf:#$d7OiP2"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="4.0"
-                   em:maxVersion="4.0.*" />
+                   em:maxVersion="6.*" />
 </RDF:RDF>
