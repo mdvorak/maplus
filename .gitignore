@@ -1,8 +1,6 @@
 *.xpi
 *.sln
 *.suo
-bzr-ci.cmd
-publish.cmd
 *.iml
 *.ipr
 *.iws
