@@ -21,14 +21,14 @@
         </RDF:li>
         <RDF:li>
           <RDF:Description>
-            <em:version>1.4.2</em:version>
+            <em:version>1.4.3</em:version>
             <em:targetApplication>
               <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>4.0</em:minVersion>
                 <em:maxVersion>6.*</em:maxVersion>
                 <em:updateLink>http://maplus.xf.cz/maplus.xpi</em:updateLink>
-                <em:updateHash>sha512:99187F2ED227CF9A36B8529CB16B70FB25AFA381538F15E7947892827B8E97B94B1CEBF130C9122A5AC66EB1FAFC9D78A90948EB5B3B4F9D4D9B727C69B92C8B</em:updateHash>
+                <em:updateHash>HASH_PLACEHOLDER</em:updateHash>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>
