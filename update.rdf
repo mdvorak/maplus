@@ -21,12 +21,12 @@
         </RDF:li>
         <RDF:li>
           <RDF:Description>
-            <em:version>1.4.3</em:version>
+            <em:version>VERSION_PLACEHOLDER</em:version>
             <em:targetApplication>
               <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-                <em:minVersion>4.0</em:minVersion>
-                <em:maxVersion>6.*</em:maxVersion>
+                <em:minVersion>MIN_PLACEHOLDER</em:minVersion>
+                <em:maxVersion>MAX_PLACEHOLDER</em:maxVersion>
                 <em:updateLink>http://maplus.xf.cz/maplus.xpi</em:updateLink>
                 <em:updateHash>HASH_PLACEHOLDER</em:updateHash>
               </RDF:Description>

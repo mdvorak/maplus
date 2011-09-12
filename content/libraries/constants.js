@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-var VERSION = "1.4.2"; // Pozn: Tahle verze je pouzivana pouze pro zobrazovani novinek
+var VERSION = "VERSION_PLACEHOLDER"; // Pozn: Tahle verze je pouzivana pouze pro zobrazovani novinek
 
 var EXTENSION_NAME = "maplus";
 var EXTENSION_ID = "maplus@michal.dvorak";

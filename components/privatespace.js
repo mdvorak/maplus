@@ -61,14 +61,17 @@ PrivateSpace.prototype = {
         PrivateSpace._initialized = true;
 
         var jssubscriptLoader = CC["@mozilla.org/moz/jssubscript-loader;1"].getService(CI.mozIJSSubScriptLoader);
+        var i;
 
         // Loads helper script with methods for loading JS files and
         // setup in XPCOM environment
+        //alert("loadSubScript");
         jssubscriptLoader.loadSubScript(CONTENT_URL + "componentHelper.js");
 
         // Load services from definition (method defined in componentHelper.js)
+        //alert("loadFileListDefinition(services.xml)");
         var services = loadFileListDefinition(CONTENT_URL + "services.xml", CONTENT_URL);
-        for (var i = 0; i < services.length; i++) {
+        for (i = 0; i < services.length; i++) {
             try {
                 jssubscriptLoader.loadSubScript(services[i]);
             }
@@ -76,10 +79,12 @@ PrivateSpace.prototype = {
         }
 
         // Load includes
+        //alert("loadFileListDefinition(includes.xml)");
         var libraries = loadFileListDefinition(CONTENT_URL + "includes.xml", CONTENT_URL);
-        for (var i = 0; i < libraries.length; i++) {
+        for (i = 0; i < libraries.length; i++) {
             ExtenderManager.include(libraries[i]);
         }
+        //alert("post-initialize")
     },
 
     registerWindow: function(win) {
@@ -87,7 +92,9 @@ PrivateSpace.prototype = {
             return;
 
         // Must be loaded by services.xml
+        //alert("WebExtender.init");
         WebExtender.init(win);
+        //alert("post-WebExtender.init")
     },
 
      // for nsISupports

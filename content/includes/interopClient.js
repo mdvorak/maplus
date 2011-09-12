@@ -238,7 +238,6 @@ var Marshal = {
         return proxy;
     },
     
-    // TODO: Do it better
     _debug: function() {
         if (window.MARSHAL_DEBUG >= 2)
             logger().debug.apply(logger(), arguments);
