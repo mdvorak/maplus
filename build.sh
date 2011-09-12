@@ -1,7 +1,7 @@
 # Config
 VERSION_PLACEHOLDER=1.4.2
 MIN_PLACEHOLDER=4.0.x
-MAX_PLACEHOLDER=7.x
+MAX_PLACEHOLDER=7.0
 
 # Directory
 rm -rf target/
